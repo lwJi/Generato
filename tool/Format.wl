@@ -1,11 +1,14 @@
 Needs["CodeFormatter`"]
 
-Print["Formatting '.wl' files in src ..."];
-
-files = FileNames["*.wl", "src"];
-Do[
-    file = File[files[[i]]];
-    Export[file, CodeFormat[file], "String"],
-{i, 1, Length[files]}];
+Module[{dirs = {"src", "test"}},
+    Do[
+        Print["Formatting '.wl' files in "<>dirs[[d]]<>" ..."];
+        files = FileNames["*.wl", dirs[[d]]];
+        Do[
+            file = File[files[[i]]];
+            Export[file, CodeFormat[file], "String"],
+        {i, 1, Length[files]}],
+    {d, 1, Length[dirs]}]
+];
 
 Print["Done"];
