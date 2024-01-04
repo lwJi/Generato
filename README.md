@@ -12,3 +12,9 @@ Generate C/C++ code from tensor expression and so on (using xAct)
 cd test
 wolframscript -f test.wl
 ```
+
+## Tips
+
+### xAct functions
+
+* Get charts on a manifold `M3`: `ChartsOfManifold[M3]`
