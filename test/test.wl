@@ -7,10 +7,33 @@
 Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"
     }]]
 
-DefManifold[M3, 3, {a, b, c, d, e, f}];
+DefManifold[M3, 3, IndexRange[a, z]];
 
-DefChart[cart, M3, {1, 2, 3}, {x[], y[], z[]}, ChartColor -> Blue];
+DefChart[cart, M3, {1, 2, 3}, {X[], Y[], Z[]}, ChartColor -> Blue];
 
-DefChart[spnr, M3, {1, 2, 3}, {r[], th[], ph[]}, ChartColor -> Green];
+(*DefChart[spnr, M3, {1, 2, 3}, {r[], th[], ph[]}, ChartColor -> Green];*)
 
-ChartsOfManifold[M3]
+DefMetric[1, euclid[-i, -j], CD];
+
+MetricInBasis[euclid, -cart, DiagonalMatrix[{1, 1, 1}]];
+
+MetricInBasis[euclid, cart, DiagonalMatrix[{1, 1, 1}]];
+
+(*
+    r^i = M^i_j M^j_k u^k     if ADM_ConstraintNorm = Msqr
+    r^i = M^i_j u^j           otherwise
+*)
+
+Print[]
+Print[]
+
+Print[RHSOf[r]]
+Print[RHSOf[r, Msqr]]
+
+Print[]
+
+Print["More Infos:"]
+
+Print["  charts:     ", ChartsOfManifold[M3]]
+
+Print["  dimensions: ", DimOfManifold[M3]]
