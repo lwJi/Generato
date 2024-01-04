@@ -4,17 +4,8 @@
 
 (* (c) Liwei Ji, 01/2024 *)
 
-Module[{
-    fname =
-        If[$InputFileName == "",
-            NotebookFileName[]
-            ,
-            $InputFileName
-        ]
-},
-    Needs["xAct`xCoba`", FileNameJoin[{ParentDirectory[DirectoryName[
-        fname]], "src/Generato.wl"}]]
-];
+Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"
+    }]]
 
 DefManifold[M3, 3, {a, b, c, d, e, f}];
 

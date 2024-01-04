@@ -2,9 +2,11 @@
 
 Generate C/C++ code from tensor expression and so on (using xAct)
 
-## Recomendations
+## Installation
 
-* Use lower case to name variables (to aviod conflict with say `Pi`)
+* clone repo: `git clone git@github.com:lwJi/Generato.git`
+
+* set enviroment variable: `export GENERATO="/your/repo/path"`
 
 ## Example
 
@@ -12,6 +14,10 @@ Generate C/C++ code from tensor expression and so on (using xAct)
 cd test
 wolframscript -f test.wl
 ```
+
+## Recomendations
+
+* Use lower case to name variables (to aviod conflict with say `Pi`)
 
 ## Tips
 
