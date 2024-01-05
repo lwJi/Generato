@@ -6,6 +6,8 @@
 
 BeginPackage["Generato`Basic`", {"xAct`xCoba`"}];
 
+isDefined::usage = "isDefined[term] return True/False if term is defined or not."
+
 RHSOf::usage = "RHSOf[var, suffix] return the expression of 'var$RHS' or 'varsuffix$RHS' (if suffix is not empty).";
 
 setEQN::usage = "setEQN[{delaySet->..., checkRHS->...}, var, suffix, varrhs] set 'var$RHS/varsuffix$RHS' equal to 'varrhs', considering if delaySet, checkRHS.";
@@ -21,6 +23,50 @@ Begin["`Private`"];
 (* Data *)
 
 (* Function *)
+
+isDefined[term_] :=
+    Module[{head = Head[term]},
+        Which[
+            NumberQ[term],
+                Return[True]
+            ,
+            head === Power || head === Plus || head === Times || head
+                 === Log,
+                Module[{subterms, undefinedsubterm = 0},
+                    subterms = Apply[List, term];
+                    Do[
+                        If[!isDefined[subterms[[isub]]],
+                            undefinedsubterm = isub;
+                            Break[]
+                        ]
+                        ,
+                        {isub, 1, Length[subterms]}
+                    ];
+                    If[undefinedsubterm > 0,
+                        Message[isDefined::ETerm, undefinedsubterm, term
+                            ];
+                        Return[False]
+                        ,
+                        Return[True]
+                    ]
+                ]
+            ,
+            head === Symbol,
+                Return[ConstantSymbolQ[term]]
+            ,
+            Head[head] === Symbol,
+                Return[xTensorQ[head]]
+            ,
+            True,
+                Throw @ Message[isDefined::EType, term]
+        ]
+    ];
+
+isDefined::ETerm = "The `1`-th subterm in '`2`' is not defined!";
+
+isDefined::EType = "The Expression type of '`1`' is not detectable!";
+
+Protect[isDefined];
 
 RHSOf[var__] :=
     Module[{argList = List[var]},
