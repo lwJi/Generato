@@ -8,11 +8,13 @@ BeginPackage["Generato`Basic`", {"xAct`xCoba`"}];
 
 RHSOf::usage = "RHSOf[var, suffix] return the expression of 'var$RHS' or 'varsuffix$RHS' (if suffix is not empty).";
 
-setRHS::usage = "setRHS[lhs, suffix, rhs, {delaySet->..., checkRHS->...}] set 'rhs' to 'lhs$RHS' or 'lhssuffix$RHS', considering if delaySet.";
+setEQN::usage = "setEQN[{delaySet->..., checkRHS->...}, var, suffix, varrhs] set 'var$RHS/varsuffix$RHS' equal to 'varrhs', considering if delaySet, checkRHS.";
 
-delaySet::usage = "delaySet is an option for setRHS specifying if use IndexSetDelayed or IndexSet.";
+delaySet::usage = "delaySet is an option for setEQN specifying if use IndexSetDelayed.";
 
-setRHSDelayed::usage = "setRHSDelayed[lhs, suffix, rhs] returns setRHS[lhs, suffix, rhs, {delaySet->True}].";
+checkRHS::usage = "checkRHS is an option for setEQN specifying if check there are undefined terms in varrhs.";
+
+setEQNDelayed::usage = "setEQNDelayed[var, suffix, varrhs] returns setEQN[ {delaySet->True}, var, suffix, varrhs].";
 
 Begin["`Private`"];
 
@@ -27,8 +29,8 @@ RHSOf[var__] :=
                 ToExpression[ToString[var] <> "$RHS"]
             ,
             2,
-                ToExpression[ToString[argList[[1]]] <> ToString[argList[[2]]] <>
-                     "$RHS"]
+                ToExpression[ToString[argList[[1]]] <> ToString[argList
+                    [[2]]] <> "$RHS"]
             ,
             _,
                 Throw @ Message[RHSOf::Eargs, Length[argList]]
@@ -39,39 +41,38 @@ RHSOf::Eargs = "`1` arguments unsupported yet!";
 
 Protect[RHSOf];
 
-Options[setRHS] =
-    {delaySet -> False, checkRHS -> True};
+Options[setEQN] = {delaySet -> False, checkRHS -> True};
 
-setRHS[lhs_, suffix_String:"", rhs_, OptionsPattern[]] :=
+setEQN[OptionsPattern[], var_, suffix_String:"", varrhs_] :=
     ReleaseHold @
         Module[{delayset, checkrhs, replaceTimes = 0},
             {delayset, checkrhs} = OptionValue[{delaySet, checkRHS}];
                 
             (* check if there is undefined term *)
-            If[checkrhs && !isDefined[rhs],
-                Throw @ Message[setRHS::Erhs, rhs]
+            If[checkrhs && !isDefined[varrhs],
+                Throw @ Message[setEQN::Evarrhs, varrhs]
             ];
-            (* define rhs *)
+            (* set var$RHS or varsuffix$RHS to varrhs *)
             If[delayset,
-                Hold[IndexSetDelayed[lhs, rhs]] /. {lhs[[0]] :> RHSOf[
-                    lhs[[0]], suffix] /; replaceTimes++ == 0}
+                Hold[IndexSetDelayed[var, varrhs]] /. {var[[0]] :> RHSOf[
+                    ToString[var[[0]]] <> suffix] /; replaceTimes++ == 0}
                 ,
-                Hold[IndexSet[lhs, rhs]] /. {lhs[[0]] :> RHSOf[lhs[[0
-                    ]], suffix] /; replaceTimes++ == 0}
+                Hold[IndexSet[var, varrhs]] /. {var[[0]] :> RHSOf[ToString[
+                    var[[0]]] <> suffix] /; replaceTimes++ == 0}
             ]
         ];
 
-setRHS::Erhs = "There are undefined terms in the RHS '`1`'!"
+setEQN::Evarrhs = "There are undefined terms in the RHS '`1`'!"
 
-Protect[setRHS];
+Protect[setEQN];
 
-setRHSDelayed[lhs_, suffix_String:"", rhs_] :=
+setEQNDelayed[var_, suffix_String:"", varrhs_] :=
     Module[{},
-        setRHS[{delaySet -> True, checkRHS -> False}, lhs, suffix, rhs
+        setEQN[{delaySet -> True, checkRHS -> False}, var, suffix, varrhs
             ]
     ];
 
-Protect[setRHSDelayed];
+Protect[setEQNDelayed];
 
 End[];
 

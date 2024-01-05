@@ -25,9 +25,11 @@ MetricInBasis[euclid, cart, DiagonalMatrix[{1, 1, 1}]];
 *)
 
 Print[]
+
 Print[]
 
 Print[RHSOf[r]]
+
 Print[RHSOf[r, Msqr]]
 
 Print[]
