@@ -4,7 +4,7 @@
 
 (* (c) Liwei Ji, 01/2024 *)
 
-BeginPackage["Generato`Basic`", {"xAct`xCoba`"}];
+BeginPackage["Generato`Basic`", "xAct`xTensor`", "xAct`xCoba`"];
 
 isDefined::usage = "isDefined[term] return True/False if term is defined or not."
 
@@ -17,6 +17,28 @@ delaySet::usage = "delaySet is an option for setEQN specifying if use IndexSetDe
 checkRHS::usage = "checkRHS is an option for setEQN specifying if check there are undefined terms in varrhs.";
 
 setEQNDelayed::usage = "setEQNDelayed[var, suffix, varrhs] returns setEQN[ {delaySet->True}, var, suffix, varrhs].";
+
+(* Setup for xAct official modules  *)
+
+$DefInfoQ = False;
+
+$CommuteCovDsOnScalars = True;
+
+$ExtrinsicKSign = -1;
+
+$AccelerationSign = -1;
+
+$CVVerbose = False;
+
+$PrePrint = ScreenDollarIndices;(* replace internal dummies by new non-dollar dummies for output *)
+
+SetOptions[ToCanonical, UseMetricOnVBundle -> None]; (* do not use metric when ToCanonical *)
+
+(* Turn off error message *)
+
+Off[Part::pkspec1];
+
+(*Off[Part::partd];*)
 
 Begin["`Private`"];
 

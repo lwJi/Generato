@@ -19,18 +19,29 @@ MetricInBasis[euclid, -cart, DiagonalMatrix[{1, 1, 1}]];
 
 MetricInBasis[euclid, cart, DiagonalMatrix[{1, 1, 1}]];
 
+DefTensor[rU[i], M3, PrintAs->"r"];
+DefTensor[mUD[i, -j], M3, PrintAs->"M"];
+DefTensor[uU[i], M3, PrintAs->"u"];
+
+
 (*
     r^i = M^i_j M^j_k u^k     if ADM_ConstraintNorm = Msqr
     r^i = M^i_j u^j           otherwise
 *)
 
-Print[]
+setEQN[rU[i_], "Msqr",
+    mUD[i,-j]mUD[j,-k]uU[k]];
+
+setEQN[rU[i_], "otherwise",
+    mUD[i,-j]uU[j]];
 
 Print[]
 
-Print[RHSOf[r]]
+Print[]
 
-Print[RHSOf[r, Msqr]]
+Print[RHSOf[rUMsqr][k]]
+
+Print[RHSOf[rUotherwise][k]]
 
 Print[]
 
