@@ -6,17 +6,17 @@
 
 BeginPackage["Generato`Basic`", "xAct`xTensor`", "xAct`xCoba`"];
 
-isDefined::usage = "isDefined[term] return True/False if term is defined or not."
+IsDefined::usage = "IsDefined[term] return True/False if term is defined or not."
 
 RHSOf::usage = "RHSOf[var, suffix] return the expression of 'var$RHS' or 'varsuffix$RHS' (if suffix is not empty).";
 
-setEQN::usage = "setEQN[{delaySet->..., checkRHS->...}, var, suffix, varrhs] set 'var$RHS/varsuffix$RHS' equal to 'varrhs', considering if delaySet, checkRHS.";
+SetEQN::usage = "SetEQN[{DelaySet->..., CheckRHS->...}, var, suffix, varrhs] set 'var$RHS/varsuffix$RHS' equal to 'varrhs', considering if DelaySet, CheckRHS.";
 
-delaySet::usage = "delaySet is an option for setEQN specifying if use IndexSetDelayed.";
+DelaySet::usage = "DelaySet is an option for SetEQN specifying if use IndexSetDelayed.";
 
-checkRHS::usage = "checkRHS is an option for setEQN specifying if check there are undefined terms in varrhs.";
+CheckRHS::usage = "CheckRHS is an option for SetEQN specifying if check there are undefined terms in varrhs.";
 
-setEQNDelayed::usage = "setEQNDelayed[var, suffix, varrhs] returns setEQN[ {delaySet->True}, var, suffix, varrhs].";
+SetEQNDelayed::usage = "SetEQNDelayed[var, suffix, varrhs] returns SetEQN[ {DelaySet->True}, var, suffix, varrhs].";
 
 Begin["`Private`"];
 
@@ -24,7 +24,7 @@ Begin["`Private`"];
 
 (* Function *)
 
-isDefined[term_] :=
+IsDefined[term_] :=
     Module[{head = Head[term]},
         Which[
             NumberQ[term],
@@ -35,7 +35,7 @@ isDefined[term_] :=
                 Module[{subterms, undefinedsubterm = 0},
                     subterms = Apply[List, term];
                     Do[
-                        If[!isDefined[subterms[[isub]]],
+                        If[!IsDefined[subterms[[isub]]],
                             undefinedsubterm = isub;
                             Break[]
                         ]
@@ -43,7 +43,7 @@ isDefined[term_] :=
                         {isub, 1, Length[subterms]}
                     ];
                     If[undefinedsubterm > 0,
-                        Message[isDefined::ETerm, undefinedsubterm, term
+                        Message[IsDefined::ETerm, undefinedsubterm, term
                             ];
                         Return[False]
                         ,
@@ -58,15 +58,15 @@ isDefined[term_] :=
                 Return[xTensorQ[head]]
             ,
             True,
-                Throw @ Message[isDefined::EType, term]
+                Throw @ Message[IsDefined::EType, term]
         ]
     ];
 
-isDefined::ETerm = "The `1`-th subterm in '`2`' is not defined!";
+IsDefined::ETerm = "The `1`-th subterm in '`2`' is not defined!";
 
-isDefined::EType = "The Expression type of '`1`' is not detectable!";
+IsDefined::EType = "The Expression type of '`1`' is not detectable!";
 
-Protect[isDefined];
+Protect[IsDefined];
 
 RHSOf[var__] :=
     Module[{argList = List[var]},
@@ -87,16 +87,16 @@ RHSOf::Eargs = "`1` arguments unsupported yet!";
 
 Protect[RHSOf];
 
-Options[setEQN] = {delaySet -> False, checkRHS -> True};
+Options[SetEQN] = {DelaySet -> False, CheckRHS -> True};
 
-setEQN[OptionsPattern[], var_, suffix_String:"", varrhs_] :=
+SetEQN[OptionsPattern[], var_, suffix_String:"", varrhs_] :=
     ReleaseHold @
         Module[{delayset, checkrhs, replaceTimes = 0},
-            {delayset, checkrhs} = OptionValue[{delaySet, checkRHS}];
+            {delayset, checkrhs} = OptionValue[{DelaySet, CheckRHS}];
                 
             (* check if there is undefined term *)
-            If[checkrhs && !isDefined[varrhs],
-                Throw @ Message[setEQN::Evarrhs, varrhs]
+            If[checkrhs && !IsDefined[varrhs],
+                Throw @ Message[SetEQN::Evarrhs, varrhs]
             ];
             (* set var$RHS or varsuffix$RHS to varrhs *)
             If[delayset,
@@ -108,17 +108,17 @@ setEQN[OptionsPattern[], var_, suffix_String:"", varrhs_] :=
             ]
         ];
 
-setEQN::Evarrhs = "There are undefined terms in the RHS '`1`'!"
+SetEQN::Evarrhs = "There are undefined terms in the RHS '`1`'!"
 
-Protect[setEQN];
+Protect[SetEQN];
 
-setEQNDelayed[var_, suffix_String:"", varrhs_] :=
+SetEQNDelayed[var_, suffix_String:"", varrhs_] :=
     Module[{},
-        setEQN[{delaySet -> True, checkRHS -> False}, var, suffix, varrhs
+        SetEQN[{DelaySet -> True, CheckRHS -> False}, var, suffix, varrhs
             ]
     ];
 
-Protect[setEQNDelayed];
+Protect[SetEQNDelayed];
 
 End[];
 

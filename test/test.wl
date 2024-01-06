@@ -30,9 +30,9 @@ DefTensor[uU[i], M3, PrintAs -> "u"];
     r^i = M^i_j u^j           otherwise
 *)
 
-setEQN[rU[i_], "Msqr", mUD[i, -j] mUD[j, -k] uU[k]];
+SetEQN[rU[i_], "Msqr", mUD[i, -j] mUD[j, -k] uU[k]];
 
-setEQN[rU[i_], "otherwise", mUD[i, -j] uU[j]];
+SetEQN[rU[i_], "otherwise", mUD[i, -j] uU[j]];
 
 Print[]
 
