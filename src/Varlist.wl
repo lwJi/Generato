@@ -339,7 +339,7 @@ Protect[SetComponent];
 SetNameArray[varname_, compindexlist_, coordinate_, addgpidx_] :=
     Module[{coordfull, compname, exprname},
         compname = varname[[0]][];
-        exprname = StringTrim[ToString[varname[[0]]], GetsuffixUnprotected[
+        exprname = StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
             ]];
         If[Length[compindexlist] > 0, (*not scalar*)
             Do[
