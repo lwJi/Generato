@@ -36,15 +36,15 @@ SetProcessNewVarlist[isnew_] :=
         $ProcessNewVarlist = isnew
     ];
 
-Options[ParseVarlist] = {ParseMode -> "", ChartName -> Null, GridPointIndex
-     -> "[[ijk]]", SuffixName -> ""};
+Options[ParseVarlist] = {ParseMode -> "", ChartName -> Null, SuffixName
+     -> ""};
 
 ParseVarlist[varlist_?ListQ, OptionsPattern[]] :=
     Module[{iMin, iMax = 3, var, varname, varLength, varWithSymmetry,
          varSymmetryName, varSymmetryIndexes, manipulateComponentValue, mode,
-         chartname, gridpointindex, suffixname},
-        {mode, chartname, gridpointindex, suffixname} = OptionValue[{
-            ParseMode, ChartName, GridPointIndex, SuffixName}];
+         chartname, suffixname},
+        {mode, chartname, suffixname} = OptionValue[{ParseMode, ChartName,
+             SuffixName}];
         manifold = $Manifolds[[1]];
         If[chartname == Null,
             chartname = ChartsOfManifold[manifold][[1]]
@@ -88,8 +88,7 @@ ParseVarlist[varlist_?ListQ, OptionsPattern[]] :=
             ];
             (* set temp function *)
             manipulateComponentValue[compindexlist_] := ManipulateComponent[
-                compindexlist, mode, chartname, varname, gridpointindex, suffixname, 
-                cnd];
+                compindexlist, mode, chartname, varname, suffixname, cnd];
             (* consider different types of tensor *)
             Switch[Length[varname],
                 (* ZERO INDEX CASE: *)0,
@@ -365,7 +364,7 @@ SetNameArray[varname_, compindexlist_, mode_, coordinate_] :=
         If[StringMatchQ[mode, "set components: temporary"],
             exprname = ToExpression[exprname]
             ,
-            exprname = ToExpression[exprname <> gridpointindex]
+            exprname = ToExpression[exprname <> GetGridPointIndex[]]
         ];
         (* return NameArray *)
         {compname, exprname}
