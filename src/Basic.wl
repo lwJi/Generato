@@ -44,7 +44,7 @@ SetGridPointIndex[gridindex_] :=
 
 Protect[SetGridPointIndex];
 
-$SuffixUnprotected = "$";
+$SuffixUnprotected = "$Upt";
 
 GetSuffixUnprotected[] :=
     Return[$SuffixUnprotected];
