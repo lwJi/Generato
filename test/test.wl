@@ -7,6 +7,8 @@
 Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"
     }]]
 
+SetGridPointIndex["[[ijk]]"]
+
 DefManifold[M3, 3, IndexRange[a, z]];
 
 DefChart[cart, M3, {1, 2, 3}, {X[], Y[], Z[]}, ChartColor -> Blue];
@@ -36,8 +38,6 @@ SetEQN[rU[i_], "otherwise", mUD[i, -j] uU[j]];
 
 Print[]
 
-Print[]
-
 Print[RHSOf[rUMsqr][k]]
 
 Print[RHSOf[rUotherwise][k]]
@@ -46,12 +46,14 @@ Print[]
 
 Print["More Infos:"]
 
-Print["  manifolds:  ", $Manifolds]
+Print["  manifolds:    ", $Manifolds]
 
-Print["    default:  ", $Manifolds[[1]]]
+Print["    default:    ", $Manifolds[[1]]]
 
-Print["  charts:     ", ChartsOfManifold[M3]]
+Print["  charts:       ", ChartsOfManifold[M3]]
 
-Print["    default:  ", ChartsOfManifold[M3][[1]]]
+Print["    default:    ", ChartsOfManifold[M3][[1]]]
 
-Print["  dimensions: ", DimOfManifold[M3]]
+Print["  dimensions:   ", DimOfManifold[M3]]
+
+Print["  gridpointidx: ", GetGridPointIndex[]]

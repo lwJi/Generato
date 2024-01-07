@@ -12,7 +12,7 @@ Begin["`Private`"];
 
 (* Data *)
 
-$MapComponentToVarlist = <||>;
+$MapComponentToVarlist = <||>;(*store all varlist's map*)
 
 $ProcessNewVarlist = True;
 
@@ -337,7 +337,7 @@ SetComponent[compname_, exprname_] :=
 
 Protect[SetComponent];
 
-SetNameArray[compindexlist_, mode_, coordinate_, varname_] :=
+SetNameArray[varname_, compindexlist_, mode_, coordinate_] :=
     Module[
         {coordfull, compname, exprname}
         ,

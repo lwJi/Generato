@@ -6,6 +6,10 @@
 
 BeginPackage["Generato`Basic`", "xAct`xTensor`", "xAct`xCoba`"];
 
+GetGridPointIndex::usage = "GetGridPointIndex[] return the grid index name.";
+
+SetGridPointIndex::usage = "SetGridPointIndex[girdindex] reset the grid index name.";
+
 IsDefined::usage = "IsDefined[term] return True/False if term is defined or not."
 
 RHSOf::usage = "RHSOf[var, suffix] return the expression of 'var$RHS' or 'varsuffix$RHS' (if suffix is not empty).";
@@ -21,6 +25,20 @@ SetEQNDelayed::usage = "SetEQNDelayed[var, suffix, varrhs] returns SetEQN[ {Dela
 Begin["`Private`"];
 
 (* Data *)
+
+$GridPointIndex = "";
+
+GetGridPointIndex[] :=
+    Return[$GridPointIndex];
+
+Protect[GetGridPointIndex];
+
+SetGridPointIndex[gridindex_] :=
+    Module[{},
+        $GridPointIndex = gridindex
+    ];
+
+Protect[SetGridPointIndex];
 
 (* Function *)
 
