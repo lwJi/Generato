@@ -46,6 +46,12 @@ Print[]
 
 Print["More Infos:"]
 
+Print["  manifolds:  ", $Manifolds]
+
+Print["    default:  ", $Manifolds[[1]]]
+
 Print["  charts:     ", ChartsOfManifold[M3]]
+
+Print["    default:  ", ChartsOfManifold[M3][[1]]]
 
 Print["  dimensions: ", DimOfManifold[M3]]
