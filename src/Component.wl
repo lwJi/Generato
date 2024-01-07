@@ -6,7 +6,38 @@ BeginPackage["Generato`Component`"];
 
 Needs["Generato`Basic`"];
 
+GetMapComponentToVarlist::usage = "GetMapComponentToVarlist[] returns the map between tensor components and varlist indexes.";
+
+SetProcessNewVarlist::usage="SetProcessNewVarlist[True] update the Boolean variable specifying if we are processing a new varlist.";
+
 Begin["`Private`"];
+
+(* Data *)
+
+$MapComponentToVarlist = <||>;(*store all varlist's map*)
+
+$ProcessNewVarlist = True;
+
+(* Function *)
+
+GetMapComponentToVarlist[] :=
+    Return[$MapComponentToVarlist];
+
+Protect[GetMapComponentToVarlist];
+
+SetMapComponentToVarlist[map_] :=
+    Module[{},
+        $MapComponentToVarlist = map
+    ];
+
+GetProcessNewVarlist[] :=
+    Return[$ProcessNewVarlist];
+
+SetProcessNewVarlist[isnew_] :=
+    Module[{},
+        $ProcessNewVarlist = isnew
+    ];
+Protect[SetProcessNewVarlist];
 
 ParseComponent[varname_, compIndexList_?ListQ, coordinate_, addgpidx_
     ?BooleanQ, suffixname_?StringQ] :=

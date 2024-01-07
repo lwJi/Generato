@@ -8,35 +8,11 @@ Needs["Generato`Basic`"];
 
 Needs["Generato`Component`"];
 
-GetMapComponentToVarlist::usage = "GetMapComponentToVarlist[] returns the map between tensor components and varlist indexes.";
-
 Begin["`Private`"];
 
 (* Data *)
 
-$MapComponentToVarlist = <||>;(*store all varlist's map*)
-
-$ProcessNewVarlist = True;
-
 (* Function *)
-
-GetMapComponentToVarlist[] :=
-    Return[$MapComponentToVarlist];
-
-Protect[GetMapComponentToVarlist];
-
-SetMapComponentToVarlist[map_] :=
-    Module[{},
-        $MapComponentToVarlist = map
-    ];
-
-GetProcessNewVarlist[] :=
-    Return[$ProcessNewVarlist];
-
-SetProcessNewVarlist[isnew_] :=
-    Module[{},
-        $ProcessNewVarlist = isnew
-    ];
 
 Options[ParseVarlist] = {ParseMode -> "", ChartName -> Null, SuffixName
      -> ""};
