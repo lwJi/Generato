@@ -165,7 +165,7 @@ ParseVarlist[varlist_?ListQ, OptionsPattern[]] :=
                             (* other three indexes cases *)True,
                                 Throw @ Message[ParseVarlist::ESymmetryType,
                                      iVar, varname]
-                        ];(* end of Which *)
+                        ];
                         varname //
                         ToBasis[chartname] //
                         ComponentArray //
@@ -259,7 +259,7 @@ ParseVarlist[varlist_?ListQ, OptionsPattern[]] :=
                             (* other four indexes cases *)True,
                                 Throw @ Message[ParseVarlist::ESymmetryType,
                                      iVar, varname]
-                        ]; (* end of Which *)
+                        ];
                         varname //
                         ToBasis[chartname] //
                         ComponentArray //
@@ -289,12 +289,6 @@ ParseVarlist::ETensorType = "Tensor type of the `1`-th var, `2`, in varlist unsu
 ParseVarlist::ESymmetryType = "Symmetry type of the `1`-th var, `2`, in varlist unsupported yet!";
 
 Protect[ParseVarlist];
-
-(*
-    compname: component expr in Mathematica kernal, say Pi[{1,-cart},{2,-cart}] 
-    exprname: component expr to be printed to C code, or lhs, say Pi12[[ijk]],
-              ignore the information about covariant/contravariant
-*)
 
 (*
     1. Set components for tensors (How would print them in c/c++ code)
@@ -336,37 +330,38 @@ SetComponent[compname_, exprname_] :=
 
 Protect[SetComponent];
 
-SetNameArray[varname_, compindexlist_, mode_, coordinate_] :=
-    Module[
-        {coordfull, compname, exprname}
-        ,
-        (* initialize *)
+(*
+    compname: component expr in Mathematica kernal, say Pi[{1,-cart},{2,-cart}] 
+    exprname: component expr to be printed to C code, or lhs, say Pi12[[ijk]],
+              ignore the information about covariant/contravariant
+*)
+
+SetNameArray[varname_, compindexlist_, coordinate_, addgpidx_] :=
+    Module[{coordfull, compname, exprname},
         compname = varname[[0]][];
         exprname = StringTrim[ToString[varname[[0]]], GetsuffixUnprotected[
             ]];
-        (* if not scalar, update names *)
-        If[Length[compindexlist] > 0,
+        If[Length[compindexlist] > 0, (*not scalar*)
             Do[
-                If[DownIndexQ[varname[[compIndex]]],
+                If[DownIndexQ[varname[[icomp]]],
                     coordfull = -coordinate
                     ,
                     coordfull = coordinate
                 ];
-                AppendTo[compname, {compindexlist[[compIndex]], coordfull
+                AppendTo[compname, {compindexlist[[icomp]], coordfull
                     }];
-                exprname = exprname <> ToString @ compindexlist[[compIndex
+                exprname = exprname <> ToString @ compindexlist[[icomp
                     ]]
                 ,
-                {compIndex, 1, Length[compindexlist]}
+                {icomp, 1, Length[compindexlist]}
             ]
         ];
-        (* if set component for temporary varlist or not *)
-        If[StringMatchQ[mode, "set components: temporary"],
-            exprname = ToExpression[exprname]
-            ,
-            exprname = ToExpression[exprname <> GetGridPointIndex[]]
-        ];
-        (* return NameArray *)
+        exprname =
+            If[addgpidx,
+                ToExpression[exprname <> GetGridPointIndex[]]
+                ,
+                ToExpression[exprname]
+            ];
         {compname, exprname}
     ];
 

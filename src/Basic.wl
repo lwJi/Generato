@@ -10,6 +10,10 @@ GetGridPointIndex::usage = "GetGridPointIndex[] return the grid index name.";
 
 SetGridPointIndex::usage = "SetGridPointIndex[girdindex] reset the grid index name.";
 
+GetSuffixUnprotected::usage = "GetSuffixUnprotected[] returns the suffix added to vars which would conflict with system default otherwise.";
+
+SetSuffixUnprotected::usage = "SetSuffixUnprotected[suffix] reset the suffix added to vars which would conflict with system default otherwise.";
+
 IsDefined::usage = "IsDefined[term] return True/False if term is defined or not."
 
 RHSOf::usage = "RHSOf[var, suffix] return the expression of 'var$RHS' or 'varsuffix$RHS' (if suffix is not empty).";
@@ -39,6 +43,20 @@ SetGridPointIndex[gridindex_] :=
     ];
 
 Protect[SetGridPointIndex];
+
+$SuffixUnprotected = "$";
+
+GetSuffixUnprotected[] :=
+    Return[$SuffixUnprotected];
+
+Protect[GetSuffixUnprotected];
+
+SetSuffixUnprotected[suffix_] :=
+    Module[{},
+        $SuffixUnprotected = suffix
+    ];
+
+Protect[SetSuffixUnprotected];
 
 (* Function *)
 
