@@ -40,7 +40,7 @@ Options[ParseVarlist] = {ParseMode -> "", ChartName -> Null, GridPointIndex
      -> "[[ijk]]", SuffixName -> ""};
 
 ParseVarlist[varlist_?ListQ, OptionsPattern[]] :=
-    Module[{iMin, iMax = 3, var, varName, varLength, varWithSymmetry,
+    Module[{iMin, iMax = 3, var, varname, varLength, varWithSymmetry,
          varSymmetryName, varSymmetryIndexes, manipulateComponentValue, mode,
          chartname, gridpointindex, suffixname},
         {mode, chartname, gridpointindex, suffixname} = OptionValue[{
@@ -59,17 +59,9 @@ ParseVarlist[varlist_?ListQ, OptionsPattern[]] :=
         ];
         (* loop over varlist in the list *)
         Do[
-            var = varlist[[iVar]];(* { metricg[-a,-b], Symmetric[{-a,-b}], "g" } 
-                
-                
-                
-                *)
-            varName = var[[1]];(* say metricg[-a,-b] *)
-            varLength = Length[var];(* var length: how many descriptions for var 
-                
-                
-                
-                *)
+            var = varlist[[iVar]];
+            varname = var[[1]];(* say metricg[-a,-b] *)
+            varLength = Length[var];
             (* if with symmetry *)
             varWithSymmetry = (varLength == 3) || (varLength == 2 && 
                 (!StringQ[var[[2]]]));
@@ -78,43 +70,28 @@ ParseVarlist[varlist_?ListQ, OptionsPattern[]] :=
                 varSymmetryIndexes = var[[2]][[1]]
             ];
             (* check if tensor defined yet *)
-            If[!xTensorQ[varName[[0]]],
+            If[!xTensorQ[varname[[0]]],
                 (* tensor not exist, creat one *)
                 If[StringMatchQ[mode, "set components*"],
                     DefineTensor[var];
-                    PrintVerbose["Define Tensor ", varName[[0]]]
+                    PrintVerbose["Define Tensor ", varname[[0]]]
                     ,
                     Throw @ Message[ParseVarlist::ETensorNonExist, iVar,
-                         varName, mode]
+                         varname, mode]
                 ]
                 ,
-(* tensor exist already: if tensor name is outside the global varlist 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    *)
                 If[!MemberQ[GetMapComponentToVarlist[][[All, 1, 0]], 
-                    varName[[0]]],
+                    varname[[0]]],
                     Throw @ Message[ParseVarlist::ETensorExistOutside,
-                         iVar, varName]
+                         iVar, varname]
                 ]
             ];
             (* set temp function *)
-            manipulateComponentValue[compIndexList_] := ManipulateComponent[
-                compIndexList, mode, chartname, varName, gridpointindex, suffixname, 
+            manipulateComponentValue[compindexlist_] := ManipulateComponent[
+                compindexlist, mode, chartname, varname, gridpointindex, suffixname, 
                 cnd];
             (* consider different types of tensor *)
-            Switch[Length[varName],
+            Switch[Length[varname],
                 (* ZERO INDEX CASE: *)0,
                     manipulateComponentValue[{}]
                 ,
@@ -136,9 +113,9 @@ ParseVarlist[varlist_?ListQ, OptionsPattern[]] :=
                             ,
                             _,
                                 Throw @ Message[ParseVarlist::ESymmetryType,
-                                     iVar, varName]
+                                     iVar, varname]
                         ];
-                        varName //
+                        varname //
                         ToBasis[chartname] //
                         ComponentArray //
                         ComponentValue
@@ -152,8 +129,8 @@ ParseVarlist[varlist_?ListQ, OptionsPattern[]] :=
                     If[varWithSymmetry,
                         (* With Symmetry *)
                         Which[(* c(ab) or c[ab] *)
-                            (varSymmetryIndexes[[1]] === varName[[2]]
-                                ) && (varSymmetryIndexes[[2]] === varName[[3]]),
+                            (varSymmetryIndexes[[1]] === varname[[2]]
+                                ) && (varSymmetryIndexes[[2]] === varname[[3]]),
                                 Switch[varSymmetryName,
                                     Symmetric,
                                         Do[manipulateComponentValue[{
@@ -166,11 +143,11 @@ ParseVarlist[varlist_?ListQ, OptionsPattern[]] :=
                                     ,
                                     _,
                                         Throw @ Message[ParseVarlist::ESymmetryType,
-                                             iVar, varName]
+                                             iVar, varname]
                                 ]
                             ,
                             (* (ab)c or [ab]c *)(varSymmetryIndexes[[
-                                1]] === varName[[1]]) && (varSymmetryIndexes[[2]] === varName[[2]]),
+                                1]] === varname[[1]]) && (varSymmetryIndexes[[2]] === varname[[2]]),
                                 Switch[varSymmetryName,
                                     Symmetric,
                                         Do[manipulateComponentValue[{
@@ -183,14 +160,14 @@ ParseVarlist[varlist_?ListQ, OptionsPattern[]] :=
                                     ,
                                     _,
                                         Throw @ Message[ParseVarlist::ESymmetryType,
-                                             iVar, varName]
+                                             iVar, varname]
                                 ]
                             ,
                             (* other three indexes cases *)True,
                                 Throw @ Message[ParseVarlist::ESymmetryType,
-                                     iVar, varName]
+                                     iVar, varname]
                         ];(* end of Which *)
-                        varName //
+                        varname //
                         ToBasis[chartname] //
                         ComponentArray //
                         ComponentValue
@@ -204,8 +181,8 @@ ParseVarlist[varlist_?ListQ, OptionsPattern[]] :=
                     If[varWithSymmetry,
                         (* With Symmetry *)
                         Which[(* cd(ab) or cd[ab] *)
-                            (varSymmetryIndexes[[1]] === varName[[3]]
-                                ) && (varSymmetryIndexes[[2]] === varName[[4]]),
+                            (varSymmetryIndexes[[1]] === varname[[3]]
+                                ) && (varSymmetryIndexes[[2]] === varname[[4]]),
                                 Switch[varSymmetryName,
                                     Symmetric,
                                         Do[manipulateComponentValue[{
@@ -219,11 +196,11 @@ ParseVarlist[varlist_?ListQ, OptionsPattern[]] :=
                                     ,
                                     _,
                                         Throw @ Message[ParseVarlist::ESymmetryType,
-                                             iVar, varName]
+                                             iVar, varname]
                                 ]
                             ,
                             (* (ab)cd or [ab]cd *)(varSymmetryIndexes
-                                [[1]] === varName[[1]]) && (varSymmetryIndexes[[2]] === varName[[2]]),
+                                [[1]] === varname[[1]]) && (varSymmetryIndexes[[2]] === varname[[2]]),
                                 
                                 Switch[varSymmetryName,
                                     Symmetric,
@@ -238,11 +215,11 @@ ParseVarlist[varlist_?ListQ, OptionsPattern[]] :=
                                     ,
                                     _,
                                         Throw @ Message[ParseVarlist::ESymmetryType,
-                                             iVar, varName]
+                                             iVar, varname]
                                 ]
                             ,
                             (* c(ab)d or c[ab]d *)(varSymmetryIndexes
-                                [[1]] === varName[[2]]) && (varSymmetryIndexes[[2]] === varName[[3]]),
+                                [[1]] === varname[[2]]) && (varSymmetryIndexes[[2]] === varname[[3]]),
                                 
                                 Switch[varSymmetryName,
                                     Symmetric,
@@ -257,7 +234,7 @@ ParseVarlist[varlist_?ListQ, OptionsPattern[]] :=
                                     ,
                                     _,
                                         Throw @ Message[ParseVarlist::ESymmetryType,
-                                             iVar, varName]
+                                             iVar, varname]
                                 ]
                             ,
                             (* (cd)(ab) or [cd][ab] *)varSymmetryName
@@ -277,14 +254,14 @@ ParseVarlist[varlist_?ListQ, OptionsPattern[]] :=
                                     ,
                                     True,
                                         Throw @ Message[ParseVarlist::ESymmetryType,
-                                             iVar, varName]
+                                             iVar, varname]
                                 ]
                             ,
                             (* other four indexes cases *)True,
                                 Throw @ Message[ParseVarlist::ESymmetryType,
-                                     iVar, varName]
+                                     iVar, varname]
                         ]; (* end of Which *)
-                        varName //
+                        varname //
                         ToBasis[chartname] //
                         ComponentArray //
                         ComponentValue
@@ -297,7 +274,7 @@ ParseVarlist[varlist_?ListQ, OptionsPattern[]] :=
                 ,
                 (* OTHER NUM OF INDEXES *)_,
                     Throw @ Message[ParseVarlist::ETensorType, iVar, 
-                        varName]
+                        varname]
             ]
             ,
             {iVar, 1, Length[varlist]}
@@ -315,6 +292,12 @@ ParseVarlist::ESymmetryType = "Symmetry type of the `1`-th var, `2`, in varlist 
 Protect[ParseVarlist];
 
 (*
+    compname: component expr in Mathematica kernal, say Pi[{1,-cart},{2,-cart}] 
+    exprname: component expr to be printed to C code, or lhs, say Pi12[[ijk]],
+              ignore the information about covariant/contravariant
+*)
+
+(*
     1. Set components for tensors (How would print them in c/c++ code)
     2. Set global map between tensor component and varlist index ( $MapComponentToVarlist ):
         case1 (start at 'new varlist', in this case, user should be careful when they define varlist)
@@ -325,10 +308,10 @@ Protect[ParseVarlist];
               0   1  ...  0   1  ...     0   1  ...  0   1  ...   ...
 *)
 
-SetComponentAndMapC2V[mode_, compName_, exprName_] :=
+SetComponent[compname_, exprname_] :=
     Module[{varlistindex, mapCtoV = GetMapComponentToVarlist[]},
         If[Length[mapCtoV] == 0 || GetProcessNewVarlist[] || (StringMatchQ[
-            mode, "set components: independent"] && (compName[[0]] =!= Last[mapCtoV
+            mode, "set components: independent"] && (compname[[0]] =!= Last[mapCtoV
             ][[1, 0]])),
             varlistindex = -1
             ,
@@ -336,23 +319,59 @@ SetComponentAndMapC2V[mode_, compName_, exprName_] :=
         ];
         varlistindex = varlistindex + 1;
         (* set components *)
-        ComponentValue[compName, exprName];
+        ComponentValue[compname, exprname];
         (* if tensor component is already exist in the list or not *)
             
-        If[MemberQ[mapCtoV[[All, 1]], compName],
-            PrintVerbose["Skip adding Component ", compName, " to Global VarList, since it already exist"
+        If[MemberQ[mapCtoV[[All, 1]], compname],
+            PrintVerbose["Skip adding Component ", compname, " to Global VarList, since it already exist"
                 ]
             ,
-            AppendTo[mapCtoV, {compName, varlistindex}];
+            AppendTo[mapCtoV, {compname, varlistindex}];
             SetMapComponentToVarlist[mapCtoV];
-            PrintVerbose["Add Component ", compName, " to Global VarList"
+            PrintVerbose["Add Component ", compname, " to Global VarList"
                 ]
         ];
         (* update $ProcessNewVarlist *)
         SetProcessNewVarlist[False]
     ];
 
-Protect[SetComponentAndMapC2V];
+Protect[SetComponent];
+
+SetNameArray[compindexlist_, mode_, coordinate_, varname_] :=
+    Module[
+        {coordfull, compname, exprname}
+        ,
+        (* initialize *)
+        compname = varname[[0]][];
+        exprname = StringTrim[ToString[varname[[0]]], GetsuffixUnprotected[
+            ]];
+        (* if not scalar, update names *)
+        If[Length[compindexlist] > 0,
+            Do[
+                If[DownIndexQ[varname[[compIndex]]],
+                    coordfull = -coordinate
+                    ,
+                    coordfull = coordinate
+                ];
+                AppendTo[compname, {compindexlist[[compIndex]], coordfull
+                    }];
+                exprname = exprname <> ToString @ compindexlist[[compIndex
+                    ]]
+                ,
+                {compIndex, 1, Length[compindexlist]}
+            ]
+        ];
+        (* if set component for temporary varlist or not *)
+        If[StringMatchQ[mode, "set components: temporary"],
+            exprname = ToExpression[exprname]
+            ,
+            exprname = ToExpression[exprname <> gridpointindex]
+        ];
+        (* return NameArray *)
+        {compname, exprname}
+    ];
+
+Protect[SetNameArray];
 
 End[];
 
