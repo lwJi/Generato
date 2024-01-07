@@ -88,7 +88,7 @@ ParseVarlist[varlist_?ListQ, OptionsPattern[]] :=
             ];
             (* set temp function *)
             manipulateComponentValue[compindexlist_] := ManipulateComponent[
-                compindexlist, mode, chartname, varname, suffixname, cnd];
+                varname, compindexlist, chartname, mode, suffixname];
             (* consider different types of tensor *)
             Switch[Length[varname],
                 (* ZERO INDEX CASE: *)0,
@@ -290,6 +290,56 @@ ParseVarlist::ESymmetryType = "Symmetry type of the `1`-th var, `2`, in varlist 
 
 Protect[ParseVarlist];
 
+ManipulateComponent[varname_, compIndexList_?ListQ, coordinate_, addgpidx_
+    ?BooleanQ, suffixname_?StringQ] :=
+    Module[{compname, exprname},
+        {compname, exprname} = SetNameArray[varname, compIndexList, coordinate,
+             addgpidx];
+        If[is4DCompIndexListIn3DTensor[compIndexList, varname],
+            If[isUp4DCompIndexListIn3DTensor[compIndexList, varname],
+                
+                ComponentValue[compname, 0]
+            ];
+            Continue[]
+        ];
+        Which[
+            StringMatchQ[mode, "set components*"],
+                SetComponent[compname, exprname];
+                PrintVerbose["Set Component ", compname, " for Tensor ",
+                     varname[[0]]]
+            ,
+            StringMatchQ[mode, "print components*"],
+                PrintComponent[mode, coordinate, varname, compname, suffixname
+                    ];
+                PrintVerbose["Print Component ", compname, " to C-file"
+                    ]
+            ,
+            True,
+                Throw @ Message[ManipulateComponent::EMode, mode]
+        ]
+    ];
+
+ManipulateComponent::EMode = "Manipulate mode \"`1`\" undefined !";
+
+PrintComponent[mode_?StringQ, coordinate_, varname_, compname_, suffixname_
+    ?StringQ, cnd_?ListQ] :=
+    Module[{},
+        Which[
+            StringMatchQ[mode, "print components initialization*"],
+                Global`PrintComponentInitialization[mode, varname, compname,
+                     GetGridPointIndex[]]
+            ,
+            StringMatchQ[mode, "print components equation*"],
+                PrintComponentEquation[mode, coordinate, compname, {SuffixName
+                     -> suffixname, ReplaceTerms -> cnd}]
+            ,
+            True,
+                Throw @ Message[PrintComponent::ErrorMode, mode]
+        ]
+    ];
+
+PrintComponent::ErrorMode = "Print mode `1` unsupported yet!";
+
 (*
     1. Set components for tensors (How would print them in c/c++ code)
     2. Set global map between tensor component and varlist index ( $MapComponentToVarlist ):
@@ -328,8 +378,6 @@ SetComponent[compname_, exprname_] :=
         SetProcessNewVarlist[False]
     ];
 
-Protect[SetComponent];
-
 (*
     compname: component expr in Mathematica kernal, say Pi[{1,-cart},{2,-cart}] 
     exprname: component expr to be printed to C code, or lhs, say Pi12[[ijk]],
@@ -364,8 +412,6 @@ SetNameArray[varname_, compindexlist_, coordinate_, addgpidx_] :=
             ];
         {compname, exprname}
     ];
-
-Protect[SetNameArray];
 
 End[];
 
