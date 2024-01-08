@@ -6,7 +6,9 @@ BeginPackage["Generato`Component`"];
 
 Needs["Generato`Basic`"];
 
-ParseMode::usage = "ParseMode[key] returns the integer mode correspond to the key";
+GetParseMode::usage = "GetParseMode[key] returns the mode correspond to the key";
+
+SetParseMode::usage = "SetParseMode[key] add/update the mode correspond to the key";
 
 GetMapComponentToVarlist::usage = "GetMapComponentToVarlist[] returns the map between tensor components and varlist indexes.";
 
@@ -18,16 +20,25 @@ Begin["`Private`"];
 
 (* Data *)
 
+$ParseModeAssociation = <|SetComp -> False, PrintComp -> False|>;
+
 $MapComponentToVarlist = <||>;(*store all varlist's map*)
 
 $ProcessNewVarlist = True;
 
 (* Function *)
 
-ParseMode[key_] :=
-    Return[<|SetComp -> 1, PrintComp -> 2|>[key]];
+GetParseMode[key_] :=
+    Return[$ParseModeAssociation[key]];
 
-Protect[ParseMode];
+Protect[GetParseMode];
+
+SetParseMode[assoc_] :=
+    Module[{},
+        AppendTo[$ParseModeAssociation, assoc]
+    ];
+
+Protect[SetParseMode];
 
 GetMapComponentToVarlist[] :=
     Return[$MapComponentToVarlist];
@@ -122,7 +133,7 @@ SetComponent[compname_, exprname_] :=
             PrintVerbose["Skip adding Component ", compname, " to Global VarList, since it already exist"
                 ]
             ,
-            AppendTo[mapCtoV, {compname, varlistindex}];
+            AppendTo[mapCtoV, compname -> varlistindex];
             SetMapComponentToVarlist[mapCtoV];
             PrintVerbose["Add Component ", compname, " to Global VarList"
                 ]
