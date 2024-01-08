@@ -6,6 +6,8 @@ BeginPackage["Generato`Component`"];
 
 Needs["Generato`Basic`"];
 
+ParseMode::usage = "ParseMode[key] returns the integer mode correspond to the key";
+
 GetMapComponentToVarlist::usage = "GetMapComponentToVarlist[] returns the map between tensor components and varlist indexes.";
 
 SetProcessNewVarlist::usage = "SetProcessNewVarlist[True] update the Boolean variable specifying if we are processing a new varlist.";
@@ -20,7 +22,14 @@ $MapComponentToVarlist = <||>;(*store all varlist's map*)
 
 $ProcessNewVarlist = True;
 
+$ParseMode = <|setcomponent -> 1, printcomponent -> 1|>
+
 (* Function *)
+
+ParseMode[key_] :=
+    Return[<|SetComp -> 1, PrintComp -> 2|>[key]];
+
+Protect[ParseMode];
 
 GetMapComponentToVarlist[] :=
     Return[$MapComponentToVarlist];
@@ -68,6 +77,8 @@ ParseComponent[varname_, compindexlist_?ListQ, coordinate_, mode_?BooleanQ,
     ];
 
 ParseComponent::EMode = "Parse mode \"`1`\" undefined !";
+
+Protect[ParseComponent];
 
 PrintComponent[mode_?StringQ, coordinate_, varname_, compname_, suffixname_
     ?StringQ, cnd_?ListQ] :=
