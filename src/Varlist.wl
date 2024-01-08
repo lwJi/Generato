@@ -14,13 +14,9 @@ Begin["`Private`"];
 
 (* Function *)
 
-Options[ParseVarlist] = {ChartName -> Null, SuffixName -> ""};
-
-ParseVarlist[varlist_?ListQ, OptionsPattern[]] :=
+ParseVarlist[varlist_?ListQ, chartname, suffixname] :=
     Module[{iMin, iMax = 3, var, varname, varWithSymmetry, varSymmetryName,
-         varSymmetryIndexes, parseComponentValue, chartname, suffixname},
-        {chartname, suffixname} = OptionValue[{ChartName, SuffixName}
-            ];
+         varSymmetryIndexes, parseComponentValue},
         manifold = $Manifolds[[1]];
         If[chartname == Null,
             chartname = ChartsOfManifold[manifold][[1]]

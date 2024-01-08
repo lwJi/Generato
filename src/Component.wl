@@ -20,9 +20,7 @@ Begin["`Private`"];
 
 (* Data *)
 
-$ParseModeAssociation = <|SetComp -> False, PrintComp -> False, PrintCompInit
-     -> False, PrintCompEQN -> False, PrintCompEQNTemp -> False, PrintCompEQNMain
-     -> False, PrintCompEQNFlux -> False, PrintCompEQNAddToMain -> False|>;
+$ParseModeAssociation = <||>;
 
 $MapComponentToVarlist = <||>;(*store all varlist's map*)
 
@@ -35,8 +33,17 @@ GetParseMode[key_] :=
 
 Protect[GetParseMode];
 
+SetParseModeToFalse[] :=
+    Module[{},
+        AppendTo[$ParseModeAssociation, <|SetComp -> False, PrintComp
+             -> False, SetCompIndep -> False, PrintCompInit -> False, PrintCompEQN
+             -> False, PrintCompEQNTemp -> False, PrintCompEQNMain -> False, PrintCompEQNFlux
+             -> False, PrintCompEQNAddToMain -> False|>]
+    ];
+
 SetParseMode[assoc_] :=
     Module[{},
+        SetParseModeToFalse[];
         AppendTo[$ParseModeAssociation, assoc]
     ];
 
