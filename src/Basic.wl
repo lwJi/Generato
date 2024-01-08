@@ -26,13 +26,13 @@ IsDefined::usage = "IsDefined[term] return True/False if term is defined or not.
 
 RHSOf::usage = "RHSOf[var, suffix] return the expression of 'var$RHS' or 'varsuffix$RHS' (if suffix is not empty).";
 
-SetEQN::usage = "SetEQN[{DelaySet->..., CheckRHS->...}, var, suffix, varrhs] set 'var$RHS/varsuffix$RHS' equal to 'varrhs', considering if DelaySet, CheckRHS.";
+SetEQN::usage = "SetEQN[{DelaySet->..., CheckRHS->..., SuffixString->...}, var, varrhs] set 'var$RHS/varsuffix$RHS' equal to 'varrhs', considering if DelaySet, CheckRHS.";
 
 DelaySet::usage = "DelaySet is an option for SetEQN specifying if use IndexSetDelayed.";
 
 CheckRHS::usage = "CheckRHS is an option for SetEQN specifying if check there are undefined terms in varrhs.";
 
-SetEQNDelayed::usage = "SetEQNDelayed[var, suffix, varrhs] returns SetEQN[ {DelaySet->True}, var, suffix, varrhs].";
+SetEQNDelayed::usage = "SetEQNDelayed[{CheckRHS->..., SuffixString->...}, var, varrhs] returns SetEQN[ {DelaySet->True, ...}, var, varrhs].";
 
 Begin["`Private`"];
 
@@ -159,13 +159,14 @@ RHSOf::Eargs = "`1` arguments unsupported yet!";
 
 Protect[RHSOf];
 
-Options[SetEQN] = {DelaySet -> False, CheckRHS -> True};
+Options[SetEQN] = {DelaySet -> False, CheckRHS -> True, SuffixString 
+    -> ""};
 
-SetEQN[OptionsPattern[], var_, suffix_String:"", varrhs_] :=
+SetEQN[OptionsPattern[], var_, varrhs_] :=
     ReleaseHold @
-        Module[{delayset, checkrhs, replaceTimes = 0},
-            {delayset, checkrhs} = OptionValue[{DelaySet, CheckRHS}];
-                
+        Module[{delayset, checkrhs, suffix, replaceTimes = 0},
+            {delayset, checkrhs, suffix} = OptionValue[{DelaySet, CheckRHS,
+                 SuffixString}];
             (* check if there is undefined term *)
             If[checkrhs && !IsDefined[varrhs],
                 Throw @ Message[SetEQN::Evarrhs, varrhs]
@@ -184,10 +185,13 @@ SetEQN::Evarrhs = "There are undefined terms in the RHS '`1`'!"
 
 Protect[SetEQN];
 
-SetEQNDelayed[var_, suffix_String:"", varrhs_] :=
-    Module[{},
-        SetEQN[{DelaySet -> True, CheckRHS -> False}, var, suffix, varrhs
-            ]
+Options[SetEQNDelayed] = {CheckRHS -> True, SuffixString -> ""};
+
+SetEQNDelayed[OptionsPattern[], var_, varrhs_] :=
+    Module[{checkrhs, suffix},
+        {checkrhs, suffix} = OptionValue[{CheckRHS, SuffixString}];
+        SetEQN[{DelaySet -> True, CheckRHS -> checkrhs, SuffixString 
+            -> suffix}, var, varrhs]
     ];
 
 Protect[SetEQNDelayed];
