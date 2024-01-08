@@ -99,8 +99,8 @@ PrintComponent[coordinate_, varname_, compname_, suffixname_?StringQ] :=
                     ]
             ,
             GetParseMode[PrintCompEQN],
-                PrintComponentEquation[coordinate, compname, {SuffixName
-                     -> suffixname}]
+                PrintComponentEquation[coordinate, compname, suffixname
+                    ]
             ,
             True,
                 Throw @ Message[PrintComponent::EMode]
@@ -109,27 +109,16 @@ PrintComponent[coordinate_, varname_, compname_, suffixname_?StringQ] :=
 
 PrintComponent::EMode = "ParseMode unrecognized!";
 
-Options[PrintComponentEquation] :=
-    {SuffixName -> ""};
-
-PrintComponentEquation[coordinate_, compName_, OptionsPattern[]] :=
-    Module[{modeMain = "print components equation: ", modeSub, outputfile
-         = GetoutputFile[], replace$ = GetreplaceSymbol$[], compToValue = compName
-         // ToValues, rhssToValue, suffixName},
-        {suffixName} = OptionValue[{SuffixName, ReplaceTerms}];
-        If[StringMatchQ[mode, modeMain <> "*"],
-            modeSub = StringTrim[mode, modeMain]
-            ,
-            Throw @ Message[PrintComponentEquation::EMode]
-        ];
-        rhssToValue = compName /. {compName[[0]] -> RHSOf[compName[[0
-            ]], suffixName]};
+PrintComponentEquation[coordinate_, compname_, suffixname_] :=
+    Module[{outputfile = GetoutputFile[], compToValue, rhssToValue},
+        compToValue = compname // ToValues;
         rhssToValue =
-            rhssToValue //
+            (compname /. {compname[[0]] -> RHSOf[compname[[0]], suffixname
+                ]}) //
             DummyToBasis[coordinate] //
             TraceBasisDummy //
             ToValues;
-        If[GetsimplifyEquation[],
+        If[GetSimplifyEquation[],
             rhssToValue = rhssToValue // Simplify
         ];
         Which[
