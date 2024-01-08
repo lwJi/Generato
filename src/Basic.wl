@@ -14,6 +14,10 @@ GetSuffixUnprotected::usage = "GetSuffixUnprotected[] returns the suffix added t
 
 SetSuffixUnprotected::usage = "SetSuffixUnprotected[suffix] reset the suffix added to vars which would conflict with system default otherwise.";
 
+GetOutputFile::usage = "GetOutputFile[] return the variable storing the output file name.";
+
+SetOutputFile::usage = "SetOutputFile[name] update the variable storing the output file name.";
+
 GetSimplifyEquation::usage = "GetSimplifyEquation[] return the Boolean variable specifying if simplify the equations.";
 
 SetSimplifyEquation::usage = "SetSimplifyEquation[True] update the Boolean variable specifying if simplify the equations.";
@@ -37,6 +41,8 @@ Begin["`Private`"];
 $GridPointIndex = "";
 
 $SuffixUnprotected = "$Upt";
+
+$OutputFile = "output.c";
 
 $SimplifyEquation = True;
 
@@ -65,6 +71,18 @@ SetSuffixUnprotected[suffix_] :=
     ];
 
 Protect[SetSuffixUnprotected];
+
+GetOutputFile[] :=
+    Return[$OutputFile];
+
+Protect[GetOutputFile];
+
+SetOutputFile[filename_] :=
+    Module[{},
+        $OutputFile = filename
+    ];
+
+Protect[SetOutputFile];
 
 GetSimplifyEquation[] :=
     Return[$SimplifyEquation];

@@ -110,7 +110,7 @@ PrintComponent[coordinate_, varname_, compname_, suffixname_?StringQ] :=
 PrintComponent::EMode = "ParseMode unrecognized!";
 
 PrintComponentEquation[coordinate_, compname_, suffixname_] :=
-    Module[{outputfile = GetoutputFile[], compToValue, rhssToValue},
+    Module[{outputfile = GetOutputFile[], compToValue, rhssToValue},
         compToValue = compname // ToValues;
         rhssToValue =
             (compname /. {compname[[0]] -> RHSOf[compname[[0]], suffixname
