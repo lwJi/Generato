@@ -12,6 +12,12 @@
 
 <<Basic.wl
 
+<<Component.wl
+
+<<Varlist.wl
+
+<<Interface.wl
+
 (***********)
 
 (* Options *)
