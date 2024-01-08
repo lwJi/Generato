@@ -111,8 +111,7 @@ PrintComponent::EMode = "ParseMode unrecognized!";
 Options[PrintComponentEquation] :=
     {SuffixName -> ""};
 
-PrintComponentEquation[mode_?StringQ, coordinate_, compName_, OptionsPattern[
-    ]] :=
+PrintComponentEquation[coordinate_, compName_, OptionsPattern[]] :=
     Module[{modeMain = "print components equation: ", modeSub, outputfile
          = GetoutputFile[], replace$ = GetreplaceSymbol$[], compToValue = compName
          // ToValues, compToValueStr, rhssToValue, rhssToValueStr, suffixName
@@ -121,7 +120,7 @@ PrintComponentEquation[mode_?StringQ, coordinate_, compName_, OptionsPattern[
         If[StringMatchQ[mode, modeMain <> "*"],
             modeSub = StringTrim[mode, modeMain]
             ,
-            Throw @ Message[PrintComponentEquation::ErrorMode, mode]
+            Throw @ Message[PrintComponentEquation::EMode]
         ];
         rhssToValue = compName /. {compName[[0]] -> RHSOf[compName[[0
             ]], suffixName]};
@@ -139,8 +138,7 @@ PrintComponentEquation[mode_?StringQ, coordinate_, compName_, OptionsPattern[
             rhssToValueStr = StringReplace[ToString[rhssToValue, CForm
                 ], "$" -> "_"]
         ];
-        (* different modes *)
-        Which[(* equations of temprary variables definition *)
+        Which[
             StringMatchQ[modeSub, "temporary*"],
                 Module[{},
                     Global`pr["double "];
@@ -157,8 +155,7 @@ PrintComponentEquation[mode_?StringQ, coordinate_, compName_, OptionsPattern[
                     ]
                 ]
             ,
-            (* equations of primary output variables *)StringMatchQ[modeSub,
-                 "primary*"],
+            StringMatchQ[modeSub, "primary*"],
                 Module[{},
                     If[replace$,
                         Global`pr[compToValueStr];
@@ -173,8 +170,7 @@ PrintComponentEquation[mode_?StringQ, coordinate_, compName_, OptionsPattern[
                     ]
                 ]
             ,
-            (* equations of adding more terms to primary variables, say add matter terms to dt_U 
-                *)StringMatchQ[modeSub, "adding to primary"],
+            StringMatchQ[modeSub, "adding to primary"],
                 Module[{},
                     If[replace$,
                         Global`pr[compToValueStr];
@@ -189,8 +185,7 @@ PrintComponentEquation[mode_?StringQ, coordinate_, compName_, OptionsPattern[
                     ]
                 ]
             ,
-            (* equations flux construction *)StringMatchQ[modeSub, "primary for flux"
-                ],
+            StringMatchQ[modeSub, "primary for flux"],
                 Module[{},
                     Global`pr["double "];
                     If[replace$,
@@ -206,15 +201,12 @@ PrintComponentEquation[mode_?StringQ, coordinate_, compName_, OptionsPattern[
                     ]
                 ]
             ,
-            (* mode undefined *)True,
-                Throw @ Message[PrintComponentEquation::ErrorMode, mode
-                    ]
+            True,
+                Throw @ Message[PrintComponentEquation::EMode]
         ]
     ];
 
-PrintComponentEquation::ErrorMode = "Print equation mode '`1`' unsupported yet!";
-
-PrintComponentEquation::ErrorUndefined = "Rhs expression '`1`' undefined!";
+PrintComponentEquation::EMode = "ParseMode unrecognized!";
 
 (*
     1. Set components for tensors (How would print them in c/c++ code)
