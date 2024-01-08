@@ -11,13 +11,21 @@ SetComponents::usage = "SetComponents[varlist, mode] set components of varlist b
 Begin["`Private`"];
 
 Options[SetComponents] :=
-    {ChartName -> GetdefaultChart[], SuffixName -> ""};
+    {ChartName -> GetdefaultChart[], SuffixName -> "", IndependentIndexForEachVar
+         -> True, TemporaryVars -> False};
 
 SetComponents[varlist_?ListQ, OptionsPattern[]] :=
     Module[{chartname, suffixname},
-        {chartname, suffixname} = OptionValue[{ChartName, SuffixName}
-            ];
+        {chartname, suffixname, indepidx, temp} = OptionValue[{ChartName,
+             SuffixName, IndependentIndexForEachVar, TemporaryVars}];
+        SetParseModeAllToFalse[];
         SetParseMode[SetComp -> True];
+        If[indepidx,
+            SetParseMode[SetCompIndep -> True]
+        ];
+        If[temp,
+            SetParseMode[SetCompTemp -> True]
+        ];
         ParseVarlist[varlist, chartname, suffixname}];
     ];
 

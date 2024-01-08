@@ -10,6 +10,8 @@ GetParseMode::usage = "GetParseMode[key] returns the mode correspond to the key"
 
 SetParseMode::usage = "SetParseMode[key] add/update the mode correspond to the key";
 
+SetParseModeAllToFalse::usage = "SetParseModeAllToFalse[] set all the modes to false";
+
 GetMapComponentToVarlist::usage = "GetMapComponentToVarlist[] returns the map between tensor components and varlist indexes.";
 
 SetProcessNewVarlist::usage = "SetProcessNewVarlist[True] update the Boolean variable specifying if we are processing a new varlist.";
@@ -33,21 +35,23 @@ GetParseMode[key_] :=
 
 Protect[GetParseMode];
 
-SetParseModeToFalse[] :=
-    Module[{},
-        AppendTo[$ParseModeAssociation, <|SetComp -> False, PrintComp
-             -> False, SetCompIndep -> False, PrintCompInit -> False, PrintCompEQN
-             -> False, PrintCompEQNTemp -> False, PrintCompEQNMain -> False, PrintCompEQNFlux
-             -> False, PrintCompEQNAddToMain -> False|>]
-    ];
-
 SetParseMode[assoc_] :=
     Module[{},
-        SetParseModeToFalse[];
         AppendTo[$ParseModeAssociation, assoc]
     ];
 
 Protect[SetParseMode];
+
+SetParseModeAllToFalse[] :=
+    Module[{},
+        AppendTo[$ParseModeAssociation, <|SetComp -> False, PrintComp
+             -> False, SetCompIndep -> False, SetCompTemp -> False, PrintCompInit
+             -> False, PrintCompEQN -> False, PrintCompEQNTemp -> False, PrintCompEQNMain
+             -> False, PrintCompEQNFlux -> False, PrintCompEQNAddToMain -> False|>
+            ]
+    ];
+
+Protect[SetParseModeAllToFalse];
 
 GetMapComponentToVarlist[] :=
     Return[$MapComponentToVarlist];
