@@ -21,7 +21,8 @@ Begin["`Private`"];
 (* Data *)
 
 $ParseModeAssociation = <|SetComp -> False, PrintComp -> False, PrintCompInit
-     -> False, PrintCompEQN -> False|>;
+     -> False, PrintCompEQN -> False, PrintCompEQNTemp -> False, PrintCompEQNMain
+     -> False, PrintCompEQNFlux -> False, PrintCompEQNAddToMain -> False|>;
 
 $MapComponentToVarlist = <||>;(*store all varlist's map*)
 
@@ -132,7 +133,7 @@ PrintComponentEquation[coordinate_, compName_, OptionsPattern[]] :=
             rhssToValue = rhssToValue // Simplify
         ];
         Which[
-            StringMatchQ[modeSub, "temporary*"],
+            GetParseMode[Temp],
                 Module[{},
                     Global`pr["double "];
                     PutAppend[CForm[compToValue], outputfile];
@@ -141,7 +142,7 @@ PrintComponentEquation[coordinate_, compName_, OptionsPattern[]] :=
                     Global`pr[";\n"]
                 ]
             ,
-            StringMatchQ[modeSub, "primary*"],
+            GetParseMode[Main],
                 Module[{},
                     PutAppend[CForm[compToValue], outputfile];
                     Global`pr["="];
@@ -149,7 +150,7 @@ PrintComponentEquation[coordinate_, compName_, OptionsPattern[]] :=
                     Global`pr[";\n"]
                 ]
             ,
-            StringMatchQ[modeSub, "adding to primary"],
+            GetParseMode[AddToMain],
                 Module[{},
                     PutAppend[CForm[compToValue], outputfile];
                     Global`pr["+="];
@@ -157,7 +158,7 @@ PrintComponentEquation[coordinate_, compName_, OptionsPattern[]] :=
                     Global`pr[";\n"]
                 ]
             ,
-            StringMatchQ[modeSub, "primary for flux"],
+            GetParseMode[Flux],
                 Module[{},
                     Global`pr["double "];
                     PutAppend[CForm[compToValue], outputfile];
