@@ -20,7 +20,7 @@ GetSuffixName::usage = "GetSuffixName[] returns the suffix added to vars in the 
 
 SetSuffixName::usage = "SetSuffixName[suffix] update the suffix added to vars in the current list.";
 
-ParseComponent::usage = "ParseComponent[varname, compindexlist, coordinate, suffixname] process a component.";
+ParseComponent::usage = "ParseComponent[varname, compindexlist, coordinate] process a component.";
 
 Begin["`Private`"];
 
@@ -90,8 +90,7 @@ SetSuffixName[suffix_] :=
 
 Protect[SetSuffixName];
 
-ParseComponent[varname_, compindexlist_?ListQ, coordinate_, suffixname_
-    ?StringQ] :=
+ParseComponent[varname_, compindexlist_?ListQ, coordinate_] :=
     Module[{compname = SetCompName[varname, compindexlist, coordinate
         ]},
         If[is4DCompIndexListIn3DTensor[compindexlist, varname],
@@ -107,8 +106,7 @@ ParseComponent[varname_, compindexlist_?ListQ, coordinate_, suffixname_
                      !GetParseMode[SetCompTemp]]]
             ,
             GetParseMode[PrintComp],
-                PrintComponent[coordinate, varname, compname, suffixname
-                    ]
+                PrintComponent[coordinate, varname, compname]
             ,
             True,
                 Throw @ Message[ParseComponent::EMode]
@@ -119,7 +117,7 @@ ParseComponent::EMode = "ParseMode unrecognized!";
 
 Protect[ParseComponent];
 
-PrintComponent[coordinate_, varname_, compname_, suffixname_?StringQ] :=
+PrintComponent[coordinate_, varname_, compname_] :=
     Module[{},
         Which[
             GetParseMode[PrintCompInit],
@@ -127,8 +125,7 @@ PrintComponent[coordinate_, varname_, compname_, suffixname_?StringQ] :=
                     ]
             ,
             GetParseMode[PrintCompEQN],
-                PrintComponentEquation[coordinate, compname, suffixname
-                    ]
+                PrintComponentEquation[coordinate, compname]
             ,
             True,
                 Throw @ Message[PrintComponent::EMode]
@@ -137,12 +134,12 @@ PrintComponent[coordinate_, varname_, compname_, suffixname_?StringQ] :=
 
 PrintComponent::EMode = "ParseMode unrecognized!";
 
-PrintComponentEquation[coordinate_, compname_, suffixname_] :=
+PrintComponentEquation[coordinate_, compname_] :=
     Module[{outputfile = GetOutputFile[], compToValue, rhssToValue},
         compToValue = compname // ToValues;
         rhssToValue =
-            (compname /. {compname[[0]] -> RHSOf[compname[[0]], suffixname
-                ]}) //
+            (compname /. {compname[[0]] -> RHSOf[compname[[0]], GetSuffixName[
+                ]]}) //
             DummyToBasis[coordinate] //
             TraceBasisDummy //
             ToValues;

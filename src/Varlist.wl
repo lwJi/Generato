@@ -14,7 +14,7 @@ Begin["`Private`"];
 
 (* Function *)
 
-ParseVarlist[varlist_?ListQ, chartname, suffixname] :=
+ParseVarlist[varlist_?ListQ, chartname] :=
     Module[{iMin, iMax = 3, var, varname, varWithSymmetry, varSymmetryName,
          varSymmetryIndexes, parseComponentValue},
         manifold = $Manifolds[[1]];
@@ -53,7 +53,7 @@ ParseVarlist[varlist_?ListQ, chartname, suffixname] :=
             ];
             (* set temp function *)
             parseComponentValue[compindexlist_] := ParseComponent[varname,
-                 compindexlist, chartname, suffixname];
+                 compindexlist, chartname];
             (* consider different types of tensor *)
             Switch[Length[varname],
                 (* ZERO INDEX CASE: *)0,
