@@ -14,13 +14,14 @@ GetMapComponentToVarlist::usage = "GetMapComponentToVarlist[] returns the map be
 
 SetProcessNewVarlist::usage = "SetProcessNewVarlist[True] update the Boolean variable specifying if we are processing a new varlist.";
 
-ParseComponent::usage = "ParseComponent[varname, compindexlist, coordinate, mode, suffixname] process a component based on mode.";
+ParseComponent::usage = "ParseComponent[varname, compindexlist, coordinate, suffixname] process a component.";
 
 Begin["`Private`"];
 
 (* Data *)
 
-$ParseModeAssociation = <|SetComp -> False, PrintComp -> False|>;
+$ParseModeAssociation = <|SetComp -> False, PrintComp -> False, PrintCompInit
+     -> False, PrintCompEQN -> False|>;
 
 $MapComponentToVarlist = <||>;(*store all varlist's map*)
 
@@ -60,8 +61,8 @@ SetProcessNewVarlist[isnew_] :=
 
 Protect[SetProcessNewVarlist];
 
-ParseComponent[varname_, compindexlist_?ListQ, coordinate_, mode_?BooleanQ,
-     suffixname_?StringQ] :=
+ParseComponent[varname_, compindexlist_?ListQ, coordinate_, suffixname_
+    ?StringQ] :=
     Module[{compname, exprname},
         compname = SetCompName[varname, compindexlist, coordinate];
         exprname = SetExprName[varname, compindexlist, addgpidx];
@@ -73,40 +74,39 @@ ParseComponent[varname_, compindexlist_?ListQ, coordinate_, mode_?BooleanQ,
             Continue[]
         ];
         Which[
-            StringMatchQ[mode, "set components*"],
+            GetParseMode[SetComp],
                 SetComponent[compname, exprname]
             ,
-            StringMatchQ[mode, "print components*"],
-                PrintComponent[mode, coordinate, varname, compname, suffixname
+            GetParseMode[PrintComp],
+                PrintComponent[coordinate, varname, compname, suffixname
                     ]
             ,
             True,
-                Throw @ Message[ParseComponent::EMode, mode]
+                Throw @ Message[ParseComponent::EMode]
         ]
     ];
 
-ParseComponent::EMode = "Parse mode \"`1`\" undefined !";
+ParseComponent::EMode = "ParseMode unrecognized!";
 
 Protect[ParseComponent];
 
-PrintComponent[mode_?StringQ, coordinate_, varname_, compname_, suffixname_
-    ?StringQ, cnd_?ListQ] :=
+PrintComponent[coordinate_, varname_, compname_, suffixname_?StringQ] :=
     Module[{},
         Which[
-            StringMatchQ[mode, "print components initialization*"],
-                Global`PrintComponentInitialization[mode, varname, compname,
-                     GetGridPointIndex[]]
+            GetParseMode[PrintCompInit],
+                Global`PrintComponentInitialization[varname, compname
+                    ]
             ,
-            StringMatchQ[mode, "print components equation*"],
-                PrintComponentEquation[mode, coordinate, compname, {SuffixName
-                     -> suffixname, ReplaceTerms -> cnd}]
+            GetParseMode[PrintCompEQN],
+                PrintComponentEquation[coordinate, compname, {SuffixName
+                     -> suffixname}]
             ,
             True,
-                Throw @ Message[PrintComponent::ErrorMode, mode]
+                Throw @ Message[PrintComponent::EMode]
         ]
     ];
 
-PrintComponent::ErrorMode = "Print mode `1` unsupported yet!";
+PrintComponent::EMode = "ParseMode unrecognized!";
 
 (*
     1. Set components for tensors (How would print them in c/c++ code)

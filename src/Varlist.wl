@@ -14,15 +14,14 @@ Begin["`Private`"];
 
 (* Function *)
 
-Options[ParseVarlist] = {ParseMode -> "", ChartName -> Null, SuffixName
-     -> ""};
+Options[ParseVarlist] = {ChartName -> Null, SuffixName -> ""};
 
 ParseVarlist[varlist_?ListQ, OptionsPattern[]] :=
     Module[{iMin, iMax = 3, var, varname, varLength, varWithSymmetry,
-         varSymmetryName, varSymmetryIndexes, manipulateComponentValue, mode,
-         chartname, suffixname},
-        {mode, chartname, suffixname} = OptionValue[{ParseMode, ChartName,
-             SuffixName}];
+         varSymmetryName, varSymmetryIndexes, manipulateComponentValue, chartname,
+         suffixname},
+        {chartname, suffixname} = OptionValue[{ChartName, SuffixName}
+            ];
         manifold = $Manifolds[[1]];
         If[chartname == Null,
             chartname = ChartsOfManifold[manifold][[1]]
@@ -50,12 +49,12 @@ ParseVarlist[varlist_?ListQ, OptionsPattern[]] :=
             (* check if tensor defined yet *)
             If[!xTensorQ[varname[[0]]],
                 (* tensor not exist, creat one *)
-                If[StringMatchQ[mode, "set components*"],
+                If[GetParseMode[SetComp],
                     DefineTensor[var];
                     PrintVerbose["Define Tensor ", varname[[0]]]
                     ,
                     Throw @ Message[ParseVarlist::ETensorNonExist, iVar,
-                         varname, mode]
+                         varname]
                 ]
                 ,
                 If[!MemberQ[GetMapComponentToVarlist[][[All, 1, 0]], 
@@ -66,7 +65,7 @@ ParseVarlist[varlist_?ListQ, OptionsPattern[]] :=
             ];
             (* set temp function *)
             manipulateComponentValue[compindexlist_] := ParseComponent[
-                varname, compindexlist, chartname, mode, suffixname];
+                varname, compindexlist, chartname, suffixname];
             (* consider different types of tensor *)
             Switch[Length[varname],
                 (* ZERO INDEX CASE: *)0,
@@ -258,7 +257,7 @@ ParseVarlist[varlist_?ListQ, OptionsPattern[]] :=
         ];
     ];
 
-ParseVarlist::ETensorNonExist = "Tensor of the `1`-th var, `2`, in varlist not exist and can't be defined since it's not in 'set components' mode (mode `3`). Please check that this type of tensor can be handled by xActToC!";
+ParseVarlist::ETensorNonExist = "Tensor of the `1`-th var, `2`, in varlist not exist and can't be defined since SetComp is false. Please check that this type of tensor can be handled by Generato!";
 
 ParseVarlist::ETensorExistOutside = "Tensor of the `1`-th var, `2`, in varlist already exsit outside the global varlist, Please try a different name!";
 
