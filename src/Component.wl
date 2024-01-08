@@ -8,7 +8,9 @@ Needs["Generato`Basic`"];
 
 GetMapComponentToVarlist::usage = "GetMapComponentToVarlist[] returns the map between tensor components and varlist indexes.";
 
-SetProcessNewVarlist::usage="SetProcessNewVarlist[True] update the Boolean variable specifying if we are processing a new varlist.";
+SetProcessNewVarlist::usage = "SetProcessNewVarlist[True] update the Boolean variable specifying if we are processing a new varlist.";
+
+ParseComponent::usage = "ParseComponent[varname, compindexlist, coordinate, mode, suffixname] process a component based on mode.";
 
 Begin["`Private`"];
 
@@ -37,15 +39,16 @@ SetProcessNewVarlist[isnew_] :=
     Module[{},
         $ProcessNewVarlist = isnew
     ];
+
 Protect[SetProcessNewVarlist];
 
-ParseComponent[varname_, compIndexList_?ListQ, coordinate_, addgpidx_
-    ?BooleanQ, suffixname_?StringQ] :=
+ParseComponent[varname_, compindexlist_?ListQ, coordinate_, mode_?BooleanQ,
+     suffixname_?StringQ] :=
     Module[{compname, exprname},
-        {compname, exprname} = SetNameArray[varname, compIndexList, coordinate,
+        {compname, exprname} = SetNameArray[varname, compindexlist, coordinate,
              addgpidx];
-        If[is4DCompIndexListIn3DTensor[compIndexList, varname],
-            If[isUp4DCompIndexListIn3DTensor[compIndexList, varname],
+        If[is4DCompIndexListIn3DTensor[compindexlist, varname],
+            If[isUp4DCompIndexListIn3DTensor[compindexlist, varname],
                 
                 ComponentValue[compname, 0]
             ];
@@ -53,14 +56,10 @@ ParseComponent[varname_, compIndexList_?ListQ, coordinate_, addgpidx_
         ];
         Which[
             StringMatchQ[mode, "set components*"],
-                SetComponent[compname, exprname];
-                PrintVerbose["Set Component ", compname, " for Tensor ",
-                     varname[[0]]]
+                SetComponent[compname, exprname]
             ,
             StringMatchQ[mode, "print components*"],
                 PrintComponent[mode, coordinate, varname, compname, suffixname
-                    ];
-                PrintVerbose["Print Component ", compname, " to C-file"
                     ]
             ,
             True,
@@ -105,15 +104,11 @@ SetComponent[compname_, exprname_] :=
         If[Length[mapCtoV] == 0 || GetProcessNewVarlist[] || (StringMatchQ[
             mode, "set components: independent"] && (compname[[0]] =!= Last[mapCtoV
             ][[1, 0]])),
-            varlistindex = -1
+            varlistindex = 0
             ,
-            varlistindex = Last[mapCtoV]
+            varlistindex = Last[mapCtoV] + 1
         ];
-        varlistindex = varlistindex + 1;
-        (* set components *)
         ComponentValue[compname, exprname];
-        (* if tensor component is already exist in the list or not *)
-            
         If[MemberQ[mapCtoV[[All, 1]], compname],
             PrintVerbose["Skip adding Component ", compname, " to Global VarList, since it already exist"
                 ]
@@ -123,7 +118,6 @@ SetComponent[compname_, exprname_] :=
             PrintVerbose["Add Component ", compname, " to Global VarList"
                 ]
         ];
-        (* update $ProcessNewVarlist *)
         SetProcessNewVarlist[False]
     ];
 
