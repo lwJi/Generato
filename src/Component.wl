@@ -177,8 +177,8 @@ PrintComponentEquation::EMode = "ParseMode unrecognized!";
 SetComponent[compname_, exprname_] :=
     Module[{varlistindex, mapCtoV = GetMapComponentToVarlist[]},
         If[Length[mapCtoV] == 0 || GetProcessNewVarlist[] || (StringMatchQ[
-            mode, "set components: independent"] && (compname[[0]] =!= Last[mapCtoV
-            ][[1, 0]])),
+            mode, "set components: independent"] && (compname[[0]] =!= Last[Keys[
+            mapCtoV]][[0]])),
             varlistindex = 0
             ,
             varlistindex = Last[mapCtoV] + 1

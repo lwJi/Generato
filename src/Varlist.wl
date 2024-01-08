@@ -17,9 +17,8 @@ Begin["`Private`"];
 Options[ParseVarlist] = {ChartName -> Null, SuffixName -> ""};
 
 ParseVarlist[varlist_?ListQ, OptionsPattern[]] :=
-    Module[{iMin, iMax = 3, var, varname, varLength, varWithSymmetry,
-         varSymmetryName, varSymmetryIndexes, parseComponentValue, chartname,
-         suffixname},
+    Module[{iMin, iMax = 3, var, varname, varWithSymmetry, varSymmetryName,
+         varSymmetryIndexes, parseComponentValue, chartname, suffixname},
         {chartname, suffixname} = OptionValue[{ChartName, SuffixName}
             ];
         manifold = $Manifolds[[1]];
@@ -36,27 +35,22 @@ ParseVarlist[varlist_?ListQ, OptionsPattern[]] :=
         Do[
             var = varlist[[iVar]];
             varname = var[[1]]; (* say metricg[-a,-b] *)
-            varLength = Length[var];
-            (* if with symmetry *)
-            varWithSymmetry = (varLength == 3) || (varLength == 2 && 
-                (!StringQ[var[[2]]]));
+            varWithSymmetry = (Length[var] == 3) || (Length[var] == 2
+                 && (!StringQ[var[[2]]]));
             If[varWithSymmetry,
                 varSymmetryName = var[[2]][[0]];
                 varSymmetryIndexes = var[[2]][[1]]
             ];
-            (* check if tensor defined yet *)
             If[!xTensorQ[varname[[0]]],
-                (* tensor not exist, creat one *)
                 If[GetParseMode[SetComp],
-                    DefineTensor[var];
-                    PrintVerbose["Define Tensor ", varname[[0]]]
+                    DefineTensor[var]
                     ,
                     Throw @ Message[ParseVarlist::ETensorNonExist, iVar,
                          varname]
                 ]
                 ,
-                If[!MemberQ[GetMapComponentToVarlist[][[All, 1, 0]], 
-                    varname[[0]]],
+                If[!MemberQ[Keys[GetMapComponentToVarlist[]][[All, 0]],
+                     varname[[0]]],
                     Throw @ Message[ParseVarlist::ETensorExistOutside,
                          iVar, varname]
                 ]
