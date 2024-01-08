@@ -14,7 +14,7 @@ Options[SetComponents] :=
     {ChartName -> GetdefaultChart[], SuffixName -> "", IndependentIndexForEachVar
          -> True, TemporaryVars -> False};
 
-SetComponents[varlist_?ListQ, OptionsPattern[]] :=
+SetComponents[OptionsPattern[], varlist_?ListQ] :=
     Module[{chartname, suffixname},
         {chartname, suffixname, indepidx, temp} = OptionValue[{ChartName,
              SuffixName, IndependentIndexForEachVar, TemporaryVars}];
