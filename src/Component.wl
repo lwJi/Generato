@@ -22,8 +22,6 @@ $MapComponentToVarlist = <||>;(*store all varlist's map*)
 
 $ProcessNewVarlist = True;
 
-$ParseMode = <|setcomponent -> 1, printcomponent -> 1|>
-
 (* Function *)
 
 ParseMode[key_] :=
