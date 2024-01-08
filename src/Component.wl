@@ -45,8 +45,8 @@ Protect[SetProcessNewVarlist];
 ParseComponent[varname_, compindexlist_?ListQ, coordinate_, mode_?BooleanQ,
      suffixname_?StringQ] :=
     Module[{compname, exprname},
-        {compname, exprname} = SetNameArray[varname, compindexlist, coordinate,
-             addgpidx];
+        compname = SetCompName[varname, compindexlist, coordinate];
+        exprname = SetExprName[varname, compindexlist, addgpidx];
         If[is4DCompIndexListIn3DTensor[compindexlist, varname],
             If[isUp4DCompIndexListIn3DTensor[compindexlist, varname],
                 
@@ -123,29 +123,43 @@ SetComponent[compname_, exprname_] :=
 
 (*
     compname: component expr in Mathematica kernal, say Pi[{1,-cart},{2,-cart}] 
+*)
+
+SetCompName[varname_, compindexlist_, coordinate_] :=
+    Module[{compname = varname[[0]][]},
+        If[Length[compindexlist] > 0,(*not scalar*)
+            Do[
+                AppendTo[
+                    compname
+                    ,
+                    {
+                        compindexlist[[icomp]]
+                        ,
+                        If[DownIndexQ[varname[[icomp]]],
+                            -coordinate
+                            ,
+                            coordinate
+                        ]
+                    }
+                ]
+                ,
+                {icomp, 1, Length[compindexlist]}
+            ]
+        ];
+        Return[compname]
+    ];
+
+(*
     exprname: component expr to be printed to C code, or lhs, say Pi12[[ijk]],
               ignore the information about covariant/contravariant
 *)
 
-SetNameArray[varname_, compindexlist_, coordinate_, addgpidx_] :=
-    Module[{coordfull, compname, exprname},
-        compname = varname[[0]][];
-        exprname = StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
-            ]];
+SetExprName[varname_, compindexlist_, addgpidx_] :=
+    Module[{exprname = StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
+        ]]},
         If[Length[compindexlist] > 0, (*not scalar*)
-            Do[
-                If[DownIndexQ[varname[[icomp]]],
-                    coordfull = -coordinate
-                    ,
-                    coordfull = coordinate
-                ];
-                AppendTo[compname, {compindexlist[[icomp]], coordfull
-                    }];
-                exprname = exprname <> ToString @ compindexlist[[icomp
-                    ]]
-                ,
-                {icomp, 1, Length[compindexlist]}
-            ]
+            Do[exprname = exprname <> ToString @ compindexlist[[icomp
+                ]], {icomp, 1, Length[compindexlist]}]
         ];
         exprname =
             If[addgpidx,
@@ -153,7 +167,7 @@ SetNameArray[varname_, compindexlist_, coordinate_, addgpidx_] :=
                 ,
                 ToExpression[exprname]
             ];
-        {compname, exprname}
+        Return[exprname]
     ];
 
 End[];
