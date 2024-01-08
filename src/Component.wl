@@ -114,8 +114,7 @@ Options[PrintComponentEquation] :=
 PrintComponentEquation[coordinate_, compName_, OptionsPattern[]] :=
     Module[{modeMain = "print components equation: ", modeSub, outputfile
          = GetoutputFile[], replace$ = GetreplaceSymbol$[], compToValue = compName
-         // ToValues, compToValueStr, rhssToValue, rhssToValueStr, suffixName
-        },
+         // ToValues, rhssToValue, suffixName},
         {suffixName} = OptionValue[{SuffixName, ReplaceTerms}];
         If[StringMatchQ[mode, modeMain <> "*"],
             modeSub = StringTrim[mode, modeMain]
@@ -132,73 +131,39 @@ PrintComponentEquation[coordinate_, compName_, OptionsPattern[]] :=
         If[GetsimplifyEquation[],
             rhssToValue = rhssToValue // Simplify
         ];
-        If[replace$,
-            compToValueStr = StringReplace[ToString[compToValue, CForm
-                ], "$" -> "_"];
-            rhssToValueStr = StringReplace[ToString[rhssToValue, CForm
-                ], "$" -> "_"]
-        ];
         Which[
             StringMatchQ[modeSub, "temporary*"],
                 Module[{},
                     Global`pr["double "];
-                    If[replace$,
-                        Global`pr[compToValueStr];
-                        Global`pr["="];
-                        Global`pr[rhssToValueStr];
-                        Global`pr[";\n"]
-                        ,
-                        PutAppend[CForm[compToValue], outputfile];
-                        Global`pr["="];
-                        PutAppend[CForm[rhssToValue], outputfile];
-                        Global`pr[";\n"]
-                    ]
+                    PutAppend[CForm[compToValue], outputfile];
+                    Global`pr["="];
+                    PutAppend[CForm[rhssToValue], outputfile];
+                    Global`pr[";\n"]
                 ]
             ,
             StringMatchQ[modeSub, "primary*"],
                 Module[{},
-                    If[replace$,
-                        Global`pr[compToValueStr];
-                        Global`pr["="];
-                        Global`pr[rhssToValueStr];
-                        Global`pr[";\n"]
-                        ,
-                        PutAppend[CForm[compToValue], outputfile];
-                        Global`pr["="];
-                        PutAppend[CForm[rhssToValue], outputfile];
-                        Global`pr[";\n"]
-                    ]
+                    PutAppend[CForm[compToValue], outputfile];
+                    Global`pr["="];
+                    PutAppend[CForm[rhssToValue], outputfile];
+                    Global`pr[";\n"]
                 ]
             ,
             StringMatchQ[modeSub, "adding to primary"],
                 Module[{},
-                    If[replace$,
-                        Global`pr[compToValueStr];
-                        Global`pr["+="];
-                        Global`pr[rhssToValueStr];
-                        Global`pr[";\n"]
-                        ,
-                        PutAppend[CForm[compToValue], outputfile];
-                        Global`pr["+="];
-                        PutAppend[CForm[rhssToValue], outputfile];
-                        Global`pr[";\n"]
-                    ]
+                    PutAppend[CForm[compToValue], outputfile];
+                    Global`pr["+="];
+                    PutAppend[CForm[rhssToValue], outputfile];
+                    Global`pr[";\n"]
                 ]
             ,
             StringMatchQ[modeSub, "primary for flux"],
                 Module[{},
                     Global`pr["double "];
-                    If[replace$,
-                        Global`pr[compToValueStr];
-                        Global`pr["="];
-                        Global`pr[rhssToValueStr];
-                        Global`pr[";\n"]
-                        ,
-                        PutAppend[CForm[compToValue], outputfile];
-                        Global`pr["="];
-                        PutAppend[CForm[rhssToValue], outputfile];
-                        Global`pr[";\n"]
-                    ]
+                    PutAppend[CForm[compToValue], outputfile];
+                    Global`pr["="];
+                    PutAppend[CForm[rhssToValue], outputfile];
+                    Global`pr[";\n"]
                 ]
             ,
             True,
