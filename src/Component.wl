@@ -16,6 +16,10 @@ GetMapComponentToVarlist::usage = "GetMapComponentToVarlist[] returns the map be
 
 SetProcessNewVarlist::usage = "SetProcessNewVarlist[True] update the Boolean variable specifying if we are processing a new varlist.";
 
+GetSuffixName::usage = "GetSuffixName[] returns the suffix added to vars in the current list.";
+
+SetSuffixName::usage = "SetSuffixName[suffix] update the suffix added to vars in the current list.";
+
 ParseComponent::usage = "ParseComponent[varname, compindexlist, coordinate, suffixname] process a component.";
 
 Begin["`Private`"];
@@ -27,6 +31,8 @@ $ParseModeAssociation = <||>;
 $MapComponentToVarlist = <||>;(*store all varlist's map*)
 
 $ProcessNewVarlist = True;
+
+$SuffixName = "";
 
 (* Function *)
 
@@ -71,6 +77,18 @@ SetProcessNewVarlist[isnew_] :=
     ];
 
 Protect[SetProcessNewVarlist];
+
+GetSuffixName[] :=
+    Return[$SuffixName];
+
+Protect[GetSuffixName];
+
+SetSuffixName[suffix_] :=
+    Module[{},
+        $SuffixName = suffix
+    ];
+
+Protect[SetSuffixName];
 
 ParseComponent[varname_, compindexlist_?ListQ, coordinate_, suffixname_
     ?StringQ] :=
