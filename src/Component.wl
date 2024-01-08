@@ -46,9 +46,8 @@ SetParseModeAllToFalse[] :=
     Module[{},
         AppendTo[$ParseModeAssociation, <|SetComp -> False, PrintComp
              -> False, SetCompIndep -> False, SetCompTemp -> False, PrintCompInit
-             -> False, PrintCompEQN -> False, PrintCompEQNTemp -> False, PrintCompEQNMain
-             -> False, PrintCompEQNFlux -> False, PrintCompEQNAddToMain -> False|>
-            ]
+             -> False, PrintCompEQN -> False, PrintCompEQNNewVar -> False, PrintCompEQNMain
+             -> False, PrintCompEQNAddToMain -> False|>]
     ];
 
 Protect[SetParseModeAllToFalse];
@@ -133,7 +132,7 @@ PrintComponentEquation[coordinate_, compname_, suffixname_] :=
             rhssToValue = rhssToValue // Simplify
         ];
         Which[
-            GetParseMode[Temp],
+            GetParseMode[PrintCompEQNNewVar],
                 Module[{},
                     Global`pr["double "];
                     PutAppend[CForm[compToValue], outputfile];
@@ -142,7 +141,7 @@ PrintComponentEquation[coordinate_, compname_, suffixname_] :=
                     Global`pr[";\n"]
                 ]
             ,
-            GetParseMode[Main],
+            GetParseMode[PrintCompEQNMain],
                 Module[{},
                     PutAppend[CForm[compToValue], outputfile];
                     Global`pr["="];
@@ -150,19 +149,10 @@ PrintComponentEquation[coordinate_, compname_, suffixname_] :=
                     Global`pr[";\n"]
                 ]
             ,
-            GetParseMode[AddToMain],
+            GetParseMode[PrintCompEQNAddToMain],
                 Module[{},
                     PutAppend[CForm[compToValue], outputfile];
                     Global`pr["+="];
-                    PutAppend[CForm[rhssToValue], outputfile];
-                    Global`pr[";\n"]
-                ]
-            ,
-            GetParseMode[Flux],
-                Module[{},
-                    Global`pr["double "];
-                    PutAppend[CForm[compToValue], outputfile];
-                    Global`pr["="];
                     PutAppend[CForm[rhssToValue], outputfile];
                     Global`pr[";\n"]
                 ]
@@ -187,22 +177,16 @@ PrintComponentEquation::EMode = "ParseMode unrecognized!";
 
 SetComponent[compname_, exprname_] :=
     Module[{varlistindex, mapCtoV = GetMapComponentToVarlist[]},
-        If[Length[mapCtoV] == 0 || GetProcessNewVarlist[] || (StringMatchQ[
-            mode, "set components: independent"] && (compname[[0]] =!= Last[Keys[
-            mapCtoV]][[0]])),
+        If[Length[mapCtoV] == 0 || GetProcessNewVarlist[] || (GetParseMode[
+            SetCompIndep] && (compname[[0]] =!= Last[Keys[mapCtoV]][[0]])),
             varlistindex = 0
             ,
             varlistindex = Last[mapCtoV] + 1
         ];
         ComponentValue[compname, exprname];
-        If[MemberQ[mapCtoV[[All, 1]], compname],
-            PrintVerbose["Skip adding Component ", compname, " to Global VarList, since it already exist"
-                ]
-            ,
+        If[!MemberQ[Keys[mapCtoV], compname],
             AppendTo[mapCtoV, compname -> varlistindex];
-            SetMapComponentToVarlist[mapCtoV];
-            PrintVerbose["Add Component ", compname, " to Global VarList"
-                ]
+            SetMapComponentToVarlist[mapCtoV]
         ];
         SetProcessNewVarlist[False]
     ];
