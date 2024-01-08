@@ -74,9 +74,8 @@ Protect[SetProcessNewVarlist];
 
 ParseComponent[varname_, compindexlist_?ListQ, coordinate_, suffixname_
     ?StringQ] :=
-    Module[{compname, exprname},
-        compname = SetCompName[varname, compindexlist, coordinate];
-        exprname = SetExprName[varname, compindexlist, addgpidx];
+    Module[{compname = SetCompName[varname, compindexlist, coordinate
+        ]},
         If[is4DCompIndexListIn3DTensor[compindexlist, varname],
             If[isUp4DCompIndexListIn3DTensor[compindexlist, varname],
                 
@@ -86,7 +85,8 @@ ParseComponent[varname_, compindexlist_?ListQ, coordinate_, suffixname_
         ];
         Which[
             GetParseMode[SetComp],
-                SetComponent[compname, exprname]
+                SetComponent[compname, SetExprName[varname, compindexlist,
+                     !GetParseMode[SetCompTemp]]]
             ,
             GetParseMode[PrintComp],
                 PrintComponent[coordinate, varname, compname, suffixname
