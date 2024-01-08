@@ -108,6 +108,114 @@ PrintComponent[coordinate_, varname_, compname_, suffixname_?StringQ] :=
 
 PrintComponent::EMode = "ParseMode unrecognized!";
 
+Options[PrintComponentEquation] :=
+    {SuffixName -> ""};
+
+PrintComponentEquation[mode_?StringQ, coordinate_, compName_, OptionsPattern[
+    ]] :=
+    Module[{modeMain = "print components equation: ", modeSub, outputfile
+         = GetoutputFile[], replace$ = GetreplaceSymbol$[], compToValue = compName
+         // ToValues, compToValueStr, rhssToValue, rhssToValueStr, suffixName
+        },
+        {suffixName} = OptionValue[{SuffixName, ReplaceTerms}];
+        If[StringMatchQ[mode, modeMain <> "*"],
+            modeSub = StringTrim[mode, modeMain]
+            ,
+            Throw @ Message[PrintComponentEquation::ErrorMode, mode]
+        ];
+        rhssToValue = compName /. {compName[[0]] -> RHSOf[compName[[0
+            ]], suffixName]};
+        rhssToValue =
+            rhssToValue //
+            DummyToBasis[coordinate] //
+            TraceBasisDummy //
+            ToValues;
+        If[GetsimplifyEquation[],
+            rhssToValue = rhssToValue // Simplify
+        ];
+        If[replace$,
+            compToValueStr = StringReplace[ToString[compToValue, CForm
+                ], "$" -> "_"];
+            rhssToValueStr = StringReplace[ToString[rhssToValue, CForm
+                ], "$" -> "_"]
+        ];
+        (* different modes *)
+        Which[(* equations of temprary variables definition *)
+            StringMatchQ[modeSub, "temporary*"],
+                Module[{},
+                    Global`pr["double "];
+                    If[replace$,
+                        Global`pr[compToValueStr];
+                        Global`pr["="];
+                        Global`pr[rhssToValueStr];
+                        Global`pr[";\n"]
+                        ,
+                        PutAppend[CForm[compToValue], outputfile];
+                        Global`pr["="];
+                        PutAppend[CForm[rhssToValue], outputfile];
+                        Global`pr[";\n"]
+                    ]
+                ]
+            ,
+            (* equations of primary output variables *)StringMatchQ[modeSub,
+                 "primary*"],
+                Module[{},
+                    If[replace$,
+                        Global`pr[compToValueStr];
+                        Global`pr["="];
+                        Global`pr[rhssToValueStr];
+                        Global`pr[";\n"]
+                        ,
+                        PutAppend[CForm[compToValue], outputfile];
+                        Global`pr["="];
+                        PutAppend[CForm[rhssToValue], outputfile];
+                        Global`pr[";\n"]
+                    ]
+                ]
+            ,
+            (* equations of adding more terms to primary variables, say add matter terms to dt_U 
+                *)StringMatchQ[modeSub, "adding to primary"],
+                Module[{},
+                    If[replace$,
+                        Global`pr[compToValueStr];
+                        Global`pr["+="];
+                        Global`pr[rhssToValueStr];
+                        Global`pr[";\n"]
+                        ,
+                        PutAppend[CForm[compToValue], outputfile];
+                        Global`pr["+="];
+                        PutAppend[CForm[rhssToValue], outputfile];
+                        Global`pr[";\n"]
+                    ]
+                ]
+            ,
+            (* equations flux construction *)StringMatchQ[modeSub, "primary for flux"
+                ],
+                Module[{},
+                    Global`pr["double "];
+                    If[replace$,
+                        Global`pr[compToValueStr];
+                        Global`pr["="];
+                        Global`pr[rhssToValueStr];
+                        Global`pr[";\n"]
+                        ,
+                        PutAppend[CForm[compToValue], outputfile];
+                        Global`pr["="];
+                        PutAppend[CForm[rhssToValue], outputfile];
+                        Global`pr[";\n"]
+                    ]
+                ]
+            ,
+            (* mode undefined *)True,
+                Throw @ Message[PrintComponentEquation::ErrorMode, mode
+                    ]
+        ]
+    ];
+
+PrintComponentEquation::ErrorMode = "Print equation mode '`1`' unsupported yet!";
+
+PrintComponentEquation::ErrorUndefined = "Rhs expression '`1`' undefined!";
+
 (*
     1. Set components for tensors (How would print them in c/c++ code)
     2. Set global map between tensor component and varlist index ( $MapComponentToVarlist ):
