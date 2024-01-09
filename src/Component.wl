@@ -94,8 +94,8 @@ Protect[SetSuffixName];
 ParseComponent[varname_, compindexlist_?ListQ, coordinate_] :=
     Module[{compname = SetCompName[varname, compindexlist, coordinate
         ]},
-        If[is4DCompIndexListIn3DTensor[compindexlist, varname],
-            If[isUp4DCompIndexListIn3DTensor[compindexlist, varname],
+        If[Is4DCompIndexListIn3DTensor[compindexlist, varname],
+            If[IsUp4DCompIndexListIn3DTensor[compindexlist, varname],
                 
                 ComponentValue[compname, 0]
             ];
@@ -254,6 +254,62 @@ SetExprName[varname_, compindexlist_] :=
                 ToExpression[exprname <> GetGridPointIndex[]]
             ];
         Return[exprname]
+    ];
+
+Is3DAbstractIndex[idx_] :=
+    Module[{},
+        LetterNumber[StringPart[ToString[idx /. {-1 x_ :> x}], 1]] >=
+             LetterNumber["i"]
+    ];
+
+Is4DCompIndexIn3DTensor[idx_, idxcomp_] :=
+    Module[{},
+        Is3DAbstractIndex[idx] && (idxcomp == 0)
+    ];
+
+Is4DCompIndexListIn3DTensor[idxcomplist_, varname_] :=
+    Module[{is4Didxcomplist = False},
+        If[Length[idxcomplist] > 0,
+            Do[
+                If[is4DCompIndexIn3DTensor[varname[[icomp]], idxcomplist
+                    [[icomp]]],
+                    is4Didxcomplist = True
+                ]
+                ,
+                {icomp, 1, Length[idxcomplist]}
+            ]
+        ];
+        is4Didxcomplist
+    ];
+
+IsUp4DCompIndexListIn3DTensor[idxcomplist_, varname_] :=
+    Module[
+        {isup4Didxcomplist = False}
+        ,
+        (*is there a 0th up index in the component list*)
+        If[Length[idxcomplist] > 0,
+            Do[
+                If[UpIndexQ[varname[[icomp]]] && Is4DCompIndexIn3DTensor[
+                    varname[[icomp]], idxcomplist[[icomp]]],
+                    isup4Didxcomplist = True
+                ]
+                ,
+                {icomp, 1, Length[idxcomplist]}
+            ]
+        ];
+        (*if there is also a 0th down index, skip this one*)
+        (*we want skip all the components with 0th down index*)
+        If[isup4Didxcomplist,
+            Do[
+                If[DownIndexQ[varname[[icomp]]] && Is4DCompIndexIn3DTensor[
+                    varname[[icomp]], idxcomplist[[icomp]]],
+                    isup4Didxcomplist = False
+                ]
+                ,
+                {icomp, 1, Length[idxcomplist]}
+            ]
+        ];
+        isup4Didxcomplist
     ];
 
 End[];
