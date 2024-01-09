@@ -16,6 +16,8 @@ GetMapComponentToVarlist::usage = "GetMapComponentToVarlist[] returns the map be
 
 SetProcessNewVarlist::usage = "SetProcessNewVarlist[True] update the Boolean variable specifying if we are processing a new varlist.";
 
+SetSimplifyEquation::usage = "SetSimplifyEquation[True] update the Boolean variable specifying if Simplify the equations.";
+
 GetSuffixName::usage = "GetSuffixName[] returns the suffix added to vars in the current list.";
 
 SetSuffixName::usage = "SetSuffixName[suffix] update the suffix added to vars in the current list.";
@@ -31,6 +33,8 @@ $ParseModeAssociation = <||>;
 $MapComponentToVarlist = <||>;(*store all varlist's map*)
 
 $ProcessNewVarlist = True;
+
+$SimplifyEquation = True;
 
 $SuffixName = "";
 
@@ -78,6 +82,16 @@ SetProcessNewVarlist[isnew_] :=
     ];
 
 Protect[SetProcessNewVarlist];
+
+GetSimplifyEquation[] :=
+    Return[$SimplifyEquation];
+
+SetSimplifyEquation[simplify_] :=
+    Module[{},
+        $SimplifyEquation = simplify
+    ];
+
+Protect[SetSimplifyEquation];
 
 GetSuffixName[] :=
     Return[$SuffixName];
@@ -133,7 +147,7 @@ PrintComponent[coordinate_, varname_, compname_] :=
         ]
     ];
 
-PrintComponent::EMode = "ParseMode unrecognized!";
+PrintComponent::EMode = "PrintMode unrecognized!";
 
 PrintComponentEquation[coordinate_, compname_] :=
     Module[{outputfile = GetOutputFile[], compToValue, rhssToValue},
@@ -178,7 +192,7 @@ PrintComponentEquation[coordinate_, compname_] :=
         ]
     ];
 
-PrintComponentEquation::EMode = "ParseMode unrecognized!";
+PrintComponentEquation::EMode = "PrintEquationMode unrecognized!";
 
 (*
     1. Set components for tensors (How would print them in c/c++ code)
@@ -195,7 +209,7 @@ SetComponent[compname_, exprname_] :=
     Module[{varlistindex, mapCtoV = GetMapComponentToVarlist[]},
         If[Length[mapCtoV] == 0 || GetProcessNewVarlist[] || (GetParseMode[
             SetCompIndep] && (compname[[0]] =!= Last[Keys[mapCtoV]][[0]])),
-            varlistindex = 0
+            varlistindex = 0(*C convention*)
             ,
             varlistindex = Last[mapCtoV] + 1
         ];
@@ -243,7 +257,7 @@ SetCompName[varname_, compindexlist_, coordinate_] :=
 SetExprName[varname_, compindexlist_] :=
     Module[{exprname = StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
         ]]},
-        If[Length[compindexlist] > 0, (*not scalar*)
+        If[Length[compindexlist] > 0, (*not scalar, ignore up/down*)
             Do[exprname = exprname <> ToString @ compindexlist[[icomp
                 ]], {icomp, 1, Length[compindexlist]}]
         ];
