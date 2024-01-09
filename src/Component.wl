@@ -51,7 +51,7 @@ Protect[SetParseMode];
 SetParseModeAllToFalse[] :=
     Module[{},
         AppendTo[$ParseModeAssociation, <|SetComp -> False, PrintComp
-             -> False, SetCompIndep -> False, SetCompTemp -> False, PrintCompInit
+             -> False, SetCompIndep -> False, SetCompNoGPIndex -> False, PrintCompInit
              -> False, PrintCompEQN -> False, PrintCompEQNNewVar -> False, PrintCompEQNMain
              -> False, PrintCompEQNAddToMain -> False|>]
     ];
@@ -247,7 +247,7 @@ SetExprName[varname_, compindexlist_] :=
                 ]], {icomp, 1, Length[compindexlist]}]
         ];
         exprname =
-            If[GetParseMode[SetCompTemp],
+            If[GetParseMode[SetCompNoGPIndex],
                 ToExpression[exprname]
                 ,
                 ToExpression[exprname <> GetGridPointIndex[]]

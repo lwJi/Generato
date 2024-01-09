@@ -12,19 +12,19 @@ Begin["`Private`"];
 
 Options[SetComponents] :=
     {ChartName -> GetdefaultChart[], IndependentIndexForEachVar -> True,
-         Mode -> "Main"};
+         WithoutGridPointIndex -> False};
 
 SetComponents[OptionsPattern[], varlist_?ListQ] :=
-    Module[{chartname, indepidx, mode},
-        {chartname, indepidx, mode} = OptionValue[{ChartName, IndependentIndexForEachVar,
-             Mode}];
+    Module[{chartname, indepidx, nogpidx},
+        {chartname, indepidx, nogpidx} = OptionValue[{ChartName, IndependentIndexForEachVar,
+             WithoutGridPointIndex}];
         SetParseModeAllToFalse[];
         SetParseMode[SetComp -> True];
         If[indepidx,
             SetParseMode[SetCompIndep -> True]
         ];
-        If[StringMatchQ[mode, "Temp"],
-            SetParseMode[SetCompTemp -> True]
+        If[nogpidx,
+            SetParseMode[SetCompNoGPIndex -> True]
         ];
         ParseVarlist[varlist, chartname}];
     ];
