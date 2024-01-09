@@ -1,6 +1,6 @@
 Needs["CodeFormatter`"]
 
-Module[{dirs = {"src", "test"}},
+Module[{dirs = {"codes", "src", "test"}},
     Do[
         Print["Formatting '.wl' files in "<>dirs[[d]]<>" ..."];
         files = FileNames["*.wl", dirs[[d]]];
