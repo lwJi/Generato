@@ -2,109 +2,99 @@
 
 (* Nmesh.wl, set up functions adapted to Nmesh code *)
 
-(* (c) Liwei Ji, 09/2022 *)
+(* (c) Liwei Ji, 01/2024 *)
 
-(* return the initial component expression of a tensor *)
-
-getInitialComp[varName_] :=
+getInitialComp[varname_] :=
     Module[{initialComp = ""},
         Do[
-            If[is3DAbstractIndex[varName[[compIndex]]],
+            If[is3DAbstractIndex[varname[[compIndex]]],
                 initialComp = initialComp <> "x"
                 ,
                 initialComp = initialComp <> "t"
             ]
             ,
-            {compIndex, 1, Length[varName]}
+            {compIndex, 1, Length[varname]}
         ];
         initialComp
     ];
 
-(*Protect[getInitialComp];*)
-
-(* print components initialization: print initialization of each component of a tensor based on mode.
-    mode choices ["vl_lhs using vl_index", "vl_evo using vl_index", "vl_lhs", "vl_evo", "more input/output"].
+(*
+    Print initialization of each component of a tensor
 *)
 
-PrintComponentInitialization[mode_?StringQ, varName_, compName_, gridPointIndex_
-    ?StringQ] :=
-    Module[{mapCtoV = GetmapComponentToVarlist[], projectName = GetprojectName[
-        ], compToValue = compName // ToValues, varlistIndex, buf},
-        varlistIndex = mapCtoV[[Position[mapCtoV, compName][[1, 1]], 
-            2]];
-        (* different modes *)
-        Which[(* print output var initialization *)
+PrintComponentInitialization[varname_, compname_] :=
+    Module[{varlistindex = GetMapComponentToVarlist[][compname], compToValue
+         = compname // ToValues, buf},
+        Which[
             StringMatchQ[mode, "print components initialization: vl_lhs using vl_index"
                 ],
                 buf = "double *" <> StringTrim[ToString[compToValue],
-                     gridPointIndex] <> " = Vard(node, Vind(vlr," <> ToString[varlistIndex
+                     GetGridPointIndex[]] <> " = Vard(node, Vind(vlr," <> ToString[varlistindex
                     ] <> "));"
             ,
-            (* print input var initialization *)StringMatchQ[mode, "print components initialization: vl_evo using vl_index"
+            StringMatchQ[mode, "print components initialization: vl_evo using vl_index"
                 ],
                 buf = "double *" <> StringTrim[ToString[compToValue],
-                     gridPointIndex] <> " = Vard(node, Vind(vlu," <> ToString[varlistIndex
+                     GetGridPointIndex[]] <> " = Vard(node, Vind(vlu," <> ToString[varlistindex
                     ] <> "));"
             ,
-            (* print output var initialization using var indepedent index
-                *)StringMatchQ[mode, "print components initialization: vl_lhs"],
+            StringMatchQ[mode, "print components initialization: vl_lhs"
+                ],
                 buf =
-                    "double *" <> StringTrim[ToString[compToValue], gridPointIndex
-                        ] <> " = Vard(node, Vind(vlr," <> ToString[projectName] <> "->i_" <> 
-                        StringTrim[ToString[varName[[0]]], (GetprefixDt[] | GetsuffixUnprotected[
-                        ])] <> getInitialComp[varName] <>
-                        If[varlistIndex == 0,
+                    "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[
+                        ]] <> " = Vard(node, Vind(vlr," <> ToString[GetProjectName[]] <> "->i_"
+                         <> StringTrim[ToString[varname[[0]]], (GetprefixDt[] | GetsuffixUnprotected[
+                        ])] <> getInitialComp[varname] <>
+                        If[varlistindex == 0,
                             ""
                             ,
-                            "+" <> ToString[varlistIndex]
+                            "+" <> ToString[varlistindex]
                         ] <> "));"
             ,
-            (* print input var initialization using var independent index
-                *)StringMatchQ[mode, "print components initialization: vl_evo"],
+            StringMatchQ[mode, "print components initialization: vl_evo"
+                ],
                 buf =
-                    "double *" <> StringTrim[ToString[compToValue], gridPointIndex
-                        ] <> " = Vard(node, Vind(vlu," <> ToString[projectName] <> "->i_" <> 
-                        StringTrim[ToString[varName[[0]]], GetsuffixUnprotected[]] <> getInitialComp[
-                        varName] <>
-                        If[varlistIndex == 0,
+                    "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[
+                        ]] <> " = Vard(node, Vind(vlu," <> ToString[GetProjectName[]] <> "->i_"
+                         <> StringTrim[ToString[varname[[0]]], GetsuffixUnprotected[]] <> getInitialComp[
+                        varname] <>
+                        If[varlistindex == 0,
                             ""
                             ,
-                            "+" <> ToString[varlistIndex]
+                            "+" <> ToString[varlistindex]
                         ] <> "));"
             ,
-            (* print more input var initialization *)StringMatchQ[mode,
-                 "print components initialization: more input/output"],
+            StringMatchQ[mode, "print components initialization: more input/output"
+                ],
                 buf =
-                    "double *" <> StringTrim[ToString[compToValue], gridPointIndex
-                        ] <> " = Vard(node, i" <> StringTrim[ToString[varName[[0]]], GetsuffixUnprotected[
-                        ]] <> getInitialComp[varName] <>
-                        If[varlistIndex == 0,
+                    "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[
+                        ]] <> " = Vard(node, i" <> StringTrim[ToString[varname[[0]]], GetsuffixUnprotected[
+                        ]] <> getInitialComp[varname] <>
+                        If[varlistindex == 0,
                             ""
                             ,
-                            "+" <> ToString[varlistIndex]
+                            "+" <> ToString[varlistindex]
                         ] <> ");"
             ,
-            (* print temp var initialization *)StringMatchQ[mode, "print components initialization: temporary"
+            StringMatchQ[mode, "print components initialization: temporary"
                 ],
                 buf = "double " <> StringTrim[ToString[compToValue], 
-                    gridPointIndex] <> ";"
+                    GetGridPointIndex[]] <> ";"
             ,
-            (* mode undefined *)True,
-                Throw @ Message[PrintComponentInitialization::ErrorMode,
-                     mode]
+            True,
+                Throw @ Message[PrintComponentInitialization::EMode, 
+                    mode]
         ];
         pr[buf];
     ];
 
-PrintComponentInitialization::ErrorMode = "Print component mode `1` unsupported yet!";
+PrintComponentInitialization::EMode = "PrintComponentInitialization mode `1` unrecognized!";
 
 (*Protect[PrintComponentInitialization];*)
 
-(* ============== *)
-
-(* Write to files *)
-
-(* ============== *)
+(*
+    Write to files
+*)
 
 Module[{outputFile = GetoutputFile[], filePointer},
     Print[];
