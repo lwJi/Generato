@@ -15,24 +15,18 @@ Begin["`Private`"];
 (* Function *)
 
 ParseVarlist[varlist_?ListQ, chartname] :=
-    Module[{iMin, iMax = 3, var, varname, symmetry, printname, varWithSymmetry,
-         varSymmetryName, varSymmetryIndexes, parseComponentValue},
-        If[chartname == Null,
-            chartname = GetDefaultChart[]
-        ];
+    Module[{iMin, iMax = 3, var, varname, symmetry, printname, varSymmetryName,
+         varSymmetryIndexes, parseComponentValue},
         If[GetDim[] == 3,
             iMin = 1
             ,
             iMin = 0
         ];
         SetProcessNewVarlist[True];
-        (* loop over varlist in the list *)
         Do[
-            var = varlist[[iVar]];
-            varname = var[[1]]; (* say metricg[-a,-b] *)
-            {varname, symmetry, printname} = ParseVar[var] varWithSymmetry
-                 = !(symmetry == Null);
-            If[varWithSymmetry,
+            var = varlist[[ivar]];
+            {varname, symmetry, printname} = ParseVar[var];
+            If[symmetry != Null,
                 varSymmetryName = symmetry[[0]];
                 varSymmetryIndexes = symmetry[[1]]
             ];
@@ -40,29 +34,27 @@ ParseVarlist[varlist_?ListQ, chartname] :=
                 If[GetParseMode[SetComp],
                     DefineTensor[varname, symmetry, printname]
                     ,
-                    Throw @ Message[ParseVarlist::ETensorNonExist, iVar,
+                    Throw @ Message[ParseVarlist::ETensorNonExist, ivar,
                          varname]
                 ]
                 ,
                 If[!MemberQ[Keys[GetMapComponentToVarlist[]][[All, 0]],
                      varname[[0]]],
                     Throw @ Message[ParseVarlist::ETensorExistOutside,
-                         iVar, varname]
+                         ivar, varname]
                 ]
             ];
-            (* set temp function *)
             parseComponentValue[compindexlist_] := ParseComponent[varname,
                  compindexlist, chartname];
-            (* consider different types of tensor *)
             Switch[Length[varname],
-                (* ZERO INDEX CASE: *)0,
+                0(* ZERO INDEX CASE: *),
                     parseComponentValue[{}]
                 ,
-                (* ONE INDEX CASE: *)1,
+                1(* ONE INDEX CASE: *),
                     Do[parseComponentValue[{ia}], {ia, iMin, iMax}]
                 ,
-                (* TWO INDEXES CASE: *)2,
-                    If[varWithSymmetry,
+                2(* TWO INDEXES CASE: *),
+                    If[symmetry != Null,
                         (* With Symmetry *)
                         Switch[varSymmetryName,
                             Symmetric,
@@ -75,7 +67,7 @@ ParseVarlist[varlist_?ListQ, chartname] :=
                             ,
                             _,
                                 Throw @ Message[ParseVarlist::ESymmetryType,
-                                     iVar, varname]
+                                     ivar, varname]
                         ];
                         varname //
                         ToBasis[chartname] //
@@ -87,8 +79,8 @@ ParseVarlist[varlist_?ListQ, chartname] :=
                             iMax}, {ib, iMin, iMax}]
                     ]
                 ,
-                (* THREE INDEXES CASE *)3,
-                    If[varWithSymmetry,
+                3(* THREE INDEXES CASE *),
+                    If[symmetry != Null,
                         (* With Symmetry *)
                         Which[(* c(ab) or c[ab] *)
                             (varSymmetryIndexes[[1]] === varname[[2]]
@@ -104,7 +96,7 @@ ParseVarlist[varlist_?ListQ, chartname] :=
                                     ,
                                     _,
                                         Throw @ Message[ParseVarlist::ESymmetryType,
-                                             iVar, varname]
+                                             ivar, varname]
                                 ]
                             ,
                             (* (ab)c or [ab]c *)(varSymmetryIndexes[[
@@ -120,12 +112,12 @@ ParseVarlist[varlist_?ListQ, chartname] :=
                                     ,
                                     _,
                                         Throw @ Message[ParseVarlist::ESymmetryType,
-                                             iVar, varname]
+                                             ivar, varname]
                                 ]
                             ,
                             (* other three indexes cases *)True,
                                 Throw @ Message[ParseVarlist::ESymmetryType,
-                                     iVar, varname]
+                                     ivar, varname]
                         ];
                         varname //
                         ToBasis[chartname] //
@@ -137,8 +129,8 @@ ParseVarlist[varlist_?ListQ, chartname] :=
                              iMax}, {ia, iMin, iMax}, {ib, iMin, iMax}]
                     ]
                 ,
-                (* FOUR INDEXES CASE *)4,
-                    If[varWithSymmetry,
+                4(* FOUR INDEXES CASE *),
+                    If[symmetry != Null,
                         (* With Symmetry *)
                         Which[(* cd(ab) or cd[ab] *)
                             (varSymmetryIndexes[[1]] === varname[[3]]
@@ -156,7 +148,7 @@ ParseVarlist[varlist_?ListQ, chartname] :=
                                     ,
                                     _,
                                         Throw @ Message[ParseVarlist::ESymmetryType,
-                                             iVar, varname]
+                                             ivar, varname]
                                 ]
                             ,
                             (* (ab)cd or [ab]cd *)(varSymmetryIndexes
@@ -175,7 +167,7 @@ ParseVarlist[varlist_?ListQ, chartname] :=
                                     ,
                                     _,
                                         Throw @ Message[ParseVarlist::ESymmetryType,
-                                             iVar, varname]
+                                             ivar, varname]
                                 ]
                             ,
                             (* c(ab)d or c[ab]d *)(varSymmetryIndexes
@@ -194,7 +186,7 @@ ParseVarlist[varlist_?ListQ, chartname] :=
                                     ,
                                     _,
                                         Throw @ Message[ParseVarlist::ESymmetryType,
-                                             iVar, varname]
+                                             ivar, varname]
                                 ]
                             ,
                             (* (cd)(ab) or [cd][ab] *)varSymmetryName
@@ -214,12 +206,12 @@ ParseVarlist[varlist_?ListQ, chartname] :=
                                     ,
                                     True,
                                         Throw @ Message[ParseVarlist::ESymmetryType,
-                                             iVar, varname]
+                                             ivar, varname]
                                 ]
                             ,
                             (* other four indexes cases *)True,
                                 Throw @ Message[ParseVarlist::ESymmetryType,
-                                     iVar, varname]
+                                     ivar, varname]
                         ];
                         varname //
                         ToBasis[chartname] //
@@ -231,12 +223,12 @@ ParseVarlist[varlist_?ListQ, chartname] :=
                              iMin, iMax}, {id, iMin, iMax}, {ia, iMin, iMax}, {ib, iMin, iMax}]
                     ]
                 ,
-                (* OTHER NUM OF INDEXES *)_,
-                    Throw @ Message[ParseVarlist::ETensorType, iVar, 
+                _(* OTHER NUM OF INDEXES *),
+                    Throw @ Message[ParseVarlist::ETensorType, ivar, 
                         varname]
             ]
             ,
-            {iVar, 1, Length[varlist]}
+            {ivar, 1, Length[varlist]}
         ];
     ];
 
