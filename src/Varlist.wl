@@ -8,6 +8,8 @@ Needs["Generato`Basic`"];
 
 Needs["Generato`Component`"];
 
+ParseVarlist::usage = "ParseVarlist[varlist, chartname] process a varlist.";
+
 Begin["`Private`"];
 
 (* Data *)
@@ -15,8 +17,8 @@ Begin["`Private`"];
 (* Function *)
 
 ParseVarlist[varlist_?ListQ, chartname] :=
-    Module[{iMin, iMax = 3, var, varname, symmetry, printname, varSymmetryName,
-         varSymmetryIndexes, parseComponentValue},
+    Module[{iMin, iMax = 3, var, varname, symmetry, printname, symname,
+         symindex, parseComponentValue},
         If[GetDim[] == 3,
             iMin = 1
             ,
@@ -27,8 +29,8 @@ ParseVarlist[varlist_?ListQ, chartname] :=
             var = varlist[[ivar]];
             {varname, symmetry, printname} = ParseVar[var];
             If[symmetry != Null,
-                varSymmetryName = symmetry[[0]];
-                varSymmetryIndexes = symmetry[[1]]
+                symname = symmetry[[0]];
+                symindex = symmetry[[1]]
             ];
             If[!xTensorQ[varname[[0]]],
                 If[GetParseMode[SetComp],
@@ -55,8 +57,7 @@ ParseVarlist[varlist_?ListQ, chartname] :=
                 ,
                 2(* TWO INDEXES CASE: *),
                     If[symmetry != Null,
-                        (* With Symmetry *)
-                        Switch[varSymmetryName,
+                        Switch[symname,
                             Symmetric,
                                 Do[parseComponentValue[{ia, ib}], {ia,
                                      iMin, iMax}, {ib, ia, iMax}]
@@ -74,18 +75,16 @@ ParseVarlist[varlist_?ListQ, chartname] :=
                         ComponentArray //
                         ComponentValue
                         ,
-                        (* Without Symmetry *)
                         Do[parseComponentValue[{ia, ib}], {ia, iMin, 
                             iMax}, {ib, iMin, iMax}]
                     ]
                 ,
                 3(* THREE INDEXES CASE *),
                     If[symmetry != Null,
-                        (* With Symmetry *)
-                        Which[(* c(ab) or c[ab] *)
-                            (varSymmetryIndexes[[1]] === varname[[2]]
-                                ) && (varSymmetryIndexes[[2]] === varname[[3]]),
-                                Switch[varSymmetryName,
+                        Which[
+                            (symindex[[1]] === varname[[2]]) && (symindex
+                                [[2]] === varname[[3]])(*c(ab) or c[ab]*),
+                                Switch[symname,
                                     Symmetric,
                                         Do[parseComponentValue[{ic, ia,
                                              ib}], {ic, iMin, iMax}, {ia, iMin, iMax}, {ib, ia, iMax}]
@@ -99,9 +98,9 @@ ParseVarlist[varlist_?ListQ, chartname] :=
                                              ivar, varname]
                                 ]
                             ,
-                            (* (ab)c or [ab]c *)(varSymmetryIndexes[[
-                                1]] === varname[[1]]) && (varSymmetryIndexes[[2]] === varname[[2]]),
-                                Switch[varSymmetryName,
+                            (symindex[[1]] === varname[[1]]) && (symindex
+                                [[2]] === varname[[2]])(*(ab)c or [ab]c*),
+                                Switch[symname,
                                     Symmetric,
                                         Do[parseComponentValue[{ia, ib,
                                              ic}], {ia, iMin, iMax}, {ib, ia, iMax}, {ic, iMin, iMax}]
@@ -115,7 +114,7 @@ ParseVarlist[varlist_?ListQ, chartname] :=
                                              ivar, varname]
                                 ]
                             ,
-                            (* other three indexes cases *)True,
+                            True,
                                 Throw @ Message[ParseVarlist::ESymmetryType,
                                      ivar, varname]
                         ];
@@ -124,18 +123,36 @@ ParseVarlist[varlist_?ListQ, chartname] :=
                         ComponentArray //
                         ComponentValue
                         ,
-                        (* Without Symmetry *)
                         Do[parseComponentValue[{ic, ia, ib}], {ic, iMin,
                              iMax}, {ia, iMin, iMax}, {ib, iMin, iMax}]
                     ]
                 ,
                 4(* FOUR INDEXES CASE *),
                     If[symmetry != Null,
-                        (* With Symmetry *)
-                        Which[(* cd(ab) or cd[ab] *)
-                            (varSymmetryIndexes[[1]] === varname[[3]]
-                                ) && (varSymmetryIndexes[[2]] === varname[[4]]),
-                                Switch[varSymmetryName,
+                        Which[
+                            symname == GenSet(*(cd)(ab) or [cd][ab]*),
+                                
+                                Which[
+                                    (symmetry[[1]] === Cycles[{1, 2}]
+                                        ) && (symmetry[[2]] === Cycles[{3, 4}]),
+                                        Do[parseComponentValue[{ic, id,
+                                             ia, ib}], {ic, iMin, iMax}, {id, ic, iMax}, {ia, iMin, iMax}, {ib, ia,
+                                             iMax}]
+                                    ,
+                                    (symmetry[[1]] === -Cycles[{1, 2}
+                                        ]) && (symmetry[[2]] === -Cycles[{3, 4}]),
+                                        Do[parseComponentValue[{ic, id,
+                                             ia, ib}], {ic, iMin, iMax}, {id, ic + 1, iMax}, {ia, iMin, iMax}, {ib,
+                                             ia + 1, iMax}]
+                                    ,
+                                    True,
+                                        Throw @ Message[ParseVarlist::ESymmetryType,
+                                             ivar, varname]
+                                ]
+                            ,
+                            (symindex[[1]] === varname[[3]]) && (symindex
+                                [[2]] === varname[[4]])(*cd(ab) or cd[ab]*),
+                                Switch[symname,
                                     Symmetric,
                                         Do[parseComponentValue[{ic, id,
                                              ia, ib}], {ic, iMin, iMax}, {id, iMin, iMax}, {ia, iMin, iMax}, {ib,
@@ -151,10 +168,9 @@ ParseVarlist[varlist_?ListQ, chartname] :=
                                              ivar, varname]
                                 ]
                             ,
-                            (* (ab)cd or [ab]cd *)(varSymmetryIndexes
-                                [[1]] === varname[[1]]) && (varSymmetryIndexes[[2]] === varname[[2]]),
-                                
-                                Switch[varSymmetryName,
+                            (symindex[[1]] === varname[[1]]) && (symindex
+                                [[2]] === varname[[2]])(*(ab)cd or [ab]cd*),
+                                Switch[symname,
                                     Symmetric,
                                         Do[parseComponentValue[{ia, ib,
                                              ic, id}], {ia, iMin, iMax}, {ib, ia, iMax}, {ic, iMin, iMax}, {id, iMin,
@@ -170,10 +186,9 @@ ParseVarlist[varlist_?ListQ, chartname] :=
                                              ivar, varname]
                                 ]
                             ,
-                            (* c(ab)d or c[ab]d *)(varSymmetryIndexes
-                                [[1]] === varname[[2]]) && (varSymmetryIndexes[[2]] === varname[[3]]),
-                                
-                                Switch[varSymmetryName,
+                            (symindex[[1]] === varname[[2]]) && (symindex
+                                [[2]] === varname[[3]])(*c(ab)d or c[ab]d*),
+                                Switch[symname,
                                     Symmetric,
                                         Do[parseComponentValue[{ic, ia,
                                              ib, id}], {ic, iMin, iMax}, {ia, iMin, iMax}, {ib, ia, iMax}, {id, iMin,
@@ -189,27 +204,7 @@ ParseVarlist[varlist_?ListQ, chartname] :=
                                              ivar, varname]
                                 ]
                             ,
-                            (* (cd)(ab) or [cd][ab] *)varSymmetryName
-                                 == GenSet,
-                                Which[
-                                    (var[[2]][[1]] === Cycles[{1, 2}]
-                                        ) && (var[[2]][[2]] === Cycles[{3, 4}]),
-                                        Do[parseComponentValue[{ic, id,
-                                             ia, ib}], {ic, iMin, iMax}, {id, ic, iMax}, {ia, iMin, iMax}, {ib, ia,
-                                             iMax}]
-                                    ,
-                                    (var[[2]][[1]] === -Cycles[{1, 2}
-                                        ]) && (var[[2]][[2]] === -Cycles[{3, 4}]),
-                                        Do[parseComponentValue[{ic, id,
-                                             ia, ib}], {ic, iMin, iMax}, {id, ic + 1, iMax}, {ia, iMin, iMax}, {ib,
-                                             ia + 1, iMax}]
-                                    ,
-                                    True,
-                                        Throw @ Message[ParseVarlist::ESymmetryType,
-                                             ivar, varname]
-                                ]
-                            ,
-                            (* other four indexes cases *)True,
+                            True,
                                 Throw @ Message[ParseVarlist::ESymmetryType,
                                      ivar, varname]
                         ];
@@ -218,7 +213,6 @@ ParseVarlist[varlist_?ListQ, chartname] :=
                         ComponentArray //
                         ComponentValue
                         ,
-                        (* Without Symmetry *)
                         Do[parseComponentValue[{ic, id, ia, ib}], {ic,
                              iMin, iMax}, {id, iMin, iMax}, {ia, iMin, iMax}, {ib, iMin, iMax}]
                     ]
