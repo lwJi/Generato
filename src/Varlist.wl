@@ -14,52 +14,6 @@ Begin["`Private`"];
 
 (* Function *)
 
-DefineTensor[varname_, symmetry_, printname_] :=
-    Module[{manifold = $Manifolds[[1]]},
-        If[symmetry != Null && Length[printname] > 0,
-            DefTensor[varname, manifold, symmetry, PrintAs -> printname
-                ]
-            ,
-            If[symmetry != Null,
-                DefTensor[varname, manifold, symmetry]
-                ,
-                If[Length[printname] > 0,
-                    DefTensor[varname, manifold, PrintAs -> printname
-                        ]
-                    ,
-                    DefTenosr[varname, manifold]
-                ]
-            ]
-        ]
-    ];
-
-ParseVar[var_] :=
-    Module[{vfeature, varname = Null, symmetry = Null, printname = ""
-        },
-        Do[
-            vfeature = var[[ifeature]];
-            If[Head @ vfeature === Rule,
-                printname = vfeature[[2]]
-                ,
-                If[Head @ Head @ vfeature === Symbol,
-                    If[Length[vfeature] > 0 && AnyTrue[{Symmetric, Antisymmetric,
-                         GenSet}, # === Head @ vfeature&],
-                        symmetry = vfeature
-                        ,
-                        varname = vfeature
-                    ]
-                    ,
-                    Throw @ Message[ParseVar::EVar, vfeature, var]
-                ]
-            ]
-            ,
-            {ifeature, 1, Length[var]}
-        ];
-        {varname, symmetry, printname}
-    ];
-
-ParseVar::EVar = "Var feature `1` in `2` unsupported yet!";
-
 ParseVarlist[varlist_?ListQ, chartname] :=
     Module[{iMin, iMax = 3, var, varname, symmetry, printname, varWithSymmetry,
          varSymmetryName, varSymmetryIndexes, parseComponentValue},
@@ -295,6 +249,52 @@ ParseVarlist::ETensorType = "Tensor type of the `1`-th var, `2`, in varlist unsu
 ParseVarlist::ESymmetryType = "Symmetry type of the `1`-th var, `2`, in varlist unsupported yet!";
 
 Protect[ParseVarlist];
+
+DefineTensor[varname_, symmetry_, printname_] :=
+    Module[{manifold = $Manifolds[[1]]},
+        If[symmetry != Null && Length[printname] > 0,
+            DefTensor[varname, manifold, symmetry, PrintAs -> printname
+                ]
+            ,
+            If[symmetry != Null,
+                DefTensor[varname, manifold, symmetry]
+                ,
+                If[Length[printname] > 0,
+                    DefTensor[varname, manifold, PrintAs -> printname
+                        ]
+                    ,
+                    DefTenosr[varname, manifold]
+                ]
+            ]
+        ]
+    ];
+
+ParseVar[var_] :=
+    Module[{vfeature, varname = Null, symmetry = Null, printname = ""
+        },
+        Do[
+            vfeature = var[[ifeature]];
+            If[Head @ vfeature === Rule,
+                printname = vfeature[[2]]
+                ,
+                If[Head @ Head @ vfeature === Symbol,
+                    If[Length[vfeature] > 0 && AnyTrue[{Symmetric, Antisymmetric,
+                         GenSet}, # === Head @ vfeature&],
+                        symmetry = vfeature
+                        ,
+                        varname = vfeature
+                    ]
+                    ,
+                    Throw @ Message[ParseVar::EVar, vfeature, var]
+                ]
+            ]
+            ,
+            {ifeature, 1, Length[var]}
+        ];
+        {varname, symmetry, printname}
+    ];
+
+ParseVar::EVar = "Var feature `1` in `2` unsupported yet!";
 
 End[];
 
