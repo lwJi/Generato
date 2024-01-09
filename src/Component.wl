@@ -102,8 +102,8 @@ ParseComponent[varname_, compindexlist_?ListQ, coordinate_] :=
         ];
         Which[
             GetParseMode[SetComp],
-                SetComponent[compname, SetExprName[varname, compindexlist,
-                     !GetParseMode[SetCompTemp]]]
+                SetComponent[compname, SetExprName[varname, compindexlist
+                    ]]
             ,
             GetParseMode[PrintComp],
                 PrintComponent[coordinate, varname, compname]
@@ -239,7 +239,7 @@ SetCompName[varname_, compindexlist_, coordinate_] :=
               ignore the information about covariant/contravariant
 *)
 
-SetExprName[varname_, compindexlist_, addgpidx_] :=
+SetExprName[varname_, compindexlist_] :=
     Module[{exprname = StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
         ]]},
         If[Length[compindexlist] > 0, (*not scalar*)
@@ -247,10 +247,10 @@ SetExprName[varname_, compindexlist_, addgpidx_] :=
                 ]], {icomp, 1, Length[compindexlist]}]
         ];
         exprname =
-            If[addgpidx,
-                ToExpression[exprname <> GetGridPointIndex[]]
-                ,
+            If[GetParseMode[SetCompTemp],
                 ToExpression[exprname]
+                ,
+                ToExpression[exprname <> GetGridPointIndex[]]
             ];
         Return[exprname]
     ];
