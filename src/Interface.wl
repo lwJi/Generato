@@ -11,7 +11,7 @@ SetComponents::usage = "SetComponents[varlist, mode] set components of varlist b
 Begin["`Private`"];
 
 Options[SetComponents] :=
-    {ChartName -> GetdefaultChart[], IndependentIndexForEachVar -> True,
+    {ChartName -> GetDefaultChart[], IndependentIndexForEachVar -> True,
          WithoutGridPointIndex -> False};
 
 SetComponents[OptionsPattern[], varlist_?ListQ] :=
@@ -32,7 +32,7 @@ SetComponents[OptionsPattern[], varlist_?ListQ] :=
 Protect[SetComponents];
 
 Options[PrintEquations] :=
-    {ChartName -> GetdefaultChart[], SuffixName -> Null, Mode -> "Main"
+    {ChartName -> GetDefaultChart[], SuffixName -> Null, Mode -> "Main"
         };
 
 PrintEquations[OptionsPattern[], varlist_?ListQ] :=
@@ -47,15 +47,16 @@ PrintEquations[OptionsPattern[], varlist_?ListQ] :=
         SetParseMode[PrintCompEQN -> True];
         Which[
             StringMatchQ[mode, "NewVar"],
-                SetParseMode[PrintCompEQNNewVar -> True];
-                StringMatchQ[mode, "Main"]
+                SetParseMode[PrintCompEQNNewVar -> True]
             ,
-            SetParseMode[PrintCompEQNMain -> True];
-                StringMatchQ[mode, "AddToMain"],
-                SetParseMode[PrintCompEQNAddToMain -> True];
-                True
+            StringMatchQ[mode, "Main"],
+                SetParseMode[PrintCompEQNMain -> True]
             ,
-            Throw @ Message[PrintEquations::EMode, mode]
+            StringMatchQ[mode, "AddToMain"],
+                SetParseMode[PrintCompEQNAddToMain -> True]
+            ,
+            True,
+                Throw @ Message[PrintEquations::EMode, mode]
         ];
         ManipulateVarlist[varlist, chartname];
     ];
@@ -63,6 +64,35 @@ PrintEquations[OptionsPattern[], varlist_?ListQ] :=
 PrintEquations::EMode = "PrintEquations mode '`1`' unsupported yet!";
 
 Protect[PrintEquations];
+
+Options[PrintInitializations] :=
+    {ChartName -> GetDefaultChart[], SuffixName -> Null, Mode -> "Main"
+        };
+
+PrintInitializations[OptionsPattern[], varlist_?ListQ] :=
+    Module[{chartname, suffixname, mode},
+        {chartname, suffixname, mode} = OptionValue[{ChartName, SuffixName,
+             Mode}];
+        If[suffixname != Null,
+            SetSuffixName[suffixname]
+        ];
+        SetParseModeAllToFalse[];
+        SetParseMode[PrintComp -> True];
+        SetParseMode[PrintCompInit -> True];
+        Which[
+            StringMatchQ[mode, "Temp"],
+                SetParseMode[PrintCompInitTemp -> True]
+            ,
+            True,
+                Throw @ Message[PrintInitializations::EMode, mode]
+        ];
+        ManipulateVarlist[varlist, chartname];
+        ParseVarlist[varlist, chartname];
+    ];
+
+PrintInitializations::EMode = "PrintInitializations mode '`1`' unsupported yet!";
+
+Protect[PrintInitializations];
 
 End[];
 

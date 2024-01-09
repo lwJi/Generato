@@ -22,6 +22,8 @@ GetSimplifyEquation::usage = "GetSimplifyEquation[] return the Boolean variable 
 
 SetSimplifyEquation::usage = "SetSimplifyEquation[True] update the Boolean variable specifying if simplify the equations.";
 
+GetDefaultChart:: usage = "GetDefaultChart[] return the default chart we are using."
+
 IsDefined::usage = "IsDefined[term] return True/False if term is defined or not."
 
 RHSOf::usage = "RHSOf[var, suffix] return the expression of 'var$RHS' or 'varsuffix$RHS' (if suffix is not empty).";
@@ -95,6 +97,9 @@ SetSimplifyEquation[simplify_] :=
     ];
 
 Protect[SetSimplifyEquation];
+
+GetDefaultChart[] :=
+    Return[ChartsOfMainfold[$Manifolds[[1]]][[1]]];
 
 IsDefined[term_] :=
     Module[{head = Head[term]},

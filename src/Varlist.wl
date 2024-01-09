@@ -17,11 +17,10 @@ Begin["`Private`"];
 ParseVarlist[varlist_?ListQ, chartname] :=
     Module[{iMin, iMax = 3, var, varname, varWithSymmetry, varSymmetryName,
          varSymmetryIndexes, parseComponentValue},
-        manifold = $Manifolds[[1]];
         If[chartname == Null,
-            chartname = ChartsOfManifold[manifold][[1]]
+            chartname = GetDefaultChart[]
         ];
-        If[DimOfManifold[manifold] == 3,
+        If[DimOfManifold[$Manifolds[[1]]] == 3,
             iMin = 1
             ,
             iMin = 0
