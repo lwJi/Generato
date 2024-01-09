@@ -24,6 +24,8 @@ SetSimplifyEquation::usage = "SetSimplifyEquation[True] update the Boolean varia
 
 GetDefaultChart:: usage = "GetDefaultChart[] return the default chart we are using."
 
+GetDim:: usage = "GetDim[] return the dimension of the manifold."
+
 IsDefined::usage = "IsDefined[term] return True/False if term is defined or not."
 
 RHSOf::usage = "RHSOf[var, suffix] return the expression of 'var$RHS' or 'varsuffix$RHS' (if suffix is not empty).";
@@ -99,6 +101,9 @@ SetSimplifyEquation[simplify_] :=
 Protect[SetSimplifyEquation];
 
 GetDefaultChart[] :=
+    Return[ChartsOfMainfold[$Manifolds[[1]]][[1]]];
+
+GetDim[] :=
     Return[ChartsOfMainfold[$Manifolds[[1]]][[1]]];
 
 IsDefined[term_] :=

@@ -14,13 +14,59 @@ Begin["`Private`"];
 
 (* Function *)
 
+DefineTensor[varname_, symmetry_, printname_] :=
+    Module[{manifold = $Manifolds[[1]]},
+        If[symmetry != Null && Length[printname] > 0,
+            DefTensor[varname, manifold, symmetry, PrintAs -> printname
+                ]
+            ,
+            If[symmetry != Null,
+                DefTensor[varname, manifold, symmetry]
+                ,
+                If[Length[printname] > 0,
+                    DefTensor[varname, manifold, PrintAs -> printname
+                        ]
+                    ,
+                    DefTenosr[varname, manifold]
+                ]
+            ]
+        ]
+    ];
+
+ParseVar[var_] :=
+    Module[{vfeature, varname = Null, symmetry = Null, printname = ""
+        },
+        Do[
+            vfeature = var[[ifeature]];
+            If[Head @ vfeature === Rule,
+                printname = vfeature[[2]]
+                ,
+                If[Head @ Head @ vfeature === Symbol,
+                    If[Length[vfeature] > 0 && AnyTrue[{Symmetric, Antisymmetric,
+                         GenSet}, # === Head @ vfeature&],
+                        symmetry = vfeature
+                        ,
+                        varname = vfeature
+                    ]
+                    ,
+                    Throw @ Message[ParseVar::EVar, vfeature, var]
+                ]
+            ]
+            ,
+            {ifeature, 1, Length[var]}
+        ];
+        {varname, symmetry, printname}
+    ];
+
+ParseVar::EVar = "Var feature `1` in `2` unsupported yet!";
+
 ParseVarlist[varlist_?ListQ, chartname] :=
-    Module[{iMin, iMax = 3, var, varname, varWithSymmetry, varSymmetryName,
-         varSymmetryIndexes, parseComponentValue},
+    Module[{iMin, iMax = 3, var, varname, symmetry, printname, varWithSymmetry,
+         varSymmetryName, varSymmetryIndexes, parseComponentValue},
         If[chartname == Null,
             chartname = GetDefaultChart[]
         ];
-        If[DimOfManifold[$Manifolds[[1]]] == 3,
+        If[GetDim[] == 3,
             iMin = 1
             ,
             iMin = 0
@@ -30,15 +76,15 @@ ParseVarlist[varlist_?ListQ, chartname] :=
         Do[
             var = varlist[[iVar]];
             varname = var[[1]]; (* say metricg[-a,-b] *)
-            varWithSymmetry = (Length[var] == 3) || (Length[var] == 2
-                 && (!StringQ[var[[2]]]));
+            {varname, symmetry, printname} = ParseVar[var] varWithSymmetry
+                 = !(symmetry == Null);
             If[varWithSymmetry,
-                varSymmetryName = var[[2]][[0]];
-                varSymmetryIndexes = var[[2]][[1]]
+                varSymmetryName = symmetry[[0]];
+                varSymmetryIndexes = symmetry[[1]]
             ];
             If[!xTensorQ[varname[[0]]],
                 If[GetParseMode[SetComp],
-                    DefineTensor[var]
+                    DefineTensor[varname, symmetry, printname]
                     ,
                     Throw @ Message[ParseVarlist::ETensorNonExist, iVar,
                          varname]
