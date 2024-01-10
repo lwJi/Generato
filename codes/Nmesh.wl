@@ -4,7 +4,7 @@
 
 (* (c) Liwei Ji, 01/2024 *)
 
-getInitialComp[varname_] :=
+GetInitialComp[varname_] :=
     Module[{initialComp = ""},
         Do[
             If[is3DAbstractIndex[varname[[compIndex]]],
@@ -26,37 +26,23 @@ PrintComponentInitialization[varname_, compname_] :=
     Module[{varlistindex = GetMapComponentToVarlist[][compname], compToValue
          = compname // ToValues, buf},
         Which[
-            StringMatchQ[mode, "print components initialization: vl_lhs using vl_index"
-                ],
-                buf = "double *" <> StringTrim[ToString[compToValue],
-                     GetGridPointIndex[]] <> " = Vard(node, Vind(vlr," <> ToString[varlistindex
-                    ] <> "));"
-            ,
-            StringMatchQ[mode, "print components initialization: vl_evo using vl_index"
-                ],
-                buf = "double *" <> StringTrim[ToString[compToValue],
-                     GetGridPointIndex[]] <> " = Vard(node, Vind(vlu," <> ToString[varlistindex
-                    ] <> "));"
-            ,
-            StringMatchQ[mode, "print components initialization: vl_lhs"
-                ],
+            GetParseMode[PrintCompInitMainOut],
                 buf =
                     "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[
                         ]] <> " = Vard(node, Vind(vlr," <> ToString[GetProjectName[]] <> "->i_"
-                         <> StringTrim[ToString[varname[[0]]], (GetprefixDt[] | GetsuffixUnprotected[
-                        ])] <> getInitialComp[varname] <>
+                         <> StringTrim[ToString[varname[[0]]], (GetprefixDt[] | GetSuffixUnprotected[
+                        ])] <> GetInitialComp[varname] <>
                         If[varlistindex == 0,
                             ""
                             ,
                             "+" <> ToString[varlistindex]
                         ] <> "));"
             ,
-            StringMatchQ[mode, "print components initialization: vl_evo"
-                ],
+            GetParseMode[PrintCompInitMainIn],
                 buf =
                     "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[
                         ]] <> " = Vard(node, Vind(vlu," <> ToString[GetProjectName[]] <> "->i_"
-                         <> StringTrim[ToString[varname[[0]]], GetsuffixUnprotected[]] <> getInitialComp[
+                         <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]] <> GetInitialComp[
                         varname] <>
                         If[varlistindex == 0,
                             ""
@@ -64,22 +50,19 @@ PrintComponentInitialization[varname_, compname_] :=
                             "+" <> ToString[varlistindex]
                         ] <> "));"
             ,
-            StringMatchQ[mode, "print components initialization: more input/output"
-                ],
+            GetParseMode[PrintCompInitMoreInOut],
                 buf =
                     "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[
-                        ]] <> " = Vard(node, i" <> StringTrim[ToString[varname[[0]]], GetsuffixUnprotected[
-                        ]] <> getInitialComp[varname] <>
+                        ]] <> " = Vard(node, i" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
+                        ]] <> GetInitialComp[varname] <>
                         If[varlistindex == 0,
                             ""
                             ,
                             "+" <> ToString[varlistindex]
                         ] <> ");"
             ,
-            StringMatchQ[mode, "print components initialization: temporary"
-                ],
-                buf = "double " <> StringTrim[ToString[compToValue], 
-                    GetGridPointIndex[]] <> ";"
+            GetParseMode[PrintCompInitTemp],
+                buf = "double " <> ToString[compToValue] <> ";"
             ,
             True,
                 Throw @ Message[PrintComponentInitialization::EMode, 

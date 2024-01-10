@@ -80,6 +80,15 @@ PrintInitializations[OptionsPattern[], varlist_?ListQ] :=
         SetParseMode[PrintComp -> True];
         SetParseMode[PrintCompInit -> True];
         Which[
+            StringMatchQ[mode, "MainOut"],
+                SetParseMode[PrintCompInitMainOut -> True]
+            ,
+            StringMatchQ[mode, "MainIn"],
+                SetParseMode[PrintCompInitMainIn -> True]
+            ,
+            StringMatchQ[mode, "MoreInOut"],
+                SetParseMode[PrintCompInitMoreInOut -> True]
+            ,
             StringMatchQ[mode, "Temp"],
                 SetParseMode[PrintCompInitTemp -> True]
             ,
