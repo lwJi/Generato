@@ -56,9 +56,10 @@ SetParseModeAllToFalse[] :=
     Module[{},
         AppendTo[$ParseModeAssociation, <|SetComp -> False, PrintComp
              -> False, SetCompIndep -> False, SetCompNoGPIndex -> False, PrintCompInit
-             -> False, PrintCompInitTemp -> False, PrintCompEQN -> False, PrintCompEQNNewVar
-             -> False, PrintCompEQNMain -> False, PrintCompEQNAddToMain -> False|>
-            ]
+             -> False, PrintCompInitMainOut -> False, PrintCompInitMainIn -> False,
+             PrintCompInitMoreInOut -> False, PrintCompInitTemp -> False, PrintCompEQN
+             -> False, PrintCompEQNNewVar -> False, PrintCompEQNMain -> False, PrintCompEQNAddToMain
+             -> False|>]
     ];
 
 Protect[SetParseModeAllToFalse];

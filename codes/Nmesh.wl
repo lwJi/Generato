@@ -5,17 +5,17 @@
 (* (c) Liwei Ji, 01/2024 *)
 
 GetInitialComp[varname_] :=
-    Module[{initialComp = ""},
+    Module[{initialcomp = ""},
         Do[
-            If[is3DAbstractIndex[varname[[compIndex]]],
-                initialComp = initialComp <> "x"
+            If[is3DAbstractIndex[varname[[icomp]]],
+                initialcomp = initialcomp <> "x"
                 ,
-                initialComp = initialComp <> "t"
+                initialcomp = initialcomp <> "t"
             ]
             ,
-            {compIndex, 1, Length[varname]}
+            {icomp, 1, Length[varname]}
         ];
-        initialComp
+        initialcomp
     ];
 
 (*
@@ -65,13 +65,12 @@ PrintComponentInitialization[varname_, compname_] :=
                 buf = "double " <> ToString[compToValue] <> ";"
             ,
             True,
-                Throw @ Message[PrintComponentInitialization::EMode, 
-                    mode]
+                Throw @ Message[PrintComponentInitialization::EMode]
         ];
         pr[buf];
     ];
 
-PrintComponentInitialization::EMode = "PrintComponentInitialization mode `1` unrecognized!";
+PrintComponentInitialization::EMode = "PrintComponentInitialization mode unrecognized!";
 
 (*Protect[PrintComponentInitialization];*)
 

@@ -66,16 +66,11 @@ PrintEquations::EMode = "PrintEquations mode '`1`' unsupported yet!";
 Protect[PrintEquations];
 
 Options[PrintInitializations] :=
-    {ChartName -> GetDefaultChart[], SuffixName -> Null, Mode -> "Main"
-        };
+    {ChartName -> GetDefaultChart[], Mode -> "Temp"};
 
 PrintInitializations[OptionsPattern[], varlist_?ListQ] :=
-    Module[{chartname, suffixname, mode},
-        {chartname, suffixname, mode} = OptionValue[{ChartName, SuffixName,
-             Mode}];
-        If[suffixname != Null,
-            SetSuffixName[suffixname]
-        ];
+    Module[{chartname, mode},
+        {chartname, mode} = OptionValue[{ChartName, Mode}];
         SetParseModeAllToFalse[];
         SetParseMode[PrintComp -> True];
         SetParseMode[PrintCompInit -> True];
