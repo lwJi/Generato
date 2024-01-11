@@ -21,39 +21,80 @@ MetricInBasis[euclid, -cart, DiagonalMatrix[{1, 1, 1}]];
 
 MetricInBasis[euclid, cart, DiagonalMatrix[{1, 1, 1}]];
 
-DefTensor[rU[i], M3, PrintAs -> "r"];
+dtEvolVarlist = {
+    {rU[i]}
+};
 
-DefTensor[mUD[i, -j], M3, PrintAs -> "M"];
+EvolVarlist = {
+    {uU[i]}
+};
 
-DefTensor[uU[i], M3, PrintAs -> "u"];
+MoreInVarlist = {
+    {MDD[-i,-j], Symmetric[{-i,-j}]}
+};
+
+TempVarlist = {
+    {vU[i]}
+}
 
 (*
     r^i = M^i_j M^j_k u^k     if ADM_ConstraintNorm = Msqr
     r^i = M^i_j u^j           otherwise
 *)
 
-SetEQN[rU[i_], "Msqr", mUD[i, -j] mUD[j, -k] uU[k]];
+SetEQN[vU[i_], euclid[i, k]MDD[-k,-j]uU[j]];
 
-SetEQN[rU[i_], "otherwise", mUD[i, -j] uU[j]];
+SetEQN[{SuffixName -> "Msqr"}, rU[i_], euclid[i,k]mDD[-k, -j]vU[j]];
 
-Print[]
+SetEQN[{SuffixName -> "otherwise"}, rU[i_], "otherwise", vU[j]];
 
-Print[RHSOf[rUMsqr][k]]
+SetComponents[dtEvolVarlist];
+SetComponents[EvolVarlist];
+SetComponents[MoreInVarlist];
+SetComponents[{WithoutGridPointIndex -> True}, TempVarlist];
 
-Print[RHSOf[rUotherwise][k]]
+SetOutFile["test.c"];
 
-Print[]
+$MainPrint[] := Module[{},
+  pr["/* use globals from "<>$projectName<>" */"];
+  pr["extern t"<>$projectName<>" "<>$projectName<>"[1];"];
+  pr[];
+  pr[];
+  pr["void test(tVarList *vlu, tVarList *vlr)"];
+  pr["{"];
+  pr["tMesh *mesh = u->mesh;"];
+  pr[];
+  pr["int Msqr = GetvLax(Par(\"ADM_ConstraintNorm\"), \"Msqr \");"];
+  pr[];
+  pr["formylnodes(mesh)"];
+  pr["{"];
+  pr["tNode *node = MyLnode;"];
+  pr["int ijk;"];
+  pr[];
+  pr["forpoints(node, ijk)"];
+  pr["{"];
+  pr["int iMDD = Ind(\"ADM_gxx\");"];
+  pr[];
 
-Print["More Infos:"]
+  PrintInitializations[dtEvolVarlist, "vl_lhs using vl_index"];
+  PrintInitializations[EvolVarlist, "vl_evo using vl_index"];
+  PrintInitializations[MoreInputVarlist, "more input/output"];
+  PrintEquations[TempVarlist, "temporary"];
+  pr[];
+  (* print equations *)
+  Print[" Printing components equation ...\n"];
+  pr["if(Msqr)"];
+  pr["{"];
+  PrintEquations[dtEvolVarlist, "primary with suffix", {coordinate->cartesian, gridPointIndex->"[[ijk]]", suffixName->"Msqr"}];
+  (*PrintEquation["primary with suffix", dtEvolVarlist, suffixName->"Msqr"];*)
+  pr["}"];
+  pr["else"];
+  pr["{"];
+  PrintEquations[dtEvolVarlist, "primary with suffix", suffixName->"otherwise"];
+  pr["}"];
+  pr[];
 
-Print["  manifolds:    ", $Manifolds]
-
-Print["    default:    ", $Manifolds[[1]]]
-
-Print["  charts:       ", ChartsOfManifold[M3]]
-
-Print["    default:    ", ChartsOfManifold[M3][[1]]]
-
-Print["  dimensions:   ", DimOfManifold[M3]]
-
-Print["  gridpointidx: ", GetGridPointIndex[]]
+   pr["} /* end of points */"];
+   pr["} /* end of nodes */"];
+   pr["}"];
+];
