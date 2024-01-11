@@ -101,10 +101,10 @@ SetSimplifyEquation[simplify_] :=
 Protect[SetSimplifyEquation];
 
 GetDefaultChart[] :=
-    Return[ChartsOfMainfold[$Manifolds[[1]]][[1]]];
+    Return[ChartsOfManifold[$Manifolds[[1]]][[1]]];
 
 GetDim[] :=
-    Return[ChartsOfMainfold[$Manifolds[[1]]][[1]]];
+    Return[DimOfManifold[$Manifolds[[1]]][[1]]];
 
 IsDefined[term_] :=
     Module[{head = Head[term]},
