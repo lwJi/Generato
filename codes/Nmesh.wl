@@ -100,7 +100,7 @@ Module[{outputfile = GetOutputFile[], filepointer},
             ]
         ];
     (* print first few lines *)
-    pr["/* " <> outputfile <> " */"];
+    pr["/* " <> FileNameTake[outputfile] <> " */"];
     pr["/* (c) Liwei Ji " <> DateString[{"Month", "/", "Day", "/", "Year"
         }] <> " */"];
     pr["/* Produced with Mathematica */"];
