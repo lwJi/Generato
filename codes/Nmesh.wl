@@ -30,7 +30,7 @@ PrintComponentInitialization[varname_, compname_] :=
                 buf =
                     "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[
                         ]] <> " = Vard(node, Vind(vlr," <> ToString[GetProjectName[]] <> "->i_"
-                         <> StringTrim[ToString[varname[[0]]], (GetprefixDt[] | GetSuffixUnprotected[
+                         <> StringTrim[ToString[varname[[0]]], (GetPrefixDt[] | GetSuffixUnprotected[
                         ])] <> GetInitialComp[varname] <>
                         If[varlistindex == 0,
                             ""
@@ -78,37 +78,35 @@ PrintComponentInitialization::EMode = "PrintComponentInitialization mode unrecog
     Write to files
 *)
 
-Module[{outputFile = GetoutputFile[], filePointer},
+Module[{outputfile = GetOutputFile[], filepointer},
     Print[];
     Print["============================================================"
         ];
-    Print[" Writing to ", outputFile];
+    Print[" Writing to ", outputfile];
     Print["============================================================"
         ];
-    If[FileExistsQ[outputFile],
-        Print[outputFile, " already exist, replacing it ..."];
-        DeleteFile[outputFile]
+    If[FileExistsQ[outputfile],
+        Print[outputfile, " already exist, replacing it ..."];
+        DeleteFile[outputfile]
     ];
     Print[];
     (* define pr *)
-    filePointer = OpenAppend[outputFile];
+    filepointer = OpenAppend[outputfile];
     pr[x_:""] :=
         Module[{},
             If[x == "double ",
-                WriteString[filePointer, x]
+                WriteString[filepointer, x]
                 ,
-                WriteLine[filePointer, x]
+                WriteLine[filepointer, x]
             ]
         ];
     (* print first few lines *)
-    pr["/* " <> outputFile <> " */"];
+    pr["/* " <> outputfile <> " */"];
     pr["/* (c) Liwei Ji " <> DateString[{"Month", "/", "Day", "/", "Year"
         }] <> " */"];
     pr["/* Produced with Mathematica */"];
     pr[];
-    $headPart[];
-    $bodyPart[];
-    $endPart[];
-    Print["Done generating ", outputFile, "\n"];
-    Close[filePointer]
+    $MainPrint[];
+    Print["Done generating ", outputfile, "\n"];
+    Close[filepointer]
 ];
