@@ -14,6 +14,10 @@ Print["------------------------------------------------------------"];
 
 SetPVerbose::usage = "SetPVerbose[True] update the Boolean variable specifying if print more messages.";
 
+GetPrintDate::usage = "GetPrintDate[] return the Boolean variable specifying if print date in file.";
+
+SetPrintDate::usage = "SetPrintDate[True] update the Boolean variable specifying if print date in file.";
+
 GetGridPointIndex::usage = "GetGridPointIndex[] return the grid index name.";
 
 SetGridPointIndex::usage = "SetGridPointIndex[girdindex] reset the grid index name.";
@@ -54,6 +58,8 @@ Begin["`Private`"];
 
 $PVerbose = False;
 
+$PrintDate = True;
+
 $GridPointIndex = "";
 
 $SuffixUnprotected = "$Upt";
@@ -75,6 +81,18 @@ SetPVerbose[verbose_] :=
     ];
 
 Protect[SetPVerbose];
+
+GetPrintDate[] :=
+    Return[$PrintDate];
+
+Protect[GetPrintDate];
+
+SetPrintDate[print_] :=
+    Module[{},
+        $PrintDate = print
+    ];
+
+Protect[SetPrintDate];
 
 GetGridPointIndex[] :=
     Return[$GridPointIndex];

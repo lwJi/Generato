@@ -101,9 +101,15 @@ Module[{outputfile = GetOutputFile[], filepointer},
         ];
     (* print first few lines *)
     pr["/* " <> FileNameTake[outputfile] <> " */"];
-    pr["/* (c) Liwei Ji " <> DateString[{"Month", "/", "Day", "/", "Year"
-        }] <> " */"];
-    pr["/* Produced with Mathematica */"];
+    pr[
+        "/* Produced with Mathematica" <>
+            If[GetPrintDate[],
+                " on " <> DateString[{"Month", "/", "Day", "/", "Year"
+                    }]
+                ,
+                ""
+            ] <> " */"
+    ];
     pr[];
     $MainPrint[];
     Print["Done generating ", outputfile, "\n"];

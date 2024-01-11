@@ -7,9 +7,11 @@
 Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"
     }]]
 
-SetGridPointIndex["[[ijk]]"]
-
 SetPVerbose[False];
+
+SetPrintDate[False];
+
+SetGridPointIndex["[[ijk]]"]
 
 DefManifold[M3, 3, IndexRange[a, z]];
 
