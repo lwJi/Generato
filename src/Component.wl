@@ -6,6 +6,12 @@ BeginPackage["Generato`Component`"];
 
 Needs["Generato`Basic`"];
 
+Print["------------------------------------------------------------"];
+
+Print["Package Generato`Component`, {2024, 1, 11}"];
+
+Print["------------------------------------------------------------"];
+
 GetParseMode::usage = "GetParseMode[key] returns the mode correspond to the key";
 
 SetParseMode::usage = "SetParseMode[key] add/update the mode correspond to the key";
@@ -182,12 +188,14 @@ PrintComponent[coordinate_, varname_, compname_] :=
     Module[{},
         Which[
             GetParseMode[PrintCompInit],
-                PrintVerbose["    PrintComponentInitialization..."];
+                PrintVerbose["    PrintComponentInitialization ", compname,
+                     "..."];
                 Global`PrintComponentInitialization[varname, compname
                     ]
             ,
             GetParseMode[PrintCompEQN],
-                PrintVerbose["    PrintComponentEquation..."];
+                PrintVerbose["    PrintComponentEquation ", compname,
+                     "..."];
                 PrintComponentEquation[coordinate, compname]
             ,
             True,
@@ -255,7 +263,7 @@ PrintComponentEquation::EMode = "PrintEquationMode unrecognized!";
 
 SetComponent[compname_, exprname_] :=
     Module[{varlistindex, mapCtoV = GetMapComponentToVarlist[]},
-        PrintVerbose["    SetComponent..."];
+        PrintVerbose["    SetComponent ", compname, "..."];
         If[Length[mapCtoV] == 0 || GetProcessNewVarlist[] || (GetParseMode[
             SetCompIndep] && (compname[[0]] =!= Last[Keys[mapCtoV]][[0]])),
             varlistindex = 0(*C convention*)

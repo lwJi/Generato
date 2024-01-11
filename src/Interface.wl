@@ -10,7 +10,17 @@ Needs["Generato`Component`"];
 
 Needs["Generato`Varlist`"];
 
+Print["------------------------------------------------------------"];
+
+Print["Package Generato`Interface`, {2024, 1, 11}"];
+
+Print["------------------------------------------------------------"];
+
 SetComponents::usage = "SetComponents[{ChartName->..., IndependentIndexForEachVar->..., WithoutGridPointIndex->...}, varlist] set components of varlist.";
+
+PrintEquations::usage = "PrintEquations[{ChartName->..., SuffixName->..., Mode->...}, varlist] print equations of varlist.";
+
+PrintInitializations::usage = "PrintInitializations[{ChartName->..., Mode->...}, varlist] print initialization of varlist.";
 
 Begin["`Private`"];
 

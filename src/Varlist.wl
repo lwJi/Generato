@@ -8,6 +8,12 @@ Needs["Generato`Basic`"];
 
 Needs["Generato`Component`"];
 
+Print["------------------------------------------------------------"];
+
+Print["Package Generato`Varlist`, {2024, 1, 11}"];
+
+Print["------------------------------------------------------------"];
+
 ParseVarlist::usage = "ParseVarlist[varlist, chartname] process a varlist.";
 
 Begin["`Private`"];

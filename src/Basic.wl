@@ -6,6 +6,12 @@
 
 BeginPackage["Generato`Basic`", "xAct`xTensor`", "xAct`xCoba`"];
 
+Print["------------------------------------------------------------"];
+
+Print["Package Generato`Basic`, {2024, 1, 11}"];
+
+Print["------------------------------------------------------------"];
+
 SetPVerbose::usage = "SetPVerbose[True] update the Boolean variable specifying if print more messages.";
 
 GetGridPointIndex::usage = "GetGridPointIndex[] return the grid index name.";
