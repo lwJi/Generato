@@ -18,15 +18,11 @@ GetOutputFile::usage = "GetOutputFile[] return the variable storing the output f
 
 SetOutputFile::usage = "SetOutputFile[name] update the variable storing the output file name.";
 
-GetSimplifyEquation::usage = "GetSimplifyEquation[] return the Boolean variable specifying if simplify the equations.";
+GetDefaultChart::usage = "GetDefaultChart[] return the default chart we are using.";
 
-SetSimplifyEquation::usage = "SetSimplifyEquation[True] update the Boolean variable specifying if simplify the equations.";
+GetDim::usage = "GetDim[] return the dimension of the manifold.";
 
-GetDefaultChart:: usage = "GetDefaultChart[] return the default chart we are using."
-
-GetDim:: usage = "GetDim[] return the dimension of the manifold."
-
-IsDefined::usage = "IsDefined[term] return True/False if term is defined or not."
+IsDefined::usage = "IsDefined[term] return True/False if term is defined or not.";
 
 RHSOf::usage = "RHSOf[var, suffix] return the expression of 'var$RHS' or 'varsuffix$RHS' (if suffix is not empty).";
 
@@ -87,18 +83,6 @@ SetOutputFile[filename_] :=
     ];
 
 Protect[SetOutputFile];
-
-GetSimplifyEquation[] :=
-    Return[$SimplifyEquation];
-
-Protect[GetSimplifyEquation];
-
-SetSimplifyEquation[simplify_] :=
-    Module[{},
-        $SimplifyEquation = simplify
-    ];
-
-Protect[SetSimplifyEquation];
 
 GetDefaultChart[] :=
     Return[ChartsOfManifold[$Manifolds[[1]]][[1]]];

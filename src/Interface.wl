@@ -6,7 +6,7 @@ BeginPackage["Generato`Interface`"];
 
 Needs["Generato`Varlist`"];
 
-SetComponents::usage = "SetComponents[varlist, mode] set components of varlist based on mode [\"independent\"(default), \"using vl_index\", \"temporary\"].";
+SetComponents::usage = "SetComponents[{ChartName->..., IndependentIndexForEachVar->..., WithoutGridPointIndex->...}, varlist] set components of varlist.";
 
 Begin["`Private`"];
 
@@ -26,7 +26,7 @@ SetComponents[OptionsPattern[], varlist_?ListQ] :=
         If[nogpidx,
             SetParseMode[SetCompNoGPIndex -> True]
         ];
-        ParseVarlist[varlist, chartname}];
+        ParseVarlist[varlist, chartname];
     ];
 
 Protect[SetComponents];
