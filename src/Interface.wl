@@ -4,6 +4,10 @@
 
 BeginPackage["Generato`Interface`"];
 
+Needs["Generato`Basic`"];
+
+Needs["Generato`Component`"];
+
 Needs["Generato`Varlist`"];
 
 SetComponents::usage = "SetComponents[{ChartName->..., IndependentIndexForEachVar->..., WithoutGridPointIndex->...}, varlist] set components of varlist.";
@@ -39,7 +43,7 @@ PrintEquations[OptionsPattern[], varlist_?ListQ] :=
     Module[{chartname, suffixname, mode},
         {chartname, suffixname, mode} = OptionValue[{ChartName, SuffixName,
              Mode}];
-        If[suffixname != Null,
+        If[suffixname =!= Null,
             SetSuffixName[suffixname]
         ];
         SetParseModeAllToFalse[];

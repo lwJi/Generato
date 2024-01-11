@@ -104,7 +104,7 @@ GetDefaultChart[] :=
     Return[ChartsOfManifold[$Manifolds[[1]]][[1]]];
 
 GetDim[] :=
-    Return[DimOfManifold[$Manifolds[[1]]][[1]]];
+    Return[DimOfManifold[$Manifolds[[1]]]];
 
 IsDefined[term_] :=
     Module[{head = Head[term]},
@@ -178,7 +178,7 @@ SetEQN[OptionsPattern[], var_, varrhs_] :=
             {delayset, checkrhs, suffix} = OptionValue[{DelaySet, CheckRHS,
                  SuffixName}];
             suffix =
-                If[suffix == Null,
+                If[suffix === Null,
                     ""
                     ,
                     ToString[suffix]
@@ -212,7 +212,7 @@ SetEQNDelayed[OptionsPattern[], var_, varrhs_] :=
 
 Protect[SetEQNDelayed];
 
-PrintVerbose[var__] :=
+PrintVerbose[var__:""] :=
     Module[{},
         If[GetPVerbose[],
             Print[var]

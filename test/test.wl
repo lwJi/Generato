@@ -9,6 +9,8 @@ Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"
 
 SetGridPointIndex["[[ijk]]"]
 
+SetPVerbose[True];
+
 DefManifold[M3, 3, IndexRange[a, z]];
 
 DefChart[cart, M3, {1, 2, 3}, {X[], Y[], Z[]}, ChartColor -> Blue];
@@ -29,18 +31,6 @@ MoreInVarlist = {{MDD[-i, -j], Symmetric[{-i, -j}]}};
 
 TempVarlist = {{vU[i]}}
 
-(*
-    r^i = M^i_j M^j_k u^k     if ADM_ConstraintNorm = Msqr
-    r^i = M^i_j u^j           otherwise
-*)
-
-SetEQN[vU[i_], euclid[i, k] MDD[-k, -j] uU[j]];
-
-SetEQN[{SuffixName -> "Msqr"}, rU[i_], euclid[i, k] mDD[-k, -j] vU[j]
-    ];
-
-SetEQN[{SuffixName -> "otherwise"}, rU[i_], "otherwise", vU[j]];
-
 SetComponents[dtEvolVarlist];
 
 SetComponents[EvolVarlist];
@@ -48,6 +38,18 @@ SetComponents[EvolVarlist];
 SetComponents[MoreInVarlist];
 
 SetComponents[{WithoutGridPointIndex -> True}, TempVarlist];
+
+(*
+    r^i = M^i_j M^j_k u^k     if ADM_ConstraintNorm = Msqr
+    r^i = M^i_j u^j           otherwise
+*)
+
+SetEQN[vU[i_], euclid[i, k] MDD[-k, -j] uU[j]];
+
+SetEQN[{SuffixName -> "Msqr"}, rU[i_], euclid[i, k] MDD[-k, -j] vU[j]
+    ];
+
+SetEQN[{SuffixName -> "otherwise"}, rU[i_], "otherwise", vU[j]];
 
 SetOutFile["test.c"];
 

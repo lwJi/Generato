@@ -12,6 +12,36 @@ SetParseMode::usage = "SetParseMode[key] add/update the mode correspond to the k
 
 SetParseModeAllToFalse::usage = "SetParseModeAllToFalse[] set all the modes to false";
 
+SetComp::usage = "ParseMode option.";
+
+Protect[SetComp];
+
+SetCompIndep::usage = "ParseMode option.";
+
+SetCompNoGPIndex::usage = "ParseMode option.";
+
+PrintComp::usage = "ParseMode option.";
+
+Protect[PrintComp];
+
+PrintCompInit::usage = "ParseMode option.";
+
+PrintCompInitMainOut::usage = "ParseMode option.";
+
+PrintCompInitMainIn::usage = "ParseMode option.";
+
+PrintCompInitMoreInOut::usage = "ParseMode option.";
+
+PrintCompInitTemp::usage = "ParseMode option.";
+
+PrintCompEQN::usage = "ParseMode option.";
+
+PrintCompEQNNewVar::usage = "ParseMode option.";
+
+PrintCompEQNMain::usage = "ParseMode option.";
+
+PrintCompEQNAddToMain::usage = "ParseMode option.";
+
 GetMapComponentToVarlist::usage = "GetMapComponentToVarlist[] returns the map between tensor components and varlist indexes.";
 
 SetProcessNewVarlist::usage = "SetProcessNewVarlist[True] update the Boolean variable specifying if we are processing a new varlist.";
@@ -123,6 +153,7 @@ Protect[SetPrefixDt];
 ParseComponent[varname_, compindexlist_?ListQ, coordinate_] :=
     Module[{compname = SetCompName[varname, compindexlist, coordinate
         ]},
+        PrintVerbose["  ParseComponent..."];
         If[Is4DCompIndexListIn3DTensor[compindexlist, varname],
             If[IsUp4DCompIndexListIn3DTensor[compindexlist, varname],
                 
@@ -151,12 +182,12 @@ PrintComponent[coordinate_, varname_, compname_] :=
     Module[{},
         Which[
             GetParseMode[PrintCompInit],
-                PrintVerbose["PrintComponetInitialization..."];
+                PrintVerbose["    PrintComponentInitialization..."];
                 Global`PrintComponentInitialization[varname, compname
                     ]
             ,
             GetParseMode[PrintCompEQN],
-                PrintVerbose["PrintComponetEquation..."];
+                PrintVerbose["    PrintComponentEquation..."];
                 PrintComponentEquation[coordinate, compname]
             ,
             True,
@@ -224,7 +255,7 @@ PrintComponentEquation::EMode = "PrintEquationMode unrecognized!";
 
 SetComponent[compname_, exprname_] :=
     Module[{varlistindex, mapCtoV = GetMapComponentToVarlist[]},
-        PrintVerbose["SetComponet..."];
+        PrintVerbose["    SetComponent..."];
         If[Length[mapCtoV] == 0 || GetProcessNewVarlist[] || (GetParseMode[
             SetCompIndep] && (compname[[0]] =!= Last[Keys[mapCtoV]][[0]])),
             varlistindex = 0(*C convention*)
