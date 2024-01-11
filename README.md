@@ -11,8 +11,8 @@ Generate C/C++ code from tensor expression and so on (using xAct)
 ## Example
 
 ```bash
-cd test
-wolframscript -f test.wl
+cd repo
+wolframscript -f test/test.wl
 ```
 
 ## Recomendations
