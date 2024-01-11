@@ -38,6 +38,8 @@ $SimplifyEquation = True;
 
 $SuffixName = "";
 
+$PrefixDt = "dt";
+
 (* Function *)
 
 GetParseMode[key_] :=
@@ -105,6 +107,18 @@ SetSuffixName[suffix_] :=
     ];
 
 Protect[SetSuffixName];
+
+GetPrefixDt[] :=
+    Return[$PrefixDt];
+
+Protect[GetPrefixDt];
+
+SetPrefixDt[Prefix_] :=
+    Module[{},
+        $PrefixDt = Prefix
+    ];
+
+Protect[SetPrefixDt];
 
 ParseComponent[varname_, compindexlist_?ListQ, coordinate_] :=
     Module[{compname = SetCompName[varname, compindexlist, coordinate
