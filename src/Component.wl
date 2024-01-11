@@ -58,7 +58,11 @@ GetSuffixName::usage = "GetSuffixName[] returns the suffix added to vars in the 
 
 SetSuffixName::usage = "SetSuffixName[suffix] update the suffix added to vars in the current list.";
 
+GetPrefixDt::usage = "GetPrefixDt[] return the prefix used for dt of vars.";
+
 ParseComponent::usage = "ParseComponent[varname, compindexlist, coordinate] process a component.";
+
+Is3DAbstractIndex::usage = "Is3DAbstractIndex[abstractindex] return True if the abstract index is after letter 'i' and only the first letter matters (say h <=> h1 <=> h2 ...).";
 
 Begin["`Private`"];
 

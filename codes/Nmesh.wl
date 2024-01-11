@@ -7,7 +7,7 @@
 GetInitialComp[varname_] :=
     Module[{initialcomp = ""},
         Do[
-            If[is3DAbstractIndex[varname[[icomp]]],
+            If[Is3DAbstractIndex[varname[[icomp]]],
                 initialcomp = initialcomp <> "x"
                 ,
                 initialcomp = initialcomp <> "t"
@@ -29,8 +29,8 @@ PrintComponentInitialization[varname_, compname_] :=
             GetParseMode[PrintCompInitMainOut],
                 buf =
                     "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[
-                        ]] <> " = Vard(node, Vind(vlr," <> ToString[GetProject[]] <> "->i_"
-                         <> StringTrim[ToString[varname[[0]]], (GetPrefixDt[] | GetSuffixUnprotected[
+                        ]] <> " = Vard(node, Vind(vlr," <> ToString[GetProject[]] <> "->i_" <>
+                         StringTrim[ToString[varname[[0]]], (GetPrefixDt[] | GetSuffixUnprotected[
                         ])] <> GetInitialComp[varname] <>
                         If[varlistindex == 0,
                             ""
@@ -41,8 +41,8 @@ PrintComponentInitialization[varname_, compname_] :=
             GetParseMode[PrintCompInitMainIn],
                 buf =
                     "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[
-                        ]] <> " = Vard(node, Vind(vlu," <> ToString[GetProject[]] <> "->i_"
-                         <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]] <> GetInitialComp[
+                        ]] <> " = Vard(node, Vind(vlu," <> ToString[GetProject[]] <> "->i_" <>
+                         StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]] <> GetInitialComp[
                         varname] <>
                         If[varlistindex == 0,
                             ""
@@ -79,7 +79,6 @@ PrintComponentInitialization::EMode = "PrintComponentInitialization mode unrecog
 *)
 
 Module[{outputfile = GetOutputFile[], filepointer},
-    Print[];
     Print["============================================================"
         ];
     Print[" Writing to ", outputfile];

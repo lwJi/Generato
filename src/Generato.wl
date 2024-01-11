@@ -18,7 +18,7 @@
 
 <<Interface.wl
 
-Print[""];
+Print[];
 
 (***********)
 

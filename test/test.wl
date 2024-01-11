@@ -9,7 +9,7 @@ Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"
 
 SetGridPointIndex["[[ijk]]"]
 
-SetPVerbose[True];
+SetPVerbose[False];
 
 DefManifold[M3, 3, IndexRange[a, z]];
 
@@ -49,9 +49,10 @@ SetEQN[vU[i_], euclid[i, k] MDD[-k, -j] uU[j]];
 SetEQN[{SuffixName -> "Msqr"}, rU[i_], euclid[i, k] MDD[-k, -j] vU[j]
     ];
 
-SetEQN[{SuffixName -> "otherwise"}, rU[i_], "otherwise", vU[j]];
+SetEQN[{SuffixName -> "otherwise"}, rU[i_], vU[i]];
 
 SetOutputFile["test.c"];
+
 SetProject["C3GH"];
 
 $MainPrint[] :=
@@ -60,8 +61,7 @@ $MainPrint[] :=
         pr["#include \"" <> project <> ".h\""];
         pr[];
         pr["/* use globals from " <> project <> " */"];
-        pr["extern t" <> project <> " " <> project <> "[1];"]
-            ;
+        pr["extern t" <> project <> " " <> project <> "[1];"];
         pr[];
         pr[];
         pr["void test(tVarList *vlu, tVarList *vlr)"];

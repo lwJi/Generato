@@ -72,7 +72,7 @@ PrintEquations[OptionsPattern[], varlist_?ListQ] :=
             True,
                 Throw @ Message[PrintEquations::EMode, mode]
         ];
-        ManipulateVarlist[varlist, chartname];
+        ParseVarlist[varlist, chartname];
     ];
 
 PrintEquations::EMode = "PrintEquations mode '`1`' unsupported yet!";
@@ -104,7 +104,6 @@ PrintInitializations[OptionsPattern[], varlist_?ListQ] :=
             True,
                 Throw @ Message[PrintInitializations::EMode, mode]
         ];
-        ManipulateVarlist[varlist, chartname];
         ParseVarlist[varlist, chartname];
     ];
 
