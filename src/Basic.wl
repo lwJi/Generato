@@ -26,6 +26,10 @@ GetOutputFile::usage = "GetOutputFile[] return the variable storing the output f
 
 SetOutputFile::usage = "SetOutputFile[name] update the variable storing the output file name.";
 
+GetProject::usage = "GetProject[] return the project name we are generating file for.";
+
+SetProject::usage = "SetProject[name] update the project name we are generating file for.";
+
 GetDefaultChart::usage = "GetDefaultChart[] return the default chart we are using.";
 
 GetDim::usage = "GetDim[] return the dimension of the manifold.";
@@ -55,6 +59,8 @@ $GridPointIndex = "";
 $SuffixUnprotected = "$Upt";
 
 $OutputFile = "output.c";
+
+$Project = "TEST";
 
 $SimplifyEquation = True;
 
@@ -105,6 +111,18 @@ SetOutputFile[filename_] :=
     ];
 
 Protect[SetOutputFile];
+
+GetProject[] :=
+    Return[$Project];
+
+Protect[GetProject];
+
+SetProject[name_] :=
+    Module[{},
+        $Project = name
+    ];
+
+Protect[SetProject];
 
 GetDefaultChart[] :=
     Return[ChartsOfManifold[$Manifolds[[1]]][[1]]];

@@ -29,7 +29,7 @@ PrintComponentInitialization[varname_, compname_] :=
             GetParseMode[PrintCompInitMainOut],
                 buf =
                     "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[
-                        ]] <> " = Vard(node, Vind(vlr," <> ToString[GetProjectName[]] <> "->i_"
+                        ]] <> " = Vard(node, Vind(vlr," <> ToString[GetProject[]] <> "->i_"
                          <> StringTrim[ToString[varname[[0]]], (GetPrefixDt[] | GetSuffixUnprotected[
                         ])] <> GetInitialComp[varname] <>
                         If[varlistindex == 0,
@@ -41,7 +41,7 @@ PrintComponentInitialization[varname_, compname_] :=
             GetParseMode[PrintCompInitMainIn],
                 buf =
                     "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[
-                        ]] <> " = Vard(node, Vind(vlu," <> ToString[GetProjectName[]] <> "->i_"
+                        ]] <> " = Vard(node, Vind(vlu," <> ToString[GetProject[]] <> "->i_"
                          <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]] <> GetInitialComp[
                         varname] <>
                         If[varlistindex == 0,

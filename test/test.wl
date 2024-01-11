@@ -51,15 +51,16 @@ SetEQN[{SuffixName -> "Msqr"}, rU[i_], euclid[i, k] MDD[-k, -j] vU[j]
 
 SetEQN[{SuffixName -> "otherwise"}, rU[i_], "otherwise", vU[j]];
 
-SetOutFile["test.c"];
+SetOutputFile["test.c"];
+SetProject["C3GH"];
 
 $MainPrint[] :=
-    Module[{projectname = "C3GH"},
+    Module[{project = GetProject[]},
         pr["#include \"nmesh.h\""];
-        pr["#include \"" <> projectname <> ".h\""];
+        pr["#include \"" <> project <> ".h\""];
         pr[];
-        pr["/* use globals from " <> projectname <> " */"];
-        pr["extern t" <> projectname <> " " <> projectname <> "[1];"]
+        pr["/* use globals from " <> project <> " */"];
+        pr["extern t" <> project <> " " <> project <> "[1];"]
             ;
         pr[];
         pr[];
@@ -100,3 +101,5 @@ $MainPrint[] :=
         pr["} /* end of nodes */"];
         pr["}"];
     ];
+
+Import[FileNameJoin[{Environment["GENERATO"], "codes/Nmesh.wl"}]];
