@@ -46,7 +46,7 @@ PrintEquations[OptionsPattern[], varlist_?ListQ] :=
         SetParseMode[PrintComp -> True];
         SetParseMode[PrintCompEQN -> True];
         Which[
-            StringMatchQ[mode, "NewVar"],
+            StringMatchQ[mode, "Temp"],
                 SetParseMode[PrintCompEQNNewVar -> True]
             ,
             StringMatchQ[mode, "Main"],

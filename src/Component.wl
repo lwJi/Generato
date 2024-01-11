@@ -151,10 +151,12 @@ PrintComponent[coordinate_, varname_, compname_] :=
     Module[{},
         Which[
             GetParseMode[PrintCompInit],
+                PrintVerbose["PrintComponetInitialization..."];
                 Global`PrintComponentInitialization[varname, compname
                     ]
             ,
             GetParseMode[PrintCompEQN],
+                PrintVerbose["PrintComponetEquation..."];
                 PrintComponentEquation[coordinate, compname]
             ,
             True,
@@ -222,6 +224,7 @@ PrintComponentEquation::EMode = "PrintEquationMode unrecognized!";
 
 SetComponent[compname_, exprname_] :=
     Module[{varlistindex, mapCtoV = GetMapComponentToVarlist[]},
+        PrintVerbose["SetComponet..."];
         If[Length[mapCtoV] == 0 || GetProcessNewVarlist[] || (GetParseMode[
             SetCompIndep] && (compname[[0]] =!= Last[Keys[mapCtoV]][[0]])),
             varlistindex = 0(*C convention*)

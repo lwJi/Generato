@@ -6,6 +6,8 @@
 
 BeginPackage["Generato`Basic`", "xAct`xTensor`", "xAct`xCoba`"];
 
+SetPVerbose::usage = "SetPVerbose[True] update the Boolean variable specifying if print more messages.";
+
 GetGridPointIndex::usage = "GetGridPointIndex[] return the grid index name.";
 
 SetGridPointIndex::usage = "SetGridPointIndex[girdindex] reset the grid index name.";
@@ -34,9 +36,13 @@ CheckRHS::usage = "CheckRHS is an option for SetEQN specifying if check there ar
 
 SetEQNDelayed::usage = "SetEQNDelayed[{CheckRHS->..., Suffix->...}, var, varrhs] returns SetEQN[ {DelaySet->True, ...}, var, varrhs].";
 
+PrintVerbose::usage = "PrintVerbose[var] print var only if GetPVerbose[] is True.";
+
 Begin["`Private`"];
 
 (* Data *)
+
+$PVerbose = False;
 
 $GridPointIndex = "";
 
@@ -47,6 +53,16 @@ $OutputFile = "output.c";
 $SimplifyEquation = True;
 
 (* Function *)
+
+GetPVerbose[] :=
+    Return[$PVerbose];
+
+SetPVerbose[verbose_] :=
+    Module[{},
+        $PVerbose = verbose
+    ];
+
+Protect[SetPVerbose];
 
 GetGridPointIndex[] :=
     Return[$GridPointIndex];
@@ -195,6 +211,15 @@ SetEQNDelayed[OptionsPattern[], var_, varrhs_] :=
     ];
 
 Protect[SetEQNDelayed];
+
+PrintVerbose[var__] :=
+    Module[{},
+        If[GetPVerbose[],
+            Print[var]
+        ]
+    ];
+
+Protect[PrintVerbose];
 
 End[];
 
