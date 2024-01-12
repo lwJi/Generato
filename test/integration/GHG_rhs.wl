@@ -20,23 +20,38 @@ DefManifold[M4, 4, Union[Complement[IndexRange[a, z], {g}], Table[ToExpression[
 DefChart[cart, M4, {0, 1, 2, 3}, {T[], X[], Y[], Z[]}, ChartColor -> 
     Blue];
 
-dtEvolVarlist = SetGridTensors[{dtg[-a, -b], Symmetric[{-a, -b}]}, {dtPi[
-    -a, -b], Symmetric[{-a, -b}], PrintAs -> "dt\[CapitalPi]"}, {dtPhi[-k,
-     -a, -b], Symmetric[{-a, -b}], PrintAs -> "dt\[CapitalPhi]"}];
+dtEvolVarlist = SetGridTensors[
+    {dtg[-a, -b], Symmetric[{-a, -b}]},
+    {dtPi[-a, -b], Symmetric[{-a, -b}], PrintAs -> "dt\[CapitalPi]"},
+    {dtPhi[-k, -a, -b], Symmetric[{-a, -b}], PrintAs -> "dt\[CapitalPhi]"}
+];
 
-EvolVarlist = SetGridTensors[{g[-a, -b], Symmetric[{-a, -b}]}, {Pi$Upt[
-    -a, -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalPi]"}, {Phi[-k, -a,
-     -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalPhi]"}, {H[-a]}];
+EvolVarlist = SetGridTensors[
+    {g[-a, -b], Symmetric[{-a, -b}]},
+    {Pi$Upt[-a, -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalPi]"},
+    {Phi[-k, -a, -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalPhi]"},
+    {H[-a]}
+];
 
-MoreInVarlist = SetGridTensors[{Adg[-a, -b], Symmetric[{-a, -b}]}, {AdPi[
-    -a, -b], Symmetric[{-a, -b}], PrintAs -> "Ad\[CapitalPi]"}, {AdPhi[-k,
-     -a, -b], Symmetric[{-a, -b}], PrintAs -> "Ad\[CapitalPhi]"}, {alpha[
-    ]}, {beta[i]}, {srcSdH[-a, -b], Symmetric[{-a, -b}]}];
+MoreInVarlist = SetGridTensors[
+    {Adg[-a, -b], Symmetric[{-a, -b}]},
+    {AdPi[-a, -b], Symmetric[{-a, -b}], PrintAs -> "Ad\[CapitalPi]"},
+    {AdPhi[-k, -a, -b], Symmetric[{-a, -b}], PrintAs -> "Ad\[CapitalPhi]"},
+    {alpha[], PrintAs -> "\[Alpha]"},
+    {beta[i], PrintAs -> "\[Beta]"},
+    {srcSdH[-a, -b], Symmetric[{-a, -b}], PrintAs -> "\!\(\*SubscriptBox[\(\[PartialD]\), \((a\)]\)\!\(\*SubscriptBox[\(H\), \(\(b\)\()\)\)]\)"}
+];
 
-TempVarlist = SetTempTensors[{detinvh[]}, {invh[i, j], Symmetric[{i, 
-    j}]}, {nvec[a]}, {ndua[-a]}, {invg[a, b], Symmetric[{a, b}]}, {dginFO[
-    -c, -a, -b], Symmetric[{-a, -b}]}, {Gam[-c, -a, -b], Symmetric[{-a, -
-    b}]}, {trGam[-a]}];
+TempVarlist = SetTempTensors[
+    {detinvh[], PrintAs -> "h"},
+    {invh[i, j], Symmetric[{i, j}], PrintAs -> "h"},
+    {nvec[a], PrintAs -> "n"},
+    {ndua[-a], PrintAs -> "n"},
+    {invg[a, b], Symmetric[{a, b}], PrintAs -> "g"},
+    {dginFO[-c, -a, -b], Symmetric[{-a, -b}], PrintAs -> "dg"},
+    {Gam[-c, -a, -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalGamma]"},
+    {trGam[-a], PrintAs -> "\[CapitalGamma]"}
+];
 
 DefConstantSymbol[gamma0];
 
