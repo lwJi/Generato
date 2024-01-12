@@ -11,7 +11,7 @@ if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ -z "$1" ]; then
 
 else
 
-  # go over all the *.wl files in the directory
+  # go over all the *.c files in the directory
   for fname_c in "$@"
   do
     echo "Removing trailing space in $fname_c"
