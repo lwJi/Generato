@@ -81,7 +81,8 @@ PrintComponentInitialization::EMode = "PrintComponentInitialization mode unrecog
 Module[{outputfile = GetOutputFile[], filepointer},
     Print["Writing to \"", outputfile, "\"...\n"];
     If[FileExistsQ[outputfile],
-        Print["\"", outputfile, "\" already exist, replacing it ...\n"];
+        Print["\"", outputfile, "\" already exist, replacing it ...\n"
+            ];
         DeleteFile[outputfile]
     ];
     (* define pr *)

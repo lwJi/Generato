@@ -239,11 +239,9 @@ SetEQN[OptionsPattern[], var_, varrhs_] :=
                     ,
                     ToString[suffix]
                 ];
-            (* check if there is undefined term *)
             If[checkrhs && !IsDefined[varrhs],
                 Throw @ Message[SetEQN::Evarrhs, varrhs]
             ];
-            (* set var$RHS or varsuffix$RHS to varrhs *)
             If[delayset,
                 Hold[IndexSetDelayed[var, varrhs]] /. {var[[0]] :> RHSOf[
                     ToString[var[[0]]] <> suffix] /; replaceTimes++ == 0}

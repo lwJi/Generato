@@ -29,7 +29,8 @@ dtEvolVarlist = GridTensors[{rU[i], PrintAs -> "r"}];
 
 EvolVarlist = GridTensors[{uU[i], PrintAs -> "u"}];
 
-MoreInVarlist = GridTensors[{MDD[-i, -j], Symmetric[{-i, -j}], PrintAs -> "M"}];
+MoreInVarlist = GridTensors[{MDD[-i, -j], Symmetric[{-i, -j}], PrintAs
+     -> "M"}];
 
 TempVarlist = TempTensors[{vU[i], PrintAs -> "v"}];
 
