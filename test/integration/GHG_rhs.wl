@@ -105,7 +105,7 @@ SetEQNDelayed[
             0.0
         ]
         ,
-        nvec[a]
+        ndua[a]
     ]
 ];
 
