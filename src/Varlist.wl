@@ -248,14 +248,14 @@ Protect[ParseVarlist];
 
 DefineTensor[varname_, symmetry_, printname_] :=
     Module[{manifold = $Manifolds[[1]]},
-        If[symmetry =!= Null && Length[printname] > 0,
+        If[symmetry =!= Null && StringLength[printname] > 0,
             DefTensor[varname, manifold, symmetry, PrintAs -> printname
                 ]
             ,
             If[symmetry =!= Null,
                 DefTensor[varname, manifold, symmetry]
                 ,
-                If[Length[printname] > 0,
+                If[StringLength[printname] > 0,
                     DefTensor[varname, manifold, PrintAs -> printname
                         ]
                     ,
