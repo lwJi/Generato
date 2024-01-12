@@ -346,7 +346,7 @@ Is4DCompIndexListIn3DTensor[idxcomplist_, varname_] :=
     Module[{is4Didxcomplist = False},
         If[Length[idxcomplist] > 0,
             Do[
-                If[is4DCompIndexIn3DTensor[varname[[icomp]], idxcomplist
+                If[Is4DCompIndexIn3DTensor[varname[[icomp]], idxcomplist
                     [[icomp]]],
                     is4Didxcomplist = True
                 ]

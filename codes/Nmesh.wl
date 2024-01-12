@@ -112,6 +112,8 @@ Module[{outputfile = GetOutputFile[], filepointer},
     ];
     pr[];
     $MainPrint[];
+    pr[];
+    pr["/* " <> FileNameTake[outputfile] <> " */"];
     Print["Done generating ", outputfile, "\n"];
     Close[filepointer]
 ];

@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* GHG_rhs_set_gravity.wl *)
+(* GHG_rhs.wl *)
 
 (* (c) Liwei Ji, 01/2024 *)
 
@@ -122,7 +122,7 @@ SetEQN[dtPhi[i_,a_,b_],
 
 
 (* Write to files *)
-SetOutputFile[FileNameJoin[{Environment["GENERATO"], "test/GHG.c"}]];
+SetOutputFile[FileNameJoin[{Environment["GENERATO"], "test/integration/GHG_rhs.c"}]];
 
 SetProject["GHG"];
 
@@ -185,8 +185,6 @@ $MainPrint[] := Module[{project = GetProject[]},
 
   pr["return 0;"];
   pr["} /* end of function */"];
-  pr[];
-  pr["/* GHG_rhs.c */"];
 ];
 
 Import[FileNameJoin[{Environment["GENERATO"], "codes/Nmesh.wl"}]];

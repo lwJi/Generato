@@ -1,0 +1,23 @@
+#!/bin/bash
+
+echo "RemoveTrailingSpaces (c) 2023 Liwei Ji"
+
+if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ -z "$1" ]; then
+
+  echo "USAGE:"
+  echo "  RemoveTrailingSpaces *.c"
+  echo "EXAMPLE:"
+  echo "  RemoveTrailingSpaces C3GH_set_profile_ADM.c"
+
+else
+
+  # go over all the *.wl files in the directory
+  for fname_c in "$@"
+  do
+    echo "Removing trailing space in $fname_c"
+    sed -i.bak -E 's/[[:space:]]*$$//' $fname_c
+    rm $fname_c.bak
+  done
+  echo "DONE"
+
+fi
