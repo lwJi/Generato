@@ -20,20 +20,20 @@ DefManifold[M4, 4, Union[Complement[IndexRange[a, z], {g}], Table[ToExpression[
 DefChart[cart, M4, {0, 1, 2, 3}, {T[], X[], Y[], Z[]}, ChartColor -> 
     Blue];
 
-dtEvolVarlist = SetGridTensors[
+dtEvolVarlist = GridTensors[
     {dtg[-a, -b], Symmetric[{-a, -b}]},
     {dtPi[-a, -b], Symmetric[{-a, -b}], PrintAs -> "dt\[CapitalPi]"},
     {dtPhi[-k, -a, -b], Symmetric[{-a, -b}], PrintAs -> "dt\[CapitalPhi]"}
 ];
 
-EvolVarlist = SetGridTensors[
+EvolVarlist = GridTensors[
     {g[-a, -b], Symmetric[{-a, -b}]},
     {Pi$Upt[-a, -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalPi]"},
     {Phi[-k, -a, -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalPhi]"},
     {H[-a]}
 ];
 
-MoreInVarlist = SetGridTensors[
+MoreInVarlist = GridTensors[
     {Adg[-a, -b], Symmetric[{-a, -b}]},
     {AdPi[-a, -b], Symmetric[{-a, -b}], PrintAs -> "Ad\[CapitalPi]"},
     {AdPhi[-k, -a, -b], Symmetric[{-a, -b}], PrintAs -> "Ad\[CapitalPhi]"},
@@ -42,7 +42,7 @@ MoreInVarlist = SetGridTensors[
     {srcSdH[-a, -b], Symmetric[{-a, -b}], PrintAs -> "\!\(\*SubscriptBox[\(\[PartialD]\), \((a\)]\)\!\(\*SubscriptBox[\(H\), \(\(b\)\()\)\)]\)"}
 ];
 
-TempVarlist = SetTempTensors[
+TempVarlist = TempTensors[
     {detinvh[], PrintAs -> "\[Gamma]"},
     {invh[i, j], Symmetric[{i, j}], PrintAs -> "\[Gamma]"},
     {nvec[a], PrintAs -> "n"},

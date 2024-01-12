@@ -25,13 +25,13 @@ MetricInBasis[euclid, -cart, DiagonalMatrix[{1, 1, 1}]];
 
 MetricInBasis[euclid, cart, DiagonalMatrix[{1, 1, 1}]];
 
-dtEvolVarlist = SetGridTensors[{rU[i], PrintAs -> "r"}];
+dtEvolVarlist = GridTensors[{rU[i], PrintAs -> "r"}];
 
-EvolVarlist = SetGridTensors[{uU[i], PrintAs -> "u"}];
+EvolVarlist = GridTensors[{uU[i], PrintAs -> "u"}];
 
-MoreInVarlist = SetGridTensors[{MDD[-i, -j], Symmetric[{-i, -j}], PrintAs -> "M"}];
+MoreInVarlist = GridTensors[{MDD[-i, -j], Symmetric[{-i, -j}], PrintAs -> "M"}];
 
-TempVarlist = SetTempTensors[{vU[i], PrintAs -> "v"}];
+TempVarlist = TempTensors[{vU[i], PrintAs -> "v"}];
 
 (*
     r^i = M^i_j M^j_k u^k     if ADM_ConstraintNorm = Msqr
