@@ -2,6 +2,13 @@
 
 Generate C/C++ code from tensor expression and so on (using xAct)
 
+## Pre-Requisites
+
+* Install free Wolfram Engine for Devolopers from https://www.wolfram.com/developer/.
+(If you are rich, you can install the totally worth-it Mathematica instead, versions that support 'wolframscript'.)
+
+* Download xAct from http://www.xact.es and install it properly.
+
 ## Installation
 
 * clone repo: `git clone git@github.com:lwJi/Generato.git`
@@ -10,15 +17,19 @@ Generate C/C++ code from tensor expression and so on (using xAct)
 
 ## Example
 
-* Small test
+* Small toy
 
 ```bash
 wolframscript -f test/unit/test.wl
 ```
 
-* GHG system
+* GHG formulation of Einstein's equations
 
-Please take a look at the example script for GHG system: [test/integration/GHG_rhs.ipynb](https://github.com/lwJi/Generato/blob/main/test/integration/GHG_rhs.ipynb)
+Please take a look at the example script for GHG system: [test/integration/GHG_rhs.ipynb](https://github.com/lwJi/Generato/blob/main/test/integration/GHG_rhs.ipynb). Or
+
+```bash
+wolframscript -f test/integration/GHG_rhs.wl
+```
 
 ## Recomendations
 
