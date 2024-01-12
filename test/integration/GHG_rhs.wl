@@ -60,8 +60,8 @@ DefConstantSymbol[interior];
 Module[{Mat, invMat},
   Mat=Table[g[{aa,-cart},{bb,-cart}]//ToValues, {aa,1,3}, {bb,1,3}];
   invMat=Inverse[Mat]/.{1/Det[Mat]->(detinvh[]//ToValues)};
-  SetRHS[detinvh[], 1/Det[Mat]//Simplify];
-  SetRHSDelayed[invh[i_,j_],
+  SetEQN[{CheckRHS->False}, detinvh[], 1/Det[Mat]//Simplify];
+  SetEQNDelayed[invh[i_,j_],
     If[IndexType[i,UpIndexQ]&&IndexType[j,UpIndexQ],
       If[i[[1]]>0&&j[[1]]>0, invMat[[i[[1]],j[[1]]]]//Simplify],
       invh[i,j]
