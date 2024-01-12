@@ -10,17 +10,18 @@ Generate C/C++ code from tensor expression and so on (using xAct)
 
 ## Example
 
+* Small test
+
 ```bash
-cd repo
-wolframscript -f test/test.wl
+wolframscript -f test/unit/test.wl
 ```
+
+* GHG system
+
+Please take a look at the example script for GHG system: [test/integration/GHG_rhs.ipynb](https://github.com/lwJi/Generato/blob/main/test/integration/GHG_rhs.ipynb)
 
 ## Recomendations
 
 * Use lower case to name variables (to aviod conflict with say `Pi`)
 
 ## Tips
-
-### xAct functions
-
-* Get charts on a manifold `M3`: `ChartsOfManifold[M3]`
