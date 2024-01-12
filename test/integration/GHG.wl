@@ -57,14 +57,14 @@ DefConstantSymbol[gamma1];
 DefConstantSymbol[gamma2];
 DefConstantSymbol[interior];
 
-Module[{Mat, invMat}
-  Mat=Table[(g[{aa,-cart},{bb,-cart}]//ToValues), {aa,1,3}, {bb,1,3}];
-  invMat=Inverse[Mat]/.{1/Det[Mat]->detinvh[]//ToValues}
+Module[{Mat, invMat},
+  Mat=Table[g[{aa,-cart},{bb,-cart}]//ToValues, {aa,1,3}, {bb,1,3}];
+  invMat=Inverse[Mat]/.{1/Det[Mat]->(detinvh[]//ToValues)};
   SetRHS[detinvh[], 1/Det[Mat]//Simplify];
   SetRHSDelayed[invh[i_,j_],
     If[IndexType[i,UpIndexQ]&&IndexType[j,UpIndexQ],
       If[i[[1]]>0&&j[[1]]>0, invMat[[i[[1]],j[[1]]]]//Simplify],
-      invh[a,b]
+      invh[i,j]
     ]
   ]
 ];
@@ -126,9 +126,9 @@ SetOutputFile[FileNameJoin[{Environment["GENERATO"], "test/GHG.c"}]];
 
 SetProject["GHG"];
 
-$MainPart[] := Module[{},
+$MainPrint[] := Module[{project = GetProject[]},
   pr["#include \"nmesh.h\""];
-  pr["#include \""<>GetprojectName[]<>".h\""];
+  pr["#include \""<>project<>".h\""];
   pr[];
   pr["#define Power(x,y) (pow((double) (x),(double) (y)))"];
   pr["#define Log(x) log((double) (x))"];
@@ -138,11 +138,11 @@ $MainPart[] := Module[{},
   pr["#define Sqrt(x) sqrt(x)"];
   pr["#define Abs(x) fabs(x)"];
   pr[];
-  pr["/* use globals from "<>GetprojectName[]<>" */"];
-  pr["extern t"<>GetprojectName[]<>" "<>GetprojectName[]<>"[1];"];
+  pr["/* use globals from "<>project<>" */"];
+  pr["extern t"<>project<>" "<>project<>"[1];"];
   pr[];
   pr[];
-  pr["int "<>$functionName<>"(tNode *node, tVarList *vlr, tVarList *vlu)"];
+  pr["int GHG_rhs(tNode *node, tVarList *vlr, tVarList *vlu)"];
   pr["{"];
   pr["tMesh *mesh = node->pat->mesh;"];
   pr["int ialpha = Ind(\"ADM_alpha\");"];
@@ -186,7 +186,7 @@ $MainPart[] := Module[{},
   pr["return 0;"];
   pr["} /* end of function */"];
   pr[];
-  pr["/* "<>$functionName<>".c */"];
+  pr["/* GHG_rhs.c */"];
 ];
 
 Import[FileNameJoin[{Environment["GENERATO"], "codes/Nmesh.wl"}]];

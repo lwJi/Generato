@@ -257,7 +257,7 @@ SetEQN::Evarrhs = "There are undefined terms in the RHS '`1`'!"
 
 Protect[SetEQN];
 
-Options[SetEQNDelayed] = {CheckRHS -> True, SuffixName -> Null};
+Options[SetEQNDelayed] = {CheckRHS -> False, SuffixName -> Null};
 
 SetEQNDelayed[OptionsPattern[], var_, varrhs_] :=
     Module[{checkrhs, suffix},
