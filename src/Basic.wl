@@ -46,13 +46,11 @@ IndexType3D::usage = "IndexType3D[compindex, indextype] return True if second co
 
 RHSOf::usage = "RHSOf[var, suffix] return the expression of 'var$RHS' or 'varsuffix$RHS' (if suffix is not empty).";
 
-SetEQN::usage = "SetEQN[{DelaySet->..., CheckRHS->..., Suffix->...}, var, varrhs] set 'var$RHS/varsuffix$RHS' equal to 'varrhs', considering if DelaySet, CheckRHS.";
-
-DelaySet::usage = "DelaySet is an option for SetEQN specifying if use IndexSetDelayed.";
+SetEQN::usage = "SetEQN[{CheckRHS->..., Suffix->...}, var, varrhs] set 'var$RHS/varsuffix$RHS' equal to 'varrhs', considering if CheckRHS.";
 
 CheckRHS::usage = "CheckRHS is an option for SetEQN specifying if check there are undefined terms in varrhs.";
 
-SetEQNDelayed::usage = "SetEQNDelayed[{CheckRHS->..., Suffix->...}, var, varrhs] returns SetEQN[ {DelaySet->True, ...}, var, varrhs].";
+SetEQNDelayed::usage = "SetEQNDelayed[{Suffix->...}, var, varrhs] set 'var$RHS/varsuffix$RHS' equal to varrhs for if cases.";
 
 PrintVerbose::usage = "PrintVerbose[var] print var only if GetPVerbose[] is True.";
 
@@ -225,14 +223,13 @@ RHSOf::Eargs = "`1` arguments unsupported yet!";
 
 Protect[RHSOf];
 
-Options[SetEQN] = {DelaySet -> False, CheckRHS -> True, SuffixName ->
-     Null};
+Options[SetEQN] = {CheckRHS -> True, SuffixName -> Null};
 
 SetEQN[OptionsPattern[], var_, varrhs_] :=
     ReleaseHold @
-        Module[{delayset, checkrhs, suffix, replaceTimes = 0},
-            {delayset, checkrhs, suffix} = OptionValue[{DelaySet, CheckRHS,
-                 SuffixName}];
+        Module[{checkrhs, suffix, replacetimes = 0},
+            {checkrhs, suffix} = OptionValue[{CheckRHS, SuffixName}];
+                
             suffix =
                 If[suffix === Null,
                     ""
@@ -242,27 +239,31 @@ SetEQN[OptionsPattern[], var_, varrhs_] :=
             If[checkrhs && !IsDefined[varrhs],
                 Throw @ Message[SetEQN::Evarrhs, varrhs]
             ];
-            If[delayset,
-                Hold[IndexSetDelayed[var, varrhs]] /. {var[[0]] :> RHSOf[
-                    ToString[var[[0]]] <> suffix] /; replaceTimes++ == 0}
-                ,
-                Hold[IndexSet[var, varrhs]] /. {var[[0]] :> RHSOf[ToString[
-                    var[[0]]] <> suffix] /; replaceTimes++ == 0}
-            ]
+            Hold[IndexSet[var, varrhs]] /. {var[[0]] :> RHSOf[ToString[
+                var[[0]]] <> suffix] /; replacetimes++ == 0}
         ];
 
 SetEQN::Evarrhs = "There are undefined terms in the RHS '`1`'!"
 
 Protect[SetEQN];
 
-Options[SetEQNDelayed] = {CheckRHS -> False, SuffixName -> Null};
+SetAttributes[SetEQNDelayed, {HoldAll, SequenceHold}];
+
+Options[SetEQNDelayed] = {SuffixName -> Null};
 
 SetEQNDelayed[OptionsPattern[], var_, varrhs_] :=
-    Module[{checkrhs, suffix},
-        {checkrhs, suffix} = OptionValue[{CheckRHS, SuffixName}];
-        SetEQN[{DelaySet -> True, CheckRHS -> checkrhs, SuffixName ->
-             suffix}, var, varrhs]
-    ];
+    ReleaseHold @
+        Module[{suffix, replacetimes = 0},
+            {suffix} = OptionValue[{SuffixName}];
+            suffix =
+                If[suffix === Null,
+                    ""
+                    ,
+                    ToString[suffix]
+                ];
+            Hold[IndexSetDelayed[var, varrhs]] /. {var[[0]] :> RHSOf[
+                ToString[var[[0]]] <> suffix] /; replacetimes++ == 0}
+        ];
 
 Protect[SetEQNDelayed];
 
