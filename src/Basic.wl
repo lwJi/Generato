@@ -40,6 +40,10 @@ GetDim::usage = "GetDim[] return the dimension of the manifold.";
 
 IsDefined::usage = "IsDefined[term] return True/False if term is defined or not.";
 
+IndexType::usage = "IndexType[compindex, indextype] return True if second compindex is indextype.";
+
+IndexType3D::usage = "IndexType3D[compindex, indextype] return True if second compindex is indextype and it's a 3D index.";
+
 RHSOf::usage = "RHSOf[var, suffix] return the expression of 'var$RHS' or 'varsuffix$RHS' (if suffix is not empty).";
 
 SetEQN::usage = "SetEQN[{DelaySet->..., CheckRHS->..., Suffix->...}, var, varrhs] set 'var$RHS/varsuffix$RHS' equal to 'varrhs', considering if DelaySet, CheckRHS.";
@@ -191,6 +195,16 @@ IsDefined::ETerm = "The `1`-th subterm in '`2`' is not defined!";
 IsDefined::EType = "The Expression type of '`1`' is not detectable!";
 
 Protect[IsDefined];
+
+IndexType[compindexlist_?ListQ, indextype_] :=
+    indextype[compindexlist[[2]]];
+
+Protect[IndexType];
+
+IndexType3D[compindexlist_?ListQ, indextype_] :=
+    indextype[compindexlist[[2]]] && (compindexlist[[1]] > 0);
+
+Protect[IndexType3D];
 
 RHSOf[var__] :=
     Module[{arglist = List[var]},
