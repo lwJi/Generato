@@ -79,16 +79,11 @@ PrintComponentInitialization::EMode = "PrintComponentInitialization mode unrecog
 *)
 
 Module[{outputfile = GetOutputFile[], filepointer},
-    Print["============================================================"
-        ];
-    Print[" Writing to ", outputfile];
-    Print["============================================================"
-        ];
+    Print["Writing to \"", outputfile, "\"...\n"];
     If[FileExistsQ[outputfile],
-        Print[outputfile, " already exist, replacing it ..."];
+        Print["\"", outputfile, "\" already exist, replacing it ...\n"];
         DeleteFile[outputfile]
     ];
-    Print[];
     (* define pr *)
     filepointer = OpenAppend[outputfile];
     pr[x_:""] :=
@@ -114,6 +109,6 @@ Module[{outputfile = GetOutputFile[], filepointer},
     $MainPrint[];
     pr[];
     pr["/* " <> FileNameTake[outputfile] <> " */"];
-    Print["Done generating ", outputfile, "\n"];
+    Print["Done generating \"", outputfile, "\"\n"];
     Close[filepointer]
 ];

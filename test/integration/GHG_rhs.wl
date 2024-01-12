@@ -43,8 +43,8 @@ MoreInVarlist = SetGridTensors[
 ];
 
 TempVarlist = SetTempTensors[
-    {detinvh[], PrintAs -> "h"},
-    {invh[i, j], Symmetric[{i, j}], PrintAs -> "h"},
+    {detinvh[], PrintAs -> "\[Gamma]"},
+    {invh[i, j], Symmetric[{i, j}], PrintAs -> "\[Gamma]"},
     {nvec[a], PrintAs -> "n"},
     {ndua[-a], PrintAs -> "n"},
     {invg[a, b], Symmetric[{a, b}], PrintAs -> "g"},
@@ -53,13 +53,13 @@ TempVarlist = SetTempTensors[
     {trGam[-a], PrintAs -> "\[CapitalGamma]"}
 ];
 
-DefConstantSymbol[gamma0];
+DefConstantSymbol[gamma0, PrintAs -> "\!\(\*SubscriptBox[\(\[Gamma]\), \(0\)]\)"];
 
-DefConstantSymbol[gamma1];
+DefConstantSymbol[gamma1, PrintAs -> "\!\(\*SubscriptBox[\(\[Gamma]\), \(1\)]\)"];
 
-DefConstantSymbol[gamma2];
+DefConstantSymbol[gamma2, PrintAs -> "\!\(\*SubscriptBox[\(\[Gamma]\), \(2\)]\)"];
 
-DefConstantSymbol[interior];
+DefConstantSymbol[interior, PrintAs -> "I"];
 
 Module[{Mat, invMat},
     Mat = Table[g[{aa, -cart}, {bb, -cart}] // ToValues, {aa, 1, 3}, 
