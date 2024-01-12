@@ -74,21 +74,27 @@ $MainPrint[] :=
         pr["{"];
         pr["int iMDD = Ind(\"ADM_gxx\");"];
         pr[];
+
         PrintInitializations[{Mode -> "MainOut"}, dtEvolVarlist];
         PrintInitializations[{Mode -> "MainIn"}, EvolVarlist];
         PrintInitializations[{Mode -> "MoreInOut"}, MoreInVarlist];
+
         pr[];
         PrintEquations[{Mode -> "Temp"}, TempVarlist];
         pr[];
         pr["if(Msqr)"];
         pr["{"];
+
         PrintEquations[{Mode -> "Main", SuffixName -> "Msqr", ChartName
              -> cart}, dtEvolVarlist];
+
         pr["}"];
         pr["else"];
         pr["{"];
+
         PrintEquations[{Mode -> "Main", SuffixName -> "otherwise"}, dtEvolVarlist
             ];
+
         pr["}"];
         pr[];
         pr["} /* end of points */"];
