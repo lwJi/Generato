@@ -193,17 +193,17 @@ IsDefined::EType = "The Expression type of '`1`' is not detectable!";
 Protect[IsDefined];
 
 RHSOf[var__] :=
-    Module[{argList = List[var]},
-        Switch[Length[argList],
+    Module[{arglist = List[var]},
+        Switch[Length[arglist],
             1,
                 ToExpression[ToString[var] <> "$RHS"]
             ,
             2,
-                ToExpression[ToString[argList[[1]]] <> ToString[argList
+                ToExpression[ToString[arglist[[1]]] <> ToString[arglist
                     [[2]]] <> "$RHS"]
             ,
             _,
-                Throw @ Message[RHSOf::Eargs, Length[argList]]
+                Throw @ Message[RHSOf::Eargs, Length[arglist]]
         ]
     ];
 

@@ -1,5 +1,5 @@
 /* test.c */
-/* Produced with Mathematica on 01/11/2024 */
+/* Produced with Mathematica */
 
 #include "nmesh.h"
 #include "C3GH.h"

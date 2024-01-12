@@ -16,6 +16,10 @@ Print["Package Generato`Interface`, {2024, 1, 11}"];
 
 Print["------------------------------------------------------------"];
 
+SetGridTensors::usage = "SetGridTensors[vars] define grid tensors (with grid point index), set components and return the varlist";
+
+SetTempTensors::usage = "SetTempTensors[vars] define temp tensors (without grid point index), set components and return the varlist";
+
 SetComponents::usage = "SetComponents[{ChartName->..., IndependentIndexForEachVar->..., WithoutGridPointIndex->...}, varlist] set components of varlist.";
 
 PrintEquations::usage = "PrintEquations[{ChartName->..., SuffixName->..., Mode->...}, varlist] print equations of varlist.";
@@ -23,6 +27,26 @@ PrintEquations::usage = "PrintEquations[{ChartName->..., SuffixName->..., Mode->
 PrintInitializations::usage = "PrintInitializations[{ChartName->..., Mode->...}, varlist] print initialization of varlist.";
 
 Begin["`Private`"];
+
+(*
+    Higher functions
+*)
+
+SetGridTensors[vars__] :=
+    Module[{arglist = List[vars]},
+        SetComponents[arglist];
+        Return[arglist]
+    ];
+
+SetTempTensors[vars__] :=
+    Module[{arglist = List[vars]},
+        SetComponents[{WithoutGridPointIndex -> True}, arglist];
+        Return[arglist]
+    ];
+
+(*
+    Baisc functions
+*)
 
 Options[SetComponents] :=
     {ChartName -> GetDefaultChart[], IndependentIndexForEachVar -> True,
