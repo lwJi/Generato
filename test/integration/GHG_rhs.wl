@@ -66,64 +66,23 @@ Module[{Mat, invMat},
         {bb, 1, 3}];
     invMat = Inverse[Mat] /. {1 / Det[Mat] -> (detinvh[] // ToValues)
         };
-    SetEQN[{CheckRHS -> False}, detinvh[], 1 / Det[Mat] // Simplify];
+    SetEQNDelayed[detinvh[], 1 / Det[Mat] // Simplify];
         
-    SetEQNDelayed[
-        invh[i_, j_]
-        ,
-        If[IndexType[i, UpIndexQ] && IndexType[j, UpIndexQ],
-            If[i[[1]] > 0 && j[[1]] > 0,
-                invMat[[i[[1]], j[[1]]]] // Simplify
-            ]
-            ,
-            invh[i, j]
-        ]
-    ]
+    SetEQNDelayed[invh[i_, j_], invMat[[i[[1]], j[[1]]]] // Simplify]
 ];
 
-SetEQNDelayed[
-    nvec[a_]
-    ,
-    If[IndexType[a, UpIndexQ],
-        If[a[[1]] == 0,
-            alpha[] ^ -1
-            ,
-            -alpha[] ^ -1 beta[a]
-        ]
-        ,
-        nvec[a]
-    ]
+SetEQNDelayed[nvec[a_],
+    If[a[[1]] == 0, alpha[] ^ -1, -alpha[] ^ -1 beta[a]]
 ];
 
-SetEQNDelayed[
-    ndua[a_]
-    ,
-    If[IndexType[a, DownIndexQ],
-        If[a[[1]] == 0,
-            -alpha[]
-            ,
-            0.0
-        ]
-        ,
-        ndua[a]
-    ]
+SetEQNDelayed[ndua[a_],
+    If[a[[1]] == 0, -alpha[], 0.0]
 ];
 
 SetEQN[invg[a_, b_], invh[a, b] - nvec[a] nvec[b]];
 
-SetEQNDelayed[
-    dginFO[c_, a_, b_]
-    ,
-    If[IndexType[c, DownIndexQ] && IndexType[a, DownIndexQ] && IndexType[
-        b, DownIndexQ],
-        If[c[[1]] == 0,
-            -alpha[] Pi$Upt[a, b] + beta[k] Phi[-k, a, b]
-            ,
-            Phi[c, a, b]
-        ]
-        ,
-        dginFO[c, a, b]
-    ]
+SetEQNDelayed[dginFO[c_, a_, b_],
+    If[c[[1]] == 0, -alpha[] Pi$Upt[a, b] + beta[k] Phi[-k, a, b], Phi[c, a, b]]
 ];
 
 SetEQN[Gam[c_, a_, b_], 1/2 (dginFO[a, b, c] + dginFO[b, c, a] - dginFO[
