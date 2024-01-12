@@ -36,3 +36,5 @@ wolframscript -f test/integration/GHG_rhs.wl
 * Use lower case to name variables (to aviod conflict with say `Pi`)
 
 ## Tips
+
+* Use `SetEQNDelayed` if your right-hand side (rhs) includes an `If` statement to handle different component cases. Otherwise, `SetEQN` is preferred because it has an option, `CheckRHS`, which checks if all the terms appearing in the rhs are well-defined.
