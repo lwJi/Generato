@@ -251,7 +251,7 @@ SetEQN[OptionsPattern[], var_, varrhs_] :=
 
 SetEQN::Evarrhs = "There are undefined terms in the RHS '`1`'!"
 
-SetEQN::Evar = "Var '`1`' is not an symbol, please use a different name!"
+SetEQN::Evar = "Var '`1`' is used with IndexSet before, please use a different name!"
 
 Protect[SetEQN];
 
@@ -276,7 +276,7 @@ SetEQNDelayed[OptionsPattern[], var_, varrhs_] :=
                 ToString[var[[0]]] <> suffix] /; replacetimes++ == 0}
         ];
 
-SetEQNDelayed::Evar = "Var '`1`' is not an symbol, please use a different name!"
+SetEQNDelayed::Evar = "Var '`1`' is used with IndexSet before, please use a different name!"
 
 Protect[SetEQNDelayed];
 
