@@ -16,6 +16,10 @@ Print["------------------------------------------------------------"];
 
 ParseVarlist::usage = "ParseVarlist[varlist, chartname] process a varlist.";
 
+ParseVar::usage = "ParseVar[var] return {varname, symmetry, printname} in order";
+
+DefineTensor::usage = "DefineTensor[varname, symmetry, printname] DefTensor, given varname, symmetry and printname";
+
 Begin["`Private`"];
 
 (* Data *)
@@ -265,6 +269,8 @@ DefineTensor[varname_, symmetry_, printname_] :=
         ]
     ];
 
+Protect[DefineTensor];
+
 ParseVar[var_] :=
     Module[{vfeature, varname = Null, symmetry = Null, printname = ""
         },
@@ -291,6 +297,8 @@ ParseVar[var_] :=
     ];
 
 ParseVar::EVar = "Var feature `1` in `2` unsupported yet!";
+
+Protect[ParseVar];
 
 End[];
 
