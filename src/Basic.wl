@@ -156,8 +156,7 @@ IsDefined[term_] :=
             NumberQ[term],
                 Return[True]
             ,
-            head === Power || head === Plus || head === Times || head
-                 === Log,
+            IsExprComb[head],
                 Module[{subterms, undefinedsubterm = 0},
                     subterms = Apply[List, term];
                     Do[
@@ -193,6 +192,10 @@ IsDefined::ETerm = "The `1`-th subterm in '`2`' is not defined!";
 IsDefined::EType = "The Expression type of '`1`' is not detectable!";
 
 Protect[IsDefined];
+
+IsExprComb[head_] :=
+    Return[head === Power || head === Plus || head === Times || head 
+        === Log];
 
 IndexType[compindexlist_?ListQ, indextype_] :=
     indextype[compindexlist[[2]]];
@@ -236,7 +239,7 @@ SetEQN[OptionsPattern[], var_, varrhs_] :=
                     ,
                     ToString[suffix]
                 ];
-            If[var[[0]] =!= Symbol,
+            If[IsExprComb[Head[var]],
                 Throw @ Message[SetEQN::Evar, var]
             ];
             If[checkrhs && !IsDefined[varrhs],
@@ -266,7 +269,7 @@ SetEQNDelayed[OptionsPattern[], var_, varrhs_] :=
                     ,
                     ToString[suffix]
                 ];
-            If[var[[0]] =!= Symbol,
+            If[IsExprComb[Head[var]],
                 Throw @ Message[SetEQNDelayed::Evar, var]
             ];
             Hold[IndexSetDelayed[var, varrhs]] /. {var[[0]] :> RHSOf[
