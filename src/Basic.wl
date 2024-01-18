@@ -236,6 +236,9 @@ SetEQN[OptionsPattern[], var_, varrhs_] :=
                     ,
                     ToString[suffix]
                 ];
+            If[var[[0]] =!= Symbol,
+                Throw @ Message[SetEQN::Evar, var]
+            ];
             If[checkrhs && !IsDefined[varrhs],
                 Throw @ Message[SetEQN::Evarrhs, varrhs]
             ];
@@ -244,6 +247,8 @@ SetEQN[OptionsPattern[], var_, varrhs_] :=
         ];
 
 SetEQN::Evarrhs = "There are undefined terms in the RHS '`1`'!"
+
+SetEQN::Evar = "Var '`1`' is not an symbol, please use a different name!"
 
 Protect[SetEQN];
 
@@ -261,9 +266,14 @@ SetEQNDelayed[OptionsPattern[], var_, varrhs_] :=
                     ,
                     ToString[suffix]
                 ];
+            If[var[[0]] =!= Symbol,
+                Throw @ Message[SetEQNDelayed::Evar, var]
+            ];
             Hold[IndexSetDelayed[var, varrhs]] /. {var[[0]] :> RHSOf[
                 ToString[var[[0]]] <> suffix] /; replacetimes++ == 0}
         ];
+
+SetEQNDelayed::Evar = "Var '`1`' is not an symbol, please use a different name!"
 
 Protect[SetEQNDelayed];
 
