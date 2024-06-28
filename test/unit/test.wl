@@ -46,8 +46,7 @@ SetEQN[{SuffixName -> "Msqr"}, rU[i_], euclid[i, k] MDD[-k, -j] vU[j]
 
 SetEQN[{SuffixName -> "otherwise"}, rU[i_], vU[i]];
 
-SetOutputFile[FileNameJoin[{Environment["GENERATO"], "test/unit/test.c"
-    }]];
+SetOutputFile[FileNameJoin[{Directory[], "test.c"}]];
 
 SetProject["C3GH"];
 

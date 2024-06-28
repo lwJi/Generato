@@ -108,8 +108,7 @@ SetEQN[dtPhi[i_, a_, b_], -AdPhi[i, a, b] interior + 1/2 alpha[] nvec[
 
 (* Write to files *)
 
-SetOutputFile[FileNameJoin[{Environment["GENERATO"], "test/integration/GHG_rhs.c"
-    }]];
+SetOutputFile[FileNameJoin[{Directory[], "GHG_rhs.c"}]];
 
 SetProject["GHG"];
 
