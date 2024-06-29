@@ -20,44 +20,36 @@ DefManifold[M4, 4, Union[Complement[IndexRange[a, z], {g}], Table[ToExpression[
 DefChart[cart, M4, {0, 1, 2, 3}, {T[], X[], Y[], Z[]}, ChartColor -> 
     Blue];
 
-dtEvolVarlist = GridTensors[
-    {dtg[-a, -b], Symmetric[{-a, -b}]},
-    {dtPi[-a, -b], Symmetric[{-a, -b}], PrintAs -> "dt\[CapitalPi]"},
-    {dtPhi[-k, -a, -b], Symmetric[{-a, -b}], PrintAs -> "dt\[CapitalPhi]"}
-];
+dtEvolVarlist = GridTensors[{dtg[-a, -b], Symmetric[{-a, -b}]}, {dtPi[
+    -a, -b], Symmetric[{-a, -b}], PrintAs -> "dt\[CapitalPi]"}, {dtPhi[-k,
+     -a, -b], Symmetric[{-a, -b}], PrintAs -> "dt\[CapitalPhi]"}];
 
-EvolVarlist = GridTensors[
-    {g[-a, -b], Symmetric[{-a, -b}]},
-    {Pi$Upt[-a, -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalPi]"},
-    {Phi[-k, -a, -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalPhi]"},
-    {H[-a]}
-];
+EvolVarlist = GridTensors[{g[-a, -b], Symmetric[{-a, -b}]}, {Pi$Upt[-
+    a, -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalPi]"}, {Phi[-k, -a,
+     -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalPhi]"}, {H[-a]}];
 
-MoreInVarlist = GridTensors[
-    {Adg[-a, -b], Symmetric[{-a, -b}]},
-    {AdPi[-a, -b], Symmetric[{-a, -b}], PrintAs -> "Ad\[CapitalPi]"},
-    {AdPhi[-k, -a, -b], Symmetric[{-a, -b}], PrintAs -> "Ad\[CapitalPhi]"},
-    {alpha[], PrintAs -> "\[Alpha]"},
-    {beta[i], PrintAs -> "\[Beta]"},
-    {srcSdH[-a, -b], Symmetric[{-a, -b}], PrintAs -> "\!\(\*SubscriptBox[\(\[PartialD]\), \((a\)]\)\!\(\*SubscriptBox[\(H\), \(\(b\)\()\)\)]\)"}
-];
+MoreInVarlist = GridTensors[{Adg[-a, -b], Symmetric[{-a, -b}]}, {AdPi[
+    -a, -b], Symmetric[{-a, -b}], PrintAs -> "Ad\[CapitalPi]"}, {AdPhi[-k,
+     -a, -b], Symmetric[{-a, -b}], PrintAs -> "Ad\[CapitalPhi]"}, {alpha[
+    ], PrintAs -> "\[Alpha]"}, {beta[i], PrintAs -> "\[Beta]"}, {srcSdH[-
+    a, -b], Symmetric[{-a, -b}], PrintAs -> "\!\(\*SubscriptBox[\(\[PartialD]\), \((a\)]\)\!\(\*SubscriptBox[\(H\), \(\(b\)\()\)\)]\)"
+    }];
 
-TempVarlist = TempTensors[
-    {detinvh[], PrintAs -> "\[Gamma]"},
-    {invh[i, j], Symmetric[{i, j}], PrintAs -> "\[Gamma]"},
-    {nvec[a], PrintAs -> "n"},
-    {ndua[-a], PrintAs -> "n"},
-    {invg[a, b], Symmetric[{a, b}], PrintAs -> "g"},
-    {dginFO[-c, -a, -b], Symmetric[{-a, -b}], PrintAs -> "dg"},
-    {Gam[-c, -a, -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalGamma]"},
-    {trGam[-a], PrintAs -> "\[CapitalGamma]"}
-];
+TempVarlist = TempTensors[{detinvh[], PrintAs -> "\[Gamma]"}, {invh[i,
+     j], Symmetric[{i, j}], PrintAs -> "\[Gamma]"}, {nvec[a], PrintAs -> 
+    "n"}, {ndua[-a], PrintAs -> "n"}, {invg[a, b], Symmetric[{a, b}], PrintAs
+     -> "g"}, {dginFO[-c, -a, -b], Symmetric[{-a, -b}], PrintAs -> "dg"},
+     {Gam[-c, -a, -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalGamma]"},
+     {trGam[-a], PrintAs -> "\[CapitalGamma]"}];
 
-DefConstantSymbol[gamma0, PrintAs -> "\!\(\*SubscriptBox[\(\[Gamma]\), \(0\)]\)"];
+DefConstantSymbol[gamma0, PrintAs -> "\!\(\*SubscriptBox[\(\[Gamma]\), \(0\)]\)"
+    ];
 
-DefConstantSymbol[gamma1, PrintAs -> "\!\(\*SubscriptBox[\(\[Gamma]\), \(1\)]\)"];
+DefConstantSymbol[gamma1, PrintAs -> "\!\(\*SubscriptBox[\(\[Gamma]\), \(1\)]\)"
+    ];
 
-DefConstantSymbol[gamma2, PrintAs -> "\!\(\*SubscriptBox[\(\[Gamma]\), \(2\)]\)"];
+DefConstantSymbol[gamma2, PrintAs -> "\!\(\*SubscriptBox[\(\[Gamma]\), \(2\)]\)"
+    ];
 
 DefConstantSymbol[interior, PrintAs -> "I"];
 
@@ -67,22 +59,40 @@ Module[{Mat, invMat},
     invMat = Inverse[Mat] /. {1 / Det[Mat] -> (detinvh[] // ToValues)
         };
     SetEQNDelayed[detinvh[], 1 / Det[Mat] // Simplify];
-        
     SetEQNDelayed[invh[i_, j_], invMat[[i[[1]], j[[1]]]] // Simplify]
+        
 ];
 
-SetEQNDelayed[nvec[a_],
-    If[a[[1]] == 0, alpha[] ^ -1, -alpha[] ^ -1 beta[a]]
+SetEQNDelayed[
+    nvec[a_]
+    ,
+    If[a[[1]] == 0,
+        alpha[] ^ -1
+        ,
+        -alpha[] ^ -1 beta[a]
+    ]
 ];
 
-SetEQNDelayed[ndua[a_],
-    If[a[[1]] == 0, -alpha[], 0.0]
+SetEQNDelayed[
+    ndua[a_]
+    ,
+    If[a[[1]] == 0,
+        -alpha[]
+        ,
+        0.0
+    ]
 ];
 
 SetEQN[invg[a_, b_], invh[a, b] - nvec[a] nvec[b]];
 
-SetEQNDelayed[dginFO[c_, a_, b_],
-    If[c[[1]] == 0, -alpha[] Pi$Upt[a, b] + beta[k] Phi[-k, a, b], Phi[c, a, b]]
+SetEQNDelayed[
+    dginFO[c_, a_, b_]
+    ,
+    If[c[[1]] == 0,
+        -alpha[] Pi$Upt[a, b] + beta[k] Phi[-k, a, b]
+        ,
+        Phi[c, a, b]
+    ]
 ];
 
 SetEQN[Gam[c_, a_, b_], 1/2 (dginFO[a, b, c] + dginFO[b, c, a] - dginFO[
