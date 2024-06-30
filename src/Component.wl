@@ -83,174 +83,169 @@ $PrefixDt = "dt";
 (* Function *)
 
 GetParseMode[key_] :=
-    Return[$ParseModeAssociation[key]];
+  Return[$ParseModeAssociation[key]];
 
 Protect[GetParseMode];
 
 SetParseMode[assoc_] :=
-    Module[{},
-        AppendTo[$ParseModeAssociation, assoc]
-    ];
+  Module[{},
+    AppendTo[$ParseModeAssociation, assoc]
+  ];
 
 Protect[SetParseMode];
 
 SetParseModeAllToFalse[] :=
-    Module[{},
-        AppendTo[$ParseModeAssociation, <|SetComp -> False, PrintComp
-             -> False, SetCompIndep -> False, SetCompNoGPIndex -> False, PrintCompInit
-             -> False, PrintCompInitMainOut -> False, PrintCompInitMainIn -> False,
-             PrintCompInitMoreInOut -> False, PrintCompInitTemp -> False, PrintCompEQN
-             -> False, PrintCompEQNNewVar -> False, PrintCompEQNMain -> False, PrintCompEQNAddToMain
-             -> False|>]
-    ];
+  Module[{},
+    AppendTo[$ParseModeAssociation, <|SetComp -> False, PrintComp -> False,
+       SetCompIndep -> False, SetCompNoGPIndex -> False, PrintCompInit -> False,
+       PrintCompInitMainOut -> False, PrintCompInitMainIn -> False, PrintCompInitMoreInOut
+       -> False, PrintCompInitTemp -> False, PrintCompEQN -> False, PrintCompEQNNewVar
+       -> False, PrintCompEQNMain -> False, PrintCompEQNAddToMain -> False|>]
+      
+  ];
 
 Protect[SetParseModeAllToFalse];
 
 GetMapComponentToVarlist[] :=
-    Return[$MapComponentToVarlist];
+  Return[$MapComponentToVarlist];
 
 Protect[GetMapComponentToVarlist];
 
 SetMapComponentToVarlist[map_] :=
-    Module[{},
-        $MapComponentToVarlist = map
-    ];
+  Module[{},
+    $MapComponentToVarlist = map
+  ];
 
 GetProcessNewVarlist[] :=
-    Return[$ProcessNewVarlist];
+  Return[$ProcessNewVarlist];
 
 SetProcessNewVarlist[isnew_] :=
-    Module[{},
-        $ProcessNewVarlist = isnew
-    ];
+  Module[{},
+    $ProcessNewVarlist = isnew
+  ];
 
 Protect[SetProcessNewVarlist];
 
 GetSimplifyEquation[] :=
-    Return[$SimplifyEquation];
+  Return[$SimplifyEquation];
 
 SetSimplifyEquation[simplify_] :=
-    Module[{},
-        $SimplifyEquation = simplify
-    ];
+  Module[{},
+    $SimplifyEquation = simplify
+  ];
 
 Protect[SetSimplifyEquation];
 
 GetSuffixName[] :=
-    Return[$SuffixName];
+  Return[$SuffixName];
 
 Protect[GetSuffixName];
 
 SetSuffixName[suffix_] :=
-    Module[{},
-        $SuffixName = suffix
-    ];
+  Module[{},
+    $SuffixName = suffix
+  ];
 
 Protect[SetSuffixName];
 
 GetPrefixDt[] :=
-    Return[$PrefixDt];
+  Return[$PrefixDt];
 
 Protect[GetPrefixDt];
 
 SetPrefixDt[Prefix_] :=
-    Module[{},
-        $PrefixDt = Prefix
-    ];
+  Module[{},
+    $PrefixDt = Prefix
+  ];
 
 Protect[SetPrefixDt];
 
 ParseComponent[varname_, compindexlist_?ListQ, coordinate_] :=
-    Module[{compname = SetCompName[varname, compindexlist, coordinate
-        ]},
-        PrintVerbose["  ParseComponent..."];
-        If[Is4DCompIndexListIn3DTensor[compindexlist, varname],
-            If[IsUp4DCompIndexListIn3DTensor[compindexlist, varname],
-                
-                ComponentValue[compname, 0]
-            ];
-            Continue[]
-        ];
-        Which[
-            GetParseMode[SetComp],
-                SetComponent[compname, SetExprName[varname, compindexlist
-                    ]]
-            ,
-            GetParseMode[PrintComp],
-                PrintComponent[coordinate, varname, compname]
-            ,
-            True,
-                Throw @ Message[ParseComponent::EMode]
-        ]
+  Module[{compname = SetCompName[varname, compindexlist, coordinate]},
+    PrintVerbose["  ParseComponent..."];
+    If[Is4DCompIndexListIn3DTensor[compindexlist, varname],
+      If[IsUp4DCompIndexListIn3DTensor[compindexlist, varname],
+        ComponentValue[compname, 0]
+      ];
+      Continue[]
     ];
+    Which[
+      GetParseMode[SetComp],
+        SetComponent[compname, SetExprName[varname, compindexlist]]
+      ,
+      GetParseMode[PrintComp],
+        PrintComponent[coordinate, varname, compname]
+      ,
+      True,
+        Throw @ Message[ParseComponent::EMode]
+    ]
+  ];
 
 ParseComponent::EMode = "ParseMode unrecognized!";
 
 Protect[ParseComponent];
 
 PrintComponent[coordinate_, varname_, compname_] :=
-    Module[{},
-        Which[
-            GetParseMode[PrintCompInit],
-                PrintVerbose["    PrintComponentInitialization ", compname,
-                     "..."];
-                Global`PrintComponentInitialization[varname, compname
-                    ]
-            ,
-            GetParseMode[PrintCompEQN],
-                PrintVerbose["    PrintComponentEquation ", compname,
-                     "..."];
-                PrintComponentEquation[coordinate, compname]
-            ,
-            True,
-                Throw @ Message[PrintComponent::EMode]
-        ]
-    ];
+  Module[{},
+    Which[
+      GetParseMode[PrintCompInit],
+        PrintVerbose["    PrintComponentInitialization ", compname, "..."
+          ];
+        Global`PrintComponentInitialization[varname, compname]
+      ,
+      GetParseMode[PrintCompEQN],
+        PrintVerbose["    PrintComponentEquation ", compname, "..."];
+        PrintComponentEquation[coordinate, compname]
+      ,
+      True,
+        Throw @ Message[PrintComponent::EMode]
+    ]
+  ];
 
 PrintComponent::EMode = "PrintMode unrecognized!";
 
 PrintComponentEquation[coordinate_, compname_] :=
-    Module[{outputfile = GetOutputFile[], compToValue, rhssToValue},
-        compToValue = compname // ToValues;
-        rhssToValue =
-            (compname /. {compname[[0]] -> RHSOf[compname[[0]], GetSuffixName[
-                ]]}) //
-            DummyToBasis[coordinate] //
-            TraceBasisDummy //
-            ToValues;
-        If[GetSimplifyEquation[],
-            rhssToValue = rhssToValue // Simplify
-        ];
-        Which[
-            GetParseMode[PrintCompEQNNewVar],
-                Module[{},
-                    Global`pr["double "];
-                    PutAppend[CForm[compToValue], outputfile];
-                    Global`pr["="];
-                    PutAppend[CForm[rhssToValue], outputfile];
-                    Global`pr[";\n"]
-                ]
-            ,
-            GetParseMode[PrintCompEQNMain],
-                Module[{},
-                    PutAppend[CForm[compToValue], outputfile];
-                    Global`pr["="];
-                    PutAppend[CForm[rhssToValue], outputfile];
-                    Global`pr[";\n"]
-                ]
-            ,
-            GetParseMode[PrintCompEQNAddToMain],
-                Module[{},
-                    PutAppend[CForm[compToValue], outputfile];
-                    Global`pr["+="];
-                    PutAppend[CForm[rhssToValue], outputfile];
-                    Global`pr[";\n"]
-                ]
-            ,
-            True,
-                Throw @ Message[PrintComponentEquation::EMode]
-        ]
+  Module[{outputfile = GetOutputFile[], compToValue, rhssToValue},
+    compToValue = compname // ToValues;
+    rhssToValue =
+      (compname /. {compname[[0]] -> RHSOf[compname[[0]], GetSuffixName[
+        ]]}) //
+      DummyToBasis[coordinate] //
+      TraceBasisDummy //
+      ToValues;
+    If[GetSimplifyEquation[],
+      rhssToValue = rhssToValue // Simplify
     ];
+    Which[
+      GetParseMode[PrintCompEQNNewVar],
+        Module[{},
+          Global`pr["double "];
+          PutAppend[CForm[compToValue], outputfile];
+          Global`pr["="];
+          PutAppend[CForm[rhssToValue], outputfile];
+          Global`pr[";\n"]
+        ]
+      ,
+      GetParseMode[PrintCompEQNMain],
+        Module[{},
+          PutAppend[CForm[compToValue], outputfile];
+          Global`pr["="];
+          PutAppend[CForm[rhssToValue], outputfile];
+          Global`pr[";\n"]
+        ]
+      ,
+      GetParseMode[PrintCompEQNAddToMain],
+        Module[{},
+          PutAppend[CForm[compToValue], outputfile];
+          Global`pr["+="];
+          PutAppend[CForm[rhssToValue], outputfile];
+          Global`pr[";\n"]
+        ]
+      ,
+      True,
+        Throw @ Message[PrintComponentEquation::EMode]
+    ]
+  ];
 
 PrintComponentEquation::EMode = "PrintEquationMode unrecognized!";
 
@@ -266,49 +261,49 @@ PrintComponentEquation::EMode = "PrintEquationMode unrecognized!";
 *)
 
 SetComponent[compname_, exprname_] :=
-    Module[{varlistindex, mapCtoV = GetMapComponentToVarlist[]},
-        PrintVerbose["    SetComponent ", compname, "..."];
-        If[Length[mapCtoV] == 0 || GetProcessNewVarlist[] || (GetParseMode[
-            SetCompIndep] && (compname[[0]] =!= Last[Keys[mapCtoV]][[0]])),
-            varlistindex = 0(*C convention*)
-            ,
-            varlistindex = Last[mapCtoV] + 1
-        ];
-        ComponentValue[compname, exprname];
-        If[!MemberQ[Keys[mapCtoV], compname],
-            AppendTo[mapCtoV, compname -> varlistindex];
-            SetMapComponentToVarlist[mapCtoV]
-        ];
-        SetProcessNewVarlist[False]
+  Module[{varlistindex, mapCtoV = GetMapComponentToVarlist[]},
+    PrintVerbose["    SetComponent ", compname, "..."];
+    If[Length[mapCtoV] == 0 || GetProcessNewVarlist[] || (GetParseMode[
+      SetCompIndep] && (compname[[0]] =!= Last[Keys[mapCtoV]][[0]])),
+      varlistindex = 0(*C convention*)
+      ,
+      varlistindex = Last[mapCtoV] + 1
     ];
+    ComponentValue[compname, exprname];
+    If[!MemberQ[Keys[mapCtoV], compname],
+      AppendTo[mapCtoV, compname -> varlistindex];
+      SetMapComponentToVarlist[mapCtoV]
+    ];
+    SetProcessNewVarlist[False]
+  ];
 
 (*
     compname: component expr in Mathematica kernal, say Pi[{1,-cart},{2,-cart}] 
 *)
 
 SetCompName[varname_, compindexlist_, coordinate_] :=
-    Module[{compname = varname[[0]][]},
-        If[Length[compindexlist] > 0,(*not scalar*)
-            Do[
-                AppendTo[
-                    compname
-                    ,
-                    {
-                        compindexlist[[icomp]]
-                        ,
-                        If[DownIndexQ[varname[[icomp]]],
-                            -coordinate
-                            ,
-                            coordinate
-                        ]
-                    }
-                ]
-                ,
-                {icomp, 1, Length[compindexlist]}
+  Module[{compname = varname[[0]][]},
+    If[Length[compindexlist] > 0,(*not scalar*)
+      Do[
+        AppendTo[
+          compname
+          ,
+          {
+            compindexlist[[icomp]]
+            ,
+            If[DownIndexQ[varname[[icomp]]],
+              -coordinate
+              ,
+              coordinate
             ]
-        ];
-        Return[compname]
+          }
+        ]
+        ,
+        {icomp, 1, Length[compindexlist]}
+      ]
     ];
+    Return[compname]
+  ];
 
 (*
     exprname: component expr to be printed to C code, or lhs, say Pi12[[ijk]],
@@ -316,76 +311,76 @@ SetCompName[varname_, compindexlist_, coordinate_] :=
 *)
 
 SetExprName[varname_, compindexlist_] :=
-    Module[{exprname = StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
-        ]]},
-        If[Length[compindexlist] > 0, (*not scalar, ignore up/down*)
-            Do[exprname = exprname <> ToString @ compindexlist[[icomp
-                ]], {icomp, 1, Length[compindexlist]}]
-        ];
-        exprname =
-            If[GetParseMode[SetCompNoGPIndex],
-                ToExpression[exprname]
-                ,
-                ToExpression[exprname <> GetGridPointIndex[]]
-            ];
-        Return[exprname]
+  Module[{exprname = StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
+    ]]},
+    If[Length[compindexlist] > 0, (*not scalar, ignore up/down*)
+      Do[exprname = exprname <> ToString @ compindexlist[[icomp]], {icomp,
+         1, Length[compindexlist]}]
     ];
+    exprname =
+      If[GetParseMode[SetCompNoGPIndex],
+        ToExpression[exprname]
+        ,
+        ToExpression[exprname <> GetGridPointIndex[]]
+      ];
+    Return[exprname]
+  ];
 
 Is3DAbstractIndex[idx_] :=
-    Module[{},
-        LetterNumber[StringPart[ToString[idx /. {-1 x_ :> x}], 1]] >=
-             LetterNumber["i"]
-    ];
+  Module[{},
+    LetterNumber[StringPart[ToString[idx /. {-1 x_ :> x}], 1]] >= LetterNumber[
+      "i"]
+  ];
 
 Is4DCompIndexIn3DTensor[idx_, idxcomp_] :=
-    Module[{},
-        Is3DAbstractIndex[idx] && (idxcomp == 0)
-    ];
+  Module[{},
+    Is3DAbstractIndex[idx] && (idxcomp == 0)
+  ];
 
 Is4DCompIndexListIn3DTensor[idxcomplist_, varname_] :=
-    Module[{is4Didxcomplist = False},
-        If[Length[idxcomplist] > 0,
-            Do[
-                If[Is4DCompIndexIn3DTensor[varname[[icomp]], idxcomplist
-                    [[icomp]]],
-                    is4Didxcomplist = True
-                ]
-                ,
-                {icomp, 1, Length[idxcomplist]}
-            ]
-        ];
-        is4Didxcomplist
+  Module[{is4Didxcomplist = False},
+    If[Length[idxcomplist] > 0,
+      Do[
+        If[Is4DCompIndexIn3DTensor[varname[[icomp]], idxcomplist[[icomp
+          ]]],
+          is4Didxcomplist = True
+        ]
+        ,
+        {icomp, 1, Length[idxcomplist]}
+      ]
     ];
+    is4Didxcomplist
+  ];
 
 IsUp4DCompIndexListIn3DTensor[idxcomplist_, varname_] :=
-    Module[
-        {isup4Didxcomplist = False}
+  Module[
+    {isup4Didxcomplist = False}
+    ,
+    (*is there a 0th up index in the component list*)
+    If[Length[idxcomplist] > 0,
+      Do[
+        If[UpIndexQ[varname[[icomp]]] && Is4DCompIndexIn3DTensor[varname
+          [[icomp]], idxcomplist[[icomp]]],
+          isup4Didxcomplist = True
+        ]
         ,
-        (*is there a 0th up index in the component list*)
-        If[Length[idxcomplist] > 0,
-            Do[
-                If[UpIndexQ[varname[[icomp]]] && Is4DCompIndexIn3DTensor[
-                    varname[[icomp]], idxcomplist[[icomp]]],
-                    isup4Didxcomplist = True
-                ]
-                ,
-                {icomp, 1, Length[idxcomplist]}
-            ]
-        ];
-        (*if there is also a 0th down index, skip this one*)
-        (*we want skip all the components with 0th down index*)
-        If[isup4Didxcomplist,
-            Do[
-                If[DownIndexQ[varname[[icomp]]] && Is4DCompIndexIn3DTensor[
-                    varname[[icomp]], idxcomplist[[icomp]]],
-                    isup4Didxcomplist = False
-                ]
-                ,
-                {icomp, 1, Length[idxcomplist]}
-            ]
-        ];
-        isup4Didxcomplist
+        {icomp, 1, Length[idxcomplist]}
+      ]
     ];
+    (*if there is also a 0th down index, skip this one*)
+    (*we want skip all the components with 0th down index*)
+    If[isup4Didxcomplist,
+      Do[
+        If[DownIndexQ[varname[[icomp]]] && Is4DCompIndexIn3DTensor[varname
+          [[icomp]], idxcomplist[[icomp]]],
+          isup4Didxcomplist = False
+        ]
+        ,
+        {icomp, 1, Length[idxcomplist]}
+      ]
+    ];
+    isup4Didxcomplist
+  ];
 
 End[];
 

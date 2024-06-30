@@ -75,117 +75,116 @@ $SimplifyEquation = True;
 (* Function *)
 
 GetPVerbose[] :=
-    Return[$PVerbose];
+  Return[$PVerbose];
 
 SetPVerbose[verbose_] :=
-    Module[{},
-        $PVerbose = verbose
-    ];
+  Module[{},
+    $PVerbose = verbose
+  ];
 
 Protect[SetPVerbose];
 
 GetPrintDate[] :=
-    Return[$PrintDate];
+  Return[$PrintDate];
 
 Protect[GetPrintDate];
 
 SetPrintDate[print_] :=
-    Module[{},
-        $PrintDate = print
-    ];
+  Module[{},
+    $PrintDate = print
+  ];
 
 Protect[SetPrintDate];
 
 GetGridPointIndex[] :=
-    Return[$GridPointIndex];
+  Return[$GridPointIndex];
 
 Protect[GetGridPointIndex];
 
 SetGridPointIndex[gridindex_] :=
-    Module[{},
-        $GridPointIndex = gridindex
-    ];
+  Module[{},
+    $GridPointIndex = gridindex
+  ];
 
 Protect[SetGridPointIndex];
 
 GetSuffixUnprotected[] :=
-    Return[$SuffixUnprotected];
+  Return[$SuffixUnprotected];
 
 Protect[GetSuffixUnprotected];
 
 SetSuffixUnprotected[suffix_] :=
-    Module[{},
-        $SuffixUnprotected = suffix
-    ];
+  Module[{},
+    $SuffixUnprotected = suffix
+  ];
 
 Protect[SetSuffixUnprotected];
 
 GetOutputFile[] :=
-    Return[$OutputFile];
+  Return[$OutputFile];
 
 Protect[GetOutputFile];
 
 SetOutputFile[filename_] :=
-    Module[{},
-        $OutputFile = filename
-    ];
+  Module[{},
+    $OutputFile = filename
+  ];
 
 Protect[SetOutputFile];
 
 GetProject[] :=
-    Return[$Project];
+  Return[$Project];
 
 Protect[GetProject];
 
 SetProject[name_] :=
-    Module[{},
-        $Project = name
-    ];
+  Module[{},
+    $Project = name
+  ];
 
 Protect[SetProject];
 
 GetDefaultChart[] :=
-    Return[ChartsOfManifold[$Manifolds[[1]]][[1]]];
+  Return[ChartsOfManifold[$Manifolds[[1]]][[1]]];
 
 GetDim[] :=
-    Return[DimOfManifold[$Manifolds[[1]]]];
+  Return[DimOfManifold[$Manifolds[[1]]]];
 
 IsDefined[term_] :=
-    Module[{head = Head[term]},
-        Which[
-            NumberQ[term],
-                Return[True]
+  Module[{head = Head[term]},
+    Which[
+      NumberQ[term],
+        Return[True]
+      ,
+      IsExprComb[head],
+        Module[{subterms, undefinedsubterm = 0},
+          subterms = Apply[List, term];
+          Do[
+            If[!IsDefined[subterms[[isub]]],
+              undefinedsubterm = isub;
+              Break[]
+            ]
             ,
-            IsExprComb[head],
-                Module[{subterms, undefinedsubterm = 0},
-                    subterms = Apply[List, term];
-                    Do[
-                        If[!IsDefined[subterms[[isub]]],
-                            undefinedsubterm = isub;
-                            Break[]
-                        ]
-                        ,
-                        {isub, 1, Length[subterms]}
-                    ];
-                    If[undefinedsubterm > 0,
-                        Message[IsDefined::ETerm, undefinedsubterm, term
-                            ];
-                        Return[False]
-                        ,
-                        Return[True]
-                    ]
-                ]
+            {isub, 1, Length[subterms]}
+          ];
+          If[undefinedsubterm > 0,
+            Message[IsDefined::ETerm, undefinedsubterm, term];
+            Return[False]
             ,
-            head === Symbol,
-                Return[ConstantSymbolQ[term]]
-            ,
-            Head[head] === Symbol,
-                Return[xTensorQ[head]]
-            ,
-            True,
-                Throw @ Message[IsDefined::EType, term]
+            Return[True]
+          ]
         ]
-    ];
+      ,
+      head === Symbol,
+        Return[ConstantSymbolQ[term]]
+      ,
+      Head[head] === Symbol,
+        Return[xTensorQ[head]]
+      ,
+      True,
+        Throw @ Message[IsDefined::EType, term]
+    ]
+  ];
 
 IsDefined::ETerm = "The `1`-th subterm in '`2`' is not defined!";
 
@@ -194,33 +193,33 @@ IsDefined::EType = "The Expression type of '`1`' is not detectable!";
 Protect[IsDefined];
 
 IsExprComb[head_] :=
-    Return[head === Power || head === Plus || head === Times || head 
-        === Log];
+  Return[head === Power || head === Plus || head === Times || head === 
+    Log];
 
 IndexType[compindexlist_?ListQ, indextype_] :=
-    indextype[compindexlist[[2]]];
+  indextype[compindexlist[[2]]];
 
 Protect[IndexType];
 
 IndexType3D[compindexlist_?ListQ, indextype_] :=
-    indextype[compindexlist[[2]]] && (compindexlist[[1]] > 0);
+  indextype[compindexlist[[2]]] && (compindexlist[[1]] > 0);
 
 Protect[IndexType3D];
 
 RHSOf[var__] :=
-    Module[{arglist = List[var]},
-        Switch[Length[arglist],
-            1,
-                ToExpression[ToString[var] <> "$RHS"]
-            ,
-            2,
-                ToExpression[ToString[arglist[[1]]] <> ToString[arglist
-                    [[2]]] <> "$RHS"]
-            ,
-            _,
-                Throw @ Message[RHSOf::Eargs, Length[arglist]]
-        ]
-    ];
+  Module[{arglist = List[var]},
+    Switch[Length[arglist],
+      1,
+        ToExpression[ToString[var] <> "$RHS"]
+      ,
+      2,
+        ToExpression[ToString[arglist[[1]]] <> ToString[arglist[[2]]] <>
+           "$RHS"]
+      ,
+      _,
+        Throw @ Message[RHSOf::Eargs, Length[arglist]]
+    ]
+  ];
 
 RHSOf::Eargs = "`1` arguments unsupported yet!";
 
@@ -229,25 +228,24 @@ Protect[RHSOf];
 Options[SetEQN] = {CheckRHS -> True, SuffixName -> Null};
 
 SetEQN[OptionsPattern[], var_, varrhs_] :=
-    ReleaseHold @
-        Module[{checkrhs, suffix, replacetimes = 0},
-            {checkrhs, suffix} = OptionValue[{CheckRHS, SuffixName}];
-                
-            suffix =
-                If[suffix === Null,
-                    ""
-                    ,
-                    ToString[suffix]
-                ];
-            If[IsExprComb[Head[var]],
-                Throw @ Message[SetEQN::Evar, var]
-            ];
-            If[checkrhs && !IsDefined[varrhs],
-                Throw @ Message[SetEQN::Evarrhs, varrhs]
-            ];
-            Hold[IndexSet[var, varrhs]] /. {var[[0]] :> RHSOf[ToString[
-                var[[0]]] <> suffix] /; replacetimes++ == 0}
+  ReleaseHold @
+    Module[{checkrhs, suffix, replacetimes = 0},
+      {checkrhs, suffix} = OptionValue[{CheckRHS, SuffixName}];
+      suffix =
+        If[suffix === Null,
+          ""
+          ,
+          ToString[suffix]
         ];
+      If[IsExprComb[Head[var]],
+        Throw @ Message[SetEQN::Evar, var]
+      ];
+      If[checkrhs && !IsDefined[varrhs],
+        Throw @ Message[SetEQN::Evarrhs, varrhs]
+      ];
+      Hold[IndexSet[var, varrhs]] /. {var[[0]] :> RHSOf[ToString[var[[0
+        ]]] <> suffix] /; replacetimes++ == 0}
+    ];
 
 SetEQN::Evarrhs = "There are undefined terms in the RHS '`1`'!"
 
@@ -260,32 +258,32 @@ SetAttributes[SetEQNDelayed, {HoldAll, SequenceHold}];
 Options[SetEQNDelayed] = {SuffixName -> Null};
 
 SetEQNDelayed[OptionsPattern[], var_, varrhs_] :=
-    ReleaseHold @
-        Module[{suffix, replacetimes = 0},
-            {suffix} = OptionValue[{SuffixName}];
-            suffix =
-                If[suffix === Null,
-                    ""
-                    ,
-                    ToString[suffix]
-                ];
-            If[IsExprComb[Head[var]],
-                Throw @ Message[SetEQNDelayed::Evar, var]
-            ];
-            Hold[IndexSetDelayed[var, varrhs]] /. {var[[0]] :> RHSOf[
-                ToString[var[[0]]] <> suffix] /; replacetimes++ == 0}
+  ReleaseHold @
+    Module[{suffix, replacetimes = 0},
+      {suffix} = OptionValue[{SuffixName}];
+      suffix =
+        If[suffix === Null,
+          ""
+          ,
+          ToString[suffix]
         ];
+      If[IsExprComb[Head[var]],
+        Throw @ Message[SetEQNDelayed::Evar, var]
+      ];
+      Hold[IndexSetDelayed[var, varrhs]] /. {var[[0]] :> RHSOf[ToString[
+        var[[0]]] <> suffix] /; replacetimes++ == 0}
+    ];
 
 SetEQNDelayed::Evar = "Var '`1`' is used with IndexSet before, please use a different name!"
 
 Protect[SetEQNDelayed];
 
 PrintVerbose[var__:""] :=
-    Module[{},
-        If[GetPVerbose[],
-            Print[var]
-        ]
-    ];
+  Module[{},
+    If[GetPVerbose[],
+      Print[var]
+    ]
+  ];
 
 Protect[PrintVerbose];
 
