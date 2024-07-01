@@ -11,7 +11,7 @@ SetPVerbose[False];
 
 SetPrintDate[False];
 
-SetGridPointIndex["[[ijk]]"];
+SetGridPointIndex[""];
 
 DefManifold[M3, 3, IndexRange[a, z]];
 
@@ -51,27 +51,6 @@ SetProject["C3GH"];
 
 $MainPrint[] :=
   Module[{project = GetProject[]},
-    pr["#include \"carpetx.h\""];
-    pr["#include \"" <> project <> ".h\""];
-    pr[];
-    pr["/* use globals from " <> project <> " */"];
-    pr["extern t" <> project <> " " <> project <> "[1];"];
-    pr[];
-    pr[];
-    pr["void test(tVarList *vlu, tVarList *vlr)"];
-    pr["{"];
-    pr["tMesh *mesh = u->mesh;"];
-    pr[];
-    pr["int Msqr = GetvLax(Par(\"ADM_ConstraintNorm\"), \"Msqr \");"];
-    pr[];
-    pr["formylnodes(mesh)"];
-    pr["{"];
-    pr["tNode *node = MyLnode;"];
-    pr["int ijk;"];
-    pr[];
-    pr["forpoints(node, ijk)"];
-    pr["{"];
-    pr["int iMDD = Ind(\"ADM_gxx\");"];
     pr[];
     PrintInitializations[{Mode -> "MainOut"}, dtEvolVarlist];
     PrintInitializations[{Mode -> "MainIn"}, EvolVarlist];
@@ -88,10 +67,6 @@ $MainPrint[] :=
     pr["{"];
     PrintEquations[{Mode -> "Main", SuffixName -> "otherwise"}, dtEvolVarlist
       ];
-    pr["}"];
-    pr[];
-    pr["} /* end of points */"];
-    pr["} /* end of nodes */"];
     pr["}"];
   ];
 

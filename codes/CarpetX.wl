@@ -28,38 +28,33 @@ PrintComponentInitialization[varname_, compname_] :=
     Which[
       GetParseMode[PrintCompInitMainOut],
         buf =
-          "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[
-            ]] <> " = Vard(node, Vind(vlr," <> ToString[GetProject[]] <> "->i_" <> 
-            StringTrim[ToString[varname[[0]]], (GetPrefixDt[] | GetSuffixUnprotected[
-            ])] <> GetInitialComp[varname] <>
-            If[varlistindex == 0,
-              ""
-              ,
-              "+" <> ToString[varlistindex]
-            ] <> "));"
+          "CCTK_REAL &"
+          <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
+          <> " = gf_"
+          <> StringTrim[ToString[varname[[0]]], (GetPrefixDt[] | GetSuffixUnprotected[])]
+          <> ".elts["
+          <> ToString[varlistindex]
+          <> "];"
       ,
       GetParseMode[PrintCompInitMainIn],
         buf =
-          "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[
-            ]] <> " = Vard(node, Vind(vlu," <> ToString[GetProject[]] <> "->i_" <> 
-            StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]] <> GetInitialComp[
-            varname] <>
-            If[varlistindex == 0,
-              ""
-              ,
-              "+" <> ToString[varlistindex]
-            ] <> "));"
+          "CCTK_REAL &"
+          <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
+          <> " = gf_"
+          <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]]
+          <> ".elts["
+          <> ToString[varlistindex]
+          <> "];"
       ,
       GetParseMode[PrintCompInitMoreInOut],
         buf =
-          "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[
-            ]] <> " = Vard(node, i" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
-            ]] <> GetInitialComp[varname] <>
-            If[varlistindex == 0,
-              ""
-              ,
-              "+" <> ToString[varlistindex]
-            ] <> ");"
+          "CCTK_REAL &"
+          <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
+          <> " = gf_"
+          <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]]
+          <> ".elts["
+          <> ToString[varlistindex]
+          <> "];"
       ,
       GetParseMode[PrintCompInitTemp],
         buf = "double " <> ToString[compToValue] <> ";"
