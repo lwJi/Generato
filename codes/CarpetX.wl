@@ -4,20 +4,6 @@
 
 (* (c) Liwei Ji, 06/2024 *)
 
-GetInitialComp[varname_] :=
-  Module[{initialcomp = ""},
-    Do[
-      If[Is3DAbstractIndex[varname[[icomp]]],
-        initialcomp = initialcomp <> "x"
-        ,
-        initialcomp = initialcomp <> "t"
-      ]
-      ,
-      {icomp, 1, Length[varname]}
-    ];
-    initialcomp
-  ];
-
 (*
     Print initialization of each component of a tensor
 *)
@@ -26,38 +12,14 @@ PrintComponentInitialization[varname_, compname_] :=
   Module[{varlistindex = GetMapComponentToVarlist[][compname], compToValue
      = compname // ToValues, buf},
     Which[
-      GetParseMode[PrintCompInitMainOut],
-        buf =
-          "CCTK_REAL &"
-          <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
-          <> " = gf_"
-          <> StringTrim[ToString[varname[[0]]], (GetPrefixDt[] | GetSuffixUnprotected[])]
-          <> ".elts["
-          <> ToString[varlistindex]
-          <> "];"
-      ,
-      GetParseMode[PrintCompInitMainIn],
-        buf =
-          "CCTK_REAL &"
-          <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
-          <> " = gf_"
-          <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]]
-          <> ".elts["
-          <> ToString[varlistindex]
-          <> "];"
-      ,
-      GetParseMode[PrintCompInitMoreInOut],
-        buf =
-          "CCTK_REAL &"
-          <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
-          <> " = gf_"
-          <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]]
-          <> ".elts["
-          <> ToString[varlistindex]
-          <> "];"
+      GetParseMode[PrintCompInitMainOut] || GetParseMode[PrintCompInitMainIn
+        ] || GetParseMode[PrintCompInitMoreInOut],
+        buf = "CCTK_REAL &" <> StringTrim[ToString[compToValue], GetGridPointIndex[
+          ]] <> " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
+          ]] <> ".elts[" <> ToString[varlistindex] <> "];"
       ,
       GetParseMode[PrintCompInitTemp],
-        buf = "double " <> ToString[compToValue] <> ";"
+        buf = "CCTK_REAL " <> ToString[compToValue] <> ";"
       ,
       True,
         Throw @ Message[PrintComponentInitialization::EMode]
