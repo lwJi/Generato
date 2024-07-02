@@ -30,12 +30,13 @@ PrintComponentInitialization[varname_, compname_] :=
         ];
         buf =
           "vreal &" <> StringTrim[ToString[compToValue], GetGridPointIndex[
-            ]] <> " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
             ]] <>
             If[GetParseMode[PrintCompInitGF3D2],
-              "(mask, index2)"
+              " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
+                ]] <> "(mask, index2)"
               ,
-              "(mask, index5)"
+              " = tl_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
+                ]] <> "(mask, index5)"
             ] <> subbuf <> ";"
       ,
       GetParseMode[PrintCompInitVecGF3D2] || GetParseMode[PrintCompInitVecGF3D5
@@ -58,12 +59,13 @@ PrintComponentInitialization[varname_, compname_] :=
         ];
         buf =
           "vreal &" <> StringTrim[ToString[compToValue], GetGridPointIndex[
-            ]] <> " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
             ]] <>
             If[GetParseMode[PrintCompInitVecGF3D2],
-              "(mask, index2)"
+              " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
+                ]] <> "(mask, index2)"
               ,
-              "(mask, index5)"
+              " = tl_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
+                ]] <> "(mask, index5)"
             ] <> subbuf <> ";"
       ,
       GetParseMode[PrintCompInitSmatGF3D2] || GetParseMode[PrintCompInitSmatGF3D5
@@ -88,12 +90,13 @@ PrintComponentInitialization[varname_, compname_] :=
         ];
         buf =
           "vreal &" <> StringTrim[ToString[compToValue], GetGridPointIndex[
-            ]] <> " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
             ]] <>
             If[GetParseMode[PrintCompInitSmatGF3D2],
-              "(mask, index2)"
+              " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
+                ]] <> "(mask, index2)"
               ,
-              "(mask, index5)"
+              " = tl_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
+                ]] <> "(mask, index5)"
             ] <> subbuf <> ";"
       ,
       GetParseMode[PrintCompInitTemp],
