@@ -29,7 +29,7 @@ PrintComponentInitialization[varname_, compname_] :=
             Throw @ Message[PrintComponentInitialization::EVarLength]
         ];
         buf =
-          "vreal &" <> StringTrim[ToString[compToValue], GetGridPointIndex[
+          "const vreal &" <> StringTrim[ToString[compToValue], GetGridPointIndex[
             ]] <>
             If[GetParseMode[PrintCompInitGF3D2],
               " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
@@ -58,7 +58,7 @@ PrintComponentInitialization[varname_, compname_] :=
             Throw @ Message[PrintComponentInitialization::EVarLength]
         ];
         buf =
-          "vreal &" <> StringTrim[ToString[compToValue], GetGridPointIndex[
+          "const vreal &" <> StringTrim[ToString[compToValue], GetGridPointIndex[
             ]] <>
             If[GetParseMode[PrintCompInitVecGF3D2],
               " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
@@ -89,7 +89,7 @@ PrintComponentInitialization[varname_, compname_] :=
             Throw @ Message[PrintComponentInitialization::EVarLength]
         ];
         buf =
-          "vreal &" <> StringTrim[ToString[compToValue], GetGridPointIndex[
+          "const vreal &" <> StringTrim[ToString[compToValue], GetGridPointIndex[
             ]] <>
             If[GetParseMode[PrintCompInitSmatGF3D2],
               " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
