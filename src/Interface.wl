@@ -142,6 +142,24 @@ PrintInitializations[OptionsPattern[], varlist_?ListQ] :=
       StringMatchQ[mode, "Temp"],
         SetParseMode[PrintCompInitTemp -> True]
       ,
+      StringMatchQ[mode, "GF3D2"],
+        SetParseMode[PrintCompInitGF3D2 -> True]
+      ,
+      StringMatchQ[mode, "GF3D5"],
+        SetParseMode[PrintCompInitGF3D5 -> True]
+      ,
+      StringMatchQ[mode, "VecGF3D2"],
+        SetParseMode[PrintCompInitVecGF3D2 -> True]
+      ,
+      StringMatchQ[mode, "VecGF3D5"],
+        SetParseMode[PrintCompInitVecGF3D5 -> True]
+      ,
+      StringMatchQ[mode, "SmatGF3D2"],
+        SetParseMode[PrintCompInitSmatGF3D2 -> True]
+      ,
+      StringMatchQ[mode, "SmatGF3D5"],
+        SetParseMode[PrintCompInitSmatGF3D5 -> True]
+      ,
       True,
         Throw @ Message[PrintInitializations::EMode, mode]
     ];

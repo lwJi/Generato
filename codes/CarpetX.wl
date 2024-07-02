@@ -10,18 +10,91 @@
 
 PrintComponentInitialization[varname_, compname_] :=
   Module[{varlistindex = GetMapComponentToVarlist[][compname], compToValue
-     = compname // ToValues, buf},
+     = compname // ToValues, buf, subbuf},
     Which[
-      GetParseMode[PrintCompInitMainOut] || GetParseMode[PrintCompInitMoreInOut
+      GetParseMode[PrintCompInitGF3D2] || GetParseMode[PrintCompInitGF3D5
         ],
-        buf = "vreal &" <> StringTrim[ToString[compToValue], GetGridPointIndex[
-          ]] <> " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
-          ]] <> "(mask, index2).elts[" <> ToString[varlistindex] <> "];"
+        Which[
+          Length[varname] == 0,
+            subbuf = ""
+          ,
+          Length[varname] == 1,
+            subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> ")"
+          ,
+          Length[varname] == 2,
+            subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> "," <> 
+              ToString[compname[[2]][[1]] - 1] <> ")"
+          ,
+          True,
+            Throw @ Message[PrintComponentInitialization::EVarLength]
+        ];
+        buf =
+          "vreal &" <> StringTrim[ToString[compToValue], GetGridPointIndex[
+            ]] <> " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
+            ]] <>
+            If[GetParseMode[PrintCompInitGF3D2],
+              "(mask, index2)"
+              ,
+              "(mask, index5)"
+            ] <> subbuf <> ";"
       ,
-      GetParseMode[PrintCompInitMainIn],
-        buf = "vreal &" <> StringTrim[ToString[compToValue], GetGridPointIndex[
-          ]] <> " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
-          ]] <> "(mask, index5).elts[" <> ToString[varlistindex] <> "];"
+      GetParseMode[PrintCompInitVecGF3D2] || GetParseMode[PrintCompInitVecGF3D5
+        ],
+        Which[
+          Length[varname] == 1,
+            subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> ")"
+          ,
+          Length[varname] == 2,
+            subbuf = "(" <> ToString[compname[[2]][[1]] - 1] <> ")" <> 
+              "(" <> ToString[compname[[1]][[1]] - 1] <> ")"
+          ,
+          Length[varname] == 3,
+            subbuf = "(" <> ToString[compname[[2]][[1]] - 1] <> "," <> 
+              ToString[compname[[3]][[1]] - 1] <> ")" <> "(" <> ToString[compname[[1]]
+              [[1]] - 1] <> ")"
+          ,
+          True,
+            Throw @ Message[PrintComponentInitialization::EVarLength]
+        ];
+        buf =
+          "vreal &" <> StringTrim[ToString[compToValue], GetGridPointIndex[
+            ]] <> " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
+            ]] <>
+            If[GetParseMode[PrintCompInitVecGF3D2],
+              "(mask, index2)"
+              ,
+              "(mask, index5)"
+            ] <> subbuf <> ";"
+      ,
+      GetParseMode[PrintCompInitSmatGF3D2] || GetParseMode[PrintCompInitSmatGF3D5
+        ],
+        Which[
+          Length[varname] == 2,
+            subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> "," <> 
+              ToString[compname[[2]][[1]] - 1] <> ")"
+          ,
+          Length[varname] == 3,
+            subbuf = "(" <> ToString[compname[[3]][[1]] - 1] <> ")" <> 
+              "(" <> ToString[compname[[1]][[1]] - 1] <> "," <> ToString[compname[[2]]
+              [[1]] - 1] <> ")"
+          ,
+          Length[varname] == 4,
+            subbuf = "(" <> ToString[compname[[3]][[1]] - 1] <> "," <> 
+              ToString[compname[[4]][[1]] - 1] <> ")" <> "(" <> ToString[compname[[1]]
+              [[1]] - 1] <> "," <> ToString[compname[[2]][[1]] - 1] <> ")"
+          ,
+          True,
+            Throw @ Message[PrintComponentInitialization::EVarLength]
+        ];
+        buf =
+          "vreal &" <> StringTrim[ToString[compToValue], GetGridPointIndex[
+            ]] <> " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
+            ]] <>
+            If[GetParseMode[PrintCompInitSmatGF3D2],
+              "(mask, index2)"
+              ,
+              "(mask, index5)"
+            ] <> subbuf <> ";"
       ,
       GetParseMode[PrintCompInitTemp],
         buf = "vreal " <> ToString[compToValue] <> ";"
@@ -33,6 +106,8 @@ PrintComponentInitialization[varname_, compname_] :=
   ];
 
 PrintComponentInitialization::EMode = "PrintComponentInitialization mode unrecognized!";
+
+PrintComponentInitialization::EVarLength = "PrintComponentInitialization variable's tensor type unsupported!";
 
 (*Protect[PrintComponentInitialization];*)
 

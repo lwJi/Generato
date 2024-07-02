@@ -40,6 +40,18 @@ PrintCompInitMoreInOut::usage = "ParseMode option.";
 
 PrintCompInitTemp::usage = "ParseMode option.";
 
+PrintCompInitGF3D2::usage = "ParseMode option.";
+
+PrintCompInitGF3D5::usage = "ParseMode option.";
+
+PrintCompInitVecGF3D2::usage = "ParseMode option.";
+
+PrintCompInitVecGF3D5::usage = "ParseMode option.";
+
+PrintCompInitSmatGF3D2::usage = "ParseMode option.";
+
+PrintCompInitSmatGF3D5::usage = "ParseMode option.";
+
 PrintCompEQN::usage = "ParseMode option.";
 
 PrintCompEQNNewVar::usage = "ParseMode option.";
@@ -103,9 +115,11 @@ SetParseModeAllToFalse[] :=
     AppendTo[$ParseModeAssociation, <|SetComp -> False, PrintComp -> False,
        SetCompIndep -> False, SetCompNoGPIndex -> False, PrintCompInit -> False,
        PrintCompInitMainOut -> False, PrintCompInitMainIn -> False, PrintCompInitMoreInOut
-       -> False, PrintCompInitTemp -> False, PrintCompEQN -> False, PrintCompEQNNewVar
-       -> False, PrintCompEQNMain -> False, PrintCompEQNAddToMain -> False|>]
-      
+       -> False, PrintCompInitTemp -> False, PrintCompInitGF3D2 -> False, PrintCompInitGF3D5
+       -> False, PrintCompInitVecGF3D2 -> False, PrintCompInitVecGF3D5 -> False,
+       PrintCompInitSmatGF3D2 -> False, PrintCompInitSmatGF3D5 -> False, PrintCompEQN
+       -> False, PrintCompEQNNewVar -> False, PrintCompEQNMain -> False, PrintCompEQNAddToMain
+       -> False|>]
   ];
 
 Protect[SetParseModeAllToFalse];
