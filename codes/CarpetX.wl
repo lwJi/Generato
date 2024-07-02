@@ -80,7 +80,7 @@ PrintComponentInitialization[varname_, compname_] :=
     buf =
       Which[
         isGF3D2 && GetParseMode[PrintCompInitMainOut],
-          "const GF3D2<CCTK_REA> &"
+          "const GF3D2<CCTK_REAL> &"
           <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
           <> " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]]
           <> subbuf <> ";"
