@@ -70,8 +70,6 @@ $OutputFile = "output.c";
 
 $Project = "TEST";
 
-$SimplifyEquation = True;
-
 (* Function *)
 
 GetPVerbose[] :=

@@ -54,6 +54,8 @@ SetProcessNewVarlist::usage = "SetProcessNewVarlist[True] update the Boolean var
 
 SetSimplifyEquation::usage = "SetSimplifyEquation[True] update the Boolean variable specifying if Simplify the equations.";
 
+SetTempVariableType::usage = "SetTempVariableType[CCTK_REAL] update the type of temporary variable.";
+
 GetSuffixName::usage = "GetSuffixName[] returns the suffix added to vars in the current list.";
 
 SetSuffixName::usage = "SetSuffixName[suffix] update the suffix added to vars in the current list.";
@@ -75,6 +77,8 @@ $MapComponentToVarlist = <||>;(*store all varlist's map*)
 $ProcessNewVarlist = True;
 
 $SimplifyEquation = True;
+
+$TempVariableType = "double";
 
 $SuffixName = "";
 
@@ -135,6 +139,16 @@ SetSimplifyEquation[simplify_] :=
   ];
 
 Protect[SetSimplifyEquation];
+
+GetTempVariableType[] :=
+  Return[$TempVariableType];
+
+SetTempVariableType[type_] :=
+  Module[{},
+    $TempVariableType = type
+  ];
+
+Protect[SetTempVariableType];
 
 GetSuffixName[] :=
   Return[$SuffixName];
@@ -219,7 +233,7 @@ PrintComponentEquation[coordinate_, compname_] :=
     Which[
       GetParseMode[PrintCompEQNNewVar],
         Module[{},
-          Global`pr["double "];
+          Global`pr[GetTempVariableType[] <> " "];
           PutAppend[CForm[compToValue], outputfile];
           Global`pr["="];
           PutAppend[CForm[rhssToValue], outputfile];
