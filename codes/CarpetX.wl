@@ -12,14 +12,19 @@ PrintComponentInitialization[varname_, compname_] :=
   Module[{varlistindex = GetMapComponentToVarlist[][compname], compToValue
      = compname // ToValues, buf},
     Which[
-      GetParseMode[PrintCompInitMainOut] || GetParseMode[PrintCompInitMainIn
-        ] || GetParseMode[PrintCompInitMoreInOut],
-        buf = "CCTK_REAL &" <> StringTrim[ToString[compToValue], GetGridPointIndex[
+      GetParseMode[PrintCompInitMainOut] || GetParseMode[PrintCompInitMoreInOut
+        ],
+        buf = "vreal &" <> StringTrim[ToString[compToValue], GetGridPointIndex[
           ]] <> " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
-          ]] <> ".elts[" <> ToString[varlistindex] <> "];"
+          ]] <> "(mask, index2).elts[" <> ToString[varlistindex] <> "];"
+      ,
+      GetParseMode[PrintCompInitMainIn],
+        buf = "vreal &" <> StringTrim[ToString[compToValue], GetGridPointIndex[
+          ]] <> " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
+          ]] <> "(mask, index5).elts[" <> ToString[varlistindex] <> "];"
       ,
       GetParseMode[PrintCompInitTemp],
-        buf = "CCTK_REAL " <> ToString[compToValue] <> ";"
+        buf = "vreal " <> ToString[compToValue] <> ";"
       ,
       True,
         Throw @ Message[PrintComponentInitialization::EMode]
@@ -45,7 +50,7 @@ Module[{outputfile = GetOutputFile[], filepointer},
   filepointer = OpenAppend[outputfile];
   pr[x_:""] :=
     Module[{},
-      If[x == "double ",
+      If[x == "vreal ",
         WriteString[filepointer, x]
         ,
         WriteLine[filepointer, x]

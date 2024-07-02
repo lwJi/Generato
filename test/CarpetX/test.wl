@@ -13,6 +13,8 @@ SetPrintDate[False];
 
 SetGridPointIndex[""];
 
+SetTempVariableType["vreal"];
+
 DefManifold[M3, 3, IndexRange[a, z]];
 
 DefChart[cart, M3, {1, 2, 3}, {X[], Y[], Z[]}, ChartColor -> Blue];
