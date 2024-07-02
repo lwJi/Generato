@@ -10,10 +10,13 @@
 
 PrintComponentInitialization[varname_, compname_] :=
   Module[{varlistindex = GetMapComponentToVarlist[][compname], compToValue
-     = compname // ToValues, buf, subbuf},
+     = compname // ToValues, buf, subbuf, isGF3D2, isGF3D5, isScal, isVect, isSmat},
+    isScal = GetParseMode[PrintCompInitGF3D2] || GetParseMode[PrintCompInitGF3D5];
+    isVect = GetParseMode[PrintCompInitVecGF3D2] || GetParseMode[PrintCompInitVecGF3D5];
+    isSmat = GetParseMode[PrintCompInitSmatGF3D2] || GetParseMode[PrintCompInitSmatGF3D5];
+    (* set subbuf *)
     Which[
-      GetParseMode[PrintCompInitGF3D2] || GetParseMode[PrintCompInitGF3D5
-        ],
+      isScal,
         Which[
           Length[varname] == 0,
             subbuf = ""
@@ -22,89 +25,85 @@ PrintComponentInitialization[varname_, compname_] :=
             subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> ")"
           ,
           Length[varname] == 2,
-            subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> "," <> 
-              ToString[compname[[2]][[1]] - 1] <> ")"
+            subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> ","
+                         <> ToString[compname[[2]][[1]] - 1] <> ")"
           ,
           True,
             Throw @ Message[PrintComponentInitialization::EVarLength]
-        ];
-        buf =
-          "const vreal &" <> StringTrim[ToString[compToValue], GetGridPointIndex[
-            ]] <>
-            If[GetParseMode[PrintCompInitGF3D2],
-              " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
-                ]] <> "(mask, index2)"
-              ,
-              " = tl_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
-                ]] <> "(mask, index5)"
-            ] <> subbuf <> ";"
+        ]
       ,
-      GetParseMode[PrintCompInitVecGF3D2] || GetParseMode[PrintCompInitVecGF3D5
-        ],
+      isVect,
         Which[
           Length[varname] == 1,
             subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> ")"
           ,
           Length[varname] == 2,
-            subbuf = "(" <> ToString[compname[[2]][[1]] - 1] <> ")" <> 
-              "(" <> ToString[compname[[1]][[1]] - 1] <> ")"
+            subbuf = "(" <> ToString[compname[[2]][[1]] - 1] <> ")"
+                  <> "(" <> ToString[compname[[1]][[1]] - 1] <> ")"
           ,
           Length[varname] == 3,
-            subbuf = "(" <> ToString[compname[[2]][[1]] - 1] <> "," <> 
-              ToString[compname[[3]][[1]] - 1] <> ")" <> "(" <> ToString[compname[[1]]
-              [[1]] - 1] <> ")"
+            subbuf = "(" <> ToString[compname[[2]][[1]] - 1] <> ","
+                         <> ToString[compname[[3]][[1]] - 1] <> ")"
+                  <> "(" <> ToString[compname[[1]][[1]] - 1] <> ")"
           ,
           True,
             Throw @ Message[PrintComponentInitialization::EVarLength]
-        ];
-        buf =
-          "const vreal &" <> StringTrim[ToString[compToValue], GetGridPointIndex[
-            ]] <>
-            If[GetParseMode[PrintCompInitVecGF3D2],
-              " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
-                ]] <> "(mask, index2)"
-              ,
-              " = tl_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
-                ]] <> "(mask, index5)"
-            ] <> subbuf <> ";"
+        ]
       ,
-      GetParseMode[PrintCompInitSmatGF3D2] || GetParseMode[PrintCompInitSmatGF3D5
-        ],
+      isSmat,
         Which[
           Length[varname] == 2,
-            subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> "," <> 
-              ToString[compname[[2]][[1]] - 1] <> ")"
+            subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> ","
+                         <> ToString[compname[[2]][[1]] - 1] <> ")"
           ,
           Length[varname] == 3,
-            subbuf = "(" <> ToString[compname[[3]][[1]] - 1] <> ")" <> 
-              "(" <> ToString[compname[[1]][[1]] - 1] <> "," <> ToString[compname[[2]]
-              [[1]] - 1] <> ")"
+            subbuf = "(" <> ToString[compname[[3]][[1]] - 1] <> ")"
+                  <> "(" <> ToString[compname[[1]][[1]] - 1] <> ","
+                         <> ToString[compname[[2]][[1]] - 1] <> ")"
           ,
           Length[varname] == 4,
-            subbuf = "(" <> ToString[compname[[3]][[1]] - 1] <> "," <> 
-              ToString[compname[[4]][[1]] - 1] <> ")" <> "(" <> ToString[compname[[1]]
-              [[1]] - 1] <> "," <> ToString[compname[[2]][[1]] - 1] <> ")"
+            subbuf = "(" <> ToString[compname[[3]][[1]] - 1] <> ","
+                         <> ToString[compname[[4]][[1]] - 1] <> ")"
+                  <> "(" <> ToString[compname[[1]][[1]] - 1] <> ","
+                         <> ToString[compname[[2]][[1]] - 1] <> ")"
           ,
           True,
             Throw @ Message[PrintComponentInitialization::EVarLength]
-        ];
-        buf =
-          "const vreal &" <> StringTrim[ToString[compToValue], GetGridPointIndex[
-            ]] <>
-            If[GetParseMode[PrintCompInitSmatGF3D2],
-              " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
-                ]] <> "(mask, index2)"
-              ,
-              " = tl_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
-                ]] <> "(mask, index5)"
-            ] <> subbuf <> ";"
-      ,
-      GetParseMode[PrintCompInitTemp],
-        buf = "vreal " <> ToString[compToValue] <> ";"
+        ]
       ,
       True,
         Throw @ Message[PrintComponentInitialization::EMode]
     ];
+    (* combine buf *)
+    isGF3D2 = GetParseMode[PrintCompInitGF3D2] || GetParseMode[PrintCompInitVecGF3D2] || GetParseMode[PrintCompInitSmatGF3D2];
+    isGF3D5 = GetParseMode[PrintCompInitGF3D5] || GetParseMode[PrintCompInitVecGF3D5] || GetParseMode[PrintCompInitSmatGF3D5];
+    buf =
+      Which[
+        isGF3D2 && GetParseMode[PrintCompInitMainOut],
+          "const GF3D2<CCTK_REA> &"
+          <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
+          <> " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]]
+          <> subbuf <> ";"
+        ,
+        isGF3D2 && GetParseMode[PrintCompInitMainIn],
+          "const vreal &" <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
+          <> " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]]
+          <> "(mask, index2)"
+          <> subbuf <> ";"
+        ,
+        isGF3D5,
+          "const vreal &" <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
+          <> " = tl_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]]
+          <> "(mask, index5)"
+          <> subbuf <> ";"
+        ,
+        GetParseMode[PrintCompInitTemp],
+          buf = "vreal " <> ToString[compToValue] <> ";"
+        ,
+        True,
+          Throw @ Message[PrintComponentInitialization::EMode]
+      ]
+    ;
     pr[buf];
   ];
 

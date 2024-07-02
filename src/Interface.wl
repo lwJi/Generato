@@ -142,20 +142,35 @@ PrintInitializations[OptionsPattern[], varlist_?ListQ] :=
       StringMatchQ[mode, "Temp"],
         SetParseMode[PrintCompInitTemp -> True]
       ,
-      StringMatchQ[mode, "GF3D2"],
-        SetParseMode[PrintCompInitGF3D2 -> True]
+      StringMatchQ[mode, "GF3D2Out"],
+        SetParseMode[PrintCompInitGF3D2 -> True];
+        SetParseMode[PrintCompInitMainOut -> True]
+      ,
+      StringMatchQ[mode, "VecGF3D2Out"],
+        SetParseMode[PrintCompInitVecGF3D2 -> True];
+        SetParseMode[PrintCompInitMainOut -> True]
+      ,
+      StringMatchQ[mode, "SmatGF3D2Out"],
+        SetParseMode[PrintCompInitSmatGF3D2 -> True];
+        SetParseMode[PrintCompInitMainOut -> True]
+      ,
+      StringMatchQ[mode, "GF3D2In"],
+        SetParseMode[PrintCompInitGF3D2 -> True];
+        SetParseMode[PrintCompInitMainIn -> True]
+      ,
+      StringMatchQ[mode, "VecGF3D2In"],
+        SetParseMode[PrintCompInitVecGF3D2 -> True];
+        SetParseMode[PrintCompInitMainIn -> True]
+      ,
+      StringMatchQ[mode, "SmatGF3D2In"],
+        SetParseMode[PrintCompInitSmatGF3D2 -> True];
+        SetParseMode[PrintCompInitMainIn -> True]
       ,
       StringMatchQ[mode, "GF3D5"],
         SetParseMode[PrintCompInitGF3D5 -> True]
       ,
-      StringMatchQ[mode, "VecGF3D2"],
-        SetParseMode[PrintCompInitVecGF3D2 -> True]
-      ,
       StringMatchQ[mode, "VecGF3D5"],
         SetParseMode[PrintCompInitVecGF3D5 -> True]
-      ,
-      StringMatchQ[mode, "SmatGF3D2"],
-        SetParseMode[PrintCompInitSmatGF3D2 -> True]
       ,
       StringMatchQ[mode, "SmatGF3D5"],
         SetParseMode[PrintCompInitSmatGF3D5 -> True]
