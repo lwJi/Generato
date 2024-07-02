@@ -107,6 +107,9 @@ PrintEquations[OptionsPattern[], varlist_?ListQ] :=
       StringMatchQ[mode, "Main"],
         SetParseMode[PrintCompEQNMain -> True]
       ,
+      StringMatchQ[mode, "MainCarpetX"],
+        SetParseMode[PrintCompEQNMainCarpetX -> True]
+      ,
       StringMatchQ[mode, "AddToMain"],
         SetParseMode[PrintCompEQNAddToMain -> True]
       ,

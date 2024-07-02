@@ -58,6 +58,8 @@ PrintCompEQNNewVar::usage = "ParseMode option.";
 
 PrintCompEQNMain::usage = "ParseMode option.";
 
+PrintCompEQNMainCarpetX::usage = "ParseMode option.";
+
 PrintCompEQNAddToMain::usage = "ParseMode option.";
 
 GetMapComponentToVarlist::usage = "GetMapComponentToVarlist[] returns the map between tensor components and varlist indexes.";
@@ -118,7 +120,10 @@ SetParseModeAllToFalse[] :=
        -> False, PrintCompInitTemp -> False, PrintCompInitGF3D2 -> False, PrintCompInitGF3D5
        -> False, PrintCompInitVecGF3D2 -> False, PrintCompInitVecGF3D5 -> False,
        PrintCompInitSmatGF3D2 -> False, PrintCompInitSmatGF3D5 -> False, PrintCompEQN
-       -> False, PrintCompEQNNewVar -> False, PrintCompEQNMain -> False, PrintCompEQNAddToMain
+       -> False, PrintCompEQNNewVar -> False,
+       PrintCompEQNMain -> False,
+       PrintCompEQNMainCarpetX -> False,
+       PrintCompEQNAddToMain
        -> False|>]
   ];
 
@@ -260,6 +265,13 @@ PrintComponentEquation[coordinate_, compname_] :=
           Global`pr["="];
           PutAppend[CForm[rhssToValue], outputfile];
           Global`pr[";\n"]
+        ]
+      ,
+      GetParseMode[PrintCompEQNMainCarpetX],
+        Module[{},
+          Global`pr[ToString[CForm[compToValue]] <>".store(mask, index2, "];
+          PutAppend[CForm[rhssToValue], outputfile];
+          Global`pr[");\n"]
         ]
       ,
       GetParseMode[PrintCompEQNAddToMain],
