@@ -92,7 +92,7 @@ PrintComponentInitialization[varname_, compname_] :=
           <> subbuf <> ";"
         ,
         isGF3D5,
-          "const vreal &" <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
+          "const vreal " <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
           <> " = tl_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]]
           <> "(mask, index5)"
           <> subbuf <> ";"
