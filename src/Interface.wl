@@ -57,7 +57,8 @@ DefTensors[vars__] :=
       DefineTensor[varname, symmetry, printname]
       ,
       {ivar, 1, Length[arglist]}
-    ]
+    ];
+    Return[arglist]
   ];
 
 Protect[DefTensors];
