@@ -12,6 +12,8 @@
 
 <<Basic.wl
 
+<<ParseMode.wl
+
 <<Component.wl
 
 <<Varlist.wl

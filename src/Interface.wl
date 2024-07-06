@@ -6,6 +6,8 @@ BeginPackage["Generato`Interface`"];
 
 Needs["Generato`Basic`"];
 
+Needs["Generato`ParseMode`"];
+
 Needs["Generato`Component`"];
 
 Needs["Generato`Varlist`"];

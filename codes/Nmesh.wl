@@ -104,13 +104,6 @@ PrintComponentEquation[coordinate_, compname_] :=
           Global`pr[";\n"]
         ]
       ,
-      GetParseMode[PrintCompEQNMainCarpetX],
-        Module[{},
-          Global`pr[ToString[CForm[compToValue]] <>".store(mask, index2, "];
-          PutAppend[CForm[rhssToValue], outputfile];
-          Global`pr[");\n"]
-        ]
-      ,
       GetParseMode[PrintCompEQNAddToMain],
         Module[{},
           PutAppend[CForm[compToValue], outputfile];
