@@ -74,6 +74,60 @@ PrintComponentInitialization::EMode = "PrintComponentInitialization mode unrecog
 
 (*Protect[PrintComponentInitialization];*)
 
+PrintComponentEquation[coordinate_, compname_] :=
+  Module[{outputfile = GetOutputFile[], compToValue, rhssToValue},
+    compToValue = compname // ToValues;
+    rhssToValue =
+      (compname /. {compname[[0]] -> RHSOf[compname[[0]], GetSuffixName[
+        ]]}) //
+      DummyToBasis[coordinate] //
+      TraceBasisDummy //
+      ToValues;
+    If[GetSimplifyEquation[],
+      rhssToValue = rhssToValue // Simplify
+    ];
+    Which[
+      GetParseMode[PrintCompEQNNewVar],
+        Module[{},
+          Global`pr[GetTempVariableType[] <> " "];
+          PutAppend[CForm[compToValue], outputfile];
+          Global`pr["="];
+          PutAppend[CForm[rhssToValue], outputfile];
+          Global`pr[";\n"]
+        ]
+      ,
+      GetParseMode[PrintCompEQNMain],
+        Module[{},
+          PutAppend[CForm[compToValue], outputfile];
+          Global`pr["="];
+          PutAppend[CForm[rhssToValue], outputfile];
+          Global`pr[";\n"]
+        ]
+      ,
+      GetParseMode[PrintCompEQNMainCarpetX],
+        Module[{},
+          Global`pr[ToString[CForm[compToValue]] <>".store(mask, index2, "];
+          PutAppend[CForm[rhssToValue], outputfile];
+          Global`pr[");\n"]
+        ]
+      ,
+      GetParseMode[PrintCompEQNAddToMain],
+        Module[{},
+          PutAppend[CForm[compToValue], outputfile];
+          Global`pr["+="];
+          PutAppend[CForm[rhssToValue], outputfile];
+          Global`pr[";\n"]
+        ]
+      ,
+      True,
+        Throw @ Message[PrintComponentEquation::EMode]
+    ]
+  ];
+
+PrintComponentEquation::EMode = "PrintEquationMode unrecognized!";
+
+(*Protect[PrintComponentEquation];*)
+
 (*
     Write to files
 *)

@@ -66,7 +66,11 @@ GetMapComponentToVarlist::usage = "GetMapComponentToVarlist[] returns the map be
 
 SetProcessNewVarlist::usage = "SetProcessNewVarlist[True] update the Boolean variable specifying if we are processing a new varlist.";
 
+GetSimplifyEquation::usage = "GetSimplifyEquation[] returns the Boolean variable specifying if Simplify the equations.";
+
 SetSimplifyEquation::usage = "SetSimplifyEquation[True] update the Boolean variable specifying if Simplify the equations.";
+
+GetTempVariableType::usage = "GetTempVariableType[] returns the type of temporary variable.";
 
 SetTempVariableType::usage = "SetTempVariableType[CCTK_REAL] update the type of temporary variable.";
 
@@ -152,6 +156,8 @@ Protect[SetProcessNewVarlist];
 GetSimplifyEquation[] :=
   Return[$SimplifyEquation];
 
+Protect[GetSimplifyEquation];
+
 SetSimplifyEquation[simplify_] :=
   Module[{},
     $SimplifyEquation = simplify
@@ -161,6 +167,8 @@ Protect[SetSimplifyEquation];
 
 GetTempVariableType[] :=
   Return[$TempVariableType];
+
+Protect[GetTempVariableType];
 
 SetTempVariableType[type_] :=
   Module[{},
@@ -228,7 +236,7 @@ PrintComponent[coordinate_, varname_, compname_] :=
       ,
       GetParseMode[PrintCompEQN],
         PrintVerbose["    PrintComponentEquation ", compname, "..."];
-        PrintComponentEquation[coordinate, compname]
+        Global`PrintComponentEquation[coordinate, compname]
       ,
       True,
         Throw @ Message[PrintComponent::EMode]
@@ -236,58 +244,6 @@ PrintComponent[coordinate_, varname_, compname_] :=
   ];
 
 PrintComponent::EMode = "PrintMode unrecognized!";
-
-PrintComponentEquation[coordinate_, compname_] :=
-  Module[{outputfile = GetOutputFile[], compToValue, rhssToValue},
-    compToValue = compname // ToValues;
-    rhssToValue =
-      (compname /. {compname[[0]] -> RHSOf[compname[[0]], GetSuffixName[
-        ]]}) //
-      DummyToBasis[coordinate] //
-      TraceBasisDummy //
-      ToValues;
-    If[GetSimplifyEquation[],
-      rhssToValue = rhssToValue // Simplify
-    ];
-    Which[
-      GetParseMode[PrintCompEQNNewVar],
-        Module[{},
-          Global`pr[GetTempVariableType[] <> " "];
-          PutAppend[CForm[compToValue], outputfile];
-          Global`pr["="];
-          PutAppend[CForm[rhssToValue], outputfile];
-          Global`pr[";\n"]
-        ]
-      ,
-      GetParseMode[PrintCompEQNMain],
-        Module[{},
-          PutAppend[CForm[compToValue], outputfile];
-          Global`pr["="];
-          PutAppend[CForm[rhssToValue], outputfile];
-          Global`pr[";\n"]
-        ]
-      ,
-      GetParseMode[PrintCompEQNMainCarpetX],
-        Module[{},
-          Global`pr[ToString[CForm[compToValue]] <>".store(mask, index2, "];
-          PutAppend[CForm[rhssToValue], outputfile];
-          Global`pr[");\n"]
-        ]
-      ,
-      GetParseMode[PrintCompEQNAddToMain],
-        Module[{},
-          PutAppend[CForm[compToValue], outputfile];
-          Global`pr["+="];
-          PutAppend[CForm[rhssToValue], outputfile];
-          Global`pr[";\n"]
-        ]
-      ,
-      True,
-        Throw @ Message[PrintComponentEquation::EMode]
-    ]
-  ];
-
-PrintComponentEquation::EMode = "PrintEquationMode unrecognized!";
 
 (*
     1. Set components for tensors (How would print them in c/c++ code)
