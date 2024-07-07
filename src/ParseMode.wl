@@ -42,6 +42,14 @@ GetParsePrintCompEQNMode::usage = "GetParsePrintCompEQNMode[key] returns the mod
 SetParsePrintCompEQNMode::usage = "SetParsePrintCompEQNMode[key] add/update the mode correspond to the key";
 CleanParsePrintCompEQNMode::usage = "CleanParsePrintCompEQNMode[] empty the association";
 
+GetParsePrintCompInitTensorType::usage = "GetParsePrintCompInitTensorType[key] returns the mode correspond to the key";
+SetParsePrintCompInitTensorType::usage = "SetParsePrintCompInitTensorType[key] add/update the mode correspond to the key";
+CleanParsePrintCompInitTensorType::usage = "CleanParsePrintCompInitTensorType[] empty the association";
+
+GetParsePrintCompInitStorageType::usage = "GetParsePrintCompInitStorageType[key] returns the mode correspond to the key";
+SetParsePrintCompInitStorageType::usage = "SetParsePrintCompInitStorageType[key] add/update the mode correspond to the key";
+CleanParsePrintCompInitStorageType::usage = "CleanParsePrintCompInitStorageType[] empty the association";
+
 Begin["`Private`"];
 
 (* Data *)
@@ -53,6 +61,9 @@ $ParsePrintCompModeAssociation = <||>;
 
 $ParsePrintCompInitModeAssociation = <||>;
 $ParsePrintCompEQNModeAssociation = <||>;
+
+$ParsePrintCompInitTensorTypeAssociation = <||>;
+$ParsePrintCompInitStorageTypeAssociation = <||>;
 
 (* Function *)
 
@@ -113,6 +124,18 @@ Protect[GetParsePrintCompEQNMode];
 SetParsePrintCompEQNMode[assoc_] := Module[{}, AppendTo[$ParsePrintCompEQNModeAssociation, assoc]];
 Protect[SetParsePrintCompEQNMode];
 CleanParsePrintCompEQNMode[] := Module[{}, $ParsePrintCompEQNModeAssociation = <||>];
+
+GetParsePrintCompInitTensorType[key_] := Return[If[KeyExistsQ[$ParsePrintCompInitTensorTypeAssociation, key], $ParsePrintCompInitTensorTypeAssociation[key], False]];
+Protect[GetParsePrintCompInitTensorType];
+SetParsePrintCompInitTensorType[assoc_] := Module[{}, AppendTo[$ParsePrintCompInitTensorTypeAssociation, assoc]];
+Protect[SetParsePrintCompInitTensorType];
+CleanParsePrintCompInitTensorType[] := Module[{}, $ParsePrintCompInitTensorTypeAssociation = <||>];
+
+GetParsePrintCompInitStorageType[key_] := Return[If[KeyExistsQ[$ParsePrintCompInitStorageTypeAssociation, key], $ParsePrintCompInitStorageTypeAssociation[key], False]];
+Protect[GetParsePrintCompInitStorageType];
+SetParsePrintCompInitStorageType[assoc_] := Module[{}, AppendTo[$ParsePrintCompInitStorageTypeAssociation, assoc]];
+Protect[SetParsePrintCompInitStorageType];
+CleanParsePrintCompInitStorageType[] := Module[{}, $ParsePrintCompInitStorageTypeAssociation = <||>];
 
 End[];
 

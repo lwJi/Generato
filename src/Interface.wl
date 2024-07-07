@@ -44,6 +44,18 @@ Protect[MoreInOut];
 Temp::usage = "PrintInitializations option."
 Protect[Temp];
 
+Scal::usage = "PrintInitializations tensor type option."
+Protect[Scal];
+Vect::usage = "PrintInitializations tensor type option."
+Protect[Vect];
+Smat::usage = "PrintInitializations tensor type option."
+Protect[Smat];
+
+GF::usage = "PrintInitializations storage type option."
+Protect[GF];
+Tile::usage = "PrintInitializations storage type option."
+Protect[Tile];
+
 Begin["`Private`"];
 
 (*
@@ -133,11 +145,11 @@ PrintEquations::EMode = "PrintEquations mode '`1`' unsupported yet!";
 Protect[PrintEquations];
 
 Options[PrintInitializations] :=
-  {ChartName -> GetDefaultChart[], Mode -> "Temp"};
+  {ChartName -> GetDefaultChart[], Mode -> "Temp", TensorType -> "Scal", StorageType -> "GF"};
 
 PrintInitializations[OptionsPattern[], varlist_?ListQ] :=
   Module[{chartname, mode},
-    {chartname, mode} = OptionValue[{ChartName, Mode}];
+    {chartname, mode, tensortype, storagetype} = OptionValue[{ChartName, Mode, TensorType, StorageType}];
     SetParseMode[{PrintComp -> True, SetComp -> False}];
     SetParsePrintCompMode[{Initializations -> True, Equations -> False}];
     Which[
@@ -156,11 +168,40 @@ PrintInitializations[OptionsPattern[], varlist_?ListQ] :=
       True,
         Throw @ Message[PrintInitializations::EMode, mode]
     ];
+    Which[
+      StringMatchQ[tensortype, "Scal"],
+        SetParsePrintCompInitTensorType[Scal -> True]
+      ,
+      StringMatchQ[tensortype, "Vect"],
+        SetParsePrintCompInitTensorType[Vect -> True]
+      ,
+      StringMatchQ[tensortype, "Smat"],
+        SetParsePrintCompInitTensorType[Smat -> True]
+      ,
+      True,
+        Throw @ Message[PrintInitializations::ETensorType, tensortype]
+    ];
+    Which[
+      StringMatchQ[storagetype, "GF"],
+        SetParsePrintCompInitStorageType[GF -> True]
+      ,
+      StringMatchQ[storagetype, "Tile"],
+        SetParsePrintCompInitStorageType[Tile -> True]
+      ,
+      True,
+        Throw @ Message[PrintInitializations::EStorageType, storagetype]
+    ];
+
     ParseVarlist[varlist, chartname];
+
     CleanParsePrintCompInitMode[];
+    CleanParsePrintCompInitTensorType[];
+    CleanParsePrintCompInitStorageType[];
   ];
 
 PrintInitializations::EMode = "PrintInitializations mode '`1`' unsupported yet!";
+PrintInitializations::ETensorType = "PrintInitializations tensor type '`1`' unsupported yet!";
+PrintInitializations::EStorageType = "PrintInitializations storage type '`1`' unsupported yet!";
 
 Protect[PrintInitializations];
 

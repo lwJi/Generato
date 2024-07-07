@@ -10,13 +10,10 @@
 
 PrintComponentInitialization[varname_, compname_] :=
   Module[{varlistindex = GetMapComponentToVarlist[][compname], compToValue
-     = compname // ToValues, buf, subbuf, isGF3D2, isGF3D5, isScal, isVect, isSmat},
-    isScal = GetParseMode[PrintCompInitGF3D2] || GetParseMode[PrintCompInitGF3D5];
-    isVect = GetParseMode[PrintCompInitVecGF3D2] || GetParseMode[PrintCompInitVecGF3D5];
-    isSmat = GetParseMode[PrintCompInitSmatGF3D2] || GetParseMode[PrintCompInitSmatGF3D5];
+     = compname // ToValues, buf, subbuf, isGF3D2, isGF3D5},
     (* set subbuf *)
     Which[
-      isScal,
+      GetParsePrintCompInitTensorType[Scal],
         Which[
           Length[varname] == 0,
             subbuf = ""
@@ -32,7 +29,7 @@ PrintComponentInitialization[varname_, compname_] :=
             Throw @ Message[PrintComponentInitialization::EVarLength]
         ]
       ,
-      isVect,
+      GetParsePrintCompInitTensorType[Vect],
         Which[
           Length[varname] == 1,
             subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> ")"
@@ -50,7 +47,7 @@ PrintComponentInitialization[varname_, compname_] :=
             Throw @ Message[PrintComponentInitialization::EVarLength]
         ]
       ,
-      isSmat,
+      GetParsePrintCompInitTensorType[Smat],
         Which[
           Length[varname] == 2,
             subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> ","
@@ -75,29 +72,29 @@ PrintComponentInitialization[varname_, compname_] :=
         Throw @ Message[PrintComponentInitialization::EMode]
     ];
     (* combine buf *)
-    isGF3D2 = GetParseMode[PrintCompInitGF3D2] || GetParseMode[PrintCompInitVecGF3D2] || GetParseMode[PrintCompInitSmatGF3D2];
-    isGF3D5 = GetParseMode[PrintCompInitGF3D5] || GetParseMode[PrintCompInitVecGF3D5] || GetParseMode[PrintCompInitSmatGF3D5];
+    isGF3D2 = GetParsePrintCompInitStorageType[GF];
+    isGF3D5 = GetParsePrintCompInitStorageType[Tile];
     buf =
       Which[
-        isGF3D2 && GetParseMode[PrintCompInitMainOut],
+        GetParsePrintCompInitMode[MainOut] && isGF3D2,
           "const GF3D2<CCTK_REAL> &"
           <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
           <> " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]]
           <> subbuf <> ";"
         ,
-        isGF3D2 && GetParseMode[PrintCompInitMainIn],
+        GetParsePrintCompInitMode[MainIn] && isGF3D2,
           "const vreal &" <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
           <> " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]]
           <> "(mask, index2)"
           <> subbuf <> ";"
         ,
-        isGF3D5,
+        GetParsePrintCompInitMode[MainIn] && isGF3D5,
           "const vreal " <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
           <> " = tl_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]]
           <> "(mask, index5)"
           <> subbuf <> ";"
         ,
-        GetParseMode[PrintCompInitTemp],
+        GetParsePrintCompInitMode[Temp],
           buf = "vreal " <> ToString[compToValue] <> ";"
         ,
         True,
@@ -126,7 +123,7 @@ PrintComponentEquation[coordinate_, compname_] :=
       rhssToValue = rhssToValue // Simplify
     ];
     Which[
-      GetParseMode[PrintCompEQNNewVar],
+      GetParsePrintCompEQNMode[NewVar],
         Module[{},
           Global`pr[GetTempVariableType[] <> " "];
           PutAppend[CForm[compToValue], outputfile];
@@ -135,22 +132,14 @@ PrintComponentEquation[coordinate_, compname_] :=
           Global`pr[";\n"]
         ]
       ,
-      GetParseMode[PrintCompEQNMain],
-        Module[{},
-          PutAppend[CForm[compToValue], outputfile];
-          Global`pr["="];
-          PutAppend[CForm[rhssToValue], outputfile];
-          Global`pr[";\n"]
-        ]
-      ,
-      GetParseMode[PrintCompEQNMainCarpetX],
+      GetParsePrintCompEQNMode[Main],
         Module[{},
           Global`pr[ToString[CForm[compToValue]] <>".store(mask, index2, "];
           PutAppend[CForm[rhssToValue], outputfile];
           Global`pr[");\n"]
         ]
       ,
-      GetParseMode[PrintCompEQNAddToMain],
+      GetParsePrintCompEQNMode[AddToMain],
         Module[{},
           PutAppend[CForm[compToValue], outputfile];
           Global`pr["+="];
