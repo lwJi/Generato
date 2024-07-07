@@ -26,7 +26,7 @@ PrintComponentInitialization[varname_, compname_] :=
   Module[{varlistindex = GetMapComponentToVarlist[][compname], compToValue
      = compname // ToValues, buf},
     Which[
-      GetParseMode[PrintCompInitMainOut],
+      GetParsePrintCompInitMode[MainOut],
         buf =
           "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[
             ]] <> " = Vard(node, Vind(vlr," <> ToString[GetProject[]] <> "->i_" <> 
@@ -38,7 +38,7 @@ PrintComponentInitialization[varname_, compname_] :=
               "+" <> ToString[varlistindex]
             ] <> "));"
       ,
-      GetParseMode[PrintCompInitMainIn],
+      GetParsePrintCompInitMode[MainIn],
         buf =
           "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[
             ]] <> " = Vard(node, Vind(vlu," <> ToString[GetProject[]] <> "->i_" <> 
@@ -50,7 +50,7 @@ PrintComponentInitialization[varname_, compname_] :=
               "+" <> ToString[varlistindex]
             ] <> "));"
       ,
-      GetParseMode[PrintCompInitMoreInOut],
+      GetParsePrintCompInitMode[MoreInOut],
         buf =
           "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[
             ]] <> " = Vard(node, i" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
@@ -61,7 +61,7 @@ PrintComponentInitialization[varname_, compname_] :=
               "+" <> ToString[varlistindex]
             ] <> ");"
       ,
-      GetParseMode[PrintCompInitTemp],
+      GetParsePrintCompInitMode[Temp],
         buf = "double " <> ToString[compToValue] <> ";"
       ,
       True,
@@ -87,7 +87,7 @@ PrintComponentEquation[coordinate_, compname_] :=
       rhssToValue = rhssToValue // Simplify
     ];
     Which[
-      GetParseMode[PrintCompEQNNewVar],
+      GetParsePrintCompEQNMode[NewVar],
         Module[{},
           Global`pr[GetTempVariableType[] <> " "];
           PutAppend[CForm[compToValue], outputfile];
@@ -96,7 +96,7 @@ PrintComponentEquation[coordinate_, compname_] :=
           Global`pr[";\n"]
         ]
       ,
-      GetParseMode[PrintCompEQNMain],
+      GetParsePrintCompEQNMode[Main],
         Module[{},
           PutAppend[CForm[compToValue], outputfile];
           Global`pr["="];
@@ -104,7 +104,7 @@ PrintComponentEquation[coordinate_, compname_] :=
           Global`pr[";\n"]
         ]
       ,
-      GetParseMode[PrintCompEQNAddToMain],
+      GetParsePrintCompEQNMode[AddToMain],
         Module[{},
           PutAppend[CForm[compToValue], outputfile];
           Global`pr["+="];

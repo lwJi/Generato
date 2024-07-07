@@ -27,8 +27,22 @@ DefTensors::usage = "DefTensors[vars] define tensors (without setting its compon
 SetComponents::usage = "SetComponents[{ChartName->..., IndependentIndexForEachVar->..., WithoutGridPointIndex->...}, varlist] set components of varlist.";
 
 PrintEquations::usage = "PrintEquations[{ChartName->..., SuffixName->..., Mode->...}, varlist] print equations of varlist.";
+NewVar::usage = "PrintEquations option.";
+Protect[NewVar];
+Main::usage = "PrintEquations option.";
+Protect[Main];
+AddToMain::usage = "PrintEquations option.";
+Protect[AddToMain];
 
 PrintInitializations::usage = "PrintInitializations[{ChartName->..., Mode->...}, varlist] print initialization of varlist.";
+MainOut::usage = "PrintInitializations option."
+Protect[MainOut];
+MainIn::usage = "PrintInitializations option."
+Protect[MainIn];
+MoreInOut::usage = "PrintInitializations option."
+Protect[MoreInOut];
+Temp::usage = "PrintInitializations option."
+Protect[Temp];
 
 Begin["`Private`"];
 
@@ -77,14 +91,9 @@ SetComponents[OptionsPattern[], varlist_?ListQ] :=
   Module[{chartname, indepidx, nogpidx},
     {chartname, indepidx, nogpidx} = OptionValue[{ChartName, IndependentIndexForEachVar,
        WithoutGridPointIndex}];
-    SetParseModeAllToFalse[];
-    SetParseMode[SetComp -> True];
-    If[indepidx,
-      SetParseMode[SetCompIndep -> True]
-    ];
-    If[nogpidx,
-      SetParseMode[SetCompNoGPIndex -> True]
-    ];
+    SetParseMode[{SetComp -> True, PrintComp -> False}];
+    SetParseSetCompMode[IndependentVarlistIndex -> indepidx];
+    SetParseSetCompMode[WithoutGridPointIndex -> nogpidx];
     ParseVarlist[varlist, chartname];
   ];
 
@@ -100,26 +109,23 @@ PrintEquations[OptionsPattern[], varlist_?ListQ] :=
     If[suffixname =!= Null,
       SetSuffixName[suffixname]
     ];
-    SetParseModeAllToFalse[];
-    SetParseMode[PrintComp -> True];
-    SetParseMode[PrintCompEQN -> True];
+    SetParseMode[{PrintComp -> True, SetComp -> False}];
+    SetParsePrintCompMode[{Equations -> True, Initializations -> False}];
     Which[
       StringMatchQ[mode, "Temp"],
-        SetParseMode[PrintCompEQNNewVar -> True]
+        SetParsePrintCompEQNMode[NewVar -> True]
       ,
       StringMatchQ[mode, "Main"],
-        SetParseMode[PrintCompEQNMain -> True]
-      ,
-      StringMatchQ[mode, "MainCarpetX"],
-        SetParseMode[PrintCompEQNMainCarpetX -> True]
+        SetParsePrintCompEQNMode[Main -> True]
       ,
       StringMatchQ[mode, "AddToMain"],
-        SetParseMode[PrintCompEQNAddToMain -> True]
+        SetParsePrintCompEQNMode[AddToMain -> True]
       ,
       True,
         Throw @ Message[PrintEquations::EMode, mode]
     ];
     ParseVarlist[varlist, chartname];
+    CleanParsePrintCompEQNMode[];
   ];
 
 PrintEquations::EMode = "PrintEquations mode '`1`' unsupported yet!";
@@ -132,59 +138,26 @@ Options[PrintInitializations] :=
 PrintInitializations[OptionsPattern[], varlist_?ListQ] :=
   Module[{chartname, mode},
     {chartname, mode} = OptionValue[{ChartName, Mode}];
-    SetParseModeAllToFalse[];
-    SetParseMode[PrintComp -> True];
-    SetParseMode[PrintCompInit -> True];
+    SetParseMode[{PrintComp -> True, SetComp -> False}];
+    SetParsePrintCompMode[{Initializations -> True, Equations -> False}];
     Which[
       StringMatchQ[mode, "MainOut"],
-        SetParseMode[PrintCompInitMainOut -> True]
+        SetParsePrintCompInitMode[MainOut -> True]
       ,
       StringMatchQ[mode, "MainIn"],
-        SetParseMode[PrintCompInitMainIn -> True]
+        SetParsePrintCompInitMode[MainIn -> True]
       ,
       StringMatchQ[mode, "MoreInOut"],
-        SetParseMode[PrintCompInitMoreInOut -> True]
+        SetParsePrintCompInitMode[MoreInOut -> True]
       ,
       StringMatchQ[mode, "Temp"],
-        SetParseMode[PrintCompInitTemp -> True]
-      ,
-      StringMatchQ[mode, "GF3D2Out"],
-        SetParseMode[PrintCompInitGF3D2 -> True];
-        SetParseMode[PrintCompInitMainOut -> True]
-      ,
-      StringMatchQ[mode, "VecGF3D2Out"],
-        SetParseMode[PrintCompInitVecGF3D2 -> True];
-        SetParseMode[PrintCompInitMainOut -> True]
-      ,
-      StringMatchQ[mode, "SmatGF3D2Out"],
-        SetParseMode[PrintCompInitSmatGF3D2 -> True];
-        SetParseMode[PrintCompInitMainOut -> True]
-      ,
-      StringMatchQ[mode, "GF3D2In"],
-        SetParseMode[PrintCompInitGF3D2 -> True];
-        SetParseMode[PrintCompInitMainIn -> True]
-      ,
-      StringMatchQ[mode, "VecGF3D2In"],
-        SetParseMode[PrintCompInitVecGF3D2 -> True];
-        SetParseMode[PrintCompInitMainIn -> True]
-      ,
-      StringMatchQ[mode, "SmatGF3D2In"],
-        SetParseMode[PrintCompInitSmatGF3D2 -> True];
-        SetParseMode[PrintCompInitMainIn -> True]
-      ,
-      StringMatchQ[mode, "GF3D5"],
-        SetParseMode[PrintCompInitGF3D5 -> True]
-      ,
-      StringMatchQ[mode, "VecGF3D5"],
-        SetParseMode[PrintCompInitVecGF3D5 -> True]
-      ,
-      StringMatchQ[mode, "SmatGF3D5"],
-        SetParseMode[PrintCompInitSmatGF3D5 -> True]
+        SetParsePrintCompInitMode[Temp -> True]
       ,
       True,
         Throw @ Message[PrintInitializations::EMode, mode]
     ];
     ParseVarlist[varlist, chartname];
+    CleanParsePrintCompInitMode[];
   ];
 
 PrintInitializations::EMode = "PrintInitializations mode '`1`' unsupported yet!";

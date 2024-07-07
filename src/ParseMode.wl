@@ -11,54 +11,36 @@ Print["Package Generato`ParseMode`, {2024, 7, 06}"];
 Print["------------------------------------------------------------"];
 
 GetParseMode::usage = "GetParseMode[key] returns the mode correspond to the key";
-
 SetParseMode::usage = "SetParseMode[key] add/update the mode correspond to the key";
-
 SetParseModeAllToFalse::usage = "SetParseModeAllToFalse[] set all the modes to false";
-
 SetComp::usage = "ParseMode option.";
-
-Protect[SetComp];
-
-SetCompIndep::usage = "ParseMode option.";
-
-SetCompNoGPIndex::usage = "ParseMode option.";
-
 PrintComp::usage = "ParseMode option.";
-
+Protect[SetComp];
 Protect[PrintComp];
 
-PrintCompInit::usage = "ParseMode option.";
+GetParseSetCompMode::usage = "GetParseSetCompMode[key] returns the mode correspond to the key";
+SetParseSetCompMode::usage = "SetParseSetCompMode[key] add/update the mode correspond to the key";
+SetParseSetCompModeAllToFalse::usage = "SetParseSetCompModeAllToFalse[] set all the modes to false";
+IndependentVarlistIndex::usage = "ParseSetCompMode option.";
+WithoutGridPointIndex::usage = "ParseSetCompMode option.";
+Protect[IndependentVarlistIndex];
+Protect[WithoutGridPointIndex];
 
-PrintCompInitMainOut::usage = "ParseMode option.";
+GetParsePrintCompMode::usage = "GetParsePrintCompMode[key] returns the mode correspond to the key";
+SetParsePrintCompMode::usage = "SetParsePrintCompMode[key] add/update the mode correspond to the key";
+SetParsePrintCompModeAllToFalse::usage = "SetParsePrintCompModeAllToFalse[] set all the modes to false";
+Initializations::usage = "ParsePrintCompMode option.";
+Equations::usage = "ParsePrintCompMode option.";
+Protect[Initializations];
+Protect[Equations];
 
-PrintCompInitMainIn::usage = "ParseMode option.";
+GetParsePrintCompInitMode::usage = "GetParsePrintCompInitMode[key] returns the mode correspond to the key";
+SetParsePrintCompInitMode::usage = "SetParsePrintCompInitMode[key] add/update the mode correspond to the key";
+CleanParsePrintCompInitMode::usage = "CleanParsePrintCompInitMode[] empty the association";
 
-PrintCompInitMoreInOut::usage = "ParseMode option.";
-
-PrintCompInitTemp::usage = "ParseMode option.";
-
-PrintCompInitGF3D2::usage = "ParseMode option.";
-
-PrintCompInitGF3D5::usage = "ParseMode option.";
-
-PrintCompInitVecGF3D2::usage = "ParseMode option.";
-
-PrintCompInitVecGF3D5::usage = "ParseMode option.";
-
-PrintCompInitSmatGF3D2::usage = "ParseMode option.";
-
-PrintCompInitSmatGF3D5::usage = "ParseMode option.";
-
-PrintCompEQN::usage = "ParseMode option.";
-
-PrintCompEQNNewVar::usage = "ParseMode option.";
-
-PrintCompEQNMain::usage = "ParseMode option.";
-
-PrintCompEQNMainCarpetX::usage = "ParseMode option.";
-
-PrintCompEQNAddToMain::usage = "ParseMode option.";
+GetParsePrintCompEQNMode::usage = "GetParsePrintCompEQNMode[key] returns the mode correspond to the key";
+SetParsePrintCompEQNMode::usage = "SetParsePrintCompEQNMode[key] add/update the mode correspond to the key";
+CleanParsePrintCompEQNMode::usage = "CleanParsePrintCompEQNMode[] empty the association";
 
 Begin["`Private`"];
 
@@ -66,33 +48,71 @@ Begin["`Private`"];
 
 $ParseModeAssociation = <||>;
 
+$ParseSetCompModeAssociation = <||>;
+$ParsePrintCompModeAssociation = <||>;
+
+$ParsePrintCompInitModeAssociation = <||>;
+$ParsePrintCompEQNModeAssociation = <||>;
+
 (* Function *)
 
-GetParseMode[key_] :=
-  Return[$ParseModeAssociation[key]];
-
+GetParseMode[key_] := Return[If[KeyExistsQ[$ParseModeAssociation, key], $ParseModeAssociation[key], False]];
 Protect[GetParseMode];
-
-SetParseMode[assoc_] :=
-  Module[{},
-    AppendTo[$ParseModeAssociation, assoc]
-  ];
-
+SetParseMode[assoc_] := Module[{}, AppendTo[$ParseModeAssociation, assoc]];
 Protect[SetParseMode];
-
 SetParseModeAllToFalse[] :=
   Module[{},
-    AppendTo[$ParseModeAssociation, <|SetComp -> False, PrintComp -> False,
-       SetCompIndep -> False, SetCompNoGPIndex -> False, PrintCompInit -> False,
-       PrintCompInitMainOut -> False, PrintCompInitMainIn -> False, PrintCompInitMoreInOut
-       -> False, PrintCompInitTemp -> False, PrintCompInitGF3D2 -> False, PrintCompInitGF3D5
-       -> False, PrintCompInitVecGF3D2 -> False, PrintCompInitVecGF3D5 -> False,
-       PrintCompInitSmatGF3D2 -> False, PrintCompInitSmatGF3D5 -> False, PrintCompEQN
-       -> False, PrintCompEQNNewVar -> False, PrintCompEQNMain -> False, PrintCompEQNMainCarpetX
-       -> False, PrintCompEQNAddToMain -> False|>]
+    AppendTo[$ParseModeAssociation,
+      <|
+        SetComp -> False,
+        PrintComp -> False
+      |>
+    ]
   ];
-
 Protect[SetParseModeAllToFalse];
+
+GetParseSetCompMode[key_] := Return[If[KeyExistsQ[$ParseSetCompModeAssociation, key], $ParseSetCompModeAssociation[key], False]];
+Protect[GetParseSetCompMode];
+SetParseSetCompMode[assoc_] := Module[{}, AppendTo[$ParseSetCompModeAssociation, assoc]];
+Protect[SetParseSetCompMode];
+SetParseSetCompModeAllToFalse[] :=
+  Module[{},
+    AppendTo[$ParseSetCompModeAssociation,
+      <|
+        IndependentVarlistIndex -> False,
+        WithoutGridPointIndex -> False
+      |>
+    ]
+  ];
+Protect[SetParseSetCompModeAllToFalse];
+
+
+GetParsePrintCompMode[key_] := Return[If[KeyExistsQ[$ParsePrintCompModeAssociation, key], $ParsePrintCompModeAssociation[key], False]];
+Protect[GetParsePrintCompMode];
+SetParsePrintCompMode[assoc_] := Module[{}, AppendTo[$ParsePrintCompModeAssociation, assoc]];
+Protect[SetParsePrintCompMode];
+SetParsePrintCompModeAllToFalse[] :=
+  Module[{},
+    AppendTo[$ParsePrintCompModeAssociation,
+      <|
+        Initializations -> False,
+        Equations -> False
+      |>
+    ]
+  ];
+Protect[SetParsePrintCompModeAllToFalse];
+
+GetParsePrintCompInitMode[key_] := Return[If[KeyExistsQ[$ParsePrintCompInitModeAssociation, key], $ParsePrintCompInitModeAssociation[key], False]];
+Protect[GetParsePrintCompInitMode];
+SetParsePrintCompInitMode[assoc_] := Module[{}, AppendTo[$ParsePrintCompInitModeAssociation, assoc]];
+Protect[SetParsePrintCompInitMode];
+CleanParsePrintCompInitMode[] := Module[{}, $ParsePrintCompInitModeAssociation = <||>];
+
+GetParsePrintCompEQNMode[key_] := Return[If[KeyExistsQ[$ParsePrintCompEQNModeAssociation, key], $ParsePrintCompEQNModeAssociation[key], False]];
+Protect[GetParsePrintCompEQNMode];
+SetParsePrintCompEQNMode[assoc_] := Module[{}, AppendTo[$ParsePrintCompEQNModeAssociation, assoc]];
+Protect[SetParsePrintCompEQNMode];
+CleanParsePrintCompEQNMode[] := Module[{}, $ParsePrintCompEQNModeAssociation = <||>];
 
 End[];
 

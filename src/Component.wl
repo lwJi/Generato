@@ -150,12 +150,12 @@ Protect[ParseComponent];
 PrintComponent[coordinate_, varname_, compname_] :=
   Module[{},
     Which[
-      GetParseMode[PrintCompInit],
+      GetParsePrintCompMode[Initializations],
         PrintVerbose["    PrintComponentInitialization ", compname, "..."
           ];
         Global`PrintComponentInitialization[varname, compname]
       ,
-      GetParseMode[PrintCompEQN],
+      GetParsePrintCompMode[Equations],
         PrintVerbose["    PrintComponentEquation ", compname, "..."];
         Global`PrintComponentEquation[coordinate, compname]
       ,
@@ -180,8 +180,7 @@ PrintComponent::EMode = "PrintMode unrecognized!";
 SetComponent[compname_, exprname_] :=
   Module[{varlistindex, mapCtoV = GetMapComponentToVarlist[]},
     PrintVerbose["    SetComponent ", compname, "..."];
-    If[Length[mapCtoV] == 0 || GetProcessNewVarlist[] || (GetParseMode[
-      SetCompIndep] && (compname[[0]] =!= Last[Keys[mapCtoV]][[0]])),
+    If[Length[mapCtoV] == 0 || GetProcessNewVarlist[] || (GetParseSetCompMode[IndependentVarlistIndex] && (compname[[0]] =!= Last[Keys[mapCtoV]][[0]])),
       varlistindex = 0(*C convention*)
       ,
       varlistindex = Last[mapCtoV] + 1
@@ -235,7 +234,7 @@ SetExprName[varname_, compindexlist_] :=
          1, Length[compindexlist]}]
     ];
     exprname =
-      If[GetParseMode[SetCompNoGPIndex],
+      If[GetParseSetCompMode[WithoutGridPointIndex],
         ToExpression[exprname]
         ,
         ToExpression[exprname <> GetGridPointIndex[]]
