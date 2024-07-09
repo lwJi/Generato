@@ -5,6 +5,24 @@
 (* (c) Liwei Ji, 06/2024 *)
 
 (*
+    Print initialization of a tensor
+*)
+
+PrintListInitializations[varlist_?ListQ, storagetype_?StringQ, indextype_?StringQ] :=
+  Module[{varname, symmetry, printname, buf},
+    Do[
+      {varname, symmetry, printname} = ParseVar[varlist[[ivar]]];
+      buf = "const auto &tmp_" <> ToString[varname[[0]]] <> " = "
+                <> storagetype <> ToString[varname[[0]]] <> "(mask, " <> indextype <> ");";
+      pr[buf]
+      ,
+      {ivar, 1, Length[varlist]}
+    ];
+  ];
+
+(*Protect[PrintListInitializations];*)
+
+(*
     Print initialization of each component of a tensor
 *)
 
@@ -77,21 +95,19 @@ PrintComponentInitialization[varname_, compname_] :=
     buf =
       Which[
         GetParsePrintCompInitMode[MainOut] && isGF3D2,
-          "const GF3D2<CCTK_REAL> &"
+          "const GF3D2<CCTK_REAL> &local_"
           <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
           <> " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]]
           <> subbuf <> ";"
         ,
         GetParsePrintCompInitMode[MainIn] && isGF3D2,
-          "const vreal &" <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
-          <> " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]]
-          <> "(mask, index2)"
+          "const vreal " <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
+          <> " = tmp_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]]
           <> subbuf <> ";"
         ,
         GetParsePrintCompInitMode[MainIn] && isGF3D5,
           "const vreal " <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
-          <> " = tl_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]]
-          <> "(mask, index5)"
+          <> " = tmp_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]]
           <> subbuf <> ";"
         ,
         GetParsePrintCompInitMode[Temp],
@@ -134,7 +150,7 @@ PrintComponentEquation[coordinate_, compname_] :=
       ,
       GetParsePrintCompEQNMode[Main],
         Module[{},
-          Global`pr[ToString[CForm[compToValue]] <>".store(mask, index2, "];
+          Global`pr["local_" <> ToString[CForm[compToValue]] <> ".store(mask, index2, "];
           PutAppend[CForm[rhssToValue], outputfile];
           Global`pr[");\n"]
         ]
