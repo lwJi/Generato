@@ -27,33 +27,55 @@ DefTensors::usage = "DefTensors[vars] define tensors (without setting its compon
 SetComponents::usage = "SetComponents[{ChartName->..., IndependentIndexForEachVar->..., WithoutGridPointIndex->...}, varlist] set components of varlist.";
 
 PrintEquations::usage = "PrintEquations[{ChartName->..., SuffixName->..., Mode->...}, varlist] print equations of varlist.";
+
 NewVar::usage = "PrintEquations option.";
+
 Protect[NewVar];
+
 Main::usage = "PrintEquations option.";
+
 Protect[Main];
+
 AddToMain::usage = "PrintEquations option.";
+
 Protect[AddToMain];
 
 PrintInitializations::usage = "PrintInitializations[{ChartName->..., Mode->...}, varlist] print initialization of varlist.";
+
 MainOut::usage = "PrintInitializations option."
+
 Protect[MainOut];
+
 MainIn::usage = "PrintInitializations option."
+
 Protect[MainIn];
+
 MoreInOut::usage = "PrintInitializations option."
+
 Protect[MoreInOut];
+
 Temp::usage = "PrintInitializations option."
+
 Protect[Temp];
 
 Scal::usage = "PrintInitializations tensor type option."
+
 Protect[Scal];
+
 Vect::usage = "PrintInitializations tensor type option."
+
 Protect[Vect];
+
 Smat::usage = "PrintInitializations tensor type option."
+
 Protect[Smat];
 
 GF::usage = "PrintInitializations storage type option."
+
 Protect[GF];
+
 Tile::usage = "PrintInitializations storage type option."
+
 Protect[Tile];
 
 Begin["`Private`"];
@@ -122,7 +144,8 @@ PrintEquations[OptionsPattern[], varlist_?ListQ] :=
       SetSuffixName[suffixname]
     ];
     SetParseMode[{PrintComp -> True, SetComp -> False}];
-    SetParsePrintCompMode[{Equations -> True, Initializations -> False}];
+    SetParsePrintCompMode[{Equations -> True, Initializations -> False}
+      ];
     Which[
       StringMatchQ[mode, "Temp"],
         SetParsePrintCompEQNMode[NewVar -> True]
@@ -145,13 +168,16 @@ PrintEquations::EMode = "PrintEquations mode '`1`' unsupported yet!";
 Protect[PrintEquations];
 
 Options[PrintInitializations] :=
-  {ChartName -> GetDefaultChart[], Mode -> "Temp", TensorType -> "Scal", StorageType -> "GF"};
+  {ChartName -> GetDefaultChart[], Mode -> "Temp", TensorType -> "Scal",
+     StorageType -> "GF"};
 
 PrintInitializations[OptionsPattern[], varlist_?ListQ] :=
   Module[{chartname, mode},
-    {chartname, mode, tensortype, storagetype} = OptionValue[{ChartName, Mode, TensorType, StorageType}];
+    {chartname, mode, tensortype, storagetype} = OptionValue[{ChartName,
+       Mode, TensorType, StorageType}];
     SetParseMode[{PrintComp -> True, SetComp -> False}];
-    SetParsePrintCompMode[{Initializations -> True, Equations -> False}];
+    SetParsePrintCompMode[{Initializations -> True, Equations -> False}
+      ];
     Which[
       StringMatchQ[mode, "MainOut"],
         SetParsePrintCompInitMode[MainOut -> True]
@@ -189,18 +215,19 @@ PrintInitializations[OptionsPattern[], varlist_?ListQ] :=
         SetParsePrintCompInitStorageType[Tile -> True]
       ,
       True,
-        Throw @ Message[PrintInitializations::EStorageType, storagetype]
+        Throw @ Message[PrintInitializations::EStorageType, storagetype
+          ]
     ];
-
     ParseVarlist[varlist, chartname];
-
     CleanParsePrintCompInitMode[];
     CleanParsePrintCompInitTensorType[];
     CleanParsePrintCompInitStorageType[];
   ];
 
 PrintInitializations::EMode = "PrintInitializations mode '`1`' unsupported yet!";
+
 PrintInitializations::ETensorType = "PrintInitializations tensor type '`1`' unsupported yet!";
+
 PrintInitializations::EStorageType = "PrintInitializations storage type '`1`' unsupported yet!";
 
 Protect[PrintInitializations];

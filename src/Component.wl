@@ -180,7 +180,9 @@ PrintComponent::EMode = "PrintMode unrecognized!";
 SetComponent[compname_, exprname_] :=
   Module[{varlistindex, mapCtoV = GetMapComponentToVarlist[]},
     PrintVerbose["    SetComponent ", compname, "..."];
-    If[Length[mapCtoV] == 0 || GetProcessNewVarlist[] || (GetParseSetCompMode[IndependentVarlistIndex] && (compname[[0]] =!= Last[Keys[mapCtoV]][[0]])),
+    If[Length[mapCtoV] == 0 || GetProcessNewVarlist[] || (GetParseSetCompMode[
+      IndependentVarlistIndex] && (compname[[0]] =!= Last[Keys[mapCtoV]][[0]]
+      )),
       varlistindex = 0(*C convention*)
       ,
       varlistindex = Last[mapCtoV] + 1
