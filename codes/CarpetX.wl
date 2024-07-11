@@ -203,8 +203,17 @@ Module[{outputfile = GetOutputFile[], filepointer},
       ] <> " */"
   ];
   pr[];
+  If[GetPrintHeaderMacro[],
+    pr["#ifndef " <> StringReplace[ToUpperCase[FileNameTake[outputfile]], "." -> "_"]];
+    pr["#define " <> StringReplace[ToUpperCase[FileNameTake[outputfile]], "." -> "_"]];
+    pr[]
+  ];
   $MainPrint[];
   pr[];
+  If[GetPrintHeaderMacro[],
+    pr["#endif // #ifndef " <> StringReplace[ToUpperCase[FileNameTake[outputfile]], "." -> "_"]];
+    pr[]
+  ];
   pr["/* " <> FileNameTake[outputfile] <> " */"];
   Print["Done generating \"", outputfile, "\"\n"];
   Close[filepointer]

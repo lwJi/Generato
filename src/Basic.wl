@@ -18,6 +18,10 @@ GetPrintDate::usage = "GetPrintDate[] return the Boolean variable specifying if 
 
 SetPrintDate::usage = "SetPrintDate[True] update the Boolean variable specifying if print date in file.";
 
+GetPrintHeaderMacro::usage = "GetPrintHeaderMacro[] return the Boolean variable specifying if print date in file.";
+
+SetPrintHeaderMacro::usage = "SetPrintHeaderMacro[True] update the Boolean variable specifying if print date in file.";
+
 GetGridPointIndex::usage = "GetGridPointIndex[] return the grid index name.";
 
 SetGridPointIndex::usage = "SetGridPointIndex[girdindex] reset the grid index name.";
@@ -62,6 +66,8 @@ $PVerbose = False;
 
 $PrintDate = True;
 
+$PrintHeaderMacro = True;
+
 $GridPointIndex = "";
 
 $SuffixUnprotected = "$Upt";
@@ -93,6 +99,18 @@ SetPrintDate[print_] :=
   ];
 
 Protect[SetPrintDate];
+
+GetPrintHeaderMacro[] :=
+  Return[$PrintHeaderMacro];
+
+Protect[GetPrintHeaderMacro];
+
+SetPrintHeaderMacro[print_] :=
+  Module[{},
+    $PrintHeaderMacro = print
+  ];
+
+Protect[SetPrintHeaderMacro];
 
 GetGridPointIndex[] :=
   Return[$GridPointIndex];
