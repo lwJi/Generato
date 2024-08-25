@@ -47,16 +47,16 @@ SetEQN[{SuffixName -> "Msqr"}, rU[i_], euclid[i, k] MDD[-k, -j] vU[j]];
 
 SetEQN[{SuffixName -> "otherwise"}, rU[i_], vU[i]];
 
-SetOutputFile[FileNameJoin[{Directory[], "test.c"}]];
+SetOutputFile[FileNameJoin[{Directory[], "test.hxx"}]];
 
-SetProject["C3GH"];
+(* SetProject["CarpetX"]; *)
 
 $MainPrint[] :=
   Module[{project = GetProject[]},
     pr[];
     PrintInitializations[{Mode -> "MainOut"}, dtEvolVarlist];
     PrintInitializations[{Mode -> "MainIn"}, EvolVarlist];
-    PrintInitializations[{Mode -> "MoreInOut"}, MoreInVarlist];
+    PrintInitializations[{Mode -> "MainIn"}, MoreInVarlist];
     pr[];
     PrintEquations[{Mode -> "Temp"}, TempVarlist];
     pr[];
