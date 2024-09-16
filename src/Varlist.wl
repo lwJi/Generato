@@ -145,7 +145,7 @@ ParseVarlist[varlist_?ListQ, chartname_] :=
         4(* FOUR INDEXES CASE *),
           If[symmetry =!= Null,
             Which[
-              symname == GenSet(*(cd)(ab) or [cd][ab]*),
+              symname === GenSet(*(cd)(ab) or [cd][ab]*),
                 Which[
                   (symmetry[[1]] === Cycles[{1, 2}]) && (symmetry[[2]] 
                     === Cycles[{3, 4}]),
