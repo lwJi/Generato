@@ -43,6 +43,11 @@ PrintComponentInitialization[varname_, compname_] :=
             subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> ","
                          <> ToString[compname[[2]][[1]] - 1] <> ")"
           ,
+          Length[varname] == 3,
+            subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> ")"
+                  <> "(" <> ToString[compname[[2]][[1]] - 1] <> ","
+                         <> ToString[compname[[3]][[1]] - 1] <> ")"
+          ,
           True,
             Throw @ Message[PrintComponentInitialization::EVarLength]
         ]
@@ -59,6 +64,12 @@ PrintComponentInitialization[varname_, compname_] :=
           Length[varname] == 3,
             subbuf = "(" <> ToString[compname[[2]][[1]] - 1] <> ","
                          <> ToString[compname[[3]][[1]] - 1] <> ")"
+                  <> "(" <> ToString[compname[[1]][[1]] - 1] <> ")"
+          ,
+          Length[varname] == 4,
+            subbuf = "(" <> ToString[compname[[2]][[1]] - 1] <> ")"
+                  <> "(" <> ToString[compname[[3]][[1]] - 1] <> ","
+                         <> ToString[compname[[4]][[1]] - 1] <> ")"
                   <> "(" <> ToString[compname[[1]][[1]] - 1] <> ")"
           ,
           True,
