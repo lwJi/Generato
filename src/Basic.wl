@@ -209,8 +209,7 @@ IsDefined::EType = "The Expression type of '`1`' is not detectable!";
 Protect[IsDefined];
 
 IsExprComb[head_] :=
-  Return[head === Power || head === Plus || head === Times || head === 
-    Log];
+  Return[head === Power || head === Plus || head === Times || head === Log];
 
 IndexType[compindexlist_?ListQ, indextype_] :=
   indextype[compindexlist[[2]]];
@@ -229,8 +228,7 @@ RHSOf[var__] :=
         ToExpression[ToString[var] <> "$RHS"]
       ,
       2,
-        ToExpression[ToString[arglist[[1]]] <> ToString[arglist[[2]]] <>
-           "$RHS"]
+        ToExpression[ToString[arglist[[1]]] <> ToString[arglist[[2]]] <> "$RHS"]
       ,
       _,
         Throw @ Message[RHSOf::Eargs, Length[arglist]]
@@ -259,8 +257,7 @@ SetEQN[OptionsPattern[], var_, varrhs_] :=
       If[checkrhs && !IsDefined[varrhs],
         Throw @ Message[SetEQN::Evarrhs, varrhs]
       ];
-      Hold[IndexSet[var, varrhs]] /. {var[[0]] :> RHSOf[ToString[var[[0
-        ]]] <> suffix] /; replacetimes++ == 0}
+      Hold[IndexSet[var, varrhs]] /. {var[[0]] :> RHSOf[ToString[var[[0]]] <> suffix] /; replacetimes++ == 0}
     ];
 
 SetEQN::Evarrhs = "There are undefined terms in the RHS '`1`'!"
@@ -286,8 +283,7 @@ SetEQNDelayed[OptionsPattern[], var_, varrhs_] :=
       If[IsExprComb[Head[var]],
         Throw @ Message[SetEQNDelayed::Evar, var]
       ];
-      Hold[IndexSetDelayed[var, varrhs]] /. {var[[0]] :> RHSOf[ToString[
-        var[[0]]] <> suffix] /; replacetimes++ == 0}
+      Hold[IndexSetDelayed[var, varrhs]] /. {var[[0]] :> RHSOf[ToString[var[[0]]] <> suffix] /; replacetimes++ == 0}
     ];
 
 SetEQNDelayed::Evar = "Var '`1`' is used with IndexSet before, please use a different name!"

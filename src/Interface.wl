@@ -118,13 +118,11 @@ Protect[DefTensors];
 *)
 
 Options[SetComponents] :=
-  {ChartName -> GetDefaultChart[], IndependentIndexForEachVar -> True, 
-    WithoutGridPointIndex -> False};
+  {ChartName -> GetDefaultChart[], IndependentIndexForEachVar -> True, WithoutGridPointIndex -> False};
 
 SetComponents[OptionsPattern[], varlist_?ListQ] :=
   Module[{chartname, indepidx, nogpidx},
-    {chartname, indepidx, nogpidx} = OptionValue[{ChartName, IndependentIndexForEachVar,
-       WithoutGridPointIndex}];
+    {chartname, indepidx, nogpidx} = OptionValue[{ChartName, IndependentIndexForEachVar, WithoutGridPointIndex}];
     SetParseMode[{SetComp -> True, PrintComp -> False}];
     SetParseSetCompMode[IndependentVarlistIndex -> indepidx];
     SetParseSetCompMode[WithoutGridPointIndex -> nogpidx];
@@ -138,14 +136,12 @@ Options[PrintEquations] :=
 
 PrintEquations[OptionsPattern[], varlist_?ListQ] :=
   Module[{chartname, suffixname, mode},
-    {chartname, suffixname, mode} = OptionValue[{ChartName, SuffixName,
-       Mode}];
+    {chartname, suffixname, mode} = OptionValue[{ChartName, SuffixName, Mode}];
     If[suffixname =!= Null,
       SetSuffixName[suffixname]
     ];
     SetParseMode[{PrintComp -> True, SetComp -> False}];
-    SetParsePrintCompMode[{Equations -> True, Initializations -> False}
-      ];
+    SetParsePrintCompMode[{Equations -> True, Initializations -> False}];
     Which[
       StringMatchQ[mode, "Temp"],
         SetParsePrintCompEQNMode[NewVar -> True]
@@ -168,16 +164,13 @@ PrintEquations::EMode = "PrintEquations mode '`1`' unsupported yet!";
 Protect[PrintEquations];
 
 Options[PrintInitializations] :=
-  {ChartName -> GetDefaultChart[], Mode -> "Temp", TensorType -> "Scal",
-     StorageType -> "GF"};
+  {ChartName -> GetDefaultChart[], Mode -> "Temp", TensorType -> "Scal", StorageType -> "GF"};
 
 PrintInitializations[OptionsPattern[], varlist_?ListQ] :=
   Module[{chartname, mode},
-    {chartname, mode, tensortype, storagetype} = OptionValue[{ChartName,
-       Mode, TensorType, StorageType}];
+    {chartname, mode, tensortype, storagetype} = OptionValue[{ChartName, Mode, TensorType, StorageType}];
     SetParseMode[{PrintComp -> True, SetComp -> False}];
-    SetParsePrintCompMode[{Initializations -> True, Equations -> False}
-      ];
+    SetParsePrintCompMode[{Initializations -> True, Equations -> False}];
     Which[
       StringMatchQ[mode, "MainOut"],
         SetParsePrintCompInitMode[MainOut -> True]
@@ -215,8 +208,7 @@ PrintInitializations[OptionsPattern[], varlist_?ListQ] :=
         SetParsePrintCompInitStorageType[Tile -> True]
       ,
       True,
-        Throw @ Message[PrintInitializations::EStorageType, storagetype
-          ]
+        Throw @ Message[PrintInitializations::EStorageType, storagetype]
     ];
     ParseVarlist[varlist, chartname];
     CleanParsePrintCompInitMode[];

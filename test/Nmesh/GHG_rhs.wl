@@ -4,8 +4,7 @@
 
 (* (c) Liwei Ji, 01/2024 *)
 
-Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"
-  }]]
+Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"}]]
 
 SetPVerbose[False];
 
@@ -13,49 +12,28 @@ SetPrintDate[False];
 
 SetGridPointIndex["[[ijk]]"];
 
-DefManifold[M4, 4, Union[Complement[IndexRange[a, z], {g}], Table[ToExpression[
-  "h" <> ToString[i]], {i, 1, 9}], Table[ToExpression["z" <> ToString[i]],
-   {i, 1, 9}]]];
+DefManifold[M4, 4, Union[Complement[IndexRange[a, z], {g}], Table[ToExpression["h" <> ToString[i]], {i, 1, 9}], Table[ToExpression["z" <> ToString[i]], {i, 1, 9}]]];
 
-DefChart[cart, M4, {0, 1, 2, 3}, {T[], X[], Y[], Z[]}, ChartColor -> Blue
-  ];
+DefChart[cart, M4, {0, 1, 2, 3}, {T[], X[], Y[], Z[]}, ChartColor -> Blue];
 
-dtEvolVarlist = GridTensors[{dtg[-a, -b], Symmetric[{-a, -b}]}, {dtPi[-
-  a, -b], Symmetric[{-a, -b}], PrintAs -> "dt\[CapitalPi]"}, {dtPhi[-k, -
-  a, -b], Symmetric[{-a, -b}], PrintAs -> "dt\[CapitalPhi]"}];
+dtEvolVarlist = GridTensors[{dtg[-a, -b], Symmetric[{-a, -b}]}, {dtPi[-a, -b], Symmetric[{-a, -b}], PrintAs -> "dt\[CapitalPi]"}, {dtPhi[-k, -a, -b], Symmetric[{-a, -b}], PrintAs -> "dt\[CapitalPhi]"}];
 
-EvolVarlist = GridTensors[{g[-a, -b], Symmetric[{-a, -b}]}, {Pi$Upt[-a,
-   -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalPi]"}, {Phi[-k, -a, -b],
-   Symmetric[{-a, -b}], PrintAs -> "\[CapitalPhi]"}, {H[-a]}];
+EvolVarlist = GridTensors[{g[-a, -b], Symmetric[{-a, -b}]}, {Pi$Upt[-a, -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalPi]"}, {Phi[-k, -a, -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalPhi]"}, {H[-a]}];
 
-MoreInVarlist = GridTensors[{Adg[-a, -b], Symmetric[{-a, -b}]}, {AdPi[-
-  a, -b], Symmetric[{-a, -b}], PrintAs -> "Ad\[CapitalPi]"}, {AdPhi[-k, -
-  a, -b], Symmetric[{-a, -b}], PrintAs -> "Ad\[CapitalPhi]"}, {alpha[], PrintAs
-   -> "\[Alpha]"}, {beta[i], PrintAs -> "\[Beta]"}, {srcSdH[-a, -b], Symmetric[
-  {-a, -b}], PrintAs -> "\!\(\*SubscriptBox[\(\[PartialD]\), \((a\)]\)\!\(\*SubscriptBox[\(H\), \(\(b\)\()\)\)]\)"
-  }];
+MoreInVarlist = GridTensors[{Adg[-a, -b], Symmetric[{-a, -b}]}, {AdPi[-a, -b], Symmetric[{-a, -b}], PrintAs -> "Ad\[CapitalPi]"}, {AdPhi[-k, -a, -b], Symmetric[{-a, -b}], PrintAs -> "Ad\[CapitalPhi]"}, {alpha[], PrintAs -> "\[Alpha]"}, {beta[i], PrintAs -> "\[Beta]"}, {srcSdH[-a, -b], Symmetric[{-a, -b}], PrintAs -> "\!\(\*SubscriptBox[\(\[PartialD]\), \((a\)]\)\!\(\*SubscriptBox[\(H\), \(\(b\)\()\)\)]\)"}];
 
-TempVarlist = TempTensors[{detinvh[], PrintAs -> "\[Gamma]"}, {invh[i, 
-  j], Symmetric[{i, j}], PrintAs -> "\[Gamma]"}, {nvec[a], PrintAs -> "n"
-  }, {ndua[-a], PrintAs -> "n"}, {invg[a, b], Symmetric[{a, b}], PrintAs 
-  -> "g"}, {dginFO[-c, -a, -b], Symmetric[{-a, -b}], PrintAs -> "dg"}, {Gam[
-  -c, -a, -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalGamma]"}, {trGam[
-  -a], PrintAs -> "\[CapitalGamma]"}];
+TempVarlist = TempTensors[{detinvh[], PrintAs -> "\[Gamma]"}, {invh[i, j], Symmetric[{i, j}], PrintAs -> "\[Gamma]"}, {nvec[a], PrintAs -> "n"}, {ndua[-a], PrintAs -> "n"}, {invg[a, b], Symmetric[{a, b}], PrintAs -> "g"}, {dginFO[-c, -a, -b], Symmetric[{-a, -b}], PrintAs -> "dg"}, {Gam[-c, -a, -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalGamma]"}, {trGam[-a], PrintAs -> "\[CapitalGamma]"}];
 
-DefConstantSymbol[gamma0, PrintAs -> "\!\(\*SubscriptBox[\(\[Gamma]\), \(0\)]\)"
-  ];
+DefConstantSymbol[gamma0, PrintAs -> "\!\(\*SubscriptBox[\(\[Gamma]\), \(0\)]\)"];
 
-DefConstantSymbol[gamma1, PrintAs -> "\!\(\*SubscriptBox[\(\[Gamma]\), \(1\)]\)"
-  ];
+DefConstantSymbol[gamma1, PrintAs -> "\!\(\*SubscriptBox[\(\[Gamma]\), \(1\)]\)"];
 
-DefConstantSymbol[gamma2, PrintAs -> "\!\(\*SubscriptBox[\(\[Gamma]\), \(2\)]\)"
-  ];
+DefConstantSymbol[gamma2, PrintAs -> "\!\(\*SubscriptBox[\(\[Gamma]\), \(2\)]\)"];
 
 DefConstantSymbol[interior, PrintAs -> "I"];
 
 Module[{Mat, invMat},
-  Mat = Table[g[{aa, -cart}, {bb, -cart}] // ToValues, {aa, 1, 3}, {bb,
-     1, 3}];
+  Mat = Table[g[{aa, -cart}, {bb, -cart}] // ToValues, {aa, 1, 3}, {bb, 1, 3}];
   invMat = Inverse[Mat] /. {1 / Det[Mat] -> (detinvh[] // ToValues)};
   SetEQNDelayed[detinvh[], 1 / Det[Mat] // Simplify];
   SetEQNDelayed[invh[i_, j_], invMat[[i[[1]], j[[1]]]] // Simplify]
@@ -93,26 +71,15 @@ SetEQNDelayed[
   ]
 ];
 
-SetEQN[Gam[c_, a_, b_], 1/2 (dginFO[a, b, c] + dginFO[b, c, a] - dginFO[
-  c, a, b])];
+SetEQN[Gam[c_, a_, b_], 1/2 (dginFO[a, b, c] + dginFO[b, c, a] - dginFO[c, a, b])];
 
 SetEQN[trGam[c_], invg[a, b] Gam[c, -a, -b]];
 
-SetEQN[dtg[a_, b_], -Adg[a, b] interior - alpha[] Pi$Upt[a, b] - gamma1
-   beta[c] Phi[-c, a, b]];
+SetEQN[dtg[a_, b_], -Adg[a, b] interior - alpha[] Pi$Upt[a, b] - gamma1 beta[c] Phi[-c, a, b]];
 
-SetEQN[dtPi[a_, b_], -AdPi[a, b] interior + 2 alpha[] invg[c, d] (invh[
-  i, j] Phi[-i, -c, a] Phi[-j, -d, b] - Pi$Upt[-c, a] Pi$Upt[-d, b] - invg[
-  e, f] Gam[a, -c, -e] Gam[b, -d, -f]) - 1/2 alpha[] nvec[c] nvec[d] Pi$Upt[
-  -c, -d] Pi$Upt[a, b] - alpha[] nvec[c] Pi$Upt[-c, -i] invh[i, j] Phi[-j,
-   a, b] + 2 alpha[] (invg[c, d] Gam[-c, a, b] H[-d]) + gamma0 alpha[] ((
-  H[a] + trGam[a]) ndua[b] + (H[b] + trGam[b]) ndua[a] - g[a, b] nvec[c] 
-  (H[-c] + trGam[-c])) - gamma1 gamma2 beta[i] Phi[-i, a, b] - srcSdH[a, 
-  b]];
+SetEQN[dtPi[a_, b_], -AdPi[a, b] interior + 2 alpha[] invg[c, d] (invh[i, j] Phi[-i, -c, a] Phi[-j, -d, b] - Pi$Upt[-c, a] Pi$Upt[-d, b] - invg[e, f] Gam[a, -c, -e] Gam[b, -d, -f]) - 1/2 alpha[] nvec[c] nvec[d] Pi$Upt[-c, -d] Pi$Upt[a, b] - alpha[] nvec[c] Pi$Upt[-c, -i] invh[i, j] Phi[-j, a, b] + 2 alpha[] (invg[c, d] Gam[-c, a, b] H[-d]) + gamma0 alpha[] ((H[a] + trGam[a]) ndua[b] + (H[b] + trGam[b]) ndua[a] - g[a, b] nvec[c] (H[-c] + trGam[-c])) - gamma1 gamma2 beta[i] Phi[-i, a, b] - srcSdH[a, b]];
 
-SetEQN[dtPhi[i_, a_, b_], -AdPhi[i, a, b] interior + 1/2 alpha[] nvec[c
-  ] nvec[d] Phi[i, -c, -d] Pi$Upt[a, b] + alpha[] invh[j, k] nvec[c] Phi[
-  i, -j, -c] Phi[-k, a, b] - gamma2 alpha[] Phi[i, a, b]];
+SetEQN[dtPhi[i_, a_, b_], -AdPhi[i, a, b] interior + 1/2 alpha[] nvec[c] nvec[d] Phi[i, -c, -d] Pi$Upt[a, b] + alpha[] invh[j, k] nvec[c] Phi[i, -j, -c] Phi[-k, a, b] - gamma2 alpha[] Phi[i, a, b]];
 
 (* Write to files *)
 

@@ -6,7 +6,7 @@ Module[{dirs = {"codes", "src", "test/Nmesh", "test/CarpetX"}},
         files = FileNames["*.wl", dirs[[d]]];
         Do[
             file = File[files[[i]]];
-            Export[file, CodeFormat[file, "IndentationString"->"  ", LineWidth->80], "String"],
+            Export[file, CodeFormat[file, "IndentationString"->"  ", LineWidth->4096], "String"],
         {i, 1, Length[files]}],
     {d, 1, Length[dirs]}]
 ];

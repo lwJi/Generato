@@ -23,15 +23,11 @@ GetInitialComp[varname_] :=
 *)
 
 PrintComponentInitialization[varname_, compname_] :=
-  Module[{varlistindex = GetMapComponentToVarlist[][compname], compToValue
-     = compname // ToValues, buf},
+  Module[{varlistindex = GetMapComponentToVarlist[][compname], compToValue = compname // ToValues, buf},
     Which[
       GetParsePrintCompInitMode[MainOut],
         buf =
-          "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[
-            ]] <> " = Vard(node, Vind(vlr," <> ToString[GetProject[]] <> "->i_" <> 
-            StringTrim[ToString[varname[[0]]], (GetPrefixDt[] | GetSuffixUnprotected[
-            ])] <> GetInitialComp[varname] <>
+          "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = Vard(node, Vind(vlr," <> ToString[GetProject[]] <> "->i_" <> StringTrim[ToString[varname[[0]]], (GetPrefixDt[] | GetSuffixUnprotected[])] <> GetInitialComp[varname] <>
             If[varlistindex == 0,
               ""
               ,
@@ -40,10 +36,7 @@ PrintComponentInitialization[varname_, compname_] :=
       ,
       GetParsePrintCompInitMode[MainIn],
         buf =
-          "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[
-            ]] <> " = Vard(node, Vind(vlu," <> ToString[GetProject[]] <> "->i_" <> 
-            StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]] <> GetInitialComp[
-            varname] <>
+          "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = Vard(node, Vind(vlu," <> ToString[GetProject[]] <> "->i_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]] <> GetInitialComp[varname] <>
             If[varlistindex == 0,
               ""
               ,
@@ -52,9 +45,7 @@ PrintComponentInitialization[varname_, compname_] :=
       ,
       GetParsePrintCompInitMode[MoreInOut],
         buf =
-          "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[
-            ]] <> " = Vard(node, i" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
-            ]] <> GetInitialComp[varname] <>
+          "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = Vard(node, i" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]] <> GetInitialComp[varname] <>
             If[varlistindex == 0,
               ""
               ,
@@ -78,8 +69,7 @@ PrintComponentEquation[coordinate_, compname_] :=
   Module[{outputfile = GetOutputFile[], compToValue, rhssToValue},
     compToValue = compname // ToValues;
     rhssToValue =
-      (compname /. {compname[[0]] -> RHSOf[compname[[0]], GetSuffixName[
-        ]]}) //
+      (compname /. {compname[[0]] -> RHSOf[compname[[0]], GetSuffixName[]]}) //
       DummyToBasis[coordinate] //
       TraceBasisDummy //
       ToValues;

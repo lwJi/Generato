@@ -151,8 +151,7 @@ PrintComponent[coordinate_, varname_, compname_] :=
   Module[{},
     Which[
       GetParsePrintCompMode[Initializations],
-        PrintVerbose["    PrintComponentInitialization ", compname, "..."
-          ];
+        PrintVerbose["    PrintComponentInitialization ", compname, "..."];
         Global`PrintComponentInitialization[varname, compname]
       ,
       GetParsePrintCompMode[Equations],
@@ -180,9 +179,7 @@ PrintComponent::EMode = "PrintMode unrecognized!";
 SetComponent[compname_, exprname_] :=
   Module[{varlistindex, mapCtoV = GetMapComponentToVarlist[]},
     PrintVerbose["    SetComponent ", compname, "..."];
-    If[Length[mapCtoV] == 0 || GetProcessNewVarlist[] || (GetParseSetCompMode[
-      IndependentVarlistIndex] && (compname[[0]] =!= Last[Keys[mapCtoV]][[0]]
-      )),
+    If[Length[mapCtoV] == 0 || GetProcessNewVarlist[] || (GetParseSetCompMode[IndependentVarlistIndex] && (compname[[0]] =!= Last[Keys[mapCtoV]][[0]])),
       varlistindex = 0(*C convention*)
       ,
       varlistindex = Last[mapCtoV] + 1
@@ -229,11 +226,9 @@ SetCompName[varname_, compindexlist_, coordinate_] :=
 *)
 
 SetExprName[varname_, compindexlist_] :=
-  Module[{exprname = StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[
-    ]]},
+  Module[{exprname = StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]]},
     If[Length[compindexlist] > 0, (*not scalar, ignore up/down*)
-      Do[exprname = exprname <> ToString @ compindexlist[[icomp]], {icomp,
-         1, Length[compindexlist]}]
+      Do[exprname = exprname <> ToString @ compindexlist[[icomp]], {icomp, 1, Length[compindexlist]}]
     ];
     exprname =
       If[GetParseSetCompMode[WithoutGridPointIndex],
@@ -246,8 +241,7 @@ SetExprName[varname_, compindexlist_] :=
 
 Is3DAbstractIndex[idx_] :=
   Module[{},
-    LetterNumber[StringPart[ToString[idx /. {-1 x_ :> x}], 1]] >= LetterNumber[
-      "i"]
+    LetterNumber[StringPart[ToString[idx /. {-1 x_ :> x}], 1]] >= LetterNumber["i"]
   ];
 
 Is4DCompIndexIn3DTensor[idx_, idxcomp_] :=
@@ -259,8 +253,7 @@ Is4DCompIndexListIn3DTensor[idxcomplist_, varname_] :=
   Module[{is4Didxcomplist = False},
     If[Length[idxcomplist] > 0,
       Do[
-        If[Is4DCompIndexIn3DTensor[varname[[icomp]], idxcomplist[[icomp
-          ]]],
+        If[Is4DCompIndexIn3DTensor[varname[[icomp]], idxcomplist[[icomp]]],
           is4Didxcomplist = True
         ]
         ,
@@ -277,8 +270,7 @@ IsUp4DCompIndexListIn3DTensor[idxcomplist_, varname_] :=
     (*is there a 0th up index in the component list*)
     If[Length[idxcomplist] > 0,
       Do[
-        If[UpIndexQ[varname[[icomp]]] && Is4DCompIndexIn3DTensor[varname
-          [[icomp]], idxcomplist[[icomp]]],
+        If[UpIndexQ[varname[[icomp]]] && Is4DCompIndexIn3DTensor[varname[[icomp]], idxcomplist[[icomp]]],
           isup4Didxcomplist = True
         ]
         ,
@@ -289,8 +281,7 @@ IsUp4DCompIndexListIn3DTensor[idxcomplist_, varname_] :=
     (*we want skip all the components with 0th down index*)
     If[isup4Didxcomplist,
       Do[
-        If[DownIndexQ[varname[[icomp]]] && Is4DCompIndexIn3DTensor[varname
-          [[icomp]], idxcomplist[[icomp]]],
+        If[DownIndexQ[varname[[icomp]]] && Is4DCompIndexIn3DTensor[varname[[icomp]], idxcomplist[[icomp]]],
           isup4Didxcomplist = False
         ]
         ,

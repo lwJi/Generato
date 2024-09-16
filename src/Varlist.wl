@@ -29,8 +29,7 @@ Begin["`Private`"];
 (* Function *)
 
 ParseVarlist[varlist_?ListQ, chartname_] :=
-  Module[{iMin, iMax = 3, var, varname, symmetry, printname, symname, symindex,
-     parseComponentValue},
+  Module[{iMin, iMax = 3, var, varname, symmetry, printname, symname, symindex, parseComponentValue},
     PrintVerbose["ParseVarlist..."];
     PrintVerbose["  Dim = ", GetDim[], ", Chart = ", chartname];
     PrintVerbose["  List: ", varlist];
@@ -52,17 +51,13 @@ ParseVarlist[varlist_?ListQ, chartname_] :=
           DefineTensor[varname, symmetry, printname]
           ,
           Throw @ Message[ParseVarlist::ETensorNonExist, ivar, varname]
-            
         ]
         ,
-        If[!MemberQ[Keys[GetMapComponentToVarlist[]][[All, 0]], varname
-          [[0]]],
-          Throw @ Message[ParseVarlist::ETensorExistOutside, ivar, varname
-            ]
+        If[!MemberQ[Keys[GetMapComponentToVarlist[]][[All, 0]], varname[[0]]],
+          Throw @ Message[ParseVarlist::ETensorExistOutside, ivar, varname]
         ]
       ];
-      parseComponentValue[compindexlist_] := ParseComponent[varname, compindexlist,
-         chartname];
+      parseComponentValue[compindexlist_] := ParseComponent[varname, compindexlist, chartname];
       Switch[Length[varname],
         0(* ZERO INDEX CASE: *),
           parseComponentValue[{}]
@@ -74,72 +69,58 @@ ParseVarlist[varlist_?ListQ, chartname_] :=
           If[symmetry =!= Null,
             Switch[symname,
               Symmetric,
-                Do[parseComponentValue[{ia, ib}], {ia, iMin, iMax}, {ib,
-                   ia, iMax}]
+                Do[parseComponentValue[{ia, ib}], {ia, iMin, iMax}, {ib, ia, iMax}]
               ,
               Antisymmetric,
-                Do[parseComponentValue[{ia, ib}], {ia, iMin, iMax}, {ib,
-                   ia + 1, iMax}]
+                Do[parseComponentValue[{ia, ib}], {ia, iMin, iMax}, {ib, ia + 1, iMax}]
               ,
               _,
-                Throw @ Message[ParseVarlist::ESymmetryType, ivar, varname
-                  ]
+                Throw @ Message[ParseVarlist::ESymmetryType, ivar, varname]
             ];
             varname //
             ToBasis[chartname] //
             ComponentArray //
             ComponentValue
             ,
-            Do[parseComponentValue[{ia, ib}], {ia, iMin, iMax}, {ib, iMin,
-               iMax}]
+            Do[parseComponentValue[{ia, ib}], {ia, iMin, iMax}, {ib, iMin, iMax}]
           ]
         ,
         3(* THREE INDEXES CASE *),
           If[symmetry =!= Null,
             Which[
-              (symindex[[1]] === varname[[2]]) && (symindex[[2]] === varname
-                [[3]])(*c(ab) or c[ab]*),
+              (symindex[[1]] === varname[[2]]) && (symindex[[2]] === varname[[3]])(*c(ab) or c[ab]*),
                 Switch[symname,
                   Symmetric,
-                    Do[parseComponentValue[{ic, ia, ib}], {ic, iMin, iMax
-                      }, {ia, iMin, iMax}, {ib, ia, iMax}]
+                    Do[parseComponentValue[{ic, ia, ib}], {ic, iMin, iMax}, {ia, iMin, iMax}, {ib, ia, iMax}]
                   ,
                   Antisymmetric,
-                    Do[parseComponentValue[{ic, ia, ib}], {ic, iMin, iMax
-                      }, {ia, iMin, iMax}, {ib, ia + 1, iMax}]
+                    Do[parseComponentValue[{ic, ia, ib}], {ic, iMin, iMax}, {ia, iMin, iMax}, {ib, ia + 1, iMax}]
                   ,
                   _,
-                    Throw @ Message[ParseVarlist::ESymmetryType, ivar, 
-                      varname]
+                    Throw @ Message[ParseVarlist::ESymmetryType, ivar, varname]
                 ]
               ,
-              (symindex[[1]] === varname[[1]]) && (symindex[[2]] === varname
-                [[2]])(*(ab)c or [ab]c*),
+              (symindex[[1]] === varname[[1]]) && (symindex[[2]] === varname[[2]])(*(ab)c or [ab]c*),
                 Switch[symname,
                   Symmetric,
-                    Do[parseComponentValue[{ia, ib, ic}], {ia, iMin, iMax
-                      }, {ib, ia, iMax}, {ic, iMin, iMax}]
+                    Do[parseComponentValue[{ia, ib, ic}], {ia, iMin, iMax}, {ib, ia, iMax}, {ic, iMin, iMax}]
                   ,
                   Antisymmetric,
-                    Do[parseComponentValue[{ia, ib, ic}], {ia, iMin, iMax
-                      }, {ib, ia + 1, iMax}, {ic, iMin, iMax}]
+                    Do[parseComponentValue[{ia, ib, ic}], {ia, iMin, iMax}, {ib, ia + 1, iMax}, {ic, iMin, iMax}]
                   ,
                   _,
-                    Throw @ Message[ParseVarlist::ESymmetryType, ivar, 
-                      varname]
+                    Throw @ Message[ParseVarlist::ESymmetryType, ivar, varname]
                 ]
               ,
               True,
-                Throw @ Message[ParseVarlist::ESymmetryType, ivar, varname
-                  ]
+                Throw @ Message[ParseVarlist::ESymmetryType, ivar, varname]
             ];
             varname //
             ToBasis[chartname] //
             ComponentArray //
             ComponentValue
             ,
-            Do[parseComponentValue[{ic, ia, ib}], {ic, iMin, iMax}, {ia,
-               iMin, iMax}, {ib, iMin, iMax}]
+            Do[parseComponentValue[{ic, ia, ib}], {ic, iMin, iMax}, {ia, iMin, iMax}, {ib, iMin, iMax}]
           ]
         ,
         4(* FOUR INDEXES CASE *),
@@ -147,80 +128,61 @@ ParseVarlist[varlist_?ListQ, chartname_] :=
             Which[
               symname === GenSet(*(cd)(ab) or [cd][ab]*),
                 Which[
-                  (symmetry[[1]] === Cycles[{1, 2}]) && (symmetry[[2]] 
-                    === Cycles[{3, 4}]),
-                    Do[parseComponentValue[{ic, id, ia, ib}], {ic, iMin,
-                       iMax}, {id, ic, iMax}, {ia, iMin, iMax}, {ib, ia, iMax}]
+                  (symmetry[[1]] === Cycles[{1, 2}]) && (symmetry[[2]] === Cycles[{3, 4}]),
+                    Do[parseComponentValue[{ic, id, ia, ib}], {ic, iMin, iMax}, {id, ic, iMax}, {ia, iMin, iMax}, {ib, ia, iMax}]
                   ,
-                  (symmetry[[1]] === -Cycles[{1, 2}]) && (symmetry[[2]]
-                     === -Cycles[{3, 4}]),
-                    Do[parseComponentValue[{ic, id, ia, ib}], {ic, iMin,
-                       iMax}, {id, ic + 1, iMax}, {ia, iMin, iMax}, {ib, ia + 1, iMax}]
+                  (symmetry[[1]] === -Cycles[{1, 2}]) && (symmetry[[2]] === -Cycles[{3, 4}]),
+                    Do[parseComponentValue[{ic, id, ia, ib}], {ic, iMin, iMax}, {id, ic + 1, iMax}, {ia, iMin, iMax}, {ib, ia + 1, iMax}]
                   ,
                   True,
-                    Throw @ Message[ParseVarlist::ESymmetryType, ivar, 
-                      varname]
+                    Throw @ Message[ParseVarlist::ESymmetryType, ivar, varname]
                 ]
               ,
-              (symindex[[1]] === varname[[3]]) && (symindex[[2]] === varname
-                [[4]])(*cd(ab) or cd[ab]*),
+              (symindex[[1]] === varname[[3]]) && (symindex[[2]] === varname[[4]])(*cd(ab) or cd[ab]*),
                 Switch[symname,
                   Symmetric,
-                    Do[parseComponentValue[{ic, id, ia, ib}], {ic, iMin,
-                       iMax}, {id, iMin, iMax}, {ia, iMin, iMax}, {ib, ia, iMax}]
+                    Do[parseComponentValue[{ic, id, ia, ib}], {ic, iMin, iMax}, {id, iMin, iMax}, {ia, iMin, iMax}, {ib, ia, iMax}]
                   ,
                   Antisymmetric,
-                    Do[parseComponentValue[{ic, id, ia, ib}], {ic, iMin,
-                       iMax}, {id, iMin, iMax}, {ia, iMin, iMax}, {ib, ia + 1, iMax}]
+                    Do[parseComponentValue[{ic, id, ia, ib}], {ic, iMin, iMax}, {id, iMin, iMax}, {ia, iMin, iMax}, {ib, ia + 1, iMax}]
                   ,
                   _,
-                    Throw @ Message[ParseVarlist::ESymmetryType, ivar, 
-                      varname]
+                    Throw @ Message[ParseVarlist::ESymmetryType, ivar, varname]
                 ]
               ,
-              (symindex[[1]] === varname[[1]]) && (symindex[[2]] === varname
-                [[2]])(*(ab)cd or [ab]cd*),
+              (symindex[[1]] === varname[[1]]) && (symindex[[2]] === varname[[2]])(*(ab)cd or [ab]cd*),
                 Switch[symname,
                   Symmetric,
-                    Do[parseComponentValue[{ia, ib, ic, id}], {ia, iMin,
-                       iMax}, {ib, ia, iMax}, {ic, iMin, iMax}, {id, iMin, iMax}]
+                    Do[parseComponentValue[{ia, ib, ic, id}], {ia, iMin, iMax}, {ib, ia, iMax}, {ic, iMin, iMax}, {id, iMin, iMax}]
                   ,
                   Antisymmetric,
-                    Do[parseComponentValue[{ia, ib, ic, id}], {ia, iMin,
-                       iMax}, {ib, ia + 1, iMax}, {ic, iMin, iMax}, {id, iMin, iMax}]
+                    Do[parseComponentValue[{ia, ib, ic, id}], {ia, iMin, iMax}, {ib, ia + 1, iMax}, {ic, iMin, iMax}, {id, iMin, iMax}]
                   ,
                   _,
-                    Throw @ Message[ParseVarlist::ESymmetryType, ivar, 
-                      varname]
+                    Throw @ Message[ParseVarlist::ESymmetryType, ivar, varname]
                 ]
               ,
-              (symindex[[1]] === varname[[2]]) && (symindex[[2]] === varname
-                [[3]])(*c(ab)d or c[ab]d*),
+              (symindex[[1]] === varname[[2]]) && (symindex[[2]] === varname[[3]])(*c(ab)d or c[ab]d*),
                 Switch[symname,
                   Symmetric,
-                    Do[parseComponentValue[{ic, ia, ib, id}], {ic, iMin,
-                       iMax}, {ia, iMin, iMax}, {ib, ia, iMax}, {id, iMin, iMax}]
+                    Do[parseComponentValue[{ic, ia, ib, id}], {ic, iMin, iMax}, {ia, iMin, iMax}, {ib, ia, iMax}, {id, iMin, iMax}]
                   ,
                   Antisymmetric,
-                    Do[parseComponentValue[{ic, ia, ib, id}], {ic, iMin,
-                       iMax}, {ia, iMin, iMax}, {ib, ia + 1, iMax}, {id, iMin, iMax}]
+                    Do[parseComponentValue[{ic, ia, ib, id}], {ic, iMin, iMax}, {ia, iMin, iMax}, {ib, ia + 1, iMax}, {id, iMin, iMax}]
                   ,
                   _,
-                    Throw @ Message[ParseVarlist::ESymmetryType, ivar, 
-                      varname]
+                    Throw @ Message[ParseVarlist::ESymmetryType, ivar, varname]
                 ]
               ,
               True,
-                Throw @ Message[ParseVarlist::ESymmetryType, ivar, varname
-                  ]
+                Throw @ Message[ParseVarlist::ESymmetryType, ivar, varname]
             ];
             varname //
             ToBasis[chartname] //
             ComponentArray //
             ComponentValue
             ,
-            Do[parseComponentValue[{ic, id, ia, ib}], {ic, iMin, iMax},
-               {id, iMin, iMax}, {ia, iMin, iMax}, {ib, iMin, iMax}]
+            Do[parseComponentValue[{ic, id, ia, ib}], {ic, iMin, iMax}, {id, iMin, iMax}, {ia, iMin, iMax}, {ib, iMin, iMax}]
           ]
         ,
         _(* OTHER NUM OF INDEXES *),
@@ -269,8 +231,7 @@ ParseVar[var_] :=
         printname = vfeature[[2]]
         ,
         If[Head @ Head @ vfeature === Symbol,
-          If[Length[vfeature] > 0 && AnyTrue[{Symmetric, Antisymmetric,
-             GenSet}, # === Head @ vfeature&],
+          If[Length[vfeature] > 0 && AnyTrue[{Symmetric, Antisymmetric, GenSet}, # === Head @ vfeature&],
             symmetry = vfeature
             ,
             varname = vfeature

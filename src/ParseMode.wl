@@ -116,8 +116,7 @@ Protect[SetParseMode];
 
 SetParseModeAllToFalse[] :=
   Module[{},
-    AppendTo[$ParseModeAssociation, <|SetComp -> False, PrintComp -> False
-      |>]
+    AppendTo[$ParseModeAssociation, <|SetComp -> False, PrintComp -> False|>]
   ];
 
 Protect[SetParseModeAllToFalse];
@@ -142,8 +141,7 @@ Protect[SetParseSetCompMode];
 
 SetParseSetCompModeAllToFalse[] :=
   Module[{},
-    AppendTo[$ParseSetCompModeAssociation, <|IndependentVarlistIndex ->
-       False, WithoutGridPointIndex -> False|>]
+    AppendTo[$ParseSetCompModeAssociation, <|IndependentVarlistIndex -> False, WithoutGridPointIndex -> False|>]
   ];
 
 Protect[SetParseSetCompModeAllToFalse];
@@ -168,8 +166,7 @@ Protect[SetParsePrintCompMode];
 
 SetParsePrintCompModeAllToFalse[] :=
   Module[{},
-    AppendTo[$ParsePrintCompModeAssociation, <|Initializations -> False,
-       Equations -> False|>]
+    AppendTo[$ParsePrintCompModeAssociation, <|Initializations -> False, Equations -> False|>]
   ];
 
 Protect[SetParsePrintCompModeAllToFalse];

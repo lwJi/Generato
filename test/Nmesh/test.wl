@@ -4,8 +4,7 @@
 
 (* (c) Liwei Ji, 01/2024 *)
 
-Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"
-  }]]
+Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"}]]
 
 SetPVerbose[False];
 
@@ -29,8 +28,7 @@ dtEvolVarlist = GridTensors[{rU[i], PrintAs -> "r"}];
 
 EvolVarlist = GridTensors[{uU[i], PrintAs -> "u"}];
 
-MoreInVarlist = GridTensors[{MDD[-i, -j], Symmetric[{-i, -j}], PrintAs 
-  -> "M"}];
+MoreInVarlist = GridTensors[{MDD[-i, -j], Symmetric[{-i, -j}], PrintAs -> "M"}];
 
 TempVarlist = TempTensors[{vU[i], PrintAs -> "v"}];
 
@@ -81,13 +79,11 @@ $MainPrint[] :=
     pr[];
     pr["if(Msqr)"];
     pr["{"];
-    PrintEquations[{Mode -> "Main", SuffixName -> "Msqr", ChartName -> 
-      cart}, dtEvolVarlist];
+    PrintEquations[{Mode -> "Main", SuffixName -> "Msqr", ChartName -> cart}, dtEvolVarlist];
     pr["}"];
     pr["else"];
     pr["{"];
-    PrintEquations[{Mode -> "Main", SuffixName -> "otherwise"}, dtEvolVarlist
-      ];
+    PrintEquations[{Mode -> "Main", SuffixName -> "otherwise"}, dtEvolVarlist];
     pr["}"];
     pr[];
     pr["} /* end of points */"];
