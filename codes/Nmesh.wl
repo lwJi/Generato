@@ -22,8 +22,9 @@ GetInitialComp[varname_] :=
     Print initialization of each component of a tensor
 *)
 
-PrintComponentInitialization[varname_, compname_] :=
-  Module[{varlistindex = GetMapComponentToVarlist[][compname], compToValue = compname // ToValues, buf},
+PrintComponentInitialization[varinfo_, compname_] :=
+  Module[{varlistindex = GetMapComponentToVarlist[][compname], compToValue = compname // ToValues, varname, buf},
+    varname = varinfo[[1]];
     Which[
       GetParsePrintCompInitMode[MainOut],
         buf =

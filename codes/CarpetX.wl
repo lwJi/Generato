@@ -25,10 +25,9 @@ PrintListInitializations[varlist_?ListQ, storagetype_?StringQ, indextype_?String
     Print initialization of each component of a tensor
 *)
 
-PrintComponentInitialization[varname_, compname_] :=
-  Module[
-    {varlistindex = GetMapComponentToVarlist[][compname], compToValue = compname // ToValues, buf, subbuf, isGF3D2, isGF3D5}
-    ,
+PrintComponentInitialization[varinfo_, compname_] :=
+  Module[{varlistindex = GetMapComponentToVarlist[][compname], compToValue = compname // ToValues, varname, buf, subbuf, isGF3D2, isGF3D5},
+    varname = varinfo[[1]];
     (* set subbuf *)
     Which[
       GetParsePrintCompInitTensorType[Scal],

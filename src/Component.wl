@@ -32,7 +32,7 @@ SetSuffixName::usage = "SetSuffixName[suffix] update the suffix added to vars in
 
 GetPrefixDt::usage = "GetPrefixDt[] return the prefix used for dt of vars.";
 
-ParseComponent::usage = "ParseComponent[varname, compindexlist, coordinate] process a component.";
+ParseComponent::usage = "ParseComponent[varinfo, compindexlist, coordinate] process a component.";
 
 Is3DAbstractIndex::usage = "Is3DAbstractIndex[abstractindex] return True if the abstract index is after letter 'i' and only the first letter matters (say h <=> h1 <=> h2 ...).";
 
@@ -122,9 +122,11 @@ SetPrefixDt[Prefix_] :=
 
 Protect[SetPrefixDt];
 
-ParseComponent[varname_, compindexlist_?ListQ, coordinate_] :=
-  Module[{compname = SetCompName[varname, compindexlist, coordinate]},
+ParseComponent[varinfo_, compindexlist_?ListQ, coordinate_] :=
+  Module[{compname, varname},
     PrintVerbose["  ParseComponent..."];
+    varname = varinfo[[1]];
+    compname = SetCompName[varname, compindexlist, coordinate];
     If[Is4DCompIndexListIn3DTensor[compindexlist, varname],
       If[IsUp4DCompIndexListIn3DTensor[compindexlist, varname],
         ComponentValue[compname, 0]
@@ -136,7 +138,7 @@ ParseComponent[varname_, compindexlist_?ListQ, coordinate_] :=
         SetComponent[compname, SetExprName[varname, compindexlist]]
       ,
       GetParseMode[PrintComp],
-        PrintComponent[coordinate, varname, compname]
+        PrintComponent[coordinate, varinfo, compname]
       ,
       True,
         Throw @ Message[ParseComponent::EMode]
@@ -147,12 +149,12 @@ ParseComponent::EMode = "ParseMode unrecognized!";
 
 Protect[ParseComponent];
 
-PrintComponent[coordinate_, varname_, compname_] :=
+PrintComponent[coordinate_, varinfo_, compname_] :=
   Module[{},
     Which[
       GetParsePrintCompMode[Initializations],
         PrintVerbose["    PrintComponentInitialization ", compname, "..."];
-        Global`PrintComponentInitialization[varname, compname]
+        Global`PrintComponentInitialization[varinfo, compname]
       ,
       GetParsePrintCompMode[Equations],
         PrintVerbose["    PrintComponentEquation ", compname, "..."];

@@ -29,7 +29,7 @@ Begin["`Private`"];
 (* Function *)
 
 ParseVarlist[varlist_?ListQ, chartname_] :=
-  Module[{iMin, iMax = 3, var, varname, symmetry, printname, symname, symindex, parseComponentValue},
+  Module[{iMin, iMax = 3, var, varinfo, varname, symmetry, printname, symname, symindex, parseComponentValue},
     PrintVerbose["ParseVarlist..."];
     PrintVerbose["  Dim = ", GetDim[], ", Chart = ", chartname];
     PrintVerbose["  List: ", varlist];
@@ -42,6 +42,7 @@ ParseVarlist[varlist_?ListQ, chartname_] :=
     Do[
       var = varlist[[ivar]];
       {varname, symmetry, printname} = ParseVar[var];
+      varinfo = {varname, symmetry};
       If[symmetry =!= Null,
         symname = symmetry[[0]];
         symindex = symmetry[[1]]
@@ -57,7 +58,7 @@ ParseVarlist[varlist_?ListQ, chartname_] :=
           Throw @ Message[ParseVarlist::ETensorExistOutside, ivar, varname]
         ]
       ];
-      parseComponentValue[compindexlist_] := ParseComponent[varname, compindexlist, chartname];
+      parseComponentValue[compindexlist_] := ParseComponent[varinfo, compindexlist, chartname];
       Switch[Length[varname],
         0(* ZERO INDEX CASE: *),
           parseComponentValue[{}]
