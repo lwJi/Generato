@@ -26,8 +26,8 @@ PrintListInitializations[varlist_?ListQ, storagetype_?StringQ, indextype_?String
 *)
 
 PrintComponentInitialization[varinfo_, compname_] :=
-  Module[{varlistindex = GetMapComponentToVarlist[][compname], compToValue = compname // ToValues, varname, buf, subbuf, isGF3D2, isGF3D5},
-    varname = varinfo[[1]];
+  Module[{varlistindex = GetMapComponentToVarlist[][compname], compToValue = compname // ToValues, varname, symmetry, buf, subbuf, isGF3D2, isGF3D5},
+    {varname, symmetry} = varinfo;
     (* set subbuf *)
     Which[
       GetParsePrintCompInitTensorType[Scal],
@@ -39,10 +39,14 @@ PrintComponentInitialization[varinfo_, compname_] :=
             subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> ")"
           ,
           Length[varname] == 2,
-            subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> "," <> ToString[compname[[2]][[1]] - 1] <> ")"
+            If[symmetry =!= Null,
+              subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> "," <> ToString[compname[[2]][[1]] - 1] <> ")"
+              ,
+              subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> ")(" <> ToString[compname[[2]][[1]] - 1] <> ")"
+            ]
           ,
           Length[varname] == 3,
-            subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> ")" <> "(" <> ToString[compname[[2]][[1]] - 1] <> "," <> ToString[compname[[3]][[1]] - 1] <> ")"
+            subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> ")(" <> ToString[compname[[2]][[1]] - 1] <> "," <> ToString[compname[[3]][[1]] - 1] <> ")"
           ,
           True,
             Throw @ Message[PrintComponentInitialization::EVarLength]
@@ -54,13 +58,17 @@ PrintComponentInitialization[varinfo_, compname_] :=
             subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> ")"
           ,
           Length[varname] == 2,
-            subbuf = "(" <> ToString[compname[[2]][[1]] - 1] <> ")" <> "(" <> ToString[compname[[1]][[1]] - 1] <> ")"
+            subbuf = "(" <> ToString[compname[[2]][[1]] - 1] <> ")(" <> ToString[compname[[1]][[1]] - 1] <> ")"
           ,
           Length[varname] == 3,
-            subbuf = "(" <> ToString[compname[[2]][[1]] - 1] <> "," <> ToString[compname[[3]][[1]] - 1] <> ")" <> "(" <> ToString[compname[[1]][[1]] - 1] <> ")"
+            If[symmetry =!= Null,
+              subbuf = "(" <> ToString[compname[[2]][[1]] - 1] <> "," <> ToString[compname[[3]][[1]] - 1] <> ")(" <> ToString[compname[[1]][[1]] - 1] <> ")"
+              ,
+              subbuf = "(" <> ToString[compname[[2]][[1]] - 1] <> ")(" <> ToString[compname[[3]][[1]] - 1] <> ")(" <> ToString[compname[[1]][[1]] - 1] <> ")"
+            ]
           ,
           Length[varname] == 4,
-            subbuf = "(" <> ToString[compname[[2]][[1]] - 1] <> ")" <> "(" <> ToString[compname[[3]][[1]] - 1] <> "," <> ToString[compname[[4]][[1]] - 1] <> ")" <> "(" <> ToString[compname[[1]][[1]] - 1] <> ")"
+            subbuf = "(" <> ToString[compname[[2]][[1]] - 1] <> ")(" <> ToString[compname[[3]][[1]] - 1] <> "," <> ToString[compname[[4]][[1]] - 1] <> ")(" <> ToString[compname[[1]][[1]] - 1] <> ")"
           ,
           True,
             Throw @ Message[PrintComponentInitialization::EVarLength]
@@ -72,10 +80,10 @@ PrintComponentInitialization[varinfo_, compname_] :=
             subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> "," <> ToString[compname[[2]][[1]] - 1] <> ")"
           ,
           Length[varname] == 3,
-            subbuf = "(" <> ToString[compname[[3]][[1]] - 1] <> ")" <> "(" <> ToString[compname[[1]][[1]] - 1] <> "," <> ToString[compname[[2]][[1]] - 1] <> ")"
+            subbuf = "(" <> ToString[compname[[3]][[1]] - 1] <> ")(" <> ToString[compname[[1]][[1]] - 1] <> "," <> ToString[compname[[2]][[1]] - 1] <> ")"
           ,
           Length[varname] == 4,
-            subbuf = "(" <> ToString[compname[[3]][[1]] - 1] <> "," <> ToString[compname[[4]][[1]] - 1] <> ")" <> "(" <> ToString[compname[[1]][[1]] - 1] <> "," <> ToString[compname[[2]][[1]] - 1] <> ")"
+            subbuf = "(" <> ToString[compname[[3]][[1]] - 1] <> "," <> ToString[compname[[4]][[1]] - 1] <> ")(" <> ToString[compname[[1]][[1]] - 1] <> "," <> ToString[compname[[2]][[1]] - 1] <> ")"
           ,
           True,
             Throw @ Message[PrintComponentInitialization::EVarLength]
