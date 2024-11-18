@@ -18,11 +18,11 @@ Print["Package Generato`Interface`, {2024, 1, 11}"];
 
 Print["------------------------------------------------------------"];
 
+DefTensors::usage = "DefTensors[vars] define tensors (without setting its components)";
+
 GridTensors::usage = "GridTensors[vars] define grid tensors (with grid point index), set components and return the varlist";
 
 TempTensors::usage = "TempTensors[vars] define temp tensors (without grid point index), set components and return the varlist";
-
-DefTensors::usage = "DefTensors[vars] define tensors (without setting its components)";
 
 SetComponents::usage = "SetComponents[{ChartName->..., IndependentIndexForEachVar->..., WithoutGridPointIndex->...}, varlist] set components of varlist.";
 
@@ -84,6 +84,19 @@ Begin["`Private`"];
     Higher functions
 *)
 
+DefTensors[vars__] :=
+  Module[{arglist = List[vars], varname, symmetry, printname},
+    Do[
+      {varname, symmetry, printname} = ParseVar[arglist[[ivar]]];
+      DefineTensor[varname, symmetry, printname]
+      ,
+      {ivar, 1, Length[arglist]}
+    ];
+    Return[arglist]
+  ];
+
+Protect[DefTensors];
+
 GridTensors[vars__] :=
   Module[{arglist = List[vars]},
     SetComponents[arglist];
@@ -99,19 +112,6 @@ TempTensors[vars__] :=
   ];
 
 Protect[TempTensors];
-
-DefTensors[vars__] :=
-  Module[{arglist = List[vars], varname, symmetry, printname},
-    Do[
-      {varname, symmetry, printname} = ParseVar[arglist[[ivar]]];
-      DefineTensor[varname, symmetry, printname]
-      ,
-      {ivar, 1, Length[arglist]}
-    ];
-    Return[arglist]
-  ];
-
-Protect[DefTensors];
 
 (*
     Baisc functions
