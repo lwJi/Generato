@@ -12,6 +12,10 @@ Print["Package Generato`Basic`, {2024, 1, 11}"];
 
 Print["------------------------------------------------------------"];
 
+GetCheckInputEquations::usage = "GetCheckInputEquations[] return the Boolean variable specifying if we are checking input equations.";
+
+SetCheckInputEquations::usage = "SetCheckInputEquations[True] update the Boolean variable specifying if we are checking input equations.";
+
 SetPVerbose::usage = "SetPVerbose[True] update the Boolean variable specifying if print more messages.";
 
 GetPrintDate::usage = "GetPrintDate[] return the Boolean variable specifying if print date in file.";
@@ -62,6 +66,8 @@ Begin["`Private`"];
 
 (* Data *)
 
+$CheckInputEquations = False;
+
 $PVerbose = False;
 
 $PrintDate = True;
@@ -77,6 +83,18 @@ $OutputFile = "output.c";
 $Project = "TEST";
 
 (* Function *)
+
+GetCheckInputEquations[] :=
+  Return[$CheckInputEquations];
+
+Protect[GetCheckInputEquations];
+
+SetCheckInputEquations[checkinput_] :=
+  Module[{},
+    $CheckInputEquations = checkinput
+  ];
+
+Protect[SetCheckInputEquations];
 
 GetPVerbose[] :=
   Return[$PVerbose];
