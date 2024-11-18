@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# Generato Script (c) 2023 Liwei Ji
+# A script to process *.wl files, generate corresponding .hxx files, and clean up trailing spaces.
+
+echo "Generato (c) 2023 Liwei Ji"
+
+# Function to display help message
+show_help() {
+  echo "USAGE:"
+  echo "  Generato <file1.wl> [file2.wl] ..."
+  echo
+  echo "DESCRIPTION:"
+  echo "  Processes the specified Wolfram Language (*.wl) files using wolframscript."
+  echo "  Removes trailing spaces from the generated *.hxx files."
+  echo
+  echo "EXAMPLES:"
+  echo "  Generato C3GH_set_profile_ADM.wl"
+  echo "  Generato file1.wl file2.wl"
+}
+
+# Check for help flag or no arguments
+if [[ "$1" == "-h" || "$1" == "--help" || -z "$1" ]]; then
+  show_help
+  exit 0
+fi
+
+# Check if wolframscript is installed
+if ! command -v wolframscript &> /dev/null; then
+  echo "Error: 'wolframscript' is not installed or not in PATH."
+  exit 1
+fi
+
+# Process each file passed as an argument
+for input_file in "$@"; do
+  # Ensure the file exists
+  if [[ ! -f "$input_file" ]]; then
+    echo "Warning: File '$input_file' does not exist. Skipping."
+    continue
+  fi
+
+  # Remove .wl extension to form the base name
+  base_name="${input_file%.wl}"
+  output_file="${base_name}.hxx"
+
+  # Run wolframscript on the input file
+  echo "Processing '$input_file'..."
+  wolframscript -f "$input_file"
+
+  # Check if the expected output file was created
+  if [[ -f "$output_file" ]]; then
+    # Remove trailing spaces from the output file
+    echo "Removing trailing spaces in '$output_file'..."
+    sed -i.bak -E 's/[[:space:]]+$//' "$output_file"
+    rm "${output_file}.bak"
+  else
+    echo "Error: Expected output file '$output_file' not found."
+  fi
+
+  echo
+done
+
+echo "DONE."
