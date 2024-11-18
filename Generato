@@ -51,8 +51,7 @@ for input_file in "$@"; do
   if [[ -f "$output_file" ]]; then
     # Remove trailing spaces from the output file
     echo "Removing trailing spaces in '$output_file'..."
-    sed -i.bak -E 's/[[:space:]]+$//' "$output_file"
-    rm "${output_file}.bak"
+    sed -i.bak -E 's/[[:space:]]+$//' "$output_file" && rm "${output_file}.bak"
   else
     echo "Error: Expected output file '$output_file' not found."
   fi
