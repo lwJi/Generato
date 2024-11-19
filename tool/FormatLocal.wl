@@ -1,16 +1,15 @@
 Needs["CodeFormatter`"]
 
 Module[{dirs = {"./"}},
+  Do[
+    Print["Formatting '.wl' files in "<>dir<>" ..."];
+    files = FileNames["*.wl", dir];
     Do[
-        Print["Formatting '.wl' files in "<>dirs[[d]]<>" ..."];
-        files = FileNames["*rhs.wl", dirs[[d]]];
-        Do[
-            file = File[files[[i]]];
-            Export[file,
-              CodeFormat[file, "IndentationString"->"  ", LineWidth->8000],
-              "String"],
-        {i, 1, Length[files]}],
-    {d, 1, Length[dirs]}]
+      file = File[fname];
+      formattedContent = CodeFormat[Import[file, "String"], "IndentationString" -> "  ", LineWidth -> 8192];
+      Export[file, formattedContent, "String"],
+    {fname, files}],
+  {dir, dirs}]
 ];
 
 Print["Done"];
