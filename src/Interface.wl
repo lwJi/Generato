@@ -163,6 +163,7 @@ PrintEquations[OptionsPattern[], varlist_?ListQ] :=
     ];
     ParseVarlist[varlist, chartname];
     CleanParsePrintCompEQNMode[];
+    SetSuffixName[""];
   ];
 
 PrintEquations::EMode = "PrintEquations mode '`1`' unsupported yet!";
