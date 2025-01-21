@@ -21,7 +21,7 @@ GetCoefficients[sample_?ListQ, values_?ListQ] := Module[{numPoints, equations, c
   numPoints = Length[sample];
 
   (* Create coefficient symbols c1, c2, ..., cn *)
-  coeffs = Table[Subscript[c, sample[[i]]], {i, 1, numPoints}];
+  coeffs = Table[Subscript[Global`c, sample[[i]]], {i, 1, numPoints}];
 
   (* Generate the system of equations based on the sample and values *)
   equations = Table[Sum[coeffs[[i]] If[j==0, 1, sample[[i]]^j], {i, 1, numPoints}] == values[[j+1]], {j, 0, numPoints-1}];
