@@ -22,6 +22,8 @@
 
 <<Derivation.wl
 
+<<stencils/FiniteDifferenceStencils.wl
+
 Print[];
 
 (***********)
