@@ -63,7 +63,7 @@ PrintComponentEquation[coordinate_, compname_] :=
     Which[
       GetParsePrintCompEQNMode[NewVar],
         Module[{},
-          Global`pr[GetTempVariableType[] <> " "];
+          Global`pr["const " <> GetTempVariableType[] <> " "];
           PutAppend[CForm[compToValue], outputfile];
           Global`pr["="];
           PutAppend[CForm[rhssToValue], outputfile];
