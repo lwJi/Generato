@@ -29,11 +29,11 @@ PrintComponentInitialization[varinfo_, compname_] :=
           "const auto &" <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = " <> GetInterfaceName[compname] <> ";"
         ,
         GetParsePrintCompInitMode[Derivs1st],
-          "const auto " <> ToString[compToValue] <> " = fd_1st(" <> StringDrop[StringDrop[ToString[compToValue], 1], {-ranks, -ranks+0}]
+          "const auto " <> ToString[compToValue] <> " = fd_1st(cctkGH, " <> StringDrop[StringDrop[ToString[compToValue], 1], {-ranks, -ranks+0}]
           <> ", i, j, k, " <> ToString[compname[[1]][[1]]] <> ");"
         ,
         GetParsePrintCompInitMode[Derivs2nd],
-          "const auto " <> ToString[compToValue] <> " = fd_2nd(" <> StringDrop[StringDrop[ToString[compToValue], 2], {-ranks, -ranks+1}]
+          "const auto " <> ToString[compToValue] <> " = fd_2nd(cctkGH, " <> StringDrop[StringDrop[ToString[compToValue], 2], {-ranks, -ranks+1}]
           <> ", i, j, k, " <> ToString[compname[[1]][[1]]] <> ", " <> ToString[compname[[2]][[1]]] <> ");"
         ,
         GetParsePrintCompInitMode[Temp],
