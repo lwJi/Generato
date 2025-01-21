@@ -12,6 +12,8 @@ Print["Package Generato`FiniteDifferenceStencils`, {2025, 1, 21}"];
 
 Print["------------------------------------------------------------"];
 
+GetFiniteDifferenceCoefficients::usage = "GetFiniteDifferenceCoefficients[sample, order] return coeffients of finite difference stencils.";
+
 Begin["`Private`"];
 
 GetCoefficients[sample_?ListQ, values_?ListQ] := Module[{numPoints, equations, coeffs},
@@ -30,15 +32,16 @@ GetCoefficients[sample_?ListQ, values_?ListQ] := Module[{numPoints, equations, c
 
 Protect[GetCoefficients];
 
-GetFiniteDifferenceCoefficients[sample_?ListQ, order_?IntegerQ] := Module[{numPoints, values, equations, coeffs},
+GetFiniteDifferenceCoefficients[sample_?ListQ, order_?IntegerQ] := Module[{numPoints, values},
   (* Number of points in the sample *)
   numPoints = Length[sample];
 
-  (* Check if the sample has at least two elements *)
+  (* Ensure the sample has enough points for the desired order *)
   If[numPoints < order + 1,
     Return[Message[GetFiniteDifferenceCoefficients::shortSample]];
   ];
 
+  (* Generate values array for finite difference coefficients *)
   values = Join[ConstantArray[0, order], {order!}, ConstantArray[0, numPoints - order - 1]];
 
   GetCoefficients[sample, values]
