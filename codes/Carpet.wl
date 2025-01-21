@@ -5,12 +5,13 @@
 (* (c) Liwei Ji, 01/2025 *)
 
 GetInterfaceName[compname_] :=
-  Module[{intfname=ToString[compname[[0]]], colist= {"t", "x", "y", "z"}},
+  Module[{intfname = ToString[compname[[0]]], colist = {"t", "x", "y", "z"}},
     Do[
       coindex = compname[[icomp]][[1]];
-      intfname = intfname <> colist[[coindex+1]]
+      intfname = intfname <> colist[[coindex + 1]]
       ,
-      {icomp, 1, Length[compname]}];
+      {icomp, 1, Length[compname]}
+    ];
     intfname = ToString[CForm[ToExpression[intfname <> GetGridPointIndex[]]]];
     Return[intfname];
   ];
@@ -29,12 +30,10 @@ PrintComponentInitialization[varinfo_, compname_] :=
           "const auto &" <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = " <> GetInterfaceName[compname] <> ";"
         ,
         GetParsePrintCompInitMode[Derivs1st],
-          "const auto " <> ToString[compToValue] <> " = fd_1st(cctkGH, " <> StringDrop[StringDrop[ToString[compToValue], 1], {-ranks, -ranks+0}]
-          <> ", i, j, k, " <> ToString[compname[[1]][[1]]] <> ");"
+          "const auto " <> ToString[compToValue] <> " = fd_1st(cctkGH, " <> StringDrop[StringDrop[ToString[compToValue], 1], {-ranks, -ranks + 0}] <> ", i, j, k, " <> ToString[compname[[1]][[1]]] <> ");"
         ,
         GetParsePrintCompInitMode[Derivs2nd],
-          "const auto " <> ToString[compToValue] <> " = fd_2nd(cctkGH, " <> StringDrop[StringDrop[ToString[compToValue], 2], {-ranks, -ranks+1}]
-          <> ", i, j, k, " <> ToString[compname[[1]][[1]]] <> ", " <> ToString[compname[[2]][[1]]] <> ");"
+          "const auto " <> ToString[compToValue] <> " = fd_2nd(cctkGH, " <> StringDrop[StringDrop[ToString[compToValue], 2], {-ranks, -ranks + 1}] <> ", i, j, k, " <> ToString[compname[[1]][[1]]] <> ", " <> ToString[compname[[2]][[1]]] <> ");"
         ,
         GetParsePrintCompInitMode[Temp],
           buf = "auto " <> ToString[compToValue] <> ";"

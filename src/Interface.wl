@@ -108,7 +108,8 @@ Protect[DefTensors];
 GridTensors[vars__] :=
   Module[{arglist = List[vars]},
     If[GetCheckInputEquations[],
-      DefTensors[vars],
+      DefTensors[vars]
+      ,
       SetComponents[arglist]
     ];
     Return[arglist]
@@ -119,7 +120,8 @@ Protect[GridTensors];
 TempTensors[vars__] :=
   Module[{arglist = List[vars]},
     If[GetCheckInputEquations[],
-      DefTensors[vars],
+      DefTensors[vars]
+      ,
       SetComponents[{WithoutGridPointIndex -> True}, arglist]
     ];
     Return[arglist]
