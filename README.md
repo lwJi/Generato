@@ -20,7 +20,7 @@ Generate C/C++ code from tensor expression and so on (using xAct)
 * Small toy
 
 ```bash
-wolframscript -f test/unit/test.wl
+Generato test/unit/test.wl
 ```
 
 * GHG formulation of Einstein's equations
@@ -28,7 +28,7 @@ wolframscript -f test/unit/test.wl
 Please take a look at the example script for GHG system: [test/integration/GHG_rhs.ipynb](https://github.com/lwJi/Generato/blob/main/test/integration/GHG_rhs.ipynb). Or
 
 ```bash
-wolframscript -f test/integration/GHG_rhs.wl
+Generato test/integration/GHG_rhs.wl
 ```
 
 ## Recomendations
