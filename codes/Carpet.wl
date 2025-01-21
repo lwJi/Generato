@@ -4,6 +4,17 @@
 
 (* (c) Liwei Ji, 01/2025 *)
 
+GetInterfaceName[compname_] :=
+  Module[{intfname=ToString[compname[[0]]], colist= {"t", "x", "y", "z"}},
+    Do[
+      coindex = compname[[icomp]][[1]];
+      intfname = intfname <> colist[[coindex+1]]
+      ,
+      {icomp, 1, Length[compname]}];
+    intfname = ToString[CForm[ToExpression[intfname <> GetGridPointIndex[]]]];
+    Return[intfname];
+  ];
+
 (*
     Print initialization of each component of a tensor
 *)
@@ -14,11 +25,17 @@ PrintComponentInitialization[varinfo_, compname_] :=
     buf =
       Which[
         GetParsePrintCompInitMode[MainIn],
-          "const auto &" <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = " <> ToString[varname[[0]]] <> ";"
+          "const auto &" <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = " <> GetInterfaceName[compname] <> ";"
         ,
         GetParsePrintCompInitMode[Derivs1st],
           "const auto " <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
-          <> " = fd_1st(" <> StringDrop[StringTrim[ToString[compToValue], GetGridPointIndex[]], 1] <> ", p, " <> ToString[compname[[1]][[1]]] <> ");"
+          <> " = fd_1st(" <> StringDrop[StringTrim[ToString[compToValue], GetGridPointIndex[]], 1]
+          <> ", " <> StringReplace[GetGridPointIndex[], {"[["->"", "]]"->""}] <> ", " <> ToString[compname[[1]][[1]]] <> ");"
+        ,
+        GetParsePrintCompInitMode[Derivs2nd],
+          "const auto " <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
+          <> " = fd_2nd(" <> StringDrop[StringTrim[ToString[compToValue], GetGridPointIndex[]], 2]
+          <> ", " <> StringReplace[GetGridPointIndex[], {"[["->"", "]]"->""}] <> ", " <> ToString[compname[[1]][[1]]] <> ", " <> ToString[compname[[2]][[1]]] <> ");"
         ,
         GetParsePrintCompInitMode[Temp],
           buf = "auto " <> ToString[compToValue] <> ";"
