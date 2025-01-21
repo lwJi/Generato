@@ -14,7 +14,23 @@ Print["------------------------------------------------------------"];
 
 GetFiniteDifferenceCoefficients::usage = "GetFiniteDifferenceCoefficients[sample, order] return coeffients of finite difference stencils.";
 
+GetCenteringStencils::usage = "GetCenteringStencils[ord] return the centering finite difference stencils of order ord.";
+
 Begin["`Private`"];
+
+(* Data *)
+
+$CenteringStencils = <|
+  2 -> {-1, 0, 1},
+  4 -> {-2, -1, 0, 1, 2},
+  6 -> {-3, -2, -1, 0, 1, 2, 3},
+  8 -> {-4, -3, -2, -1, 0, 1, 2, 3, 4}
+|>;
+
+(* Function *)
+
+GetCenteringStencils[ord_?IntegerQ] :=
+  Return[$CenteringStencils[ord]];
 
 GetCoefficients[sample_?ListQ, values_?ListQ] := Module[{numPoints, equations, coeffs},
   (* Number of points in the sample *)
