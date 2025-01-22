@@ -22,6 +22,10 @@ GetSimplifyEquation::usage = "GetSimplifyEquation[] returns the Boolean variable
 
 SetSimplifyEquation::usage = "SetSimplifyEquation[True] update the Boolean variable specifying if Simplify the equations.";
 
+GetUseLetterForTensorComponet::usage = "GetUseLetterForTensorComponet[] returns the Boolean variable specifying if use letter for tensor components (instead of number).";
+
+SetUseLetterForTensorComponet::usage = "SetUseLetterForTensorComponet[True] update the Boolean variable specifying if use letter for tensor components (instead of number).";
+
 GetTempVariableType::usage = "GetTempVariableType[] returns the type of temporary variable.";
 
 SetTempVariableType::usage = "SetTempVariableType[CCTK_REAL] update the type of temporary variable.";
@@ -45,6 +49,8 @@ $MapComponentToVarlist = <||>;(*store all varlist's map*)
 $ProcessNewVarlist = True;
 
 $SimplifyEquation = True;
+
+$UseLetterForTensorComponet = False;
 
 $TempVariableType = "double";
 
@@ -85,6 +91,18 @@ SetSimplifyEquation[simplify_] :=
   ];
 
 Protect[SetSimplifyEquation];
+
+GetUseLetterForTensorComponet[] :=
+  Return[$UseLetterForTensorComponet];
+
+Protect[GetUseLetterForTensorComponet];
+
+SetUseLetterForTensorComponet[useletter_] :=
+  Module[{},
+    $UseLetterForTensorComponet = useletter
+  ];
+
+Protect[SetUseLetterForTensorComponet];
 
 GetTempVariableType[] :=
   Return[$TempVariableType];
