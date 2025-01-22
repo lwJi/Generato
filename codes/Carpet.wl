@@ -4,6 +4,10 @@
 
 (* (c) Liwei Ji, 01/2025 *)
 
+(******************)
+(* Misc functions *)
+(******************)
+
 (* Function to get GF index name *)
 GetGFIndexName[index_?IntegerQ] :=
   Module[{gfindex},
@@ -51,7 +55,6 @@ PrintFDExpression[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
   Module[{stencils, solution, buf},
     stencils = GetCenteringStencils[accuracyord];
     solution = GetFiniteDifferenceCoefficients[stencils, fdord];
-
     buf = "    " <> ToString[CForm[
       (Sum[
         index = stencils[[i]];
@@ -66,14 +69,13 @@ PrintFDExpressionMix[accuracyord_?IntegerQ] :=
   Module[{stencils, solution, buf},
     stencils = GetCenteringStencils[accuracyord];
     solution = GetFiniteDifferenceCoefficients[stencils, 1];
-
     buf = "    " <> ToString[CForm[
       (Sum[
         index1 = stencils[[i]];
         index2 = stencils[[j]];
         (Subscript[c, index1] /. solution) (Subscript[c, index2] /. solution) gf[[GetGFIndexNameMix[index1, index2]]],
         {i, 1, Length[stencils]}, {j, 1, Length[stencils]}] // Simplify)
-      Product[idx[[dir-1]], {i, 1, 2}]
+      idx[[dir1-1]] idx[[dir2-1]]
     ]] <> ";";
     pr[buf];
   ];
@@ -91,9 +93,9 @@ GetInterfaceName[compname_] :=
     Return[intfname];
   ];
 
-(*
-    Print initialization of each component of a tensor
-*)
+(******************************************************)
+(* Print initialization of each component of a tensor *)
+(******************************************************)
 
 PrintComponentInitialization[varinfo_, compname_] :=
   Module[{varlistindex = GetMapComponentToVarlist[][compname], compToValue = compname // ToValues, varname, symmetry, buf, ranks},
@@ -128,6 +130,10 @@ PrintComponentInitialization[varinfo_, compname_] :=
 PrintComponentInitialization::EMode = "PrintComponentInitialization mode unrecognized!";
 
 (*Protect[PrintComponentInitialization];*)
+
+(************************************************)
+(* Print equation of each component of a tensor *)
+(************************************************)
 
 PrintComponentEquation[coordinate_, compname_] :=
   Module[{outputfile = GetOutputFile[], compToValue, rhssToValue},
@@ -175,9 +181,9 @@ PrintComponentEquation::EMode = "PrintEquationMode unrecognized!";
 
 (*Protect[PrintComponentEquation];*)
 
-(*
-    Write to files
-*)
+(******************)
+(* Write to files *)
+(******************)
 
 Module[{outputfile = GetOutputFile[], filepointer},
   Print["Writing to \"", outputfile, "\"...\n"];
