@@ -58,6 +58,14 @@ Derivs2nd::usage = "PrintInitializations option."
 
 Protect[Derivs2nd];
 
+PreDerivs1st::usage = "PrintInitializations option."
+
+Protect[PreDerivs1st];
+
+PreDerivs2nd::usage = "PrintInitializations option."
+
+Protect[PreDerivs2nd];
+
 MoreInOut::usage = "PrintInitializations option."
 
 Protect[MoreInOut];
@@ -200,6 +208,12 @@ PrintInitializations[OptionsPattern[], varlist_?ListQ] :=
       ,
       StringMatchQ[mode, "Derivs2nd"],
         SetParsePrintCompInitMode[Derivs2nd -> True]
+      ,
+      StringMatchQ[mode, "PreDerivs1st"],
+        SetParsePrintCompInitMode[PreDerivs1st -> True]
+      ,
+      StringMatchQ[mode, "PreDerivs2nd"],
+        SetParsePrintCompInitMode[PreDerivs2nd -> True]
       ,
       StringMatchQ[mode, "MoreInOut"],
         SetParsePrintCompInitMode[MoreInOut -> True]
