@@ -4,11 +4,16 @@
 
 (* (c) Liwei Ji, 01/2025 *)
 
+
 (******************************************************************************)
 (*                    Finite difference stencil function                      *)
 (******************************************************************************)
+(**
+ * fooMix[] only support 2nd mixed derivatives only
+ *)
 
 (* Function to get GF index name *)
+
 GetGFIndexName[index_?IntegerQ] :=
   Module[{gfindex},
     gfindex =
@@ -27,6 +32,7 @@ GetGFIndexNameMix[index1_?IntegerQ, index2_?IntegerQ] :=
   ];
 
 (* Function to print 3D indexes *)
+
 PrintIndexes3D[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
   Module[{stencils, solution, index, buf},
     stencils = GetCenteringStencils[accuracyord];
@@ -53,7 +59,6 @@ PrintIndexes3D[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
     ];
   ];
 
-(* Function to print 3D indexes (for 2nd mixed derivatives) *)
 PrintIndexes3DMix[accuracyord_?IntegerQ] :=
   Module[{stencils, solution, index1, index2, buf},
     stencils = GetCenteringStencils[accuracyord];
@@ -106,6 +111,7 @@ PrintIndexes3DMix[accuracyord_?IntegerQ] :=
   ];
 
 (* Function to print FD expression *)
+
 PrintFDExpression[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
   Module[{stencils, solution, buf},
     stencils = GetCenteringStencils[accuracyord];
@@ -120,7 +126,6 @@ PrintFDExpression[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
     pr[buf];
   ];
 
-(* Function to print FD expression (for 2nd mixed derivatives) *)
 PrintFDExpressionMix[accuracyord_?IntegerQ] :=
   Module[{stencils, solution, buf},
     stencils = GetCenteringStencils[accuracyord];
@@ -136,7 +141,12 @@ PrintFDExpressionMix[accuracyord_?IntegerQ] :=
     pr[buf];
   ];
 
+(******************************************************************************)
+(*                               Misc functions                               *)
+(******************************************************************************)
+
 (* Function to get varialbe name in interface.ccl *)
+
 GetInterfaceName[compname_] :=
   Module[{intfname = ToString[compname[[0]]], colist = {"t", "x", "y", "z"}},
     Do[
@@ -148,6 +158,7 @@ GetInterfaceName[compname_] :=
     intfname = ToString[CForm[ToExpression[intfname <> GetGridPointIndex[]]]];
     Return[intfname];
   ];
+
 
 (******************************************************************************)
 (*            Print initialization of each component of a tensor              *)
@@ -186,6 +197,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
 PrintComponentInitialization::EMode = "PrintComponentInitialization mode unrecognized!";
 
 (*Protect[PrintComponentInitialization];*)
+
 
 (******************************************************************************)
 (*               Print equation of each component of a tensor                 *)
@@ -236,6 +248,7 @@ PrintComponentEquation[coordinate_, compname_] :=
 PrintComponentEquation::EMode = "PrintEquationMode unrecognized!";
 
 (*Protect[PrintComponentEquation];*)
+
 
 (******************************************************************************)
 (*                                Write to files                              *)
