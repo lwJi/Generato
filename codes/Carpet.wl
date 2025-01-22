@@ -9,9 +9,9 @@ GetGFIndexName[index_?IntegerQ] :=
   Module[{gfindex},
     gfindex =
       Which[
-        index > 0, "ijkp" <> ToString[index],
-        index < 0, "ijkm" <> ToString[Abs[index]],
-        True, "ijkc0"
+        index > 0, "p" <> ToString[index],
+        index < 0, "m" <> ToString[Abs[index]],
+        True, "c0"
       ];
     ToExpression[gfindex]
   ];
