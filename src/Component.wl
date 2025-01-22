@@ -246,9 +246,19 @@ SetCompName[varname_, compindexlist_, coordinate_] :=
 *)
 
 SetExprName[varname_, compindexlist_] :=
-  Module[{exprname = StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]]},
+  Module[{exprname, colist={"t", "x", "y", "z"}},
+    exprname = StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]];
     If[Length[compindexlist] > 0, (*not scalar, ignore up/down*)
-      Do[exprname = exprname <> ToString @ compindexlist[[icomp]], {icomp, 1, Length[compindexlist]}]
+      Do[
+        exprname = exprname <>
+          If[GetUseLetterForTensorComponet[],
+            colist[[compindexlist[[icomp]] + 1]]
+            ,
+            ToString @ compindexlist[[icomp]]
+          ]
+        ,
+        {icomp, 1, Length[compindexlist]}
+      ]
     ];
     exprname =
       If[GetParseSetCompMode[WithoutGridPointIndex],
