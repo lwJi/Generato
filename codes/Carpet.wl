@@ -16,6 +16,12 @@ GetGFIndexName[index_?IntegerQ] :=
     ToExpression[gfindex]
   ];
 
+GetGFIndexName2D[index1_?IntegerQ, index2_?IntegerQ] :=
+  Module[{gfindex},
+    gfindex = ToString[GetGFIndexName[index1]] <> ToString[GetGFIndexName[index2]];
+    ToExpression[gfindex]
+  ];
+
 (* Function to print 3D indexes *)
 PrintIndexes3D[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
   Module[{stencils, solution, index, buf},
@@ -47,11 +53,27 @@ PrintFDExpression[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
     solution = GetFiniteDifferenceCoefficients[stencils, fdord];
 
     buf = "    " <> ToString[CForm[
-      Sum[
+      (Sum[
         index = stencils[[i]];
-        (Subscript[c, index] /. solution) gf[[GetGFIndexName[index]]], {i, 1, Length[stencils]}]
+        (Subscript[c, index] /. solution) gf[[GetGFIndexName[index]]],
+        {i, 1, Length[stencils]}] // Simplify)
       Product[idx[[dir-1]], {i, 1, fdord}]
-      (*// Simplify*)
+    ]] <> ";";
+    pr[buf];
+  ];
+
+PrintFDExpression2D[accuracyord_?IntegerQ] :=
+  Module[{stencils, solution, buf},
+    stencils = GetCenteringStencils[accuracyord];
+    solution = GetFiniteDifferenceCoefficients[stencils, 1];
+
+    buf = "    " <> ToString[CForm[
+      (Sum[
+        index1 = stencils[[i]];
+        index2 = stencils[[j]];
+        (Subscript[c, index1] /. solution) (Subscript[c, index2] /. solution) gf[[GetGFIndexName2D[index1, index2]]],
+        {i, 1, Length[stencils]}, {j, 1, Length[stencils]}] // Simplify)
+      Product[idx[[dir-1]], {i, 1, 2}]
     ]] <> ";";
     pr[buf];
   ];
