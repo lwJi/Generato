@@ -16,7 +16,7 @@ GetGFIndexName[index_?IntegerQ] :=
     ToExpression[gfindex]
   ];
 
-GetGFIndexName2D[index1_?IntegerQ, index2_?IntegerQ] :=
+GetGFIndexNameMix[index1_?IntegerQ, index2_?IntegerQ] :=
   Module[{gfindex},
     gfindex = ToString[GetGFIndexName[index1]] <> ToString[GetGFIndexName[index2]];
     ToExpression[gfindex]
@@ -62,7 +62,7 @@ PrintFDExpression[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
     pr[buf];
   ];
 
-PrintFDExpression2D[accuracyord_?IntegerQ] :=
+PrintFDExpressionMix[accuracyord_?IntegerQ] :=
   Module[{stencils, solution, buf},
     stencils = GetCenteringStencils[accuracyord];
     solution = GetFiniteDifferenceCoefficients[stencils, 1];
@@ -71,7 +71,7 @@ PrintFDExpression2D[accuracyord_?IntegerQ] :=
       (Sum[
         index1 = stencils[[i]];
         index2 = stencils[[j]];
-        (Subscript[c, index1] /. solution) (Subscript[c, index2] /. solution) gf[[GetGFIndexName2D[index1, index2]]],
+        (Subscript[c, index1] /. solution) (Subscript[c, index2] /. solution) gf[[GetGFIndexNameMix[index1, index2]]],
         {i, 1, Length[stencils]}, {j, 1, Length[stencils]}] // Simplify)
       Product[idx[[dir-1]], {i, 1, 2}]
     ]] <> ";";
