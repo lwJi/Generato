@@ -4,9 +4,9 @@
 
 (* (c) Liwei Ji, 01/2025 *)
 
-(******************)
-(* Misc functions *)
-(******************)
+(******************************************************************************)
+(*                    Finite difference stencil function                      *)
+(******************************************************************************)
 
 (* Function to get GF index name *)
 GetGFIndexName[index_?IntegerQ] :=
@@ -31,6 +31,7 @@ PrintIndexes3D[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
   Module[{stencils, solution, index, buf},
     stencils = GetCenteringStencils[accuracyord];
     solution = GetFiniteDifferenceCoefficients[stencils, fdord];
+    pr["  constexpr int DI = D - 1;"]
     Do[
       index = stencils[[i]];
       If[(Subscript[c, index] /. solution) == 0, Continue[]];
@@ -40,9 +41,11 @@ PrintIndexes3D[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
         " = CCTK_GFINDEX3D(cctkGH, i, j, k);"
         ,
         " = CCTK_GFINDEX3D(cctkGH, "
-          <> "i + (dir == 1 ? " <> ToString[index] <> " : 0), "
-          <> "j + (dir == 2 ? " <> ToString[index] <> " : 0), "
-          <> "k + (dir == 3 ? " <> ToString[index] <> " : 0));"
+          <> "i + (D == 1 ? " <> ToString[index] <> " : 0),\n"
+          <> "                                        "
+          <> "j + (D == 2 ? " <> ToString[index] <> " : 0),\n"
+          <> "                                        "
+          <> "k + (D == 3 ? " <> ToString[index] <> " : 0));"
       ];
       pr[buf]
       ,
@@ -50,6 +53,7 @@ PrintIndexes3D[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
     ];
   ];
 
+(* Function to print 3D indexes (for 2nd mixed derivatives) *)
 PrintIndexes3DMix[accuracyord_?IntegerQ] :=
   Module[{stencils, solution, index1, index2, buf},
     stencils = GetCenteringStencils[accuracyord];
@@ -111,11 +115,12 @@ PrintFDExpression[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
         index = stencils[[i]];
         (Subscript[c, index] /. solution) gf[[GetGFIndexName[index]]],
         {i, 1, Length[stencils]}] // Simplify)
-      Product[idx[[dir-1]], {i, 1, fdord}]
+      Product[idx[[DI]], {i, 1, fdord}]
     ]] <> ";";
     pr[buf];
   ];
 
+(* Function to print FD expression (for 2nd mixed derivatives) *)
 PrintFDExpressionMix[accuracyord_?IntegerQ] :=
   Module[{stencils, solution, buf},
     stencils = GetCenteringStencils[accuracyord];
@@ -144,9 +149,9 @@ GetInterfaceName[compname_] :=
     Return[intfname];
   ];
 
-(******************************************************)
-(* Print initialization of each component of a tensor *)
-(******************************************************)
+(******************************************************************************)
+(*            Print initialization of each component of a tensor              *)
+(******************************************************************************)
 
 PrintComponentInitialization[varinfo_, compname_] :=
   Module[{varlistindex = GetMapComponentToVarlist[][compname], compToValue = compname // ToValues, varname, symmetry, buf, ranks},
@@ -182,9 +187,9 @@ PrintComponentInitialization::EMode = "PrintComponentInitialization mode unrecog
 
 (*Protect[PrintComponentInitialization];*)
 
-(************************************************)
-(* Print equation of each component of a tensor *)
-(************************************************)
+(******************************************************************************)
+(*               Print equation of each component of a tensor                 *)
+(******************************************************************************)
 
 PrintComponentEquation[coordinate_, compname_] :=
   Module[{outputfile = GetOutputFile[], compToValue, rhssToValue},
@@ -232,9 +237,9 @@ PrintComponentEquation::EMode = "PrintEquationMode unrecognized!";
 
 (*Protect[PrintComponentEquation];*)
 
-(******************)
-(* Write to files *)
-(******************)
+(******************************************************************************)
+(*                                Write to files                              *)
+(******************************************************************************)
 
 Module[{outputfile = GetOutputFile[], filepointer},
   Print["Writing to \"", outputfile, "\"...\n"];
