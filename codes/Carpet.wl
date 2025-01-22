@@ -88,6 +88,9 @@ PrintComponentInitialization[varinfo_, compname_] :=
         GetParsePrintCompInitMode[Derivs2nd],
           "const auto " <> ToString[compToValue] <> " = fd_2nd(" <> StringDrop[StringDrop[ToString[compToValue], 2], {-ranks, -ranks + 1}] <> ", i, j, k, " <> ToString[compname[[1]][[1]]] <> ", " <> ToString[compname[[2]][[1]]] <> ");"
         ,
+        GetParsePrintCompInitMode[PreDerivs1st],
+          ToString[compToValue] <> " = fd_1st(" <> StringDrop[StringDrop[ToString[compToValue], 1], {-ranks, -ranks + 0}] <> ", i, j, k, " <> ToString[compname[[1]][[1]]] <> ");"
+        ,
         GetParsePrintCompInitMode[Temp],
           buf = "auto " <> ToString[compToValue] <> ";"
         ,
