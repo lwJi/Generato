@@ -50,6 +50,57 @@ PrintIndexes3D[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
     ];
   ];
 
+PrintIndexes3DMix[accuracyord_?IntegerQ] :=
+  Module[{stencils, solution, index1, index2, buf},
+    stencils = GetCenteringStencils[accuracyord];
+    solution = GetFiniteDifferenceCoefficients[stencils, 1];
+    Do[
+      index1 = stencils[[i]];
+      index2 = stencils[[j]];
+      If[(Subscript[c, index1] /. solution) == 0 || (Subscript[c, index2] /. solution) == 0,
+        Continue[]
+      ];
+
+      buf = "  const int " <> ToString[GetGFIndexNameMix[index1, index2]] <>
+      If[index1 != 0 && index2 != 0,
+        If[index1 == index2,
+          " = CCTK_GFINDEX3D(cctkGH, "
+            <> "i + (dir1 != 1 && dir2 != 1 ? 0 : " <> ToString[index1] <> "),\n"
+            <> "                                          "
+            <> "j + (dir1 != 2 && dir2 != 2 ? 0 : " <> ToString[index1] <> "),\n"
+            <> "                                          "
+            <> "k + (dir1 != 3 && dir2 != 3 ? 0 : " <> ToString[index1] <> "));"
+          ,
+          " = CCTK_GFINDEX3D(cctkGH, "
+            <> "i + (dir1 != 1 && dir2 != 1 ? 0 : (dir1 == 1 ? " <> ToString[index1] <> " : " <> ToString[index2] <> ")),\n"
+            <> "                                          "
+            <> "j + (dir1 != 2 && dir2 != 2 ? 0 : (dir1 == 2 ? " <> ToString[index1] <> " : " <> ToString[index2] <> ")),\n"
+            <> "                                          "
+            <> "k + (dir1 != 3 && dir2 != 3 ? 0 : (dir1 == 3 ? " <> ToString[index1] <> " : " <> ToString[index2] <> ")));"
+        ]
+        ,
+        If[index1 == 0 && index2 == 0,
+          " = CCTK_GFINDEX3D(cctkGH, i, j, k);"
+          ,
+          If[index1 == 0,
+            " = CCTK_GFINDEX3D(cctkGH, "
+              <> "i + (dir2 == 1 ? " <> ToString[index2] <> " : 0), "
+              <> "j + (dir2 == 2 ? " <> ToString[index2] <> " : 0), "
+              <> "k + (dir2 == 3 ? " <> ToString[index2] <> " : 0));"
+            ,
+            " = CCTK_GFINDEX3D(cctkGH, "
+              <> "i + (dir1 == 1 ? " <> ToString[index1] <> " : 0), "
+              <> "j + (dir1 == 2 ? " <> ToString[index1] <> " : 0), "
+              <> "k + (dir1 == 3 ? " <> ToString[index1] <> " : 0));"
+          ]
+        ]
+      ];
+      pr[buf]
+      ,
+      {i, 1, Length[stencils]}, {j, 1, Length[stencils]}
+    ];
+  ];
+
 (* Function to print FD expression *)
 PrintFDExpression[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
   Module[{stencils, solution, buf},
