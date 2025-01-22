@@ -42,7 +42,7 @@ PrintIndexes3D[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
         " = CCTK_GFINDEX3D(cctkGH, "
           <> "i + (dir == 1 ? " <> ToString[index] <> " : 0), "
           <> "j + (dir == 2 ? " <> ToString[index] <> " : 0), "
-          <> "j + (dir == 3 ? " <> ToString[index] <> " : 0));"
+          <> "k + (dir == 3 ? " <> ToString[index] <> " : 0));"
       ];
       pr[buf]
       ,
