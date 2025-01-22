@@ -8,9 +8,6 @@
 (******************************************************************************)
 (*                    Finite difference stencil function                      *)
 (******************************************************************************)
-(**
- * fooMix[] only support 2nd mixed derivatives only
- *)
 
 (* Function to get GF index name *)
 
@@ -25,7 +22,7 @@ GetGFIndexName[index_?IntegerQ] :=
     ToExpression[gfindex]
   ];
 
-GetGFIndexNameMix[index1_?IntegerQ, index2_?IntegerQ] :=
+GetGFIndexNameMix2nd[index1_?IntegerQ, index2_?IntegerQ] :=
   Module[{gfindex},
     gfindex = ToString[GetGFIndexName[index1]] <> ToString[GetGFIndexName[index2]];
     ToExpression[gfindex]
@@ -34,35 +31,36 @@ GetGFIndexNameMix[index1_?IntegerQ, index2_?IntegerQ] :=
 (* Function to print 3D indexes *)
 
 PrintIndexes3D[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
-  Module[{stencils, solution, index, buf},
+  Module[{stencils, solution},
     stencils = GetCenteringStencils[accuracyord];
     solution = GetFiniteDifferenceCoefficients[stencils, fdord];
-    pr["  constexpr int DI = D - 1;"]
+    pr["  constexpr int DI = D - 1;"];
     Do[
       index = stencils[[i]];
       If[(Subscript[c, index] /. solution) == 0, Continue[]];
-
       buf = "  const int " <> ToString[GetGFIndexName[index]] <>
-      If[index == 0,
-        " = CCTK_GFINDEX3D(cctkGH, i, j, k);"
-        ,
-        " = CCTK_GFINDEX3D(cctkGH, "
-          <> "i + (D == 1 ? " <> ToString[index] <> " : 0),\n"
-          <> "                                        "
-          <> "j + (D == 2 ? " <> ToString[index] <> " : 0),\n"
-          <> "                                        "
-          <> "k + (D == 3 ? " <> ToString[index] <> " : 0));"
-      ];
+        If[index == 0,
+          " = CCTK_GFINDEX3D(cctkGH, i, j, k);"
+          ,
+          " = CCTK_GFINDEX3D(cctkGH, "
+            <> "i + (D == 1 ? " <> ToString[index] <> " : 0),\n"
+            <> "                                        "
+            <> "j + (D == 2 ? " <> ToString[index] <> " : 0),\n"
+            <> "                                        "
+            <> "k + (D == 3 ? " <> ToString[index] <> " : 0));"
+        ];
       pr[buf]
       ,
       {i, 1, Length[stencils]}
     ];
   ];
 
-PrintIndexes3DMix[accuracyord_?IntegerQ] :=
-  Module[{stencils, solution, index1, index2, buf},
+PrintIndexes3DMix2nd[accuracyord_?IntegerQ] :=
+  Module[{stencils, solution},
     stencils = GetCenteringStencils[accuracyord];
     solution = GetFiniteDifferenceCoefficients[stencils, 1];
+    pr["  constexpr int DI1 = D1 - 1;"];
+    pr["  constexpr int DI2 = D2 - 1;"];
     Do[
       index1 = stencils[[i]];
       index2 = stencils[[j]];
@@ -70,22 +68,22 @@ PrintIndexes3DMix[accuracyord_?IntegerQ] :=
         Continue[]
       ];
 
-      buf = "  const int " <> ToString[GetGFIndexNameMix[index1, index2]] <>
+      buf = "  const int " <> ToString[GetGFIndexNameMix2nd[index1, index2]] <>
       If[index1 != 0 && index2 != 0,
         If[index1 == index2,
           " = CCTK_GFINDEX3D(cctkGH, "
-            <> "i + (dir1 != 1 && dir2 != 1 ? 0 : " <> ToString[index1] <> "),\n"
+            <> "i + (D1 != 1 && D2 != 1 ? 0 : " <> ToString[index1] <> "),\n"
             <> "                                          "
-            <> "j + (dir1 != 2 && dir2 != 2 ? 0 : " <> ToString[index1] <> "),\n"
+            <> "j + (D1 != 2 && D2 != 2 ? 0 : " <> ToString[index1] <> "),\n"
             <> "                                          "
-            <> "k + (dir1 != 3 && dir2 != 3 ? 0 : " <> ToString[index1] <> "));"
+            <> "k + (D1 != 3 && D2 != 3 ? 0 : " <> ToString[index1] <> "));"
           ,
           " = CCTK_GFINDEX3D(cctkGH, "
-            <> "i + (dir1 != 1 && dir2 != 1 ? 0 : (dir1 == 1 ? " <> ToString[index1] <> " : " <> ToString[index2] <> ")),\n"
+            <> "i + (D1 != 1 && D2 != 1 ? 0 : (D1 == 1 ? " <> ToString[index1] <> " : " <> ToString[index2] <> ")),\n"
             <> "                                          "
-            <> "j + (dir1 != 2 && dir2 != 2 ? 0 : (dir1 == 2 ? " <> ToString[index1] <> " : " <> ToString[index2] <> ")),\n"
+            <> "j + (D1 != 2 && D2 != 2 ? 0 : (D1 == 2 ? " <> ToString[index1] <> " : " <> ToString[index2] <> ")),\n"
             <> "                                          "
-            <> "k + (dir1 != 3 && dir2 != 3 ? 0 : (dir1 == 3 ? " <> ToString[index1] <> " : " <> ToString[index2] <> ")));"
+            <> "k + (D1 != 3 && D2 != 3 ? 0 : (D1 == 3 ? " <> ToString[index1] <> " : " <> ToString[index2] <> ")));"
         ]
         ,
         If[index1 == 0 && index2 == 0,
@@ -93,14 +91,14 @@ PrintIndexes3DMix[accuracyord_?IntegerQ] :=
           ,
           If[index1 == 0,
             " = CCTK_GFINDEX3D(cctkGH, "
-              <> "i + (dir2 == 1 ? " <> ToString[index2] <> " : 0), "
-              <> "j + (dir2 == 2 ? " <> ToString[index2] <> " : 0), "
-              <> "k + (dir2 == 3 ? " <> ToString[index2] <> " : 0));"
+              <> "i + (D2 == 1 ? " <> ToString[index2] <> " : 0), "
+              <> "j + (D2 == 2 ? " <> ToString[index2] <> " : 0), "
+              <> "k + (D2 == 3 ? " <> ToString[index2] <> " : 0));"
             ,
             " = CCTK_GFINDEX3D(cctkGH, "
-              <> "i + (dir1 == 1 ? " <> ToString[index1] <> " : 0), "
-              <> "j + (dir1 == 2 ? " <> ToString[index1] <> " : 0), "
-              <> "k + (dir1 == 3 ? " <> ToString[index1] <> " : 0));"
+              <> "i + (D1 == 1 ? " <> ToString[index1] <> " : 0), "
+              <> "j + (D1 == 2 ? " <> ToString[index1] <> " : 0), "
+              <> "k + (D1 == 3 ? " <> ToString[index1] <> " : 0));"
           ]
         ]
       ];
@@ -126,7 +124,7 @@ PrintFDExpression[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
     pr[buf];
   ];
 
-PrintFDExpressionMix[accuracyord_?IntegerQ] :=
+PrintFDExpressionMix2nd[accuracyord_?IntegerQ] :=
   Module[{stencils, solution, buf},
     stencils = GetCenteringStencils[accuracyord];
     solution = GetFiniteDifferenceCoefficients[stencils, 1];
@@ -134,9 +132,9 @@ PrintFDExpressionMix[accuracyord_?IntegerQ] :=
       (Sum[
         index1 = stencils[[i]];
         index2 = stencils[[j]];
-        (Subscript[c, index1] /. solution) (Subscript[c, index2] /. solution) gf[[GetGFIndexNameMix[index1, index2]]],
+        (Subscript[c, index1] /. solution) (Subscript[c, index2] /. solution) gf[[GetGFIndexNameMix2nd[index1, index2]]],
         {i, 1, Length[stencils]}, {j, 1, Length[stencils]}] // Simplify)
-      idx[[dir1-1]] idx[[dir2-1]]
+      idx[[DI1]] idx[[DI2]]
     ]] <> ";";
     pr[buf];
   ];
