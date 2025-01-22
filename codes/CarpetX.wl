@@ -166,8 +166,10 @@ PrintComponentEquation::EMode = "PrintEquationMode unrecognized!";
 
 (*Protect[PrintComponentEquation];*)
 
+(******************************************************************************)
+
+(*                                Write to files                              *)
 
 (******************************************************************************)
-(*                                Write to files                              *)
-(******************************************************************************)
+
 <<Global/WriteToFiles.wl
