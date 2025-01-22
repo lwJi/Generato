@@ -189,7 +189,7 @@ Module[{outputfile = GetOutputFile[], filepointer},
   (* print first few lines *)
   pr["/* " <> FileNameTake[outputfile] <> " */"];
   pr[
-    "/* Produced with Mathematica" <>
+    "/* Produced with Generato" <>
       If[GetPrintDate[],
         " on " <> DateString[{"Month", "/", "Day", "/", "Year"}]
         ,
