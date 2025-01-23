@@ -196,3 +196,11 @@ PrintComponentEquation::EMode = "PrintEquationMode unrecognized!";
 (*                                Write to files                              *)
 (******************************************************************************)
 WriteToFile[GetOutputFile[]];
+ReplaceGFIndexName[
+  GetOutputFile[],
+  StringDrop[
+    ToString[CForm[ToExpression["gf" <> GetGridPointIndex[]]]]
+    ,
+    2
+  ] -> "(p.I)"
+];

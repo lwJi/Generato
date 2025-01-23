@@ -22,6 +22,8 @@ GetMainPrint::usage = "GetMainPrint[content] return the variable storing functio
 
 WriteToFile::usage = "WriteToFile[] writing contents to a file.";
 
+ReplaceGFIndexName::usage = "ReplaceGFIndexName[] writing contents to a file.";
+
 Begin["`Private`"];
 
 (* Data *)
@@ -89,6 +91,14 @@ WriteToFile[outputfile_] :=
   ];
 
 Protect[WriteToFile];
+
+ReplaceGFIndexName[outputfile_, replacerule_] :=
+  Module[{content},
+    content = Import[outputfile, "Text"];
+    Export[outputfile, StringReplace[content, replacerule], "Text"];
+  ];
+
+Protect[ReplaceGFIndexName];
 
 End[];
 
