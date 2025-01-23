@@ -122,7 +122,9 @@ GetInterfaceName[compname_] :=
 (******************************************************************************)
 
 PrintComponentInitialization[varinfo_, compname_] :=
-  Module[{varlistindex = GetMapComponentToVarlist[][compname], compToValue = compname // ToValues, varname, symmetry, buf, ranks},
+  Module[{varlistindex, compToValue, varname, symmetry, buf, ranks},
+    varlistindex = GetMapComponentToVarlist[][compname];
+    compToValue = compname // ToValues;
     {varname, symmetry} = varinfo;
     ranks = Length[varname];
     buf =
