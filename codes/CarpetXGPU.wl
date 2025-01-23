@@ -24,14 +24,17 @@ GetGFIndexName[index_?IntegerQ] :=
 
 GetGFIndexNameMix2nd[index1_?IntegerQ, index2_?IntegerQ] :=
   Module[{gfindex},
-    gfindex = ToString[GetGFIndexName[index1]] <> ToString[GetGFIndexName[index2]];
+    gfindex = ToString[GetGFIndexName[index1]]
+           <> ToString[GetGFIndexName[index2]];
     ToExpression[gfindex]
   ];
 
 (* Function to print FD expression *)
 
 replaceRule = Module[{cterm},
-  cterm[sign_, x_, di_] := "p.I" <> sign <> If[ToExpression[x] == 1, "", x <> "*"] <> "p.DI[" <> di <> "]";
+  cterm[sign_, x_, di_] :=
+    "p.I" <> sign <> If[ToExpression[x] == 1, "", x <> "*"]
+          <> "p.DI[" <> di <> "]";
   {
     "dx[DI]" -> "p.DX[D]",
     "[" -> "(",
@@ -57,17 +60,24 @@ PrintFDExpression[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
   ];
 
 replaceRuleMix2nd = Module[{cterm},
-  cterm[sign1_, x_, di1_, sign2_, y_, di2_] := "p.I" <> sign1 <> If[ToExpression[x] == 1, "", x <> "*"] <> "p.DI[" <> di1 <> "]"
-                                                     <> sign2 <> If[ToExpression[y] == 1, "", y <> "*"] <> "p.DI[" <> di2 <> "]";
+  cterm[sign1_, x_, di1_, sign2_, y_, di2_] :=
+    "p.I" <> sign1
+          <> If[ToExpression[x] == 1, "", x <> "*"] <> "p.DI[" <> di1 <> "]"
+          <> sign2
+          <> If[ToExpression[y] == 1, "", y <> "*"] <> "p.DI[" <> di2 <> "]";
   {
     "dx[DI1]" -> "p.DX[D1]",
     "dx[DI2]" -> "p.DX[D2]",
     "[" -> "(",
     "]" -> ")",
-    "p" ~~ x : DigitCharacter .. ~~ "p" ~~ y : DigitCharacter .. :> cterm["+", x, "D1", "+", y, "D2"],
-    "p" ~~ x : DigitCharacter .. ~~ "m" ~~ y : DigitCharacter .. :> cterm["+", x, "D1", "-", y, "D2"],
-    "m" ~~ x : DigitCharacter .. ~~ "p" ~~ y : DigitCharacter .. :> cterm["-", x, "D1", "+", y, "D2"],
-    "m" ~~ x : DigitCharacter .. ~~ "m" ~~ y : DigitCharacter .. :> cterm["-", x, "D1", "-", y, "D2"]
+    "p" ~~ x : DigitCharacter .. ~~ "p" ~~ y : DigitCharacter ..
+      :> cterm["+", x, "D1", "+", y, "D2"],
+    "p" ~~ x : DigitCharacter .. ~~ "m" ~~ y : DigitCharacter ..
+      :> cterm["+", x, "D1", "-", y, "D2"],
+    "m" ~~ x : DigitCharacter .. ~~ "p" ~~ y : DigitCharacter ..
+      :> cterm["-", x, "D1", "+", y, "D2"],
+    "m" ~~ x : DigitCharacter .. ~~ "m" ~~ y : DigitCharacter ..
+      :> cterm["-", x, "D1", "-", y, "D2"]
   }
 ];
 
@@ -79,8 +89,9 @@ PrintFDExpressionMix2nd[accuracyord_?IntegerQ] :=
       (Sum[
         index1 = stencils[[i]];
         index2 = stencils[[j]];
-        (Subscript[c, index1] /. solution) (Subscript[c, index2] /. solution) gf[[GetGFIndexNameMix2nd[index1, index2]]],
-        {i, 1, Length[stencils]}, {j, 1, Length[stencils]}] // Simplify)
+        (Subscript[c, index1] /. solution) (Subscript[c, index2] /. solution)
+        gf[[GetGFIndexNameMix2nd[index1, index2]]],
+      {i, 1, Length[stencils]}, {j, 1, Length[stencils]}] // Simplify)
       / (dx[[DI1]] dx[[DI2]])
     ]] <> ";";
     pr[StringReplace[buf, replaceRuleMix2nd]];
