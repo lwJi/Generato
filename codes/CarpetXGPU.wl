@@ -122,23 +122,30 @@ GetInterfaceName[compname_] :=
 (******************************************************************************)
 
 PrintComponentInitialization[varinfo_, compname_] :=
-  Module[{varlistindex, compToValue, varname, symmetry, buf, ranks},
+  Module[{varlistindex, compToValue, varname, symmetry, buf, len},
     varlistindex = GetMapComponentToVarlist[][compname];
     compToValue = compname // ToValues;
     {varname, symmetry} = varinfo;
-    ranks = Length[varname];
+    len = Length[varname];
     buf =
       Which[
         GetParsePrintCompInitMode[MainIn],
-          "const auto &" <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = " <> GetInterfaceName[compname] <> ";"
+          "const auto &"
+          <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
+          <> " = " <> GetInterfaceName[compname] <> ";"
         ,
         GetParsePrintCompInitMode[Derivs1st],
-          "const auto " <> ToString[compToValue] <> " = fd_1st<" <> ToString[compname[[1]][[1]]] <> ">("
-                                                              <> StringDrop[StringDrop[ToString[compToValue], 1], {-ranks, -ranks + 0}] <> ", p);"
+          "const auto " <> ToString[compToValue]
+          <> " = fd_1st<" <> ToString[compname[[1]][[1]]] <> ">("
+          <> StringDrop[StringDrop[ToString[compToValue], 1], {-len, -len + 0}]
+          <> ", p);"
         ,
         GetParsePrintCompInitMode[Derivs2nd],
-          "const auto " <> ToString[compToValue] <> " = fd_2nd<" <> ToString[compname[[1]][[1]]] <> "><" <> ToString[compname[[2]][[1]]] <> ">("
-                                                              <> StringDrop[StringDrop[ToString[compToValue], 2], {-ranks, -ranks + 1}] <> ", p);"
+          "const auto " <> ToString[compToValue]
+          <> " = fd_2nd<" <> ToString[compname[[1]][[1]]] <> "><"
+          <> ToString[compname[[2]][[1]]] <> ">("
+          <> StringDrop[StringDrop[ToString[compToValue], 2], {-len, -len + 1}]
+          <> ", p);"
         ,
         GetParsePrintCompInitMode[Temp],
           buf = "auto " <> ToString[compToValue] <> ";"
