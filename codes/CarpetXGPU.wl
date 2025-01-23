@@ -156,7 +156,8 @@ PrintComponentInitialization[varinfo_, compname_] :=
     pr[buf];
   ];
 
-PrintComponentInitialization::EMode = "PrintComponentInitialization mode unrecognized!";
+PrintComponentInitialization::EMode =
+  "PrintComponentInitialization mode unrecognized!";
 
 (*Protect[PrintComponentInitialization];*)
 
