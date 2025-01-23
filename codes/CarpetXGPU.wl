@@ -28,86 +28,16 @@ GetGFIndexNameMix2nd[index1_?IntegerQ, index2_?IntegerQ] :=
     ToExpression[gfindex]
   ];
 
-(* Function to print 3D indexes *)
-
-PrintIndexes3D[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
-  Module[{stencils, solution},
-    stencils = GetCenteringStencils[accuracyord];
-    solution = GetFiniteDifferenceCoefficients[stencils, fdord];
-    pr["  constexpr int DI = D - 1;"];
-    Do[
-      index = stencils[[i]];
-      If[(Subscript[c, index] /. solution) == 0, Continue[]];
-      buf = "  const int " <> ToString[GetGFIndexName[index]] <>
-        If[index == 0,
-          " = CCTK_GFINDEX3D(cctkGH, i, j, k);"
-          ,
-          " = CCTK_GFINDEX3D(cctkGH, "
-            <> "i + (D == 1 ? " <> ToString[index] <> " : 0),\n"
-            <> "                                        "
-            <> "j + (D == 2 ? " <> ToString[index] <> " : 0),\n"
-            <> "                                        "
-            <> "k + (D == 3 ? " <> ToString[index] <> " : 0));"
-        ];
-      pr[buf]
-      ,
-      {i, 1, Length[stencils]}
-    ];
-  ];
-
-PrintIndexes3DMix2nd[accuracyord_?IntegerQ] :=
-  Module[{stencils, solution},
-    stencils = GetCenteringStencils[accuracyord];
-    solution = GetFiniteDifferenceCoefficients[stencils, 1];
-    pr["  constexpr int DI1 = D1 - 1;"];
-    pr["  constexpr int DI2 = D2 - 1;"];
-    Do[
-      index1 = stencils[[i]];
-      index2 = stencils[[j]];
-      If[(Subscript[c, index1] /. solution) == 0 || (Subscript[c, index2] /. solution) == 0,
-        Continue[]
-      ];
-      buf = "  const int " <> ToString[GetGFIndexNameMix2nd[index1, index2]] <>
-        If[index1 != 0 && index2 != 0,
-          If[index1 == index2,
-            " = CCTK_GFINDEX3D(cctkGH, "
-              <> "i + (D1 != 1 && D2 != 1 ? 0 : " <> ToString[index1] <> "),\n"
-              <> "                                          "
-              <> "j + (D1 != 2 && D2 != 2 ? 0 : " <> ToString[index1] <> "),\n"
-              <> "                                          "
-              <> "k + (D1 != 3 && D2 != 3 ? 0 : " <> ToString[index1] <> "));"
-            ,
-            " = CCTK_GFINDEX3D(cctkGH, "
-              <> "i + (D1 != 1 && D2 != 1 ? 0 : (D1 == 1 ? " <> ToString[index1] <> " : " <> ToString[index2] <> ")),\n"
-              <> "                                          "
-              <> "j + (D1 != 2 && D2 != 2 ? 0 : (D1 == 2 ? " <> ToString[index1] <> " : " <> ToString[index2] <> ")),\n"
-              <> "                                          "
-              <> "k + (D1 != 3 && D2 != 3 ? 0 : (D1 == 3 ? " <> ToString[index1] <> " : " <> ToString[index2] <> ")));"
-          ]
-          ,
-          If[index1 == 0 && index2 == 0,
-            " = CCTK_GFINDEX3D(cctkGH, i, j, k);"
-            ,
-            If[index1 == 0,
-              " = CCTK_GFINDEX3D(cctkGH, "
-                <> "i + (D2 == 1 ? " <> ToString[index2] <> " : 0), "
-                <> "j + (D2 == 2 ? " <> ToString[index2] <> " : 0), "
-                <> "k + (D2 == 3 ? " <> ToString[index2] <> " : 0));"
-              ,
-              " = CCTK_GFINDEX3D(cctkGH, "
-                <> "i + (D1 == 1 ? " <> ToString[index1] <> " : 0), "
-                <> "j + (D1 == 2 ? " <> ToString[index1] <> " : 0), "
-                <> "k + (D1 == 3 ? " <> ToString[index1] <> " : 0));"
-            ]
-          ]
-        ];
-      pr[buf]
-      ,
-      {i, 1, Length[stencils]}, {j, 1, Length[stencils]}
-    ];
-  ];
-
 (* Function to print FD expression *)
+
+replaceRule = {
+  "dx[DI]" -> "p.DX[D]",
+  "[" -> "(",
+  "]" -> ")",
+  "c0" -> "p.I",
+  "p" ~~ x : DigitCharacter .. :> "p.I + " <> If[ToExpression[x] == 1, "", x <> "*"] <> "p.DI[D]",
+  "m" ~~ x : DigitCharacter .. :> "p.I - " <> If[ToExpression[x] == 1, "", x <> "*"] <> "p.DI[D]"
+};
 
 PrintFDExpression[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
   Module[{stencils, solution, buf},
@@ -118,10 +48,29 @@ PrintFDExpression[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
         index = stencils[[i]];
         (Subscript[c, index] /. solution) gf[[GetGFIndexName[index]]],
         {i, 1, Length[stencils]}] // Simplify)
-      Product[idx[[DI]], {i, 1, fdord}]
+      / Product[dx[[DI]], {i, 1, fdord}]
     ]] <> ";";
-    pr[buf];
+    pr[StringReplace[buf, replaceRule]];
   ];
+
+replaceRuleMix2nd = {
+  "dx[DI1]" -> "p.DX[D1]",
+  "dx[DI2]" -> "p.DX[D2]",
+  "[" -> "(",
+  "]" -> ")",
+  "p" ~~ x : DigitCharacter .. ~~ "p" ~~ y : DigitCharacter .. :> "p.I"
+    <> "+" <> If[ToExpression[x] == 1, "", x <> "*"] <> "p.DI[D1]"
+    <> "+" <> If[ToExpression[y] == 1, "", y <> "*"] <> "p.DI[D2]",
+  "p" ~~ x : DigitCharacter .. ~~ "m" ~~ y : DigitCharacter .. :> "p.I"
+    <> "+" <> If[ToExpression[x] == 1, "", x <> "*"] <> "p.DI[D1]"
+    <> "-" <> If[ToExpression[y] == 1, "", y <> "*"] <> "p.DI[D2]",
+  "m" ~~ x : DigitCharacter .. ~~ "p" ~~ y : DigitCharacter .. :> "p.I"
+    <> "-" <> If[ToExpression[x] == 1, "", x <> "*"] <> "p.DI[D1]"
+    <> "+" <> If[ToExpression[y] == 1, "", y <> "*"] <> "p.DI[D2]",
+  "m" ~~ x : DigitCharacter .. ~~ "m" ~~ y : DigitCharacter .. :> "p.I"
+    <> "-" <> If[ToExpression[x] == 1, "", x <> "*"] <> "p.DI[D1]"
+    <> "-" <> If[ToExpression[y] == 1, "", y <> "*"] <> "p.DI[D2]"
+};
 
 PrintFDExpressionMix2nd[accuracyord_?IntegerQ] :=
   Module[{stencils, solution, buf},
@@ -133,9 +82,9 @@ PrintFDExpressionMix2nd[accuracyord_?IntegerQ] :=
         index2 = stencils[[j]];
         (Subscript[c, index1] /. solution) (Subscript[c, index2] /. solution) gf[[GetGFIndexNameMix2nd[index1, index2]]],
         {i, 1, Length[stencils]}, {j, 1, Length[stencils]}] // Simplify)
-      idx[[DI1]] idx[[DI2]]
+      / (dx[[DI1]] dx[[DI2]])
     ]] <> ";";
-    pr[buf];
+    pr[StringReplace[buf, replaceRuleMix2nd]];
   ];
 
 (******************************************************************************)
