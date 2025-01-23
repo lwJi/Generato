@@ -122,17 +122,100 @@ GetInterfaceName[compname_] :=
 (******************************************************************************)
 
 PrintComponentInitialization[varinfo_, compname_] :=
-  Module[{varlistindex, compToValue, varname, symmetry, buf, len},
+  Module[{varlistindex, compToValue, varname, symmetry, buf, subbuf, len},
     varlistindex = GetMapComponentToVarlist[][compname];
     compToValue = compname // ToValues;
     {varname, symmetry} = varinfo;
     len = Length[varname];
+
+    (* set subbuf *)
+    subbuf =
+      Which[
+        GetParsePrintCompInitTensorType[Scal],
+          Which[
+            len == 0, ""
+            ,
+            len == 1, "(" <> ToString[compname[[1]][[1]] - 1] <> ")"
+            ,
+            len == 2,
+              If[symmetry =!= Null,
+                "(" <> ToString[compname[[1]][[1]] - 1] <> ","
+                    <> ToString[compname[[2]][[1]] - 1] <> ")"
+                ,
+                "(" <> ToString[compname[[1]][[1]] - 1] <> ")("
+                    <> ToString[compname[[2]][[1]] - 1] <> ")"
+              ]
+            ,
+            len == 3, "(" <> ToString[compname[[1]][[1]] - 1] <> ")("
+                          <> ToString[compname[[2]][[1]] - 1] <> ","
+                          <> ToString[compname[[3]][[1]] - 1] <> ")"
+            ,
+            True,
+              Throw @ Message[PrintComponentInitialization::EVarLength]
+          ]
+        ,
+        GetParsePrintCompInitTensorType[Vect],
+          Which[
+            len == 1,
+              subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> ")"
+            ,
+            len == 2,
+              subbuf = "(" <> ToString[compname[[2]][[1]] - 1] <> ")("
+                           <> ToString[compname[[1]][[1]] - 1] <> ")"
+            ,
+            len == 3,
+              If[symmetry =!= Null,
+                subbuf = "(" <> ToString[compname[[2]][[1]] - 1] <> ","
+                             <> ToString[compname[[3]][[1]] - 1] <> ")("
+                             <> ToString[compname[[1]][[1]] - 1] <> ")"
+                ,
+                subbuf = "(" <> ToString[compname[[2]][[1]] - 1] <> ")("
+                             <> ToString[compname[[3]][[1]] - 1] <> ")("
+                             <> ToString[compname[[1]][[1]] - 1] <> ")"
+              ]
+            ,
+            len == 4,
+              subbuf = "(" <> ToString[compname[[2]][[1]] - 1] <> ")("
+                           <> ToString[compname[[3]][[1]] - 1] <> ","
+                           <> ToString[compname[[4]][[1]] - 1] <> ")("
+                           <> ToString[compname[[1]][[1]] - 1] <> ")"
+            ,
+            True,
+              Throw @ Message[PrintComponentInitialization::EVarLength]
+          ]
+        ,
+        GetParsePrintCompInitTensorType[Smat],
+          Which[
+            len == 2,
+              subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> ","
+                           <> ToString[compname[[2]][[1]] - 1] <> ")"
+            ,
+            len == 3,
+              subbuf = "(" <> ToString[compname[[3]][[1]] - 1] <> ")("
+                           <> ToString[compname[[1]][[1]] - 1] <> ","
+                           <> ToString[compname[[2]][[1]] - 1] <> ")"
+            ,
+            len == 4,
+              subbuf = "(" <> ToString[compname[[3]][[1]] - 1] <> ","
+                           <> ToString[compname[[4]][[1]] - 1] <> ")("
+                           <> ToString[compname[[1]][[1]] - 1] <> ","
+                           <> ToString[compname[[2]][[1]] - 1] <> ")"
+            ,
+            True,
+              Throw @ Message[PrintComponentInitialization::EVarLength]
+          ]
+        ,
+        True,
+          Throw @ Message[PrintComponentInitialization::EMode]
+      ];
+
+    (* set buf *)
     buf =
       Which[
         GetParsePrintCompInitMode[MainIn],
           "const auto &"
           <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
-          <> " = " <> GetInterfaceName[compname] <> ";"
+          <> " = gf_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
         ,
         GetParsePrintCompInitMode[Derivs1st],
           "const auto " <> ToString[compToValue]
@@ -158,6 +241,9 @@ PrintComponentInitialization[varinfo_, compname_] :=
 
 PrintComponentInitialization::EMode =
   "PrintComponentInitialization mode unrecognized!";
+
+PrintComponentInitialization::EVarLength =
+  "PrintComponentInitialization variable's tensor type unsupported!";
 
 (*Protect[PrintComponentInitialization];*)
 
