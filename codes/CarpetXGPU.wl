@@ -30,14 +30,18 @@ GetGFIndexNameMix2nd[index1_?IntegerQ, index2_?IntegerQ] :=
 
 (* Function to print FD expression *)
 
-replaceRule = {
-  "dx[DI]" -> "p.DX[D]",
-  "[" -> "(",
-  "]" -> ")",
-  "c0" -> "p.I",
-  "p" ~~ x : DigitCharacter .. :> "p.I + " <> If[ToExpression[x] == 1, "", x <> "*"] <> "p.DI[D]",
-  "m" ~~ x : DigitCharacter .. :> "p.I - " <> If[ToExpression[x] == 1, "", x <> "*"] <> "p.DI[D]"
-};
+
+replaceRule = Module[{cterm},
+  cterm[sign_, x_, di_] := "p.I" <> sign <> If[ToExpression[x] == 1, "", x <> "*"] <> "p.DI[" <> di <> "]";
+  {
+    "dx[DI]" -> "p.DX[D]",
+    "[" -> "(",
+    "]" -> ")",
+    "c0" -> "p.I",
+    "p" ~~ x : DigitCharacter .. :> cterm["+", x, "D"],
+    "m" ~~ x : DigitCharacter .. :> cterm["-", x, "D"]
+  }
+];
 
 PrintFDExpression[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
   Module[{stencils, solution, buf},
@@ -53,24 +57,21 @@ PrintFDExpression[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
     pr[StringReplace[buf, replaceRule]];
   ];
 
-replaceRuleMix2nd = {
-  "dx[DI1]" -> "p.DX[D1]",
-  "dx[DI2]" -> "p.DX[D2]",
-  "[" -> "(",
-  "]" -> ")",
-  "p" ~~ x : DigitCharacter .. ~~ "p" ~~ y : DigitCharacter .. :> "p.I"
-    <> "+" <> If[ToExpression[x] == 1, "", x <> "*"] <> "p.DI[D1]"
-    <> "+" <> If[ToExpression[y] == 1, "", y <> "*"] <> "p.DI[D2]",
-  "p" ~~ x : DigitCharacter .. ~~ "m" ~~ y : DigitCharacter .. :> "p.I"
-    <> "+" <> If[ToExpression[x] == 1, "", x <> "*"] <> "p.DI[D1]"
-    <> "-" <> If[ToExpression[y] == 1, "", y <> "*"] <> "p.DI[D2]",
-  "m" ~~ x : DigitCharacter .. ~~ "p" ~~ y : DigitCharacter .. :> "p.I"
-    <> "-" <> If[ToExpression[x] == 1, "", x <> "*"] <> "p.DI[D1]"
-    <> "+" <> If[ToExpression[y] == 1, "", y <> "*"] <> "p.DI[D2]",
-  "m" ~~ x : DigitCharacter .. ~~ "m" ~~ y : DigitCharacter .. :> "p.I"
-    <> "-" <> If[ToExpression[x] == 1, "", x <> "*"] <> "p.DI[D1]"
-    <> "-" <> If[ToExpression[y] == 1, "", y <> "*"] <> "p.DI[D2]"
-};
+
+replaceRuleMix2nd = Module[{cterm},
+  cterm[sign1_, x_, di1_, sign2_, y_, di2_] := "p.I" <> sign1 <> If[ToExpression[x] == 1, "", x <> "*"] <> "p.DI[" <> di1 <> "]"
+                                                     <> sign2 <> If[ToExpression[y] == 1, "", y <> "*"] <> "p.DI[" <> di2 <> "]";
+  {
+    "dx[DI1]" -> "p.DX[D1]",
+    "dx[DI2]" -> "p.DX[D2]",
+    "[" -> "(",
+    "]" -> ")",
+    "p" ~~ x : DigitCharacter .. ~~ "p" ~~ y : DigitCharacter .. :> cterm["+", x, "D1", "+", y, "D2"],
+    "p" ~~ x : DigitCharacter .. ~~ "m" ~~ y : DigitCharacter .. :> cterm["+", x, "D1", "-", y, "D2"],
+    "m" ~~ x : DigitCharacter .. ~~ "p" ~~ y : DigitCharacter .. :> cterm["-", x, "D1", "+", y, "D2"],
+    "m" ~~ x : DigitCharacter .. ~~ "m" ~~ y : DigitCharacter .. :> cterm["-", x, "D1", "-", y, "D2"]
+  }
+];
 
 PrintFDExpressionMix2nd[accuracyord_?IntegerQ] :=
   Module[{stencils, solution, buf},
