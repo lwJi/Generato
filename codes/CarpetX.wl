@@ -172,4 +172,4 @@ PrintComponentEquation::EMode = "PrintEquationMode unrecognized!";
 
 (******************************************************************************)
 
-<<Global/WriteToFiles.wl
+WriteToFile[GetOutputFile[]];
