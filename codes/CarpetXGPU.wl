@@ -30,7 +30,6 @@ GetGFIndexNameMix2nd[index1_?IntegerQ, index2_?IntegerQ] :=
 
 (* Function to print FD expression *)
 
-
 replaceRule = Module[{cterm},
   cterm[sign_, x_, di_] := "p.I" <> sign <> If[ToExpression[x] == 1, "", x <> "*"] <> "p.DI[" <> di <> "]";
   {
@@ -56,7 +55,6 @@ PrintFDExpression[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
     ]] <> ";";
     pr[StringReplace[buf, replaceRule]];
   ];
-
 
 replaceRuleMix2nd = Module[{cterm},
   cterm[sign1_, x_, di1_, sign2_, y_, di2_] := "p.I" <> sign1 <> If[ToExpression[x] == 1, "", x <> "*"] <> "p.DI[" <> di1 <> "]"
@@ -87,6 +85,7 @@ PrintFDExpressionMix2nd[accuracyord_?IntegerQ] :=
     ]] <> ";";
     pr[StringReplace[buf, replaceRuleMix2nd]];
   ];
+
 
 (******************************************************************************)
 (*                               Misc functions                               *)
@@ -121,16 +120,12 @@ PrintComponentInitialization[varinfo_, compname_] :=
           "const auto &" <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = " <> GetInterfaceName[compname] <> ";"
         ,
         GetParsePrintCompInitMode[Derivs1st],
-          "const auto " <> ToString[compToValue] <> " = fd_1st<" <> ToString[compname[[1]][[1]]] <> ">(cctkGH, "
-                                                              <> StringDrop[StringDrop[ToString[compToValue], 1], {-ranks, -ranks + 0}] <> ", i, j, k);"
+          "const auto " <> ToString[compToValue] <> " = fd_1st<" <> ToString[compname[[1]][[1]]] <> ">("
+                                                              <> StringDrop[StringDrop[ToString[compToValue], 1], {-ranks, -ranks + 0}] <> ", p);"
         ,
         GetParsePrintCompInitMode[Derivs2nd],
-          "const auto " <> ToString[compToValue] <> " = fd_2nd<" <> ToString[compname[[1]][[1]]] <> "><" <> ToString[compname[[2]][[1]]] <> ">(cctkGH, "
-                                                              <> StringDrop[StringDrop[ToString[compToValue], 2], {-ranks, -ranks + 1}] <> ", i, j, k);"
-        ,
-        GetParsePrintCompInitMode[PreDerivs1st],
-          ToString[CForm[compToValue]] <> " = fd_1st(" <> StringDrop[StringDrop[StringTrim[ToString[compToValue], GetGridPointIndex[]], 1], {-ranks, -ranks + 0}]
-                                                       <> ", i, j, k, " <> ToString[compname[[1]][[1]]] <> ");"
+          "const auto " <> ToString[compToValue] <> " = fd_2nd<" <> ToString[compname[[1]][[1]]] <> "><" <> ToString[compname[[2]][[1]]] <> ">("
+                                                              <> StringDrop[StringDrop[ToString[compToValue], 2], {-ranks, -ranks + 1}] <> ", p);"
         ,
         GetParsePrintCompInitMode[Temp],
           buf = "auto " <> ToString[compToValue] <> ";"
