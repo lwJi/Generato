@@ -179,27 +179,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
     subbuf =
       Which[
         GetParsePrintCompInitTensorType[Scal],
-          Which[
-            len == 0, ""
-            ,
-            len == 1, "(" <> ToString[compname[[1]][[1]] - 1] <> ")"
-            ,
-            len == 2,
-              If[symmetry =!= Null,
-                "(" <> ToString[compname[[1]][[1]] - 1] <> ","
-                    <> ToString[compname[[2]][[1]] - 1] <> ")"
-                ,
-                "(" <> ToString[compname[[1]][[1]] - 1] <> ")("
-                    <> ToString[compname[[2]][[1]] - 1] <> ")"
-              ]
-            ,
-            len == 3, "(" <> ToString[compname[[1]][[1]] - 1] <> ")("
-                          <> ToString[compname[[2]][[1]] - 1] <> ","
-                          <> ToString[compname[[3]][[1]] - 1] <> ")"
-            ,
-            True,
-              Throw @ Message[PrintComponentInitialization::EVarLength]
-          ]
+          "[" <> ToString[varlistindex] <> "]"
         ,
         GetParsePrintCompInitTensorType[Vect],
           Which[
