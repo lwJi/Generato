@@ -24,7 +24,8 @@ GetGFIndexName[index_?IntegerQ] :=
 
 GetGFIndexNameMix2nd[index1_?IntegerQ, index2_?IntegerQ] :=
   Module[{gfindex},
-    gfindex = ToString[GetGFIndexName[index1]] <> ToString[GetGFIndexName[index2]];
+    gfindex = ToString[GetGFIndexName[index1]]
+           <> ToString[GetGFIndexName[index2]];
     ToExpression[gfindex]
   ];
 
@@ -64,7 +65,8 @@ PrintIndexes3DMix2nd[accuracyord_?IntegerQ] :=
     Do[
       index1 = stencils[[i]];
       index2 = stencils[[j]];
-      If[(Subscript[c, index1] /. solution) == 0 || (Subscript[c, index2] /. solution) == 0,
+      If[(Subscript[c, index1] /. solution) == 0 ||
+         (Subscript[c, index2] /. solution) == 0,
         Continue[]
       ];
       buf = "  const int " <> ToString[GetGFIndexNameMix2nd[index1, index2]] <>
@@ -78,11 +80,14 @@ PrintIndexes3DMix2nd[accuracyord_?IntegerQ] :=
               <> "k + (D1 != 3 && D2 != 3 ? 0 : " <> ToString[index1] <> "));"
             ,
             " = CCTK_GFINDEX3D(cctkGH, "
-              <> "i + (D1 != 1 && D2 != 1 ? 0 : (D1 == 1 ? " <> ToString[index1] <> " : " <> ToString[index2] <> ")),\n"
+              <> "i + (D1 != 1 && D2 != 1 ? 0 : (D1 == 1 ? "
+              <> ToString[index1] <> " : " <> ToString[index2] <> ")),\n"
               <> "                                          "
-              <> "j + (D1 != 2 && D2 != 2 ? 0 : (D1 == 2 ? " <> ToString[index1] <> " : " <> ToString[index2] <> ")),\n"
+              <> "j + (D1 != 2 && D2 != 2 ? 0 : (D1 == 2 ? "
+              <> ToString[index1] <> " : " <> ToString[index2] <> ")),\n"
               <> "                                          "
-              <> "k + (D1 != 3 && D2 != 3 ? 0 : (D1 == 3 ? " <> ToString[index1] <> " : " <> ToString[index2] <> ")));"
+              <> "k + (D1 != 3 && D2 != 3 ? 0 : (D1 == 3 ? "
+              <> ToString[index1] <> " : " <> ToString[index2] <> ")));"
           ]
           ,
           If[index1 == 0 && index2 == 0,
@@ -131,12 +136,14 @@ PrintFDExpressionMix2nd[accuracyord_?IntegerQ] :=
       (Sum[
         index1 = stencils[[i]];
         index2 = stencils[[j]];
-        (Subscript[c, index1] /. solution) (Subscript[c, index2] /. solution) gf[[GetGFIndexNameMix2nd[index1, index2]]],
-        {i, 1, Length[stencils]}, {j, 1, Length[stencils]}] // Simplify)
+        (Subscript[c, index1] /. solution) (Subscript[c, index2] /. solution)
+        gf[[GetGFIndexNameMix2nd[index1, index2]]],
+      {i, 1, Length[stencils]}, {j, 1, Length[stencils]}] // Simplify)
       idx[[DI1]] idx[[DI2]]
     ]] <> ";";
     pr[buf];
   ];
+
 
 (******************************************************************************)
 (*                               Misc functions                               *)
@@ -162,25 +169,119 @@ GetInterfaceName[compname_] :=
 (******************************************************************************)
 
 PrintComponentInitialization[varinfo_, compname_] :=
-  Module[{varlistindex = GetMapComponentToVarlist[][compname], compToValue = compname // ToValues, varname, symmetry, buf, ranks},
+  Module[{varlistindex, compToValue, varname, symmetry, buf, len},
+    varlistindex = GetMapComponentToVarlist[][compname];
+    compToValue = compname // ToValues;
     {varname, symmetry} = varinfo;
-    ranks = Length[varname];
+    len = Length[varname];
+
+    (* set subbuf *)
+    subbuf =
+      Which[
+        GetParsePrintCompInitTensorType[Scal],
+          Which[
+            len == 0, ""
+            ,
+            len == 1, "(" <> ToString[compname[[1]][[1]] - 1] <> ")"
+            ,
+            len == 2,
+              If[symmetry =!= Null,
+                "(" <> ToString[compname[[1]][[1]] - 1] <> ","
+                    <> ToString[compname[[2]][[1]] - 1] <> ")"
+                ,
+                "(" <> ToString[compname[[1]][[1]] - 1] <> ")("
+                    <> ToString[compname[[2]][[1]] - 1] <> ")"
+              ]
+            ,
+            len == 3, "(" <> ToString[compname[[1]][[1]] - 1] <> ")("
+                          <> ToString[compname[[2]][[1]] - 1] <> ","
+                          <> ToString[compname[[3]][[1]] - 1] <> ")"
+            ,
+            True,
+              Throw @ Message[PrintComponentInitialization::EVarLength]
+          ]
+        ,
+        GetParsePrintCompInitTensorType[Vect],
+          Which[
+            len == 1,
+              subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> ")"
+            ,
+            len == 2,
+              subbuf = "(" <> ToString[compname[[2]][[1]] - 1] <> ")("
+                           <> ToString[compname[[1]][[1]] - 1] <> ")"
+            ,
+            len == 3,
+              If[symmetry =!= Null,
+                subbuf = "(" <> ToString[compname[[2]][[1]] - 1] <> ","
+                             <> ToString[compname[[3]][[1]] - 1] <> ")("
+                             <> ToString[compname[[1]][[1]] - 1] <> ")"
+                ,
+                subbuf = "(" <> ToString[compname[[2]][[1]] - 1] <> ")("
+                             <> ToString[compname[[3]][[1]] - 1] <> ")("
+                             <> ToString[compname[[1]][[1]] - 1] <> ")"
+              ]
+            ,
+            len == 4,
+              subbuf = "(" <> ToString[compname[[2]][[1]] - 1] <> ")("
+                           <> ToString[compname[[3]][[1]] - 1] <> ","
+                           <> ToString[compname[[4]][[1]] - 1] <> ")("
+                           <> ToString[compname[[1]][[1]] - 1] <> ")"
+            ,
+            True,
+              Throw @ Message[PrintComponentInitialization::EVarLength]
+          ]
+        ,
+        GetParsePrintCompInitTensorType[Smat],
+          Which[
+            len == 2,
+              subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> ","
+                           <> ToString[compname[[2]][[1]] - 1] <> ")"
+            ,
+            len == 3,
+              subbuf = "(" <> ToString[compname[[3]][[1]] - 1] <> ")("
+                           <> ToString[compname[[1]][[1]] - 1] <> ","
+                           <> ToString[compname[[2]][[1]] - 1] <> ")"
+            ,
+            len == 4,
+              subbuf = "(" <> ToString[compname[[3]][[1]] - 1] <> ","
+                           <> ToString[compname[[4]][[1]] - 1] <> ")("
+                           <> ToString[compname[[1]][[1]] - 1] <> ","
+                           <> ToString[compname[[2]][[1]] - 1] <> ")"
+            ,
+            True,
+              Throw @ Message[PrintComponentInitialization::EVarLength]
+          ]
+        ,
+        True,
+          Throw @ Message[PrintComponentInitialization::EMode]
+      ];
+
+    (* set buf *)
     buf =
       Which[
-        GetParsePrintCompInitMode[MainIn],
-          "const auto &" <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = " <> GetInterfaceName[compname] <> ";"
+        GetParsePrintCompInitMode[MainIn] || GetParsePrintCompInitMode[MainOut],
+          "const auto &"
+          <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
+          <> " = gf_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
         ,
         GetParsePrintCompInitMode[Derivs1st],
-          "const auto " <> ToString[compToValue] <> " = fd_1st<" <> ToString[compname[[1]][[1]]] <> ">(cctkGH, "
-                                                              <> StringDrop[StringDrop[ToString[compToValue], 1], {-ranks, -ranks + 0}] <> ", i, j, k);"
+          "const auto " <> ToString[compToValue]
+          <> " = fd_1st<" <> ToString[compname[[1]][[1]]] <> ">(cctkGH, "
+          <> StringDrop[StringDrop[ToString[compToValue], 1], {-len, -len + 0}]
+          <> ", i, j, k);"
         ,
         GetParsePrintCompInitMode[Derivs2nd],
-          "const auto " <> ToString[compToValue] <> " = fd_2nd<" <> ToString[compname[[1]][[1]]] <> "><" <> ToString[compname[[2]][[1]]] <> ">(cctkGH, "
-                                                              <> StringDrop[StringDrop[ToString[compToValue], 2], {-ranks, -ranks + 1}] <> ", i, j, k);"
+          "const auto " <> ToString[compToValue]
+          <> " = fd_2nd<" <> ToString[compname[[1]][[1]]] <> ", "
+          <> ToString[compname[[2]][[1]]] <> ">(cctkGH, "
+          <> StringDrop[StringDrop[ToString[compToValue], 2], {-len, -len + 1}]
+          <> ", i, j, k);"
         ,
         GetParsePrintCompInitMode[PreDerivs1st],
-          ToString[CForm[compToValue]] <> " = fd_1st(" <> StringDrop[StringDrop[StringTrim[ToString[compToValue], GetGridPointIndex[]], 1], {-ranks, -ranks + 0}]
-                                                       <> ", i, j, k, " <> ToString[compname[[1]][[1]]] <> ");"
+          ToString[CForm[compToValue]] <> " = fd_1st("
+          <> StringDrop[StringDrop[StringTrim[
+            ToString[compToValue], GetGridPointIndex[]], 1], {-len, -len + 0}]
+          <> ", i, j, k, " <> ToString[compname[[1]][[1]]] <> ");"
         ,
         GetParsePrintCompInitMode[Temp],
           buf = "auto " <> ToString[compToValue] <> ";"
@@ -191,7 +292,11 @@ PrintComponentInitialization[varinfo_, compname_] :=
     pr[buf];
   ];
 
-PrintComponentInitialization::EMode = "PrintComponentInitialization mode unrecognized!";
+PrintComponentInitialization::EMode =
+  "PrintComponentInitialization mode unrecognized!";
+
+PrintComponentInitialization::EVarLength =
+  "PrintComponentInitialization variable's tensor type unsupported!";
 
 (*Protect[PrintComponentInitialization];*)
 
