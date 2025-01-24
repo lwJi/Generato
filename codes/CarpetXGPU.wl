@@ -212,7 +212,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
     (* set buf *)
     buf =
       Which[
-        GetParsePrintCompInitMode[MainIn],
+        GetParsePrintCompInitMode[MainIn] || GetParsePrintCompInitMode[MainOut],
           "const auto &"
           <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
           <> " = gf_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
@@ -225,7 +225,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
         ,
         GetParsePrintCompInitMode[Derivs2nd],
           "const auto " <> ToString[compToValue]
-          <> " = fd_2nd<" <> ToString[compname[[1]][[1]]] <> "><"
+          <> " = fd_2nd<" <> ToString[compname[[1]][[1]]] <> ", "
           <> ToString[compname[[2]][[1]]] <> ">("
           <> StringDrop[StringDrop[ToString[compToValue], 2], {-len, -len + 1}]
           <> ", p);"

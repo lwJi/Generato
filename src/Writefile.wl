@@ -95,7 +95,7 @@ Protect[WriteToFile];
 ReplaceGFIndexName[outputfile_, replacerule_] :=
   Module[{content},
     content = Import[outputfile, "Text"];
-    Export[outputfile, StringReplace[content, replacerule], "Text"];
+    Export[outputfile, StringReplace[content, replacerule] <> "\n", "Text"];
   ];
 
 Protect[ReplaceGFIndexName];
