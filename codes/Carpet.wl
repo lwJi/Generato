@@ -179,7 +179,11 @@ PrintComponentInitialization[varinfo_, compname_] :=
     subbuf =
       Which[
         GetParsePrintCompInitTensorType[Scal],
-          "[" <> ToString[varlistindex] <> "]"
+          If[len == 0,
+            ""
+            ,
+            "[" <> ToString[varlistindex] <> "]"
+          ]
         ,
         GetParsePrintCompInitTensorType[Vect],
           Which[
