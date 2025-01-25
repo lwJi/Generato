@@ -31,60 +31,62 @@ GetGFIndexNameMix2nd[index1_?IntegerQ, index2_?IntegerQ] :=
 
 (* Function to print FD expression *)
 
-replaceRule = Module[{cterm},
-  cterm[sign_, x_, di_] :=
-    "p.I" <> sign <> If[ToExpression[x] == 1, "", x <> "*"]
-          <> "p.DI[" <> di <> "]";
-  {
-    "dx[DI]" -> "p.DX[D]",
-    "[" -> "(",
-    "]" -> ")",
-    "c0" -> "p.I",
-    "p" ~~ x : DigitCharacter .. :> cterm["+", x, "D"],
-    "m" ~~ x : DigitCharacter .. :> cterm["-", x, "D"]
-  }
-];
-
-PrintFDExpression[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
-  Module[{stencils, solution, buf},
-    stencils = GetCenteringStencils[accuracyord];
-    solution = GetFiniteDifferenceCoefficients[stencils, fdord];
+PrintFDExpression[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strDir_?StringQ] :=
+  Module[{stencils, solution, buf, cterm, rule},
+    (* Helper function to format coefficients *)
+    cterm[sign_, x_, dir_] :=
+      "p.I" <> sign
+            <> If[ToExpression[x] == 1, "", x <> "*"] <> "p.DI[" <> dir <> "]";
+    (* Rules for string replacements *)
+    rule = {
+      "dx" -> "p.DX[" <> strDir <> "]",
+      "[" -> "(",
+      "]" -> ")",
+      "c0" -> "p.I",
+      "p" ~~ x : DigitCharacter .. :> cterm["+", x, strDir],
+      "m" ~~ x : DigitCharacter .. :> cterm["-", x, strDir]
+    };
+    (* Get stencils and finite difference coefficients *)
+    stencils = GetCenteringStencils[accuracyOrd];
+    solution = GetFiniteDifferenceCoefficients[stencils, fdOrd];
+    (* Construct the finite difference expression *)
     buf = "    " <> ToString[CForm[
       (Sum[
         index = stencils[[i]];
         (Subscript[c, index] /. solution) gf[[GetGFIndexName[index]]],
         {i, 1, Length[stencils]}] // Simplify)
-      / Product[dx[[DI]], {i, 1, fdord}]
+      / Product[dx, {i, 1, fdOrd}]
     ]] <> ";";
-    pr[StringReplace[buf, replaceRule]];
+    pr[StringReplace[buf, rule]];
   ];
 
-replaceRuleMix2nd = Module[{cterm},
-  cterm[sign1_, x_, di1_, sign2_, y_, di2_] :=
-    "p.I" <> sign1
-          <> If[ToExpression[x] == 1, "", x <> "*"] <> "p.DI[" <> di1 <> "]"
-          <> sign2
-          <> If[ToExpression[y] == 1, "", y <> "*"] <> "p.DI[" <> di2 <> "]";
-  {
-    "dx[DI1]" -> "p.DX[D1]",
-    "dx[DI2]" -> "p.DX[D2]",
-    "[" -> "(",
-    "]" -> ")",
-    "p" ~~ x : DigitCharacter .. ~~ "p" ~~ y : DigitCharacter ..
-      :> cterm["+", x, "D1", "+", y, "D2"],
-    "p" ~~ x : DigitCharacter .. ~~ "m" ~~ y : DigitCharacter ..
-      :> cterm["+", x, "D1", "-", y, "D2"],
-    "m" ~~ x : DigitCharacter .. ~~ "p" ~~ y : DigitCharacter ..
-      :> cterm["-", x, "D1", "+", y, "D2"],
-    "m" ~~ x : DigitCharacter .. ~~ "m" ~~ y : DigitCharacter ..
-      :> cterm["-", x, "D1", "-", y, "D2"]
-  }
-];
-
-PrintFDExpressionMix2nd[accuracyord_?IntegerQ] :=
-  Module[{stencils, solution, buf},
-    stencils = GetCenteringStencils[accuracyord];
+PrintFDExpressionMix2nd[accuracyOrd_?IntegerQ, strDir1_?StringQ, strDir2_?StringQ] :=
+  Module[{stencils, solution, buf, cterm, rule},
+    (* Helper function to format coefficients *)
+    cterm[sign1_, x_, dir1_, sign2_, y_, dir2_] :=
+      "p.I" <> sign1
+            <> If[ToExpression[x] == 1, "", x <> "*"] <> "p.DI[" <> dir1 <> "]"
+            <> sign2
+            <> If[ToExpression[y] == 1, "", y <> "*"] <> "p.DI[" <> dir2 <> "]";
+    (* Rules for string replacements *)
+    rule = {
+      "dx1" -> "p.DX[" <> strDir1 <> "]",
+      "dx2" -> "p.DX[" <> strDir2 <> "]",
+      "[" -> "(",
+      "]" -> ")",
+      "p" ~~ x : DigitCharacter .. ~~ "p" ~~ y : DigitCharacter ..
+        :> cterm["+", x, strDir1, "+", y, strDir2],
+      "p" ~~ x : DigitCharacter .. ~~ "m" ~~ y : DigitCharacter ..
+        :> cterm["+", x, strDir1, "-", y, strDir2],
+      "m" ~~ x : DigitCharacter .. ~~ "p" ~~ y : DigitCharacter ..
+        :> cterm["-", x, strDir1, "+", y, strDir2],
+      "m" ~~ x : DigitCharacter .. ~~ "m" ~~ y : DigitCharacter ..
+        :> cterm["-", x, strDir1, "-", y, strDir2]
+    };
+    (* Get stencils and finite difference coefficients *)
+    stencils = GetCenteringStencils[accuracyOrd];
     solution = GetFiniteDifferenceCoefficients[stencils, 1];
+    (* Construct the finite difference expression *)
     buf = "    " <> ToString[CForm[
       (Sum[
         index1 = stencils[[i]];
@@ -92,9 +94,9 @@ PrintFDExpressionMix2nd[accuracyord_?IntegerQ] :=
         (Subscript[c, index1] /. solution) (Subscript[c, index2] /. solution)
         gf[[GetGFIndexNameMix2nd[index1, index2]]],
       {i, 1, Length[stencils]}, {j, 1, Length[stencils]}] // Simplify)
-      / (dx[[DI1]] dx[[DI2]])
+      / (dx1 dx2)
     ]] <> ";";
-    pr[StringReplace[buf, replaceRuleMix2nd]];
+    pr[StringReplace[buf, rule]];
   ];
 
 
