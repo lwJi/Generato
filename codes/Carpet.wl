@@ -33,9 +33,11 @@ GetGFIndexNameMix2nd[index1_?IntegerQ, index2_?IntegerQ] :=
 
 PrintIndexes3D[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strDir_?StringQ] :=
   Module[{stencils, solution},
+    (* Get stencils and finite difference coefficients *)
     stencils = GetCenteringStencils[accuracyOrd];
     solution = GetFiniteDifferenceCoefficients[stencils, fdOrd];
-    pr["  constexpr int DI = D - 1;"];
+    (* Construct the finite difference index expression *)
+    pr["  constexpr int D = " <> strDir <> " - 1;"];
     Do[
       index = stencils[[i]];
       If[(Subscript[c, index] /. solution) == 0, Continue[]];
@@ -44,11 +46,9 @@ PrintIndexes3D[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strDir_?StringQ] :=
           " = CCTK_GFINDEX3D(cctkGH, i, j, k);"
           ,
           " = CCTK_GFINDEX3D(cctkGH, "
-            <> "i + (D == 1 ? " <> ToString[index] <> " : 0),\n"
-            <> "                                        "
-            <> "j + (D == 2 ? " <> ToString[index] <> " : 0),\n"
-            <> "                                        "
-            <> "k + (D == 3 ? " <> ToString[index] <> " : 0));"
+            <> "i + (D == 0 ? " <> ToString[index] <> " : 0), "
+            <> "j + (D == 1 ? " <> ToString[index] <> " : 0), "
+            <> "k + (D == 2 ? " <> ToString[index] <> " : 0));"
         ];
       pr[buf]
       ,
@@ -58,10 +58,12 @@ PrintIndexes3D[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strDir_?StringQ] :=
 
 PrintIndexes3DMix2nd[accuracyOrd_?IntegerQ, strDir1_?StringQ, strDir2_?StringQ] :=
   Module[{stencils, solution},
+    (* Get stencils and finite difference coefficients *)
     stencils = GetCenteringStencils[accuracyOrd];
     solution = GetFiniteDifferenceCoefficients[stencils, 1];
-    pr["  constexpr int DI1 = D1 - 1;"];
-    pr["  constexpr int DI2 = D2 - 1;"];
+    (* Construct the finite difference index expression *)
+    pr["  constexpr int D1 = " <> strDir1 <> " - 1;"];
+    pr["  constexpr int D2 = " <> strDir2 <> " - 1;"];
     Do[
       index1 = stencils[[i]];
       index2 = stencils[[j]];
@@ -73,20 +75,18 @@ PrintIndexes3DMix2nd[accuracyOrd_?IntegerQ, strDir1_?StringQ, strDir2_?StringQ] 
         If[index1 != 0 && index2 != 0,
           If[index1 == index2,
             " = CCTK_GFINDEX3D(cctkGH, "
-              <> "i + (D1 != 1 && D2 != 1 ? 0 : " <> ToString[index1] <> "),\n"
-              <> "                                          "
-              <> "j + (D1 != 2 && D2 != 2 ? 0 : " <> ToString[index1] <> "),\n"
-              <> "                                          "
-              <> "k + (D1 != 3 && D2 != 3 ? 0 : " <> ToString[index1] <> "));"
+              <> "i + (D1 != 0 && D2 != 0 ? 0 : " <> ToString[index1] <> "), "
+              <> "j + (D1 != 1 && D2 != 1 ? 0 : " <> ToString[index1] <> "), "
+              <> "k + (D1 != 2 && D2 != 2 ? 0 : " <> ToString[index1] <> "));"
             ,
             " = CCTK_GFINDEX3D(cctkGH, "
-              <> "i + (D1 != 1 && D2 != 1 ? 0 : (D1 == 1 ? "
+              <> "i + (D1 != 0 && D2 != 0 ? 0 : (D1 == 0 ? "
               <> ToString[index1] <> " : " <> ToString[index2] <> ")),\n"
               <> "                                          "
-              <> "j + (D1 != 2 && D2 != 2 ? 0 : (D1 == 2 ? "
+              <> "j + (D1 != 1 && D2 != 1 ? 0 : (D1 == 1 ? "
               <> ToString[index1] <> " : " <> ToString[index2] <> ")),\n"
               <> "                                          "
-              <> "k + (D1 != 3 && D2 != 3 ? 0 : (D1 == 3 ? "
+              <> "k + (D1 != 2 && D2 != 2 ? 0 : (D1 == 2 ? "
               <> ToString[index1] <> " : " <> ToString[index2] <> ")));"
           ]
           ,
@@ -95,14 +95,14 @@ PrintIndexes3DMix2nd[accuracyOrd_?IntegerQ, strDir1_?StringQ, strDir2_?StringQ] 
             ,
             If[index1 == 0,
               " = CCTK_GFINDEX3D(cctkGH, "
-                <> "i + (D2 == 1 ? " <> ToString[index2] <> " : 0), "
-                <> "j + (D2 == 2 ? " <> ToString[index2] <> " : 0), "
-                <> "k + (D2 == 3 ? " <> ToString[index2] <> " : 0));"
+                <> "i + (D2 == 0 ? " <> ToString[index2] <> " : 0), "
+                <> "j + (D2 == 1 ? " <> ToString[index2] <> " : 0), "
+                <> "k + (D2 == 2 ? " <> ToString[index2] <> " : 0));"
               ,
               " = CCTK_GFINDEX3D(cctkGH, "
-                <> "i + (D1 == 1 ? " <> ToString[index1] <> " : 0), "
-                <> "j + (D1 == 2 ? " <> ToString[index1] <> " : 0), "
-                <> "k + (D1 == 3 ? " <> ToString[index1] <> " : 0));"
+                <> "i + (D1 == 0 ? " <> ToString[index1] <> " : 0), "
+                <> "j + (D1 == 1 ? " <> ToString[index1] <> " : 0), "
+                <> "k + (D1 == 2 ? " <> ToString[index1] <> " : 0));"
             ]
           ]
         ];
