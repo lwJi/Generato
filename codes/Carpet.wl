@@ -115,12 +115,11 @@ PrintIndexes3DMix2nd[accuracyOrd_?IntegerQ,
 
 (* Function to print FD expression *)
 
-PrintFDExpression[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strDir_?StringQ,
-                  strIdx_?StringQ] :=
+PrintFDExpression[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strIdx_?StringQ] :=
   Module[{stencils, solution, buf, rule},
     (* Rules for string replacements *)
     rule = {
-      "invdx" -> strIdx <> "[" <> strDir <> "]"
+      "invdx" -> strIdx <> "[D]"
     };
     (* Get stencils and finite difference coefficients *)
     stencils = GetCenteringStencils[accuracyOrd];
@@ -136,13 +135,12 @@ PrintFDExpression[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strDir_?StringQ,
     pr[StringReplace[buf, rule]];
   ];
 
-PrintFDExpressionMix2nd[accuracyOrd_?IntegerQ, strDir1_?StringQ, strDir2_?StringQ,
-                        strIdx_?StringQ] :=
+PrintFDExpressionMix2nd[accuracyOrd_?IntegerQ, strIdx_?StringQ] :=
   Module[{stencils, solution, buf, rule},
     (* Rules for string replacements *)
     rule = {
-      "invdx1" -> strIdx <> "[" <> strDir1 <> "]",
-      "invdx2" -> strIdx <> "[" <> strDir2 <> "]"
+      "invdx1" -> strIdx <> "[D1]",
+      "invdx2" -> strIdx <> "[D2]"
     };
     (* Get stencils and finite difference coefficients *)
     stencils = GetCenteringStencils[accuracyOrd];
