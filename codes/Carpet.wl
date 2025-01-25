@@ -56,7 +56,8 @@ PrintIndexes3D[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strDir_?StringQ] :=
     ];
   ];
 
-PrintIndexes3DMix2nd[accuracyOrd_?IntegerQ, strDir1_?StringQ, strDir2_?StringQ] :=
+PrintIndexes3DMix2nd[accuracyOrd_?IntegerQ,
+                     strDir1_?StringQ, strDir2_?StringQ] :=
   Module[{stencils, solution},
     (* Get stencils and finite difference coefficients *)
     stencils = GetCenteringStencils[accuracyOrd];
