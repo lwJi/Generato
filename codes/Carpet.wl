@@ -31,10 +31,10 @@ GetGFIndexNameMix2nd[index1_?IntegerQ, index2_?IntegerQ] :=
 
 (* Function to print 3D indexes *)
 
-PrintIndexes3D[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
+PrintIndexes3D[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strDir_?StringQ] :=
   Module[{stencils, solution},
-    stencils = GetCenteringStencils[accuracyord];
-    solution = GetFiniteDifferenceCoefficients[stencils, fdord];
+    stencils = GetCenteringStencils[accuracyOrd];
+    solution = GetFiniteDifferenceCoefficients[stencils, fdOrd];
     pr["  constexpr int DI = D - 1;"];
     Do[
       index = stencils[[i]];
@@ -56,9 +56,9 @@ PrintIndexes3D[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
     ];
   ];
 
-PrintIndexes3DMix2nd[accuracyord_?IntegerQ] :=
+PrintIndexes3DMix2nd[accuracyOrd_?IntegerQ, strDir1_?StringQ, strDir2_?StringQ] :=
   Module[{stencils, solution},
-    stencils = GetCenteringStencils[accuracyord];
+    stencils = GetCenteringStencils[accuracyOrd];
     solution = GetFiniteDifferenceCoefficients[stencils, 1];
     pr["  constexpr int DI1 = D1 - 1;"];
     pr["  constexpr int DI2 = D2 - 1;"];
@@ -114,24 +114,39 @@ PrintIndexes3DMix2nd[accuracyord_?IntegerQ] :=
 
 (* Function to print FD expression *)
 
-PrintFDExpression[accuracyord_?IntegerQ, fdord_?IntegerQ] :=
-  Module[{stencils, solution, buf},
-    stencils = GetCenteringStencils[accuracyord];
-    solution = GetFiniteDifferenceCoefficients[stencils, fdord];
+PrintFDExpression[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strDir_?StringQ,
+                  strIdx_?StringQ] :=
+  Module[{stencils, solution, buf, rule},
+    (* Rules for string replacements *)
+    rule = {
+      "invdx" -> strIdx <> "[" <> strDir <> "]"
+    };
+    (* Get stencils and finite difference coefficients *)
+    stencils = GetCenteringStencils[accuracyOrd];
+    solution = GetFiniteDifferenceCoefficients[stencils, fdOrd];
+    (* Construct the finite difference expression *)
     buf = "    " <> ToString[CForm[
       (Sum[
         index = stencils[[i]];
         (Subscript[c, index] /. solution) gf[[GetGFIndexName[index]]],
         {i, 1, Length[stencils]}] // Simplify)
-      Product[idx[[DI]], {i, 1, fdord}]
+      Product[invdx, {i, 1, fdOrd}]
     ]] <> ";";
-    pr[buf];
+    pr[StringReplace[buf, rule]];
   ];
 
-PrintFDExpressionMix2nd[accuracyord_?IntegerQ] :=
-  Module[{stencils, solution, buf},
-    stencils = GetCenteringStencils[accuracyord];
+PrintFDExpressionMix2nd[accuracyOrd_?IntegerQ, strDir1_?StringQ, strDir2_?StringQ,
+                        strIdx_?StringQ] :=
+  Module[{stencils, solution, buf, rule},
+    (* Rules for string replacements *)
+    rule = {
+      "invdx1" -> strIdx <> "[" <> strDir1 <> "]",
+      "invdx2" -> strIdx <> "[" <> strDir2 <> "]"
+    };
+    (* Get stencils and finite difference coefficients *)
+    stencils = GetCenteringStencils[accuracyOrd];
     solution = GetFiniteDifferenceCoefficients[stencils, 1];
+    (* Construct the finite difference expression *)
     buf = "    " <> ToString[CForm[
       (Sum[
         index1 = stencils[[i]];
@@ -139,9 +154,9 @@ PrintFDExpressionMix2nd[accuracyord_?IntegerQ] :=
         (Subscript[c, index1] /. solution) (Subscript[c, index2] /. solution)
         gf[[GetGFIndexNameMix2nd[index1, index2]]],
       {i, 1, Length[stencils]}, {j, 1, Length[stencils]}] // Simplify)
-      idx[[DI1]] idx[[DI2]]
+      invdx1 invdx2
     ]] <> ";";
-    pr[buf];
+    pr[StringReplace[buf, rule]];
   ];
 
 
