@@ -60,7 +60,8 @@ PrintFDExpression[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strDir_?StringQ] :=
     pr[StringReplace[buf, rule]];
   ];
 
-PrintFDExpressionMix2nd[accuracyOrd_?IntegerQ, strDir1_?StringQ, strDir2_?StringQ] :=
+PrintFDExpressionMix2nd[accuracyOrd_?IntegerQ,
+                        strDir1_?StringQ, strDir2_?StringQ] :=
   Module[{stencils, solution, buf, cterm, rule},
     (* Helper function to format coefficients *)
     cterm[sign1_, x_, dir1_, sign2_, y_, dir2_] :=
