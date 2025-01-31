@@ -1,6 +1,6 @@
 # Generato
 
-Generate C/C++ code from tensor expression and so on (using xAct)
+Generate C/C++ Code from Tensor Expression and So On
 
 ## Pre-Requisites
 
