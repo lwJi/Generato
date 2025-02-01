@@ -31,8 +31,7 @@ GetGFIndexNameMix2nd[index1_?IntegerQ, index2_?IntegerQ] :=
 
 (* Function to print 3D indexes *)
 
-PrintIndexes3D[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strDir_?StringQ,
-               strLayout_?StringQ] :=
+PrintIndexes3D[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strDir_?StringQ] :=
   Module[{stencils, solution},
     (* Get stencils and finite difference coefficients *)
     stencils = GetCenteringStencils[accuracyOrd];
@@ -44,9 +43,9 @@ PrintIndexes3D[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strDir_?StringQ,
       If[(Subscript[c, index] /. solution) == 0, Continue[]];
       buf = "  const int " <> ToString[GetGFIndexName[index]] <>
         If[index == 0,
-          " = " <> strLayout <> ".linear(i, j, k);"
+          " = layout.linear(i, j, k);"
           ,
-          " = " <> strLayout <> ".linear("
+          " = layout.linear("
             <> "i + (D == 0 ? " <> ToString[index] <> " : 0), "
             <> "j + (D == 1 ? " <> ToString[index] <> " : 0), "
             <> "k + (D == 2 ? " <> ToString[index] <> " : 0));"
@@ -58,7 +57,7 @@ PrintIndexes3D[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strDir_?StringQ,
   ];
 
 PrintIndexes3DMix2nd[accuracyOrd_?IntegerQ,
-                     strDir1_?StringQ, strDir2_?StringQ, strLayout_?StringQ] :=
+                     strDir1_?StringQ, strDir2_?StringQ] :=
   Module[{stencils, solution},
     (* Get stencils and finite difference coefficients *)
     stencils = GetCenteringStencils[accuracyOrd];
@@ -76,12 +75,12 @@ PrintIndexes3DMix2nd[accuracyOrd_?IntegerQ,
       buf = "  const int " <> ToString[GetGFIndexNameMix2nd[index1, index2]] <>
         If[index1 != 0 && index2 != 0,
           If[index1 == index2,
-            " = " <> strLayout <> ".linear("
+            " = layout.linear("
               <> "i + (D1 != 0 && D2 != 0 ? 0 : " <> ToString[index1] <> "), "
               <> "j + (D1 != 1 && D2 != 1 ? 0 : " <> ToString[index1] <> "), "
               <> "k + (D1 != 2 && D2 != 2 ? 0 : " <> ToString[index1] <> "));"
             ,
-            " = " <> strLayout <> ".linear("
+            " = layout.linear("
               <> "i + (D1 != 0 && D2 != 0 ? 0 : (D1 == 0 ? "
               <> ToString[index1] <> " : " <> ToString[index2] <> ")), "
               <> "j + (D1 != 1 && D2 != 1 ? 0 : (D1 == 1 ? "
@@ -91,15 +90,15 @@ PrintIndexes3DMix2nd[accuracyOrd_?IntegerQ,
           ]
           ,
           If[index1 == 0 && index2 == 0,
-            " = " <> strLayout <> ".linear(i, j, k);"
+            " = layout.linear(i, j, k);"
             ,
             If[index1 == 0,
-              " = " <> strLayout <> ".linear("
+              " = layout.linear("
                 <> "i + (D2 == 0 ? " <> ToString[index2] <> " : 0), "
                 <> "j + (D2 == 1 ? " <> ToString[index2] <> " : 0), "
                 <> "k + (D2 == 2 ? " <> ToString[index2] <> " : 0));"
               ,
-              " = " <> strLayout <> ".linear("
+              " = layout.linear("
                 <> "i + (D1 == 0 ? " <> ToString[index1] <> " : 0), "
                 <> "j + (D1 == 1 ? " <> ToString[index1] <> " : 0), "
                 <> "k + (D1 == 2 ? " <> ToString[index1] <> " : 0));"
@@ -201,16 +200,16 @@ PrintComponentInitialization[varinfo_, compname_] :=
         ,
         GetParsePrintCompInitMode[Derivs1st],
           "const auto " <> ToString[compToValue]
-          <> " = fd_1st<" <> ToString[compname[[1]][[1]]] <> ">("
+          <> " = fd_1st<" <> ToString[compname[[1]][[1]]] <> ">(layout2, "
           <> StringDrop[StringDrop[ToString[compToValue], 1], {-len, -len + 0}]
-          <> ", p.i, p.j, p.k, Dijk, invDxyz);"
+          <> ", p.i, p.j, p.k, invDxyz);"
         ,
         GetParsePrintCompInitMode[Derivs2nd],
           "const auto " <> ToString[compToValue]
           <> " = fd_2nd<" <> ToString[compname[[1]][[1]]] <> ", "
-          <> ToString[compname[[2]][[1]]] <> ">("
+          <> ToString[compname[[2]][[1]]] <> ">(layout2, "
           <> StringDrop[StringDrop[ToString[compToValue], 2], {-len, -len + 1}]
-          <> ", p.i, p.j, p.k, Dijk, invDxyz);"
+          <> ", p.i, p.j, p.k, invDxyz);"
         ,
         GetParsePrintCompInitMode[PreDerivs1st],
           ToString[CForm[compToValue]] <> " = fd_1st("
