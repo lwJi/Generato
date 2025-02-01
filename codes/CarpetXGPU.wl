@@ -31,7 +31,8 @@ GetGFIndexNameMix2nd[index1_?IntegerQ, index2_?IntegerQ] :=
 
 (* Function to print 3D indexes *)
 
-PrintIndexes3D[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strDir_?StringQ] :=
+PrintIndexes3D[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strDir_?StringQ,
+               strLayout_?StringQ] :=
   Module[{stencils, solution},
     (* Get stencils and finite difference coefficients *)
     stencils = GetCenteringStencils[accuracyOrd];
@@ -43,9 +44,9 @@ PrintIndexes3D[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strDir_?StringQ] :=
       If[(Subscript[c, index] /. solution) == 0, Continue[]];
       buf = "  const int " <> ToString[GetGFIndexName[index]] <>
         If[index == 0,
-          " = CCTK_GFINDEX3D(cctkGH, i, j, k);"
+          " = " <> strLayout <> ".linear(i, j, k);"
           ,
-          " = CCTK_GFINDEX3D(cctkGH, "
+          " = " <> strLayout <> ".linear("
             <> "i + (D == 0 ? " <> ToString[index] <> " : 0), "
             <> "j + (D == 1 ? " <> ToString[index] <> " : 0), "
             <> "k + (D == 2 ? " <> ToString[index] <> " : 0));"
@@ -57,7 +58,7 @@ PrintIndexes3D[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strDir_?StringQ] :=
   ];
 
 PrintIndexes3DMix2nd[accuracyOrd_?IntegerQ,
-                     strDir1_?StringQ, strDir2_?StringQ] :=
+                     strDir1_?StringQ, strDir2_?StringQ, strLayout_?StringQ] :=
   Module[{stencils, solution},
     (* Get stencils and finite difference coefficients *)
     stencils = GetCenteringStencils[accuracyOrd];
@@ -75,32 +76,30 @@ PrintIndexes3DMix2nd[accuracyOrd_?IntegerQ,
       buf = "  const int " <> ToString[GetGFIndexNameMix2nd[index1, index2]] <>
         If[index1 != 0 && index2 != 0,
           If[index1 == index2,
-            " = CCTK_GFINDEX3D(cctkGH, "
+            " = " <> strLayout <> ".linear("
               <> "i + (D1 != 0 && D2 != 0 ? 0 : " <> ToString[index1] <> "), "
               <> "j + (D1 != 1 && D2 != 1 ? 0 : " <> ToString[index1] <> "), "
               <> "k + (D1 != 2 && D2 != 2 ? 0 : " <> ToString[index1] <> "));"
             ,
-            " = CCTK_GFINDEX3D(cctkGH, "
+            " = " <> strLayout <> ".linear("
               <> "i + (D1 != 0 && D2 != 0 ? 0 : (D1 == 0 ? "
-              <> ToString[index1] <> " : " <> ToString[index2] <> ")),\n"
-              <> "                                          "
+              <> ToString[index1] <> " : " <> ToString[index2] <> ")), "
               <> "j + (D1 != 1 && D2 != 1 ? 0 : (D1 == 1 ? "
-              <> ToString[index1] <> " : " <> ToString[index2] <> ")),\n"
-              <> "                                          "
+              <> ToString[index1] <> " : " <> ToString[index2] <> ")), "
               <> "k + (D1 != 2 && D2 != 2 ? 0 : (D1 == 2 ? "
               <> ToString[index1] <> " : " <> ToString[index2] <> ")));"
           ]
           ,
           If[index1 == 0 && index2 == 0,
-            " = CCTK_GFINDEX3D(cctkGH, i, j, k);"
+            " = " <> strLayout <> ".linear(i, j, k);"
             ,
             If[index1 == 0,
-              " = CCTK_GFINDEX3D(cctkGH, "
+              " = " <> strLayout <> ".linear("
                 <> "i + (D2 == 0 ? " <> ToString[index2] <> " : 0), "
                 <> "j + (D2 == 1 ? " <> ToString[index2] <> " : 0), "
                 <> "k + (D2 == 2 ? " <> ToString[index2] <> " : 0));"
               ,
-              " = CCTK_GFINDEX3D(cctkGH, "
+              " = " <> strLayout <> ".linear("
                 <> "i + (D1 == 0 ? " <> ToString[index1] <> " : 0), "
                 <> "j + (D1 == 1 ? " <> ToString[index1] <> " : 0), "
                 <> "k + (D1 == 2 ? " <> ToString[index1] <> " : 0));"
@@ -202,22 +201,22 @@ PrintComponentInitialization[varinfo_, compname_] :=
         ,
         GetParsePrintCompInitMode[Derivs1st],
           "const auto " <> ToString[compToValue]
-          <> " = fd_1st<" <> ToString[compname[[1]][[1]]] <> ">(cctkGH, "
+          <> " = fd_1st<" <> ToString[compname[[1]][[1]]] <> ">("
           <> StringDrop[StringDrop[ToString[compToValue], 1], {-len, -len + 0}]
-          <> ", i, j, k, idx);"
+          <> ", p.i, p.j, p.k, Dijk, invDxyz);"
         ,
         GetParsePrintCompInitMode[Derivs2nd],
           "const auto " <> ToString[compToValue]
           <> " = fd_2nd<" <> ToString[compname[[1]][[1]]] <> ", "
-          <> ToString[compname[[2]][[1]]] <> ">(cctkGH, "
+          <> ToString[compname[[2]][[1]]] <> ">("
           <> StringDrop[StringDrop[ToString[compToValue], 2], {-len, -len + 1}]
-          <> ", i, j, k, idx);"
+          <> ", p.i, p.j, p.k, Dijk, invDxyz);"
         ,
         GetParsePrintCompInitMode[PreDerivs1st],
           ToString[CForm[compToValue]] <> " = fd_1st("
           <> StringDrop[StringDrop[StringTrim[
             ToString[compToValue], GetGridPointIndex[]], 1], {-len, -len + 0}]
-          <> ", i, j, k, idx);"
+          <> ", p.i, p.j, p.k, invDxyz);"
         ,
         GetParsePrintCompInitMode[Temp],
           buf = "auto " <> ToString[compToValue] <> ";"
