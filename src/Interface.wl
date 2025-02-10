@@ -50,21 +50,13 @@ MainIn::usage = "PrintInitializations option."
 
 Protect[MainIn];
 
-Derivs1st::usage = "PrintInitializations option."
+DerivsOrder::usage = "PrintInitializations option."
 
-Protect[Derivs1st];
+Protect[DerivsOrder];
 
-Derivs2nd::usage = "PrintInitializations option."
+DerivsAccuracy::usage = "PrintInitializations option."
 
-Protect[Derivs2nd];
-
-PreDerivs1st::usage = "PrintInitializations option."
-
-Protect[PreDerivs1st];
-
-PreDerivs2nd::usage = "PrintInitializations option."
-
-Protect[PreDerivs2nd];
+Protect[DerivsAccuracy];
 
 MoreInOut::usage = "PrintInitializations option."
 
@@ -189,11 +181,11 @@ PrintEquations::EMode = "PrintEquations mode '`1`' unsupported yet!";
 Protect[PrintEquations];
 
 Options[PrintInitializations] :=
-  {ChartName -> GetDefaultChart[], Mode -> "Temp", TensorType -> "Scal", StorageType -> "GF"};
+  {ChartName -> GetDefaultChart[], Mode -> "Temp", TensorType -> "Scal", StorageType -> "GF", AccuracyOrder -> 4};
 
 PrintInitializations[OptionsPattern[], varlist_?ListQ] :=
   Module[{chartname, mode},
-    {chartname, mode, tensortype, storagetype} = OptionValue[{ChartName, Mode, TensorType, StorageType}];
+    {chartname, mode, tensortype, storagetype, accuracyorder} = OptionValue[{ChartName, Mode, TensorType, StorageType, AccuracyOrder}];
     SetParseMode[{PrintComp -> True, SetComp -> False}];
     SetParsePrintCompMode[{Initializations -> True, Equations -> False}];
     Which[
@@ -204,16 +196,12 @@ PrintInitializations[OptionsPattern[], varlist_?ListQ] :=
         SetParsePrintCompInitMode[MainIn -> True]
       ,
       StringMatchQ[mode, "Derivs1st"],
-        SetParsePrintCompInitMode[Derivs1st -> True]
+        SetParsePrintCompInitMode[DerivsOrder -> 1];
+        SetParsePrintCompInitMode[DerivsAccuracy -> accuracyorder]
       ,
       StringMatchQ[mode, "Derivs2nd"],
-        SetParsePrintCompInitMode[Derivs2nd -> True]
-      ,
-      StringMatchQ[mode, "PreDerivs1st"],
-        SetParsePrintCompInitMode[PreDerivs1st -> True]
-      ,
-      StringMatchQ[mode, "PreDerivs2nd"],
-        SetParsePrintCompInitMode[PreDerivs2nd -> True]
+        SetParsePrintCompInitMode[DerivsOrder -> 2];
+        SetParsePrintCompInitMode[DerivsAccuracy -> accuracyorder]
       ,
       StringMatchQ[mode, "MoreInOut"],
         SetParsePrintCompInitMode[MoreInOut -> True]

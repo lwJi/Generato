@@ -198,23 +198,17 @@ PrintComponentInitialization[varinfo_, compname_] :=
           <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
           <> " = gf_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
         ,
-        GetParsePrintCompInitMode[Derivs1st],
+        GetParsePrintCompInitMode[DerivsOrder] == 1,
           "const auto " <> ToString[compToValue]
           <> " = fd_1st<" <> ToString[compname[[1]][[1]]] <> ">(layout2, "
           <> StringDrop[StringDrop[ToString[compToValue], 1], {-len, -len + 0}]
           <> ", p.i, p.j, p.k, invDxyz);"
         ,
-        GetParsePrintCompInitMode[Derivs2nd],
+        GetParsePrintCompInitMode[DerivsOrder] == 2,
           "const auto " <> ToString[compToValue]
           <> " = fd_2nd<" <> ToString[compname[[1]][[1]]] <> ", "
           <> ToString[compname[[2]][[1]]] <> ">(layout2, "
           <> StringDrop[StringDrop[ToString[compToValue], 2], {-len, -len + 1}]
-          <> ", p.i, p.j, p.k, invDxyz);"
-        ,
-        GetParsePrintCompInitMode[PreDerivs1st],
-          ToString[CForm[compToValue]] <> " = fd_1st("
-          <> StringDrop[StringDrop[StringTrim[
-            ToString[compToValue], GetGridPointIndex[]], 1], {-len, -len + 0}]
           <> ", p.i, p.j, p.k, invDxyz);"
         ,
         GetParsePrintCompInitMode[Temp],

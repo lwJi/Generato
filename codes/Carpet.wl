@@ -213,12 +213,6 @@ PrintComponentInitialization[varinfo_, compname_] :=
           <> StringDrop[StringDrop[ToString[compToValue], 2], {-len, -len + 1}]
           <> ", i, j, k, idx);"
         ,
-        GetParsePrintCompInitMode[PreDerivs1st],
-          ToString[CForm[compToValue]] <> " = fd_1st("
-          <> StringDrop[StringDrop[StringTrim[
-            ToString[compToValue], GetGridPointIndex[]], 1], {-len, -len + 0}]
-          <> ", i, j, k, idx);"
-        ,
         GetParsePrintCompInitMode[Temp],
           buf = "auto " <> ToString[compToValue] <> ";"
         ,
