@@ -181,7 +181,8 @@ GetInterfaceName[compname_] :=
 (******************************************************************************)
 
 PrintComponentInitialization[varinfo_, compname_] :=
-  Module[{varlistindex, compToValue, varname, symmetry, buf, subbuf, len},
+  Module[{varlistindex, compToValue, varname, symmetry, buf, subbuf, len,
+          fdaccuracy},
     varlistindex = GetMapComponentToVarlist[][compname];
     compToValue = compname // ToValues;
     {varname, symmetry} = varinfo;
@@ -189,6 +190,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
 
     (* set subbuf *)
     subbuf = If[len == 0, "", "[" <> ToString[varlistindex] <> "]"];
+    fdaccuracy = GetParsePrintCompInitMode[DerivsAccuracy];
 
     (* set buf *)
     buf =
@@ -200,13 +202,15 @@ PrintComponentInitialization[varinfo_, compname_] :=
         ,
         GetParsePrintCompInitMode[DerivsOrder] == 1,
           "const auto " <> ToString[compToValue]
-          <> " = fd_1st<" <> ToString[compname[[1]][[1]]] <> ">(layout2, "
+          <> " = fd_1st_o" <> ToString[fdaccuracy]
+          <> "<" <> ToString[compname[[1]][[1]]] <> ">(layout2, "
           <> StringDrop[StringDrop[ToString[compToValue], 1], {-len, -len + 0}]
           <> ", p.i, p.j, p.k, invDxyz);"
         ,
         GetParsePrintCompInitMode[DerivsOrder] == 2,
           "const auto " <> ToString[compToValue]
-          <> " = fd_2nd<" <> ToString[compname[[1]][[1]]] <> ", "
+          <> " = fd_2nd_o" <> ToString[fdaccuracy]
+          <>"<" <> ToString[compname[[1]][[1]]] <> ", "
           <> ToString[compname[[2]][[1]]] <> ">(layout2, "
           <> StringDrop[StringDrop[ToString[compToValue], 2], {-len, -len + 1}]
           <> ", p.i, p.j, p.k, invDxyz);"
