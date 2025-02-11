@@ -50,6 +50,10 @@ MainIn::usage = "PrintInitializations option."
 
 Protect[MainIn];
 
+Derivs::usage = "PrintInitializations option."
+
+Protect[Derivs];
+
 DerivsOrder::usage = "PrintInitializations option."
 
 Protect[DerivsOrder];
@@ -181,11 +185,11 @@ PrintEquations::EMode = "PrintEquations mode '`1`' unsupported yet!";
 Protect[PrintEquations];
 
 Options[PrintInitializations] :=
-  {ChartName -> GetDefaultChart[], Mode -> "Temp", TensorType -> "Scal", StorageType -> "GF", AccuracyOrder -> 4};
+  {ChartName -> GetDefaultChart[], Mode -> "Temp", TensorType -> "Scal", StorageType -> "GF", DerivsOrder -> 1, AccuracyOrder -> 4};
 
 PrintInitializations[OptionsPattern[], varlist_?ListQ] :=
   Module[{chartname, mode},
-    {chartname, mode, tensortype, storagetype, accuracyorder} = OptionValue[{ChartName, Mode, TensorType, StorageType, AccuracyOrder}];
+    {chartname, mode, tensortype, storagetype, derivsorder, accuracyorder} = OptionValue[{ChartName, Mode, TensorType, StorageType, DerivsOrder, AccuracyOrder}];
     SetParseMode[{PrintComp -> True, SetComp -> False}];
     SetParsePrintCompMode[{Initializations -> True, Equations -> False}];
     Which[
@@ -195,12 +199,9 @@ PrintInitializations[OptionsPattern[], varlist_?ListQ] :=
       StringMatchQ[mode, "MainIn"],
         SetParsePrintCompInitMode[MainIn -> True]
       ,
-      StringMatchQ[mode, "Derivs1st"],
-        SetParsePrintCompInitMode[DerivsOrder -> 1];
-        SetParsePrintCompInitMode[DerivsAccuracy -> accuracyorder]
-      ,
-      StringMatchQ[mode, "Derivs2nd"],
-        SetParsePrintCompInitMode[DerivsOrder -> 2];
+      StringMatchQ[mode, "Derivs"],
+        SetParsePrintCompInitMode[Derivs -> True];
+        SetParsePrintCompInitMode[DerivsOrder -> derivsorder];
         SetParsePrintCompInitMode[DerivsAccuracy -> accuracyorder]
       ,
       StringMatchQ[mode, "MoreInOut"],
