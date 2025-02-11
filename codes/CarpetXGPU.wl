@@ -182,7 +182,7 @@ GetInterfaceName[compname_] :=
 
 PrintComponentInitialization[varinfo_, compname_] :=
   Module[{varlistindex, compToValue, varname, symmetry, buf, subbuf, len,
-          fdaccuracy},
+          fdorder, fdaccuracy},
     varlistindex = GetMapComponentToVarlist[][compname];
     compToValue = compname // ToValues;
     {varname, symmetry} = varinfo;
@@ -190,6 +190,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
 
     (* set subbuf *)
     subbuf = If[len == 0, "", "[" <> ToString[varlistindex] <> "]"];
+    fdorder = GetParsePrintCompInitMode[DerivsOrder];
     fdaccuracy = GetParsePrintCompInitMode[DerivsAccuracy];
 
     (* set buf *)
@@ -200,19 +201,16 @@ PrintComponentInitialization[varinfo_, compname_] :=
           <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
           <> " = gf_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
         ,
-        GetParsePrintCompInitMode[DerivsOrder] == 1,
+        GetParsePrintCompInitMode[Derivs],
+          offset = fdorder - 1;
           "const auto " <> ToString[compToValue]
-          <> " = fd_1st_o" <> ToString[fdaccuracy]
-          <> "<" <> ToString[compname[[1]][[1]]] <> ">(layout2, "
-          <> StringDrop[StringDrop[ToString[compToValue], 1], {-len, -len + 0}]
-          <> ", p.i, p.j, p.k, invDxyz);"
-        ,
-        GetParsePrintCompInitMode[DerivsOrder] == 2,
-          "const auto " <> ToString[compToValue]
-          <> " = fd_2nd_o" <> ToString[fdaccuracy]
-          <>"<" <> ToString[compname[[1]][[1]]] <> ", "
-          <> ToString[compname[[2]][[1]]] <> ">(layout2, "
-          <> StringDrop[StringDrop[ToString[compToValue], 2], {-len, -len + 1}]
+          <> " = fd_" <> ToString[fdorder] <> "_o" <> ToString[fdaccuracy]
+          <> "<"
+          <> StringRiffle[
+              Table[ToString[compname[[i]][[1]]], {i, 1, fdorder}], ", "]
+          <> ">(layout2, "
+          <> StringDrop[
+              StringDrop[ToString[compToValue], fdorder], {-len, -len + offset}]
           <> ", p.i, p.j, p.k, invDxyz);"
         ,
         GetParsePrintCompInitMode[Temp],
