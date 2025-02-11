@@ -113,8 +113,12 @@ PrintIndexes3DMix2nd[accuracyOrd_?IntegerQ,
 
 (* Function to print FD expression *)
 
-PrintFDExpression[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strIdx_?StringQ] :=
-  Module[{stencils, solution, buf, rule},
+Options[PrintFDExpression] := {ForDissipation -> False};
+
+PrintFDExpression[OptionsPattern[],
+                  accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strIdx_?StringQ] :=
+  Module[{stencils, solution, buf, rule, fordiss},
+    {fordiss} = OptionValue[{ForDissipation}];
     (* Rules for string replacements *)
     rule = {
       "invdx" -> strIdx <> "[D]"
@@ -128,7 +132,7 @@ PrintFDExpression[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strIdx_?StringQ] :=
         index = stencils[[i]];
         (Subscript[c, index] /. solution) gf[[GetGFIndexName[index]]],
         {i, 1, Length[stencils]}] // Simplify)
-      Product[invdx, {i, 1, fdOrd}]
+      If[fordiss, invdx, Product[invdx, {i, 1, fdOrd}]]
     ]] <> ";";
     pr[StringReplace[buf, rule]];
   ];
