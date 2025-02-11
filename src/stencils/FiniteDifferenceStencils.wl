@@ -20,12 +20,7 @@ Begin["`Private`"];
 
 (* Data *)
 
-$CenteringStencils = <|
-  2 -> {-1, 0, 1},
-  4 -> {-2, -1, 0, 1, 2},
-  6 -> {-3, -2, -1, 0, 1, 2, 3},
-  8 -> {-4, -3, -2, -1, 0, 1, 2, 3, 4}
-|>;
+$CenteringStencils = <|Table[ord -> Table[i, {i, -ord/2, ord/2}], {ord, 2, 12, 2}]|>;
 
 (* Function *)
 
