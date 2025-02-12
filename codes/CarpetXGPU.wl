@@ -208,6 +208,18 @@ PrintComponentInitialization[varinfo_, compname_] :=
         GetParsePrintCompInitMode[Derivs],
           offset = fdorder - 1;
           "const auto " <> ToString[compToValue]
+          <> " = calcderivs" <> ToString[fdorder] <> "_"
+          <> StringRiffle[
+              Table[ToString[compname[[i]][[1]]], {i, 1, fdorder}], ""]
+          <> "("
+          <> StringDrop[
+              StringDrop[ToString[compToValue], fdorder], {-len, -len + offset}]
+          <> ", p.i, p.j, p.k);"
+        ,
+        (*
+        GetParsePrintCompInitMode[Derivs],
+          offset = fdorder - 1;
+          "const auto " <> ToString[compToValue]
           <> " = fd_" <> ToString[fdorder] <> "_o" <> ToString[fdaccuracy]
           <> "<"
           <> StringRiffle[
@@ -217,6 +229,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
               StringDrop[ToString[compToValue], fdorder], {-len, -len + offset}]
           <> ", p.i, p.j, p.k, invDxyz);"
         ,
+        *)
         GetParsePrintCompInitMode[Temp],
           buf = "auto " <> ToString[compToValue] <> ";"
         ,
