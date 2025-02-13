@@ -115,8 +115,12 @@ PrintIndexes3DMix2nd[accuracyOrd_?IntegerQ,
 
 (* Function to print FD expression *)
 
-PrintFDExpression[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strIdx_?StringQ] :=
-  Module[{stencils, solution, buf, rule},
+Options[PrintFDExpression] := {ForDissipation -> False};
+
+PrintFDExpression[OptionsPattern[],
+                  accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strIdx_?StringQ] :=
+  Module[{stencils, solution, buf, rule, fordiss},
+    {fordiss} = OptionValue[{ForDissipation}];
     (* Rules for string replacements *)
     rule = {
       "invdx" -> strIdx <> "[D]"
@@ -130,7 +134,7 @@ PrintFDExpression[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strIdx_?StringQ] :=
         index = stencils[[i]];
         (Subscript[c, index] /. solution) gf[[GetGFIndexName[index]]],
         {i, 1, Length[stencils]}] // Simplify)
-      Product[invdx, {i, 1, fdOrd}]
+      If[fordiss, invdx, Product[invdx, {i, 1, fdOrd}]]
     ]] <> ";";
     pr[StringReplace[buf, rule]];
   ];
@@ -183,7 +187,8 @@ GetInterfaceName[compname_] :=
 (******************************************************************************)
 
 PrintComponentInitialization[varinfo_, compname_] :=
-  Module[{varlistindex, compToValue, varname, symmetry, buf, subbuf, len},
+  Module[{varlistindex, compToValue, varname, symmetry, buf, subbuf, len,
+          fdorder, fdaccuracy},
     varlistindex = GetMapComponentToVarlist[][compname];
     compToValue = compname // ToValues;
     {varname, symmetry} = varinfo;
@@ -191,6 +196,8 @@ PrintComponentInitialization[varinfo_, compname_] :=
 
     (* set subbuf *)
     subbuf = If[len == 0, "", "[" <> ToString[varlistindex] <> "]"];
+    fdorder = GetParsePrintCompInitMode[DerivsOrder];
+    fdaccuracy = GetParsePrintCompInitMode[DerivsAccuracy];
 
     (* set buf *)
     buf =
@@ -200,19 +207,31 @@ PrintComponentInitialization[varinfo_, compname_] :=
           <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
           <> " = gf_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
         ,
-        GetParsePrintCompInitMode[Derivs1st],
+        GetParsePrintCompInitMode[Derivs],
+          offset = fdorder - 1;
           "const auto " <> ToString[compToValue]
-          <> " = fd_1st<" <> ToString[compname[[1]][[1]]] <> ">(cctkGH, "
-          <> StringDrop[StringDrop[ToString[compToValue], 1], {-len, -len + 0}]
-          <> ", i, j, k, idx);"
+          <> " = calcderivs" <> ToString[fdorder] <> "_"
+          <> StringRiffle[
+              Table[ToString[compname[[i]][[1]]], {i, 1, fdorder}], ""]
+          <> "("
+          <> StringDrop[
+              StringDrop[ToString[compToValue], fdorder], {-len, -len + offset}]
+          <> ", i, j, k);"
         ,
-        GetParsePrintCompInitMode[Derivs2nd],
+        (*
+        GetParsePrintCompInitMode[Derivs],
+          offset = fdorder - 1;
           "const auto " <> ToString[compToValue]
-          <> " = fd_2nd<" <> ToString[compname[[1]][[1]]] <> ", "
-          <> ToString[compname[[2]][[1]]] <> ">(cctkGH, "
-          <> StringDrop[StringDrop[ToString[compToValue], 2], {-len, -len + 1}]
-          <> ", i, j, k, idx);"
+          <> " = fd_" <> ToString[fdorder] <> "_o" <> ToString[fdaccuracy]
+          <> "<"
+          <> StringRiffle[
+              Table[ToString[compname[[i]][[1]]], {i, 1, fdorder}], ", "]
+          <> ">(cctkGH, "
+          <> StringDrop[
+              StringDrop[ToString[compToValue], fdorder], {-len, -len + offset}]
+          <> ", i, j, k, invDxyz);"
         ,
+        *)
         GetParsePrintCompInitMode[Temp],
           buf = "auto " <> ToString[compToValue] <> ";"
         ,
