@@ -193,7 +193,47 @@ PrintComponentInitialization[varinfo_, compname_] :=
     len = Length[varname];
 
     (* set subbuf *)
-    subbuf = If[len == 0, "", "[" <> ToString[varlistindex] <> "]"];
+    Which[
+      GetParsePrintCompInitTensorType[Scal],
+        subbuf = If[len == 0, "", "[" <> ToString[varlistindex] <> "]"]
+      ,
+      GetParsePrintCompInitTensorType[Vect],
+        Which[
+          len == 1,
+            subbuf = "[" <> ToString[varlistindex] <> "]"
+          ,
+          len == 2,
+            subbuf = "[" <> ToString[Mod[varlistindex, 3]] <> "]["
+                         <> ToString[Quotient[varlistindex, 3]] <> "]"
+          ,
+          len == 3,
+            subbuf = "[" <> ToString[Mod[varlistindex, 6]] <> "]["
+                         <> ToString[Quotient[varlistindex, 6]] <> "]"
+          ,
+          True,
+            Throw @ Message[PrintComponentInitialization::EVarLength]
+        ]
+      ,
+      GetParsePrintCompInitTensorType[Smat],
+        Which[
+          len == 2,
+            subbuf = "[" <> ToString[varlistindex] <> "]"
+          ,
+          len == 3,
+            subbuf = "[" <> ToString[Mod[varlistindex, 3]] <> "]["
+                         <> ToString[Quotient[varlistindex, 3]] <> "]"
+          ,
+          len == 4,
+            subbuf = "[" <> ToString[Mod[varlistindex, 6]] <> "]["
+                         <> ToString[Quotient[varlistindex, 6]] <> "]"
+          ,
+          True,
+            Throw @ Message[PrintComponentInitialization::EVarLength]
+        ]
+      ,
+      True,
+        Throw @ Message[PrintComponentInitialization::EMode]
+    ];
     fdorder = GetParsePrintCompInitMode[DerivsOrder];
     fdaccuracy = GetParsePrintCompInitMode[DerivsAccuracy];
 
@@ -207,14 +247,19 @@ PrintComponentInitialization[varinfo_, compname_] :=
         ,
         GetParsePrintCompInitMode[Derivs],
           offset = fdorder - 1;
-          "const auto " <> ToString[compToValue]
-          <> " = calcderivs" <> ToString[fdorder] <> "_"
-          <> StringRiffle[
-              Table[ToString[compname[[i]][[1]]], {i, 1, fdorder}], ""]
-          <> "("
-          <> StringDrop[
-              StringDrop[ToString[compToValue], fdorder], {-len, -len + offset}]
-          <> ", p.i, p.j, p.k);"
+          If[GetParsePrintCompInitStorageType[Tile],
+            "const auto &" <> ToString[compToValue]
+            <> " = tl_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ".ptr[ijk5];"
+            ,
+            "const auto " <> ToString[compToValue]
+            <> " = calcderivs" <> ToString[fdorder] <> "_"
+            <> StringRiffle[
+                Table[ToString[compname[[i]][[1]]], {i, 1, fdorder}], ""]
+            <> "("
+            <> StringDrop[
+                StringDrop[ToString[compToValue], fdorder], {-len, -len + offset}]
+            <> ", p.i, p.j, p.k);"
+          ]
         ,
         (*
         GetParsePrintCompInitMode[Derivs],
