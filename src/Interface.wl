@@ -22,6 +22,8 @@ DefTensors::usage = "DefTensors[vars] define tensors (without setting its compon
 
 GridTensors::usage = "GridTensors[vars] define grid tensors (with grid point index), set components and return the varlist";
 
+TileTensors::usage = "TileTensors[vars] define grid tensors (with tile point index), set components and return the varlist";
+
 TempTensors::usage = "TempTensors[vars] define temp tensors (without grid point index), set components and return the varlist";
 
 SetComponents::usage = "SetComponents[{ChartName->..., IndependentIndexForEachVar->..., WithoutGridPointIndex->...}, varlist] set components of varlist.";
@@ -121,6 +123,18 @@ GridTensors[vars__] :=
 
 Protect[GridTensors];
 
+TileTensors[vars__] :=
+  Module[{arglist = List[vars]},
+    If[GetCheckInputEquations[],
+      DefTensors[vars]
+      ,
+      SetComponents[{UseTilePointIndex -> True}, arglist]
+    ];
+    Return[arglist]
+  ];
+
+Protect[TileTensors];
+
 TempTensors[vars__] :=
   Module[{arglist = List[vars]},
     If[GetCheckInputEquations[],
@@ -138,14 +152,15 @@ Protect[TempTensors];
 *)
 
 Options[SetComponents] :=
-  {ChartName -> GetDefaultChart[], IndependentIndexForEachVar -> True, WithoutGridPointIndex -> False};
+  {ChartName -> GetDefaultChart[], IndependentIndexForEachVar -> True, WithoutGridPointIndex -> False, UseTilePointIndex -> False};
 
 SetComponents[OptionsPattern[], varlist_?ListQ] :=
-  Module[{chartname, indepidx, nogpidx},
-    {chartname, indepidx, nogpidx} = OptionValue[{ChartName, IndependentIndexForEachVar, WithoutGridPointIndex}];
+  Module[{chartname, indepidx, nogpidx, tlidx},
+    {chartname, indepidx, nogpidx, tlidx} = OptionValue[{ChartName, IndependentIndexForEachVar, WithoutGridPointIndex, UseTilePointIndex}];
     SetParseMode[{SetComp -> True, PrintComp -> False}];
     SetParseSetCompMode[IndependentVarlistIndex -> indepidx];
     SetParseSetCompMode[WithoutGridPointIndex -> nogpidx];
+    SetParseSetCompMode[UseTilePointIndex -> tlidx];
     ParseVarlist[varlist, chartname];
   ];
 

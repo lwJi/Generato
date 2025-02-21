@@ -265,7 +265,11 @@ SetExprName[varname_, compindexlist_] :=
       If[GetParseSetCompMode[WithoutGridPointIndex],
         ToExpression[exprname]
         ,
-        ToExpression[exprname <> GetGridPointIndex[]]
+        If[GetParseSetCompMode[UseTilePointIndex],
+          ToExpression[exprname <> GetTilePointIndex[]]
+          ,
+          ToExpression[exprname <> GetGridPointIndex[]]
+        ]
       ];
     Return[exprname]
   ];

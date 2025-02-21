@@ -34,9 +34,13 @@ IndependentVarlistIndex::usage = "ParseSetCompMode option.";
 
 WithoutGridPointIndex::usage = "ParseSetCompMode option.";
 
+UseTilePointIndex::usage = "ParseSetCompMode option.";
+
 Protect[IndependentVarlistIndex];
 
 Protect[WithoutGridPointIndex];
+
+Protect[UseTilePointIndex];
 
 GetParsePrintCompMode::usage = "GetParsePrintCompMode[key] returns the mode correspond to the key";
 
@@ -141,7 +145,7 @@ Protect[SetParseSetCompMode];
 
 SetParseSetCompModeAllToFalse[] :=
   Module[{},
-    AppendTo[$ParseSetCompModeAssociation, <|IndependentVarlistIndex -> False, WithoutGridPointIndex -> False|>]
+    AppendTo[$ParseSetCompModeAssociation, <|IndependentVarlistIndex -> False, WithoutGridPointIndex -> False, UseTilePointIndex -> False|>]
   ];
 
 Protect[SetParseSetCompModeAllToFalse];

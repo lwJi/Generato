@@ -30,6 +30,10 @@ GetGridPointIndex::usage = "GetGridPointIndex[] return the grid index name.";
 
 SetGridPointIndex::usage = "SetGridPointIndex[girdindex] reset the grid index name.";
 
+GetTilePointIndex::usage = "GetTilePointIndex[] return the tile index name.";
+
+SetTilePointIndex::usage = "SetTilePointIndex[girdindex] reset the tile index name.";
+
 GetSuffixUnprotected::usage = "GetSuffixUnprotected[] returns the suffix added to vars which would conflict with system default otherwise.";
 
 SetSuffixUnprotected::usage = "SetSuffixUnprotected[suffix] reset the suffix added to vars which would conflict with system default otherwise.";
@@ -75,6 +79,8 @@ $PrintDate = True;
 $PrintHeaderMacro = True;
 
 $GridPointIndex = "";
+
+$TilePointIndex = "";
 
 $SuffixUnprotected = "$Upt";
 
@@ -141,6 +147,18 @@ SetGridPointIndex[gridindex_] :=
   ];
 
 Protect[SetGridPointIndex];
+
+GetTilePointIndex[] :=
+  Return[$TilePointIndex];
+
+Protect[GetTilePointIndex];
+
+SetTilePointIndex[tileindex_] :=
+  Module[{},
+    $TilePointIndex = tileindex
+  ];
+
+Protect[SetTilePointIndex];
 
 GetSuffixUnprotected[] :=
   Return[$SuffixUnprotected];
