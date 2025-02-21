@@ -241,9 +241,14 @@ PrintComponentInitialization[varinfo_, compname_] :=
     buf =
       Which[
         GetParsePrintCompInitMode[MainIn] || GetParsePrintCompInitMode[MainOut],
-          "const auto &"
-          <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
-          <> " = gf_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
+          If[GetParsePrintCompInitStorageType[Tile],
+            "const auto &" <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
+            <> " = tl_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ".ptr[ijk5];"
+            ,
+            "const auto &"
+            <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
+            <> " = gf_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
+          ]
         ,
         GetParsePrintCompInitMode[Derivs],
           offset = fdorder - 1;
@@ -320,7 +325,7 @@ PrintComponentEquation[coordinate_, compname_] :=
       ,
       GetParsePrintCompEQNMode[Main],
         Module[{},
-          PutAppend[CForm[compToValue], outputfile];
+          Global`pr[ToString[CForm[compToValue]] <> "[ijk]"];
           Global`pr["="];
           PutAppend[CForm[rhssToValue], outputfile];
           Global`pr[";\n"]
