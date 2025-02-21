@@ -325,7 +325,7 @@ PrintComponentEquation[coordinate_, compname_] :=
       ,
       GetParsePrintCompEQNMode[Main],
         Module[{},
-          Global`pr[ToString[CForm[compToValue]] <> "[ijk]"];
+          PutAppend[CForm[compToValue], outputfile];
           Global`pr["="];
           PutAppend[CForm[rhssToValue], outputfile];
           Global`pr[";\n"]
