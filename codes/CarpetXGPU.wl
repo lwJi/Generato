@@ -243,7 +243,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
         GetParsePrintCompInitMode[MainIn] || GetParsePrintCompInitMode[MainOut],
           If[GetParsePrintCompInitStorageType[Tile],
             "const auto &" <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
-            <> " = tl_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ".ptr[ijk5];"
+            <> " = tl_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ".ptr;"
             ,
             "const auto &"
             <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
@@ -253,8 +253,8 @@ PrintComponentInitialization[varinfo_, compname_] :=
         GetParsePrintCompInitMode[Derivs],
           offset = fdorder - 1;
           If[GetParsePrintCompInitStorageType[Tile],
-            "const auto &" <> ToString[compToValue]
-            <> " = tl_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ".ptr[ijk5];"
+            "const auto &" <> StringTrim[ToString[compToValue], GetTilePointIndex[]]
+            <> " = tl_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ".ptr;"
             ,
             "const auto " <> ToString[compToValue]
             <> " = calcderivs" <> ToString[fdorder] <> "_"
