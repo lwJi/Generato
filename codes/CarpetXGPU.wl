@@ -256,13 +256,19 @@ PrintComponentInitialization[varinfo_, compname_] :=
             "const auto &" <> StringTrim[ToString[compToValue], GetTilePointIndex[]]
             <> " = tl_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ".ptr;"
             ,
+            tensorname = StringDrop[ToString[compToValue], {-len, -len + offset}];
+            pos1stbackwards =
+              If[StringStartsQ[tensorname, "d"],
+                fdorder
+                ,
+                StringPosition[tensorname, "d"][[-1]][[1]]
+              ];
             "const auto " <> ToString[compToValue]
             <> " = calcderivs" <> ToString[fdorder] <> "_"
             <> StringRiffle[
                 Table[ToString[compname[[i]][[1]]], {i, 1, fdorder}], ""]
             <> "("
-            <> StringDrop[
-                StringDrop[ToString[compToValue], fdorder], {-len, -len + offset}]
+            <> StringDrop[tensorname, {pos1stbackwards - offset, pos1stbackwards}]
             <> ", p.i, p.j, p.k);"
           ]
         ,
