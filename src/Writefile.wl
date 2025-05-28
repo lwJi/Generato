@@ -36,7 +36,11 @@ GetMainPrint[] :=
   Return[$MainPrint];
 
 SetAttributes[SetMainPrint, HoldAll];
-SetMainPrint[content_] := ($MainPrint := content)
+
+SetMainPrint[content_] :=
+  Module[{},
+    $MainPrint := content
+  ];
 
 Protect[SetMainPrint];
 
@@ -47,7 +51,6 @@ WriteToFile[outputfile_] :=
       Print["\"", outputfile, "\" already exist, replacing it ...\n"];
       DeleteFile[outputfile]
     ];
-
     (* define pr *)
     filepointer = OpenAppend[outputfile];
     Global`pr[x_:""] :=
@@ -58,7 +61,6 @@ WriteToFile[outputfile_] :=
           WriteLine[filepointer, x]
         ]
       ];
-
     (* print first few lines *)
     Global`pr["/* " <> FileNameTake[outputfile] <> " */"];
     Global`pr[
@@ -70,21 +72,17 @@ WriteToFile[outputfile_] :=
         ] <> " */"
     ];
     Global`pr[];
-
     If[GetPrintHeaderMacro[],
       Global`pr["#ifndef " <> StringReplace[ToUpperCase[FileNameTake[outputfile]], "." -> "_"]];
       Global`pr["#define " <> StringReplace[ToUpperCase[FileNameTake[outputfile]], "." -> "_"]];
       Global`pr[]
     ];
-
     GetMainPrint[];
     Global`pr[];
-
     If[GetPrintHeaderMacro[],
       Global`pr["#endif // #ifndef " <> StringReplace[ToUpperCase[FileNameTake[outputfile]], "." -> "_"]];
       Global`pr[]
     ];
-
     Global`pr["/* " <> FileNameTake[outputfile] <> " */"];
     Print["Done generating \"", outputfile, "\"\n"];
     Close[filepointer]
