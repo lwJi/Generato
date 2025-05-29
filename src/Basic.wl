@@ -340,6 +340,13 @@ SetEQN[OptionsPattern[], var_, varrhs_] :=
 
 Protect[SetEQN];
 
+(*
+  Delayed version of SetEQN.
+  - Does not inspect 'varrhs', as it may contain unconventional or unevaluated expressions.
+  - HoldAll:      prevents evaluation of arguments for symbolic manipulation.
+  - SequenceHold: preserves argument structure by preventing sequence flattening.
+*)
+
 SetAttributes[SetEQNDelayed, {HoldAll, SequenceHold}];
 
 Options[SetEQNDelayed] = {SuffixName -> Null};
