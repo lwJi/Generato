@@ -322,6 +322,13 @@ SetEQNdetail::Evar = "Var '`1`' is used with IndexSet before, please use a diffe
 
 Protect[SetEQNdetail];
 
+(*
+  Assign var$RHS to varrhs, allowing index patterns such as {1, -cart}.
+  - Internally uses 'IndexSet'.
+  - Ensures all variables used in varrhs are defined beforehand.
+  - Verifies that the symbol used in var has not been used previously.
+*)
+
 Options[SetEQN] = {CheckRHS -> True, SuffixName -> Null};
 
 SetEQN[OptionsPattern[], var_, varrhs_] :=
