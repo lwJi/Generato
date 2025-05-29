@@ -315,7 +315,7 @@ SetEQNdetail[checkrhs_, suffix_, var_, varrhs_] :=
       If[checkrhs && !IsDefined[varrhs],
         Throw @ Message[SetEQNdetail::Evarrhs, varrhs]
       ];
-      Hold[IndexSetDelayed[var, varrhs]] /. {var[[0]] :> RHSOf[ToString[var[[0]]] <> suffix0] /; replacetimes++ == 0}
+      Hold[IndexSet[var, varrhs]] /. {var[[0]] :> RHSOf[ToString[var[[0]]] <> suffix0] /; replacetimes++ == 0}
     ];
 
 SetEQNdetail::Evarrhs = "There are undefined terms in the RHS '`1`'!"
