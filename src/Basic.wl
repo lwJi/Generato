@@ -298,6 +298,8 @@ AdjustEQNIndexes[var_, varrhs_] :=
 
 Protect[AdjustEQNIndexes];
 
+(* Detailed implementation of SetEQN and SetEQNDelayed *)
+
 SetEQNdetail[checkrhs_, suffix_, var_, varrhs_] :=
   ReleaseHold @
     Module[{suffix0, replacetimes = 0},
@@ -321,6 +323,27 @@ SetEQNdetail::Evarrhs = "There are undefined terms in the RHS '`1`'!"
 SetEQNdetail::Evar = "Var '`1`' is used with IndexSet before, please use a different name!"
 
 Protect[SetEQNdetail];
+
+SetAttributes[SetEQNDelayeddetail, {HoldAll, SequenceHold}];
+
+SetEQNDelayeddetail[suffix_, var_, varrhs_] :=
+  ReleaseHold @
+    Module[{suffix0, replacetimes = 0},
+      suffix0 =
+        If[suffix === Null,
+          ""
+          ,
+          ToString[suffix]
+        ];
+      If[IsExprComb[Head[var]],
+        Throw @ Message[SetEQNDelayeddetail::Evar, var]
+      ];
+      Hold[IndexSetDelayed[var, varrhs]] /. {var[[0]] :> RHSOf[ToString[var[[0]]] <> suffix0] /; replacetimes++ == 0}
+    ];
+
+SetEQNDelayeddetail::Evar = "Var '`1`' is used with IndexSet before, please use a different name!"
+
+Protect[SetEQNDelayeddetail];
 
 (*
   Assign var$RHS to varrhs, allowing index patterns such as {1, -cart}.
@@ -352,20 +375,10 @@ SetAttributes[SetEQNDelayed, {HoldAll, SequenceHold}];
 Options[SetEQNDelayed] = {SuffixName -> Null};
 
 SetEQNDelayed[OptionsPattern[], var_, varrhs_] :=
-  ReleaseHold @
-    Module[{suffix, replacetimes = 0},
-      {suffix} = OptionValue[{SuffixName}];
-      suffix =
-        If[suffix === Null,
-          ""
-          ,
-          ToString[suffix]
-        ];
-      If[IsExprComb[Head[var]],
-        Throw @ Message[SetEQNDelayed::Evar, var]
-      ];
-      Hold[IndexSetDelayed[var, varrhs]] /. {var[[0]] :> RHSOf[ToString[var[[0]]] <> suffix] /; replacetimes++ == 0}
-    ];
+  Module[{suffix, var0, varrhs0},
+    {suffix} = OptionValue[{SuffixName}];
+    SetEQNDelayeddetail[suffix, var, varrhs]
+  ];
 
 SetEQNDelayed::Evar = "Var '`1`' is used with IndexSet before, please use a different name!"
 
