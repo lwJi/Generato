@@ -313,7 +313,7 @@ SetEQNdetail[checkrhs_, suffix_, var_, varrhs_] :=
       If[checkrhs && !IsDefined[varrhs],
         Throw @ Message[SetEQNdetail::Evarrhs, varrhs]
       ];
-      Hold[IndexSet[var, varrhs]] /. {var[[0]] :> RHSOf[ToString[var[[0]]] <> suffix0] /; replacetimes++ == 0}
+      Hold[IndexSetDelayed[var, varrhs]] /. {var[[0]] :> RHSOf[ToString[var[[0]]] <> suffix0] /; replacetimes++ == 0}
     ];
 
 SetEQNdetail::Evarrhs = "There are undefined terms in the RHS '`1`'!"
@@ -324,7 +324,7 @@ Protect[SetEQNdetail];
 
 (*
   Assign var$RHS to varrhs, allowing index patterns such as {1, -cart}.
-  - Internally uses 'IndexSet'.
+  - Internally uses 'IndexSetDelayed'.
   - Ensures all variables used in varrhs are defined beforehand.
   - Verifies that the symbol used in var has not been used previously.
 *)
