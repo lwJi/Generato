@@ -275,7 +275,7 @@ RHSOf::Eargs = "`1` arguments unsupported yet!";
 
 Protect[RHSOf];
 
-(* Replace -x with x for free indexes *)
+(* Replace -x with x for free indexes in eqs, to support patterns like {1, -cart} *)
 
 AdjustEQNIndexes[var_, varrhs_] :=
   Module[{var0, varrhs0, idxname},
