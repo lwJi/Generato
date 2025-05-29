@@ -384,8 +384,6 @@ SetEQNDelayed[OptionsPattern[], var_, varrhs_] :=
     SetEQNDelayeddetail[suffix, var, varrhs]
   ];
 
-SetEQNDelayed::Evar = "Var '`1`' is used with IndexSet before, please use a different name!"
-
 Protect[SetEQNDelayed];
 
 PrintVerbose[var__:""] :=
