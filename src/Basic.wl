@@ -275,6 +275,29 @@ RHSOf::Eargs = "`1` arguments unsupported yet!";
 
 Protect[RHSOf];
 
+(* Replace -x with x for free indexes *)
+
+AdjustEQNIndexes[var_, varrhs_] :=
+  Module[{var0, varrhs0, idxname},
+    varrhs0 = varrhs;
+    (* replace -x_ with x_ for free indexes in varrhs *)
+    Do[
+      If[Head[var[[idx]]] === Times && var[[idx]][[1]] === -1, (* arguments start with '-' *)
+        (* get x from x_ from -x_ *)
+        idxname = var[[idx]][[2]][[1]];
+        (* replace -x with x in varrhs *)
+        varrhs0 = varrhs0 /. {-idxname -> idxname}
+      ]
+      ,
+      {idx, 1, Length[var]}
+    ];
+    (* replace -x_ with x_ in var *)
+    var0 = var /. var[[0]][indices__] :> var[[0]] @@ Map[Replace[#, -x_ :> x]&, {indices}];
+    Return[{var0, varrhs0}]
+  ];
+
+Protect[AdjustEQNIndexes];
+
 Options[SetEQN] = {CheckRHS -> True, SuffixName -> Null};
 
 SetEQN[OptionsPattern[], var_, varrhs_] :=
