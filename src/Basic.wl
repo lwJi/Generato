@@ -327,9 +327,10 @@ Protect[SetEQNdetail];
 Options[SetEQN] = {CheckRHS -> True, SuffixName -> Null};
 
 SetEQN[OptionsPattern[], var_, varrhs_] :=
-  Module[{checkrhs, suffix, replacetimes = 0},
+  Module[{checkrhs, suffix, var0, varrhs0},
     {checkrhs, suffix} = OptionValue[{CheckRHS, SuffixName}];
-    SetEQNdetail[checkrhs, suffix, var, varrhs]
+    {var0, varrhs0} = AdjustEQNIndexes[var, varrhs];
+    SetEQNdetail[checkrhs, suffix, var0, varrhs0]
   ];
 
 Protect[SetEQN];
