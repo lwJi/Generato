@@ -300,7 +300,7 @@ Protect[AdjustEQNIndexes];
 
 SetEQNdetail[checkrhs_, suffix_, var_, varrhs_] :=
   ReleaseHold @
-    Module[{replacetimes = 0, suffix0},
+    Module[{suffix0, replacetimes = 0},
       suffix0 =
         If[suffix === Null,
           ""
