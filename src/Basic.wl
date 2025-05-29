@@ -298,30 +298,39 @@ AdjustEQNIndexes[var_, varrhs_] :=
 
 Protect[AdjustEQNIndexes];
 
+SetEQNdetail[checkrhs_, suffix_, var_, varrhs_] :=
+  Module[{suffix0},
+    ReleaseHold @
+      Module[{replacetimes = 0},
+        suffix0 =
+          If[suffix === Null,
+            ""
+            ,
+            ToString[suffix]
+          ];
+        If[IsExprComb[Head[var]],
+          Throw @ Message[SetEQNdetail::Evar, var]
+        ];
+        If[checkrhs && !IsDefined[varrhs],
+          Throw @ Message[SetEQNdetail::Evarrhs, varrhs]
+        ];
+        Hold[IndexSet[var, varrhs]] /. {var[[0]] :> RHSOf[ToString[var[[0]]] <> suffix0] /; replacetimes++ == 0}
+      ];
+  ];
+
+SetEQNdetail::Evarrhs = "There are undefined terms in the RHS '`1`'!"
+
+SetEQNdetail::Evar = "Var '`1`' is used with IndexSet before, please use a different name!"
+
+Protect[SetEQNdetail];
+
 Options[SetEQN] = {CheckRHS -> True, SuffixName -> Null};
 
 SetEQN[OptionsPattern[], var_, varrhs_] :=
-  ReleaseHold @
-    Module[{checkrhs, suffix, replacetimes = 0},
-      {checkrhs, suffix} = OptionValue[{CheckRHS, SuffixName}];
-      suffix =
-        If[suffix === Null,
-          ""
-          ,
-          ToString[suffix]
-        ];
-      If[IsExprComb[Head[var]],
-        Throw @ Message[SetEQN::Evar, var]
-      ];
-      If[checkrhs && !IsDefined[varrhs],
-        Throw @ Message[SetEQN::Evarrhs, varrhs]
-      ];
-      Hold[IndexSet[var, varrhs]] /. {var[[0]] :> RHSOf[ToString[var[[0]]] <> suffix] /; replacetimes++ == 0}
-    ];
-
-SetEQN::Evarrhs = "There are undefined terms in the RHS '`1`'!"
-
-SetEQN::Evar = "Var '`1`' is used with IndexSet before, please use a different name!"
+  Module[{checkrhs, suffix, replacetimes = 0},
+    {checkrhs, suffix} = OptionValue[{CheckRHS, SuffixName}];
+    SetEQNdetail[checkrhs, suffix, var, varrhs]
+  ];
 
 Protect[SetEQN];
 
