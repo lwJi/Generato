@@ -301,47 +301,45 @@ Protect[AdjustEQNIndexes];
 (* Detailed implementation of SetEQN and SetEQNDelayed *)
 
 SetEQNdetail[checkrhs_, suffix_, var_, varrhs_] :=
-  ReleaseHold @
-    Module[{suffix0, replacetimes = 0},
-      suffix0 =
-        If[suffix === Null,
-          ""
-          ,
-          ToString[suffix]
-        ];
-      If[IsExprComb[Head[var]],
-        Throw @ Message[SetEQNdetail::Evar, var]
+  Module[{suffix0, replacetimes = 0},
+    suffix0 =
+      If[suffix === Null,
+        ""
+        ,
+        ToString[suffix]
       ];
-      If[checkrhs && !IsDefined[varrhs],
-        Throw @ Message[SetEQNdetail::Evarrhs, varrhs]
-      ];
-      Hold[IndexSet[var, varrhs]] /. {var[[0]] :> RHSOf[ToString[var[[0]]] <> suffix0] /; replacetimes++ == 0}
+    If[IsExprComb[Head[var]],
+      Throw @ Message[SetEQNdetail::Evar, var]
     ];
+    If[checkrhs && !IsDefined[varrhs],
+      Throw @ Message[SetEQNdetail::Evarrhs, varrhs]
+    ];
+    ReleaseHold[Hold[IndexSet[var, varrhs]] /. {var[[0]] :> RHSOf[ToString[var[[0]]] <> suffix0] /; replacetimes++ == 0}]
+  ];
 
-SetEQNdetail::Evarrhs = "There are undefined terms in the RHS '`1`'!"
+SetEQNdetail::Evarrhs = "There are undefined terms in the RHS '`1`'!";
 
-SetEQNdetail::Evar = "Var '`1`' is used with IndexSet before, please use a different name!"
+SetEQNdetail::Evar = "Var '`1`' is used with IndexSet before, please use a different name!";
 
 Protect[SetEQNdetail];
 
 SetAttributes[SetEQNDelayeddetail, {HoldAll, SequenceHold}];
 
 SetEQNDelayeddetail[suffix_, var_, varrhs_] :=
-  ReleaseHold @
-    Module[{suffix0, replacetimes = 0},
-      suffix0 =
-        If[suffix === Null,
-          ""
-          ,
-          ToString[suffix]
-        ];
-      If[IsExprComb[Head[var]],
-        Throw @ Message[SetEQNDelayeddetail::Evar, var]
+  Module[{suffix0, replacetimes = 0},
+    suffix0 =
+      If[suffix === Null,
+        ""
+        ,
+        ToString[suffix]
       ];
-      Hold[IndexSetDelayed[var, varrhs]] /. {var[[0]] :> RHSOf[ToString[var[[0]]] <> suffix0] /; replacetimes++ == 0}
+    If[IsExprComb[Head[var]],
+      Throw @ Message[SetEQNDelayeddetail::Evar, var]
     ];
+    ReleaseHold[Hold[IndexSetDelayed[var, varrhs]] /. {var[[0]] :> RHSOf[ToString[var[[0]]] <> suffix0] /; replacetimes++ == 0}]
+  ];
 
-SetEQNDelayeddetail::Evar = "Var '`1`' is used with IndexSet before, please use a different name!"
+SetEQNDelayeddetail::Evar = "Var '`1`' is used with IndexSet before, please use a different name!";
 
 Protect[SetEQNDelayeddetail];
 
