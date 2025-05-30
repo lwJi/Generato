@@ -373,7 +373,7 @@ SetAttributes[SetEQNDelayed, {HoldAll, SequenceHold}];
 Options[SetEQNDelayed] = {SuffixName -> Null};
 
 SetEQNDelayed[OptionsPattern[], var_, varrhs_] :=
-  Module[{suffix, var0, varrhs0},
+  Module[{suffix},
     {suffix} = OptionValue[{SuffixName}];
     SetEQNDelayeddetail[suffix, var, varrhs]
   ];
