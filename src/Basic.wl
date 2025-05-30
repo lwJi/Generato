@@ -352,17 +352,13 @@ Protect[SetEQNDelayeddetail];
   - Verifies that the symbol used in var has not been used previously.
 *)
 
-Options[SetEQN] = {CheckRHS -> True, AllowLowerFreeIndex -> True, SuffixName -> Null};
+Options[SetEQN] = {CheckRHS -> True, SuffixName -> Null};
 
 SetEQN[OptionsPattern[], var_, varrhs_] :=
-  Module[{checkrhs, suffix, var0, varrhs0},
-    {checkrhs, allowlowerfreeindex, suffix} = OptionValue[{CheckRHS, AllowLowerFreeIndex, SuffixName}];
-    var0 = var;
-    varrhs0 = varrhs;
-    If[allowlowerfreeindex,
-      {var0, varrhs0} = AdjustEQNIndexes[var, varrhs]
-    ];
-    SetEQNdetail[checkrhs, suffix, var0, varrhs0]
+  Module[{checkrhs, suffix},
+    {checkrhs, suffix} = OptionValue[{CheckRHS, SuffixName}];
+    (* If[allowlowerfreeindex, {var0, varrhs0} = AdjustEQNIndexes[var, varrhs]]; *)
+    SetEQNdetail[checkrhs, suffix, var, varrhs]
   ];
 
 Protect[SetEQN];
