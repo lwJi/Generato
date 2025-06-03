@@ -1,5 +1,5 @@
 /* test.hxx */
-/* Produced with Mathematica */
+/* Produced with Generato */
 
 #ifndef TEST_HXX
 #define TEST_HXX
@@ -18,17 +18,20 @@ const vreal MDD22 = tmp_MDD(1,1);
 const vreal MDD23 = tmp_MDD(1,2);
 const vreal MDD33 = tmp_MDD(2,2);
 
-vreal vU1
+vreal
+vU1
 =
 MDD11*uU1 + MDD12*uU2 + MDD13*uU3
 ;
 
-vreal vU2
+vreal
+vU2
 =
 MDD12*uU1 + MDD22*uU2 + MDD23*uU3
 ;
 
-vreal vU3
+vreal
+vU3
 =
 MDD13*uU1 + MDD23*uU2 + MDD33*uU3
 ;
@@ -36,30 +39,30 @@ MDD13*uU1 + MDD23*uU2 + MDD33*uU3
 
 if(Msqr)
 {
-local_rU1.store(mask, index2, 
+local_rU1.store(mask, index2,
 MDD11*vU1 + MDD12*vU2 + MDD13*vU3
 );
 
-local_rU2.store(mask, index2, 
+local_rU2.store(mask, index2,
 MDD12*vU1 + MDD22*vU2 + MDD23*vU3
 );
 
-local_rU3.store(mask, index2, 
+local_rU3.store(mask, index2,
 MDD13*vU1 + MDD23*vU2 + MDD33*vU3
 );
 
 }
 else
 {
-local_rU1.store(mask, index2, 
+local_rU1.store(mask, index2,
 vU1
 );
 
-local_rU2.store(mask, index2, 
+local_rU2.store(mask, index2,
 vU2
 );
 
-local_rU3.store(mask, index2, 
+local_rU3.store(mask, index2,
 vU3
 );
 

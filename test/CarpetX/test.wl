@@ -49,23 +49,22 @@ SetOutputFile[FileNameJoin[{Directory[], "test.hxx"}]];
 
 (* SetProject["CarpetX"]; *)
 
-$MainPrint[] :=
-  Module[{project = GetProject[]},
-    pr[];
-    PrintInitializations[{Mode -> "MainOut"}, dtEvolVarlist];
-    PrintInitializations[{Mode -> "MainIn"}, EvolVarlist];
-    PrintInitializations[{Mode -> "MainIn"}, MoreInVarlist];
-    pr[];
-    PrintEquations[{Mode -> "Temp"}, TempVarlist];
-    pr[];
-    pr["if(Msqr)"];
-    pr["{"];
-    PrintEquations[{Mode -> "Main", SuffixName -> "Msqr", ChartName -> cart}, dtEvolVarlist];
-    pr["}"];
-    pr["else"];
-    pr["{"];
-    PrintEquations[{Mode -> "Main", SuffixName -> "otherwise"}, dtEvolVarlist];
-    pr["}"];
-  ];
+SetMainPrint[
+  pr[];
+  PrintInitializations[{Mode -> "MainOut"}, dtEvolVarlist];
+  PrintInitializations[{Mode -> "MainIn"}, EvolVarlist];
+  PrintInitializations[{Mode -> "MainIn"}, MoreInVarlist];
+  pr[];
+  PrintEquations[{Mode -> "Temp"}, TempVarlist];
+  pr[];
+  pr["if(Msqr)"];
+  pr["{"];
+  PrintEquations[{Mode -> "Main", SuffixName -> "Msqr", ChartName -> cart}, dtEvolVarlist];
+  pr["}"];
+  pr["else"];
+  pr["{"];
+  PrintEquations[{Mode -> "Main", SuffixName -> "otherwise"}, dtEvolVarlist];
+  pr["}"];
+];
 
 Import[FileNameJoin[{Environment["GENERATO"], "codes/CarpetX.wl"}]];
