@@ -1,5 +1,5 @@
 /* GHG_rhs.c */
-/* Produced with Mathematica */
+/* Produced with Generato */
 
 #include "nmesh.h"
 #include "GHG.h"

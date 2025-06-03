@@ -1,5 +1,5 @@
 /* test.c */
-/* Produced with Mathematica */
+/* Produced with Generato */
 
 #include "nmesh.h"
 #include "C3GH.h"
