@@ -242,10 +242,10 @@ PrintComponentInitialization[varinfo_, compname_] :=
       Which[
         GetParsePrintCompInitMode[MainIn] || GetParsePrintCompInitMode[MainOut],
           If[GetParsePrintCompInitStorageType[Tile],
-            "const auto &" <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
+            "const auto " <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
             <> " = tl_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ".ptr;"
             ,
-            "const auto &"
+            "const auto "
             <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
             <> " = gf_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
           ]
@@ -253,7 +253,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
         GetParsePrintCompInitMode[Derivs],
           offset = fdorder - 1;
           If[GetParsePrintCompInitStorageType[Tile],
-            "const auto &" <> StringTrim[ToString[compToValue], GetTilePointIndex[]]
+            "const auto " <> StringTrim[ToString[compToValue], GetTilePointIndex[]]
             <> " = tl_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ".ptr;"
             ,
             tensorname = StringDrop[ToString[compToValue], {-len, -len + offset}];
