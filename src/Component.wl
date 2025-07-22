@@ -153,7 +153,7 @@ ParseComponent[varinfo_, compindexlist_?ListQ, coordinate_] :=
     ];
     Which[
       GetParseMode[SetComp],
-        SetComponent[compname, SetExprName[varname, compindexlist]]
+        SetComponent[compname, SetExprName[varname, compindexlist, coordinate]]
       ,
       GetParseMode[PrintComp],
         PrintComponent[coordinate, varinfo, compname]
@@ -245,10 +245,13 @@ SetCompName[varname_, compindexlist_, coordinate_] :=
               ignore the information about covariant/contravariant
 *)
 
-SetExprName[varname_, compindexlist_] :=
+SetExprName[varname_, compindexlist_, coordinate_] :=
   Module[{exprname, colist = {"t", "x", "y", "z"}},
     exprname = StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]];
     If[Length[compindexlist] > 0, (*not scalar, ignore up/down*)
+      If[coordinate =!= GetDefaultChart[],
+        exprname = exprname <> ToString[coordinate]
+      ];
       Do[
         exprname =
           exprname <>
