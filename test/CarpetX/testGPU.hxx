@@ -5,18 +5,18 @@
 #define TESTGPU_HXX
 
 
-const auto &rU1 = gf_rU[0];
-const auto &rU2 = gf_rU[1];
-const auto &rU3 = gf_rU[2];
-const auto &uU1 = gf_uU[0];
-const auto &uU2 = gf_uU[1];
-const auto &uU3 = gf_uU[2];
-const auto &MDD11 = gf_MDD[0];
-const auto &MDD12 = gf_MDD[1];
-const auto &MDD13 = gf_MDD[2];
-const auto &MDD22 = gf_MDD[3];
-const auto &MDD23 = gf_MDD[4];
-const auto &MDD33 = gf_MDD[5];
+const auto rU1 = gf_rU[0];
+const auto rU2 = gf_rU[1];
+const auto rU3 = gf_rU[2];
+const auto uU1 = gf_uU[0];
+const auto uU2 = gf_uU[1];
+const auto uU3 = gf_uU[2];
+const auto MDD11 = gf_MDD[0];
+const auto MDD12 = gf_MDD[1];
+const auto MDD13 = gf_MDD[2];
+const auto MDD22 = gf_MDD[3];
+const auto MDD23 = gf_MDD[4];
+const auto MDD33 = gf_MDD[5];
 
 const vreal
 vU1
