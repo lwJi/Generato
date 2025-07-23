@@ -233,6 +233,9 @@ IsDefined[term_] :=
       Head[head] === Symbol,
         Return[xTensorQ[head]]
       ,
+      CovDQ[Head[head]],
+        Return[True]
+      ,
       True,
         Throw @ Message[IsDefined::EType, term]
     ]
