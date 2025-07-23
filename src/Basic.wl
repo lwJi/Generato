@@ -245,7 +245,8 @@ IsDefined::EType = "The Expression type of '`1`' is not detectable!";
 Protect[IsDefined];
 
 IsExprComb[head_] :=
-  MemberQ[{Power, Plus, Times, Log, Max, Min}, head];
+  MemberQ[{Power, Plus, Times, Log, Max, Min, Sin, Cos, Tan, Csc, Sec, Cot},
+          head];
 
 IndexType[compindexlist_?ListQ, indextype_] :=
   indextype[compindexlist[[2]]];
