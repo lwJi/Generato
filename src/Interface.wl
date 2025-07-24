@@ -171,6 +171,7 @@ Protect[SetComponents];
  *
  *   \option ExtraReplaceRules: not needed in most of the cases, they are introduced to replace say coordinates representation of metric.
  *)
+
 Options[PrintEquations] :=
   {ChartName -> GetDefaultChart[], SuffixName -> Null, Mode -> "Main", ExtraReplaceRules -> {}};
 
@@ -207,6 +208,7 @@ Protect[PrintEquations];
 (**
  * \brief Print Initialization of each tensor components from a Varlist.
  *)
+
 Options[PrintInitializations] :=
   {ChartName -> GetDefaultChart[], Mode -> "Temp", TensorType -> "Scal", StorageType -> "GF", DerivsOrder -> 1, AccuracyOrder -> 4};
 
