@@ -16,23 +16,27 @@ Print["------------------------------------------------------------"];
 
 GetMapComponentToVarlist::usage = "GetMapComponentToVarlist[] returns the map between tensor components and varlist indexes.";
 
-SetProcessNewVarlist::usage = "SetProcessNewVarlist[True] update the Boolean variable specifying if we are processing a new varlist.";
+SetProcessNewVarlist::usage = "SetProcessNewVarlist[True] updates the Boolean variable specifying if we are processing a new varlist.";
 
 GetSimplifyEquation::usage = "GetSimplifyEquation[] returns the Boolean variable specifying if Simplify the equations.";
 
-SetSimplifyEquation::usage = "SetSimplifyEquation[True] update the Boolean variable specifying if Simplify the equations.";
+SetSimplifyEquation::usage = "SetSimplifyEquation[True] updates the Boolean variable specifying if Simplify the equations.";
 
 GetUseLetterForTensorComponet::usage = "GetUseLetterForTensorComponet[] returns the Boolean variable specifying if use letter for tensor components (instead of number).";
 
-SetUseLetterForTensorComponet::usage = "SetUseLetterForTensorComponet[True] update the Boolean variable specifying if use letter for tensor components (instead of number).";
+SetUseLetterForTensorComponet::usage = "SetUseLetterForTensorComponet[True] updates the Boolean variable specifying if use letter for tensor components (instead of number).";
 
 GetTempVariableType::usage = "GetTempVariableType[] returns the type of temporary variable.";
 
-SetTempVariableType::usage = "SetTempVariableType[CCTK_REAL] update the type of temporary variable.";
+SetTempVariableType::usage = "SetTempVariableType[CCTK_REAL] updates the type of temporary variable.";
+
+GetInterfaceWithNonCoordBasis::usage = "GetInterfaceWithNonCoordBasis[] returns the Boolean variable specifying if we are interfacing with non-coordinate basis.";
+
+SetInterfaceWithNonCoordBasis::usage = "SetInterfaceWithNonCoordBasis[True] updates the Boolean variable specifying if we are interfacing with non-coordinate basis.";
 
 GetSuffixName::usage = "GetSuffixName[] returns the suffix added to vars in the current list.";
 
-SetSuffixName::usage = "SetSuffixName[suffix] update the suffix added to vars in the current list.";
+SetSuffixName::usage = "SetSuffixName[suffix] updates the suffix added to vars in the current list.";
 
 GetPrefixDt::usage = "GetPrefixDt[] return the prefix used for dt of vars.";
 
@@ -53,6 +57,8 @@ $SimplifyEquation = True;
 $UseLetterForTensorComponet = False;
 
 $TempVariableType = "double";
+
+$InterfaceWithNonCoordBasis = False;
 
 $SuffixName = "";
 
@@ -115,6 +121,18 @@ SetTempVariableType[type_] :=
   ];
 
 Protect[SetTempVariableType];
+
+GetInterfaceWithNonCoordBasis[] :=
+  Return[$InterfaceWithNonCoordBasis];
+
+Protect[GetInterfaceWithNonCoordBasis];
+
+SetInterfaceWithNonCoordBasis[noncoordbasis_] :=
+  Module[{},
+    $InterfaceWithNonCoordBasis = noncoordbasis
+  ];
+
+Protect[SetInterfaceWithNonCoordBasis];
 
 GetSuffixName[] :=
   Return[$SuffixName];
@@ -265,7 +283,7 @@ SetExprName[varname_, compindexlist_, coordinate_] :=
       ]
     ];
     exprname =
-      If[GetParseSetCompMode[WithoutGridPointIndex],
+      If[GetParseSetCompMode[WithoutGridPointIndex] || (GetInterfaceWithNonCoordBasis[] && coordinate === GetDefaultChart[]),
         ToExpression[exprname]
         ,
         If[GetParseSetCompMode[UseTilePointIndex],
