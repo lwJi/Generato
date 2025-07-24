@@ -328,7 +328,7 @@ PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
       GetParsePrintCompEQNMode[NewVar],
         Module[{},
           Global`pr["const " <> GetTempVariableType[] <> " "];
-          PutAppend[CForm[compToValue], outputfile];
+          Global`pr[StringTrim[ToString[compToValue], GetGridPointIndex[]]];
           Global`pr["="];
           PutAppend[CForm[rhssToValue], outputfile];
           Global`pr[";\n"]
