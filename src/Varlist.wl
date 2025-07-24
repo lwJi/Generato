@@ -28,8 +28,12 @@ Begin["`Private`"];
 
 (* Function *)
 
-ParseVarlist[varlist_?ListQ, chartname_] :=
-  Module[{iMin, iMax = 3, var, varinfo, varname, symmetry, printname, symname, symindex, parseComponentValue},
+Options[ParseVarlist] :=
+  {ExtraReplaceRules -> {}};
+
+ParseVarlist[OptionsPattern[], varlist_?ListQ, chartname_] :=
+  Module[{iMin, iMax = 3, var, varinfo, varname, symmetry, printname, symname, symindex, parseComponentValue, extrareplacerules},
+    {extrareplacerules} = OptionValue[{ExtraReplaceRules}];
     PrintVerbose["ParseVarlist..."];
     PrintVerbose["  Dim = ", GetDim[], ", Chart = ", chartname];
     PrintVerbose["  List: ", varlist];
@@ -58,7 +62,7 @@ ParseVarlist[varlist_?ListQ, chartname_] :=
           Throw @ Message[ParseVarlist::ETensorExistOutside, ivar, varname]
         ]
       ];
-      parseComponentValue[compindexlist_] := ParseComponent[varinfo, compindexlist, chartname];
+      parseComponentValue[compindexlist_] := ParseComponent[varinfo, compindexlist, chartname, extrareplacerules];
       Switch[Length[varname],
         0(* ZERO INDEX CASE: *),
           parseComponentValue[{}]

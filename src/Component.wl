@@ -140,7 +140,7 @@ SetPrefixDt[Prefix_] :=
 
 Protect[SetPrefixDt];
 
-ParseComponent[varinfo_, compindexlist_?ListQ, coordinate_] :=
+ParseComponent[varinfo_, compindexlist_?ListQ, coordinate_, extrareplacerules_?ListQ] :=
   Module[{compname, varname},
     PrintVerbose["  ParseComponent..."];
     varname = varinfo[[1]];
@@ -156,7 +156,7 @@ ParseComponent[varinfo_, compindexlist_?ListQ, coordinate_] :=
         SetComponent[compname, SetExprName[varname, compindexlist, coordinate]]
       ,
       GetParseMode[PrintComp],
-        PrintComponent[coordinate, varinfo, compname]
+        PrintComponent[coordinate, varinfo, compname, extrareplacerules]
       ,
       True,
         Throw @ Message[ParseComponent::EMode]
@@ -167,7 +167,7 @@ ParseComponent::EMode = "ParseMode unrecognized!";
 
 Protect[ParseComponent];
 
-PrintComponent[coordinate_, varinfo_, compname_] :=
+PrintComponent[coordinate_, varinfo_, compname_, extrareplacerules_] :=
   Module[{},
     Which[
       GetParsePrintCompMode[Initializations],
@@ -176,7 +176,7 @@ PrintComponent[coordinate_, varinfo_, compname_] :=
       ,
       GetParsePrintCompMode[Equations],
         PrintVerbose["    PrintComponentEquation ", compname, "..."];
-        Global`PrintComponentEquation[coordinate, compname]
+        Global`PrintComponentEquation[coordinate, compname, extrareplacerules]
       ,
       True,
         Throw @ Message[PrintComponent::EMode]

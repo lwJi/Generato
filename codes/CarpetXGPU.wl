@@ -307,17 +307,22 @@ PrintComponentInitialization::EVarLength =
 (******************************************************************************)
 (*               Print equation of each component of a tensor                 *)
 (******************************************************************************)
+(**
+ * \param extrareplacerules: not needed in most of the cases, they are
+ *        introduced to replace say coordinates representation of metric.
+ *)
 
-PrintComponentEquation[coordinate_, compname_] :=
+PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
   Module[{outputfile = GetOutputFile[], compToValue, rhssToValue},
     compToValue = compname // ToValues;
     rhssToValue =
       (compname /. {compname[[0]] -> RHSOf[compname[[0]], GetSuffixName[]]}) //
-      DummyToBasis[coordinate] //
-      TraceBasisDummy //
-      ToValues;
+      DummyToBasis[coordinate] // TraceBasisDummy // ToValues;
     If[GetSimplifyEquation[],
       rhssToValue = rhssToValue // Simplify
+    ];
+    If[Length[extrareplacerules] > 0,
+      rhssToValue = (rhssToValue // ToValues) /. extrareplacerules
     ];
     Which[
       GetParsePrintCompEQNMode[NewVar],
