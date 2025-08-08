@@ -314,7 +314,7 @@ PrintComponentInitialization::EVarLength =
 
 PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
   Module[{outputfile = GetOutputFile[], compToValue, rhssToValue},
-    compToValue = compname // ToValues;
+    compToValue = (compname // ToValues) /. extrareplacerules;
     rhssToValue =
       (compname /. {compname[[0]] -> RHSOf[compname[[0]], GetSuffixName[]]}) //
       DummyToBasis[coordinate] // TraceBasisDummy // ToValues;
