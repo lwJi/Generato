@@ -133,14 +133,8 @@ PrintComponentInitialization[varinfo_, compname_] :=
     buf =
       Which[
         GetParsePrintCompInitMode[MainIn] || GetParsePrintCompInitMode[MainOut],
-          If[GetParsePrintCompInitStorageType[Tile],
-            "const auto " <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
-            <> " = tl_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ".ptr;"
-            ,
-            "const auto "
-            <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
-            <> " = gf_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
-          ]
+          "auto &" <> ToString[compToValue]
+          <> " = " <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
         ,
         GetParsePrintCompInitMode[Derivs],
           offset = fdorder - 1;
@@ -165,8 +159,8 @@ PrintComponentInitialization[varinfo_, compname_] :=
           ]
         ,
         GetParsePrintCompInitMode[Temp],
-          buf = "const auto &" <> ToString[compToValue] <>
-                " = " <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
+          "const auto &" <> ToString[compToValue]
+          <> " = " <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
         ,
         True,
           Throw @ Message[PrintComponentInitialization::EMode]
