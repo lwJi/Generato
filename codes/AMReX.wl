@@ -95,12 +95,12 @@ PrintComponentInitialization[varinfo_, compname_] :=
             subbuf = "[" <> ToString[varlistindex] <> "]"
           ,
           len == 2,
-            subbuf = "[" <> ToString[Mod[varlistindex, 3]] <> "]["
-                         <> ToString[Quotient[varlistindex, 3]] <> "]"
+            subbuf = "[" <> ToString[Quotient[varlistindex, 3]] <> "]["
+                         <> ToString[Mod[varlistindex, 3]] <> "]"
           ,
           len == 3,
-            subbuf = "[" <> ToString[Mod[varlistindex, 6]] <> "]["
-                         <> ToString[Quotient[varlistindex, 6]] <> "]"
+            subbuf = "[" <> ToString[Quotient[varlistindex, 3]] <> "]["
+                         <> ToString[Mod[varlistindex, 3]] <> "]"
           ,
           True,
             Throw @ Message[PrintComponentInitialization::EVarLength]
@@ -112,12 +112,12 @@ PrintComponentInitialization[varinfo_, compname_] :=
             subbuf = "[" <> ToString[varlistindex] <> "]"
           ,
           len == 3,
-            subbuf = "[" <> ToString[Mod[varlistindex, 3]] <> "]["
-                         <> ToString[Quotient[varlistindex, 3]] <> "]"
+            subbuf = "[" <> ToString[Quotient[varlistindex, 6]] <> "]["
+                         <> ToString[Mod[varlistindex, 6]] <> "]"
           ,
           len == 4,
-            subbuf = "[" <> ToString[Mod[varlistindex, 6]] <> "]["
-                         <> ToString[Quotient[varlistindex, 6]] <> "]"
+            subbuf = "[" <> ToString[Quotient[varlistindex, 6]] <> "]["
+                         <> ToString[Mod[varlistindex, 6]] <> "]"
           ,
           True,
             Throw @ Message[PrintComponentInitialization::EVarLength]
@@ -164,22 +164,9 @@ PrintComponentInitialization[varinfo_, compname_] :=
             <> ", p.i, p.j, p.k);"
           ]
         ,
-        (*
-        GetParsePrintCompInitMode[Derivs],
-          offset = fdorder - 1;
-          "const auto " <> ToString[compToValue]
-          <> " = fd_" <> ToString[fdorder] <> "_o" <> ToString[fdaccuracy]
-          <> "<"
-          <> StringRiffle[
-              Table[ToString[compname[[i]][[1]]], {i, 1, fdorder}], ", "]
-          <> ">(layout2, "
-          <> StringDrop[
-              StringDrop[ToString[compToValue], fdorder], {-len, -len + offset}]
-          <> ", p.i, p.j, p.k, invDxyz);"
-        ,
-        *)
         GetParsePrintCompInitMode[Temp],
-          buf = "auto " <> ToString[compToValue] <> ";"
+          buf = "const auto &" <> ToString[compToValue] <>
+                " = " <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
         ,
         True,
           Throw @ Message[PrintComponentInitialization::EMode]
