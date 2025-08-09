@@ -287,7 +287,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
         ,
         *)
         GetParsePrintCompInitMode[Temp],
-          buf = "auto " <> ToString[compToValue] <> ";"
+          "auto " <> ToString[compToValue] <> ";"
         ,
         True,
           Throw @ Message[PrintComponentInitialization::EMode]
