@@ -76,10 +76,180 @@ PrintFDExpression[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strIdx_?StringQ] :=
 (*            Print initialization of each component of a tensor              *)
 (******************************************************************************)
 
+PrintComponentInitialization[varinfo_, compname_] :=
+  Module[{varlistindex, compToValue, varname, symmetry, buf, subbuf, len,
+          fdorder, fdaccuracy},
+    varlistindex = GetMapComponentToVarlist[][compname];
+    compToValue = compname // ToValues;
+    {varname, symmetry} = varinfo;
+    len = Length[varname];
+
+    (* set subbuf *)
+    Which[
+      GetParsePrintCompInitTensorType[Scal],
+        subbuf = If[len == 0, "", "[" <> ToString[varlistindex] <> "]"]
+      ,
+      GetParsePrintCompInitTensorType[Vect],
+        Which[
+          len == 1,
+            subbuf = "[" <> ToString[varlistindex] <> "]"
+          ,
+          len == 2,
+            subbuf = "[" <> ToString[Mod[varlistindex, 3]] <> "]["
+                         <> ToString[Quotient[varlistindex, 3]] <> "]"
+          ,
+          len == 3,
+            subbuf = "[" <> ToString[Mod[varlistindex, 6]] <> "]["
+                         <> ToString[Quotient[varlistindex, 6]] <> "]"
+          ,
+          True,
+            Throw @ Message[PrintComponentInitialization::EVarLength]
+        ]
+      ,
+      GetParsePrintCompInitTensorType[Smat],
+        Which[
+          len == 2,
+            subbuf = "[" <> ToString[varlistindex] <> "]"
+          ,
+          len == 3,
+            subbuf = "[" <> ToString[Mod[varlistindex, 3]] <> "]["
+                         <> ToString[Quotient[varlistindex, 3]] <> "]"
+          ,
+          len == 4,
+            subbuf = "[" <> ToString[Mod[varlistindex, 6]] <> "]["
+                         <> ToString[Quotient[varlistindex, 6]] <> "]"
+          ,
+          True,
+            Throw @ Message[PrintComponentInitialization::EVarLength]
+        ]
+      ,
+      True,
+        Throw @ Message[PrintComponentInitialization::EMode]
+    ];
+    fdorder = GetParsePrintCompInitMode[DerivsOrder];
+    fdaccuracy = GetParsePrintCompInitMode[DerivsAccuracy];
+
+    (* set buf *)
+    buf =
+      Which[
+        GetParsePrintCompInitMode[MainIn] || GetParsePrintCompInitMode[MainOut],
+          If[GetParsePrintCompInitStorageType[Tile],
+            "const auto " <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
+            <> " = tl_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ".ptr;"
+            ,
+            "const auto "
+            <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
+            <> " = gf_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
+          ]
+        ,
+        GetParsePrintCompInitMode[Derivs],
+          offset = fdorder - 1;
+          If[GetParsePrintCompInitStorageType[Tile],
+            "const auto " <> StringTrim[ToString[compToValue], GetTilePointIndex[]]
+            <> " = tl_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ".ptr;"
+            ,
+            tensorname = StringDrop[ToString[compToValue], {-len, -len + offset}];
+            pos1stbackwards =
+              If[StringStartsQ[tensorname, "d"],
+                fdorder
+                ,
+                StringPosition[tensorname, "d"][[-1]][[1]]
+              ];
+            "const auto " <> ToString[compToValue]
+            <> " = calcderivs" <> ToString[fdorder] <> "_"
+            <> StringRiffle[
+                Table[ToString[compname[[i]][[1]]], {i, 1, fdorder}], ""]
+            <> "("
+            <> StringDrop[tensorname, {pos1stbackwards - offset, pos1stbackwards}]
+            <> ", p.i, p.j, p.k);"
+          ]
+        ,
+        (*
+        GetParsePrintCompInitMode[Derivs],
+          offset = fdorder - 1;
+          "const auto " <> ToString[compToValue]
+          <> " = fd_" <> ToString[fdorder] <> "_o" <> ToString[fdaccuracy]
+          <> "<"
+          <> StringRiffle[
+              Table[ToString[compname[[i]][[1]]], {i, 1, fdorder}], ", "]
+          <> ">(layout2, "
+          <> StringDrop[
+              StringDrop[ToString[compToValue], fdorder], {-len, -len + offset}]
+          <> ", p.i, p.j, p.k, invDxyz);"
+        ,
+        *)
+        GetParsePrintCompInitMode[Temp],
+          buf = "auto " <> ToString[compToValue] <> ";"
+        ,
+        True,
+          Throw @ Message[PrintComponentInitialization::EMode]
+      ];
+    pr[buf];
+  ];
+
+PrintComponentInitialization::EMode =
+  "PrintComponentInitialization mode unrecognized!";
+
+PrintComponentInitialization::EVarLength =
+  "PrintComponentInitialization variable's tensor type unsupported!";
+
+(*Protect[PrintComponentInitialization];*)
+
 
 (******************************************************************************)
 (*               Print equation of each component of a tensor                 *)
 (******************************************************************************)
+(**
+ * \param extrareplacerules: not needed in most of the cases, they are
+ *        introduced to replace say coordinates representation of metric.
+ *)
+
+PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
+  Module[{outputfile = GetOutputFile[], compToValue, rhssToValue},
+    compToValue = (compname // ToValues) /. extrareplacerules;
+    rhssToValue =
+      (compname /. {compname[[0]] -> RHSOf[compname[[0]], GetSuffixName[]]}) //
+      DummyToBasis[coordinate] // TraceBasisDummy // ToValues;
+    If[GetSimplifyEquation[],
+      rhssToValue = rhssToValue // Simplify
+    ];
+    If[Length[extrareplacerules] > 0,
+      rhssToValue = (rhssToValue // ToValues) /. extrareplacerules
+    ];
+    Which[
+      GetParsePrintCompEQNMode[NewVar],
+        Module[{},
+          Global`pr["const " <> GetTempVariableType[] <> " "];
+          Global`pr[StringTrim[ToString[compToValue], GetGridPointIndex[]]];
+          Global`pr["="];
+          PutAppend[CForm[rhssToValue], outputfile];
+          Global`pr[";\n"]
+        ]
+      ,
+      GetParsePrintCompEQNMode[Main],
+        Module[{},
+          PutAppend[CForm[compToValue], outputfile];
+          Global`pr["="];
+          PutAppend[CForm[rhssToValue], outputfile];
+          Global`pr[";\n"]
+        ]
+      ,
+      GetParsePrintCompEQNMode[AddToMain],
+        Module[{},
+          PutAppend[CForm[compToValue], outputfile];
+          Global`pr["+="];
+          PutAppend[CForm[rhssToValue], outputfile];
+          Global`pr[";\n"]
+        ]
+      ,
+      True,
+        Throw @ Message[PrintComponentEquation::EMode]
+    ]
+  ];
+
+PrintComponentEquation::EMode = "PrintEquationMode unrecognized!";
+
+(*Protect[PrintComponentEquation];*)
 
 
 (******************************************************************************)
