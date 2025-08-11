@@ -33,12 +33,13 @@ PrintIndexes3D[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strDir_?StringQ] :=
       If[(Subscript[c, index] /. solution) == 0, Continue[]];
       buf = "  const T " <> ToString[GetGFIndexName[index]] <>
         If[index == 0,
-          " = gf(i, j, k);"
+          " = gf(i, j, k, comp);"
           ,
           " = gf("
             <> "i + (D == 0 ? " <> ToString[index] <> " : 0), "
             <> "j + (D == 1 ? " <> ToString[index] <> " : 0), "
-            <> "k + (D == 2 ? " <> ToString[index] <> " : 0));"
+            <> "k + (D == 2 ? " <> ToString[index] <> " : 0), "
+            <> "comp);"
         ];
       pr[buf]
       ,
