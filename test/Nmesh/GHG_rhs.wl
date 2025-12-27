@@ -32,11 +32,11 @@ DefConstantSymbol[gamma2, PrintAs -> "\!\(\*SubscriptBox[\(\[Gamma]\), \(2\)]\)"
 
 DefConstantSymbol[interior, PrintAs -> "I"];
 
-Module[{Mat, invMat},
-  Mat = Table[g[{aa, -cart}, {bb, -cart}] // ToValues, {aa, 1, 3}, {bb, 1, 3}];
-  invMat = Inverse[Mat] /. {1 / Det[Mat] -> (detinvh[] // ToValues)};
-  SetEQNDelayed[detinvh[], 1 / Det[Mat] // Simplify];
-  SetEQNDelayed[invh[i_, j_], invMat[[i[[1]], j[[1]]]] // Simplify]
+Module[{mat, invmat},
+  mat = Table[g[{aa, -cart}, {bb, -cart}] // ToValues, {aa, 1, 3}, {bb, 1, 3}];
+  invmat = Inverse[mat] /. {1 / Det[mat] -> (detinvh[] // ToValues)};
+  SetEQNDelayed[detinvh[], 1 / Det[mat] // Simplify];
+  SetEQNDelayed[invh[i_, j_], invmat[[i[[1]], j[[1]]]] // Simplify]
 ];
 
 SetEQNDelayed[

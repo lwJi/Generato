@@ -6,11 +6,11 @@
 
 BeginPackage["Generato`FiniteDifferenceStencils`"];
 
-Print["------------------------------------------------------------"];
+System`Print["------------------------------------------------------------"];
 
-Print["Package Generato`FiniteDifferenceStencils`, {2025, 1, 21}"];
+System`Print["Package Generato`FiniteDifferenceStencils`, {2025, 1, 21}"];
 
-Print["------------------------------------------------------------"];
+System`Print["------------------------------------------------------------"];
 
 GetFiniteDifferenceCoefficients::usage = "GetFiniteDifferenceCoefficients[sample, order] return coeffients of finite difference stencils.";
 
