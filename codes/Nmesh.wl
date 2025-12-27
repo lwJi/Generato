@@ -127,9 +127,9 @@ PrintComponentEquation::EMode = "PrintEquationMode unrecognized!";
 *)
 
 Module[{outputfile = GetOutputFile[], filepointer},
-  Global`Print["Writing to \"", outputfile, "\"...\n"];
+  System`Print["Writing to \"", outputfile, "\"...\n"];
   If[FileExistsQ[outputfile],
-    Global`Print["\"", outputfile, "\" already exist, replacing it ...\n"];
+    System`Print["\"", outputfile, "\" already exist, replacing it ...\n"];
     DeleteFile[outputfile]
   ];
   (* define pr *)
@@ -156,6 +156,6 @@ Module[{outputfile = GetOutputFile[], filepointer},
   $MainPrint[];
   pr[];
   pr["/* " <> FileNameTake[outputfile] <> " */"];
-  Global`Print["Done generating \"", outputfile, "\"\n"];
+  System`Print["Done generating \"", outputfile, "\"\n"];
   Close[filepointer]
 ];
