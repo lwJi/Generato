@@ -4,22 +4,22 @@
 
 BeginPackage["Generato`Derivation`"];
 
-Print["------------------------------------------------------------"];
+System`Print["------------------------------------------------------------"];
 
-Print["Package Generato`Derivation`, {2024, 1, 18}"];
+System`Print["Package Generato`Derivation`, {2024, 1, 18}"];
 
-Print["------------------------------------------------------------"];
+System`Print["------------------------------------------------------------"];
 
 TestEQN::usage = "TestEQN[equal, terms] print SUCCEED/FAILED if equal/not";
 
 Begin["`Private`"];
 
-TestEQN[equal_?BooleanQ, terms_ : String ""] :=
+TestEQN[equal_?BooleanQ, terms_ : ""] :=
   Module[{},
     If[equal,
-      Print["  Testing " <> terms <> " SUCCEED!"]
+      System`Print["  Testing " <> terms <> " SUCCEED!"]
       ,
-      Print["  Testing " <> terms <> " FAILED!"];
+      System`Print["  Testing " <> terms <> " FAILED!"];
       Abort[]
     ]
   ];
