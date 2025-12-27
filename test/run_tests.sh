@@ -96,24 +96,44 @@ compare_golden() {
   fi
 }
 
+# Function to update golden file
+update_golden() {
+  local backend=$1
+  local test_name=$2
+  local ext=$3
+
+  local current="$SCRIPT_DIR/$backend/${test_name}${ext}"
+  local golden_dir="$SCRIPT_DIR/golden/$backend"
+  local golden="$golden_dir/${test_name}${ext}.golden"
+
+  if [ ! -f "$current" ]; then
+    echo -e "${YELLOW}  SKIP: $current not found${NC}"
+    return 0
+  fi
+
+  mkdir -p "$golden_dir"
+  cp "$current" "$golden"
+  echo -e "${GREEN}  UPDATED: ${backend}/${test_name}${ext}${NC}"
+}
+
 # Track results
 PASSED=0
 FAILED=0
 
+# Backend test definitions
+BACKENDS=(
+  "CarpetX:test:.hxx"
+  "CarpetX:testGPU:.hxx"
+  "CarpetXPointDesc:test:.hxx"
+  "Carpet:test:.hxx"
+  "AMReX:test:.hxx"
+  "Nmesh:test:.c"
+  "Nmesh:GHG_rhs:.c"
+)
+
 if [ "$COMPARE_ONLY" = false ]; then
   echo "--- Integration Tests ---"
   echo ""
-
-  # Run tests for each backend
-  BACKENDS=(
-    "CarpetX:test:.hxx"
-    "CarpetX:testGPU:.hxx"
-    "CarpetXPointDesc:test:.hxx"
-    "Carpet:test:.hxx"
-    "AMReX:test:.hxx"
-    "Nmesh:test:.c"
-    "Nmesh:GHG_rhs:.c"
-  )
 
   for entry in "${BACKENDS[@]}"; do
     IFS=':' read -r backend test_name ext <<< "$entry"
@@ -134,24 +154,23 @@ if [ "$COMPARE_ONLY" = false ]; then
   echo ""
 fi
 
-echo "--- Golden File Comparison ---"
-echo ""
+if [ "$GENERATE" = true ]; then
+  echo "--- Updating Golden Files ---"
+  echo ""
 
-# Compare all outputs
-BACKENDS=(
-  "CarpetX:test:.hxx"
-  "CarpetX:testGPU:.hxx"
-  "CarpetXPointDesc:test:.hxx"
-  "Carpet:test:.hxx"
-  "AMReX:test:.hxx"
-  "Nmesh:test:.c"
-  "Nmesh:GHG_rhs:.c"
-)
+  for entry in "${BACKENDS[@]}"; do
+    IFS=':' read -r backend test_name ext <<< "$entry"
+    update_golden "$backend" "$test_name" "$ext"
+  done
+else
+  echo "--- Golden File Comparison ---"
+  echo ""
 
-for entry in "${BACKENDS[@]}"; do
-  IFS=':' read -r backend test_name ext <<< "$entry"
-  compare_golden "$backend" "$test_name" "$ext"
-done
+  for entry in "${BACKENDS[@]}"; do
+    IFS=':' read -r backend test_name ext <<< "$entry"
+    compare_golden "$backend" "$test_name" "$ext"
+  done
+fi
 
 echo ""
 echo "========================================"
