@@ -44,3 +44,19 @@ Generato GHG_rhs.wl
 * Use `SetEQNDelayed` if your right-hand side (rhs) includes an `If` statement to handle different component cases. Otherwise, `SetEQN` is preferred because it has an option, `CheckRHS`, which checks if all the terms appearing in the rhs are well-defined.
 
 * `IsDefined[term]` is very useful for debugging.
+
+## Running Tests
+
+```bash
+# Run all tests (integration + golden file comparison)
+./test/run_tests.sh
+
+# Run only golden file comparison (no regeneration)
+./test/run_tests.sh --compare
+
+# Regenerate all test outputs
+./test/run_tests.sh --generate
+
+# Run via Wolfram (unit tests + regression tests)
+wolframscript -f test/AllTests.wl
+```

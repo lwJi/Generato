@@ -57,6 +57,28 @@ Each backend implements `PrintComponentInitialization` and `PrintComponentEquati
 - **Component Mapping**: Logical tensor indices map to varlist positions
 - **Symmetry Handling**: Symmetric vs Antisymmetric (AB) notations for 2-index tensors
 
+## Running Tests
+
+```bash
+# Run all tests (integration + golden file comparison)
+./test/run_tests.sh
+
+# Run only golden file comparison (no regeneration)
+./test/run_tests.sh --compare
+
+# Regenerate all test outputs
+./test/run_tests.sh --generate
+
+# Run via Wolfram (unit tests + regression tests)
+wolframscript -f test/AllTests.wl
+```
+
+The test suite includes:
+
+- **Unit tests** (`test/unit/`) - Test individual module functions
+- **Integration tests** - Generate output for each backend
+- **Golden file regression** (`test/golden/`) - Compare outputs against expected results
+
 ## Test Examples
 
 - `test/CarpetX/test.wl` - Simple CarpetX example with 3 vectors
