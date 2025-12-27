@@ -41,20 +41,12 @@ CompareGoldenFile[currentFile_String, goldenFile_String] := Module[
   ]
 ];
 
-(* Define test cases: {backend, testName, extension} *)
-$TestCases = {
-  (* CarpetX backends *)
-  {"CarpetX", "test", ".hxx"},
-  {"CarpetX", "testGPU", ".hxx"},
-  {"CarpetXPointDesc", "test", ".hxx"},
-  (* Carpet backend *)
-  {"Carpet", "test", ".hxx"},
-  (* AMReX backend *)
-  {"AMReX", "test", ".hxx"},
-  (* Nmesh backend *)
-  {"Nmesh", "test", ".c"},
-  {"Nmesh", "GHG_rhs", ".c"}
-};
+(* Load test cases from shared config file *)
+$ConfigFile = FileNameJoin[{$TestDir, "..", "test_cases.txt"}];
+$TestCases = Select[
+  StringSplit[#, ":"] & /@ Import[$ConfigFile, "Lines"],
+  Length[#] == 3 && !StringStartsQ[#[[1]], "#"] &
+];
 
 (* Run all golden file comparisons *)
 RunGoldenTests[] := Module[

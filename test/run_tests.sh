@@ -120,16 +120,20 @@ update_golden() {
 PASSED=0
 FAILED=0
 
-# Backend test definitions
-BACKENDS=(
-  "CarpetX:test:.hxx"
-  "CarpetX:testGPU:.hxx"
-  "CarpetXPointDesc:test:.hxx"
-  "Carpet:test:.hxx"
-  "AMReX:test:.hxx"
-  "Nmesh:test:.c"
-  "Nmesh:GHG_rhs:.c"
-)
+# Load test cases from config file
+CONFIG_FILE="$SCRIPT_DIR/test_cases.txt"
+if [ ! -f "$CONFIG_FILE" ]; then
+  echo -e "${RED}ERROR: Config file not found: $CONFIG_FILE${NC}"
+  exit 1
+fi
+
+# Read config file into BACKENDS array (skip comments and empty lines)
+BACKENDS=()
+while IFS= read -r line || [ -n "$line" ]; do
+  # Skip comments and empty lines
+  [[ "$line" =~ ^#.*$ || -z "$line" ]] && continue
+  BACKENDS+=("$line")
+done < "$CONFIG_FILE"
 
 if [ "$COMPARE_ONLY" = false ]; then
   echo "--- Integration Tests ---"
