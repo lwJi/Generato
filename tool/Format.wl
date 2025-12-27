@@ -2,7 +2,7 @@ Needs["CodeFormatter`"]
 
 Module[{dirs = {"src", "test/Nmesh", "test/CarpetX"}},
   Do[
-    Print["Formatting '.wl' files in "<>dir<>" ..."];
+    System`Print["Formatting '.wl' files in "<>dir<>" ..."];
     files = FileNames["*.wl", dir];
     Do[
       file = File[fname];
@@ -12,4 +12,4 @@ Module[{dirs = {"src", "test/Nmesh", "test/CarpetX"}},
   {dir, dirs}]
 ];
 
-Print["Done"];
+System`Print["Done"];
