@@ -61,7 +61,7 @@ PrintFDExpression[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strIdx_?StringQ] :=
       (Sum[
         index = stencils[[i]];
         (Subscript[c, index] /. solution) GetGFIndexName[index],
-        {i, 1, Length[stencils]}] // Simplify)
+        {i, 1, Length[stencils]}] // Simplify) *
       Product[invdx, {i, 1, fdOrd}]
     ]] <> ";";
     pr[StringReplace[buf, rule]];
