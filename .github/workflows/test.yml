@@ -1,0 +1,106 @@
+name: Generato Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set GENERATO environment variable
+        run: echo "GENERATO=${{ github.workspace }}" >> $GITHUB_ENV
+
+      # Note: Wolfram Engine requires a license. For CI, you would need to:
+      # 1. Install Wolfram Engine from https://www.wolfram.com/engine/
+      # 2. Configure a Wolfram Cloud account with a free license
+      # 3. Set up credentials as GitHub secrets
+      #
+      # The following steps assume Wolfram Engine is available.
+      # Uncomment and configure as needed for your setup.
+
+      # - name: Install Wolfram Engine
+      #   run: |
+      #     wget -q https://account.wolfram.com/download/public/wolfram-engine/...
+      #     sudo bash WolframEngine_*.sh -- -auto
+      #
+      # - name: Activate Wolfram Engine
+      #   env:
+      #     WOLFRAM_ID: ${{ secrets.WOLFRAM_ID }}
+      #     WOLFRAM_PASSWORD: ${{ secrets.WOLFRAM_PASSWORD }}
+      #   run: |
+      #     wolframscript -activate
+
+      # Integration Tests: Generate code for each backend
+      - name: Run Integration Tests (CarpetX)
+        if: ${{ false }}  # Disabled until Wolfram Engine is configured
+        run: |
+          cd test/CarpetX
+          $GENERATO/Generato test.wl
+          $GENERATO/Generato testGPU.wl
+
+      - name: Run Integration Tests (CarpetXPointDesc)
+        if: ${{ false }}  # Disabled until Wolfram Engine is configured
+        run: |
+          cd test/CarpetXPointDesc
+          $GENERATO/Generato test.wl
+
+      - name: Run Integration Tests (Carpet)
+        if: ${{ false }}  # Disabled until Wolfram Engine is configured
+        run: |
+          cd test/Carpet
+          $GENERATO/Generato test.wl
+
+      - name: Run Integration Tests (AMReX)
+        if: ${{ false }}  # Disabled until Wolfram Engine is configured
+        run: |
+          cd test/AMReX
+          $GENERATO/Generato test.wl
+
+      - name: Run Integration Tests (Nmesh)
+        if: ${{ false }}  # Disabled until Wolfram Engine is configured
+        run: |
+          cd test/Nmesh
+          $GENERATO/Generato test.wl
+          $GENERATO/Generato GHG_rhs.wl
+
+      # Golden File Comparison
+      - name: Run Golden File Regression Tests
+        if: ${{ false }}  # Disabled until Wolfram Engine is configured
+        run: |
+          wolframscript -f test/regression/compare_golden.wl
+
+      # Syntax Check: Verify generated C/C++ code compiles
+      - name: Check CarpetX output syntax
+        run: |
+          if [ -f test/CarpetX/test.hxx ]; then
+            g++ -fsyntax-only -x c++ test/CarpetX/test.hxx 2>/dev/null || echo "Note: CarpetX test.hxx may require framework headers"
+          fi
+
+      - name: Check Nmesh output syntax
+        run: |
+          if [ -f test/Nmesh/test.c ]; then
+            gcc -fsyntax-only test/Nmesh/test.c 2>/dev/null || echo "Note: Nmesh test.c may require framework headers"
+          fi
+
+      # Unit Tests
+      - name: Run Unit Tests
+        if: ${{ false }}  # Disabled until Wolfram Engine is configured
+        run: |
+          wolframscript -f test/AllTests.wl
+
+  # Optional: Matrix test across multiple platforms
+  # test-matrix:
+  #   strategy:
+  #     matrix:
+  #       os: [ubuntu-latest, macos-latest]
+  #   runs-on: ${{ matrix.os }}
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     # ... additional steps

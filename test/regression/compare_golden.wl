@@ -1,0 +1,98 @@
+(* ::Package:: *)
+
+(* compare_golden.wl *)
+(* Golden file comparison for regression testing *)
+(* (c) Generato Test Suite *)
+
+BeginPackage["GoldenTest`"];
+
+CompareGoldenFile::usage = "CompareGoldenFile[currentFile, goldenFile] compares a generated file against its golden reference.";
+RunGoldenTests::usage = "RunGoldenTests[] runs all golden file comparisons and returns a summary.";
+
+Begin["`Private`"];
+
+$TestDir = DirectoryName[$InputFileName];
+$GoldenDir = FileNameJoin[{$TestDir, "..", "golden"}];
+
+(* Compare two files, return True if identical *)
+CompareGoldenFile[currentFile_String, goldenFile_String] := Module[
+  {current, golden, result},
+
+  If[!FileExistsQ[currentFile],
+    Print["FAIL: Current file not found: ", currentFile];
+    Return[$Failed]
+  ];
+
+  If[!FileExistsQ[goldenFile],
+    Print["FAIL: Golden file not found: ", goldenFile];
+    Return[$Failed]
+  ];
+
+  current = Import[currentFile, "Text"];
+  golden = Import[goldenFile, "Text"];
+
+  If[current === golden,
+    Print["PASS: ", FileNameTake[currentFile]];
+    True,
+    Print["FAIL: ", FileNameTake[currentFile], " differs from golden"];
+    Print["  Current: ", StringLength[current], " chars"];
+    Print["  Golden:  ", StringLength[golden], " chars"];
+    $Failed
+  ]
+];
+
+(* Define test cases: {backend, testName, extension} *)
+$TestCases = {
+  (* CarpetX backends *)
+  {"CarpetX", "test", ".hxx"},
+  {"CarpetX", "testGPU", ".hxx"},
+  {"CarpetXPointDesc", "test", ".hxx"},
+  (* Carpet backend *)
+  {"Carpet", "test", ".hxx"},
+  (* AMReX backend *)
+  {"AMReX", "test", ".hxx"},
+  (* Nmesh backend *)
+  {"Nmesh", "test", ".c"},
+  {"Nmesh", "GHG_rhs", ".c"}
+};
+
+(* Run all golden file comparisons *)
+RunGoldenTests[] := Module[
+  {results, passed, failed, backend, testName, ext, currentFile, goldenFile},
+
+  Print["=== Golden File Regression Tests ==="];
+  Print[""];
+
+  results = Table[
+    {backend, testName, ext} = testCase;
+    currentFile = FileNameJoin[{$TestDir, "..", backend, testName <> ext}];
+    goldenFile = FileNameJoin[{$GoldenDir, backend, testName <> ext <> ".golden"}];
+    CompareGoldenFile[currentFile, goldenFile],
+    {testCase, $TestCases}
+  ];
+
+  passed = Count[results, True];
+  failed = Count[results, $Failed];
+
+  Print[""];
+  Print["=== Summary ==="];
+  Print["Passed: ", passed, "/", Length[results]];
+  Print["Failed: ", failed, "/", Length[results]];
+
+  If[failed > 0,
+    Print[""];
+    Print["REGRESSION DETECTED"];
+    Exit[1],
+    Print[""];
+    Print["ALL TESTS PASSED"];
+    Exit[0]
+  ]
+];
+
+End[];
+EndPackage[];
+
+(* Run tests when executed directly *)
+If[Length[$ScriptCommandLine] > 0,
+  RunGoldenTests[]
+];
