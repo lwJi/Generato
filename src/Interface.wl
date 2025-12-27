@@ -12,11 +12,11 @@ Needs["Generato`Component`"];
 
 Needs["Generato`Varlist`"];
 
-Print["------------------------------------------------------------"];
+System`Print["------------------------------------------------------------"];
 
-Print["Package Generato`Interface`, {2024, 1, 11}"];
+System`Print["Package Generato`Interface`, {2024, 1, 11}"];
 
-Print["------------------------------------------------------------"];
+System`Print["------------------------------------------------------------"];
 
 DefTensors::usage = "DefTensors[vars] define tensors (without setting its components)";
 

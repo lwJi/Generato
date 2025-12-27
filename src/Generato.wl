@@ -26,7 +26,7 @@
 
 <<stencils/FiniteDifferenceStencils.wl
 
-Print[];
+System`Print[];
 
 (***********)
 
@@ -46,7 +46,7 @@ $AccelerationSign = -1;
 
 $CVVerbose = False;
 
-$PrePrint = ScreenDollarIndices;(* replace internal dummies by new non-dollar dummies for output *)
+System`$PrePrint = ScreenDollarIndices;(* replace internal dummies by new non-dollar dummies for output *)
 
 SetOptions[ToCanonical, UseMetricOnVBundle -> None]; (* do not use metric when ToCanonical *)
 

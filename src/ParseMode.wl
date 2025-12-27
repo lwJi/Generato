@@ -4,11 +4,11 @@
 
 BeginPackage["Generato`ParseMode`"];
 
-Print["------------------------------------------------------------"];
+System`Print["------------------------------------------------------------"];
 
-Print["Package Generato`ParseMode`, {2024, 7, 06}"];
+System`Print["Package Generato`ParseMode`, {2024, 7, 06}"];
 
-Print["------------------------------------------------------------"];
+System`Print["------------------------------------------------------------"];
 
 GetParseMode::usage = "GetParseMode[key] returns the mode correspond to the key";
 

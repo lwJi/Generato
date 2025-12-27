@@ -10,11 +10,11 @@ Needs["Generato`Basic`"];
 
 Needs["Generato`Component`"];
 
-Print["------------------------------------------------------------"];
+System`Print["------------------------------------------------------------"];
 
-Print["Package Generato`Writefile`, {2025, 1, 23}"];
+System`Print["Package Generato`Writefile`, {2025, 1, 23}"];
 
-Print["------------------------------------------------------------"];
+System`Print["------------------------------------------------------------"];
 
 SetMainPrint::usage = "SetMainPrint[content] update the variable storing function printing more main content.";
 
@@ -46,9 +46,9 @@ Protect[SetMainPrint];
 
 WriteToFile[outputfile_] :=
   Module[{},
-    Print["Writing to \"", outputfile, "\"...\n"];
+    System`Print["Writing to \"", outputfile, "\"...\n"];
     If[FileExistsQ[outputfile],
-      Print["\"", outputfile, "\" already exist, replacing it ...\n"];
+      System`Print["\"", outputfile, "\" already exist, replacing it ...\n"];
       DeleteFile[outputfile]
     ];
     (* define pr *)
@@ -84,7 +84,7 @@ WriteToFile[outputfile_] :=
       Global`pr[]
     ];
     Global`pr["/* " <> FileNameTake[outputfile] <> " */"];
-    Print["Done generating \"", outputfile, "\"\n"];
+    System`Print["Done generating \"", outputfile, "\"\n"];
     Close[filepointer]
   ];
 
