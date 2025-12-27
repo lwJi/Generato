@@ -4,13 +4,13 @@
 
 (* (c) Liwei Ji, 01/2024 *)
 
-BeginPackage["Generato`Basic`", "xAct`xTensor`", "xAct`xCoba`"];
+BeginPackage["Generato`Basic`", {"xAct`xTensor`", "xAct`xCoba`"}];
 
-Print["------------------------------------------------------------"];
+System`Print["------------------------------------------------------------"];
 
-Print["Package Generato`Basic`, {2024, 1, 11}"];
+System`Print["Package Generato`Basic`, {2024, 1, 11}"];
 
-Print["------------------------------------------------------------"];
+System`Print["------------------------------------------------------------"];
 
 GetCheckInputEquations::usage = "GetCheckInputEquations[] return the Boolean variable specifying if we are checking input equations.";
 
@@ -386,7 +386,7 @@ Protect[SetEQNDelayed];
 PrintVerbose[var__:""] :=
   Module[{},
     If[GetPVerbose[],
-      Print[var]
+      System`Print[var]
     ]
   ];
 
