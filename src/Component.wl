@@ -151,9 +151,9 @@ GetPrefixDt[] :=
 
 Protect[GetPrefixDt];
 
-SetPrefixDt[Prefix_] :=
+SetPrefixDt[prefix_] :=
   Module[{},
-    $PrefixDt = Prefix
+    $PrefixDt = prefix
   ];
 
 Protect[SetPrefixDt];
