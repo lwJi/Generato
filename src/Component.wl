@@ -8,11 +8,11 @@ Needs["Generato`Basic`"];
 
 Needs["Generato`ParseMode`"];
 
-Print["------------------------------------------------------------"];
+System`Print["------------------------------------------------------------"];
 
-Print["Package Generato`Component`, {2024, 1, 11}"];
+System`Print["Package Generato`Component`, {2024, 1, 11}"];
 
-Print["------------------------------------------------------------"];
+System`Print["------------------------------------------------------------"];
 
 GetMapComponentToVarlist::usage = "GetMapComponentToVarlist[] returns the map between tensor components and varlist indexes.";
 
@@ -231,7 +231,7 @@ SetComponent[compname_, exprname_] :=
   ];
 
 (*
-    compname: component expr in Mathematica kernal, say Pi[{1,-cart},{2,-cart}] 
+    compname: component expr in Mathematica kernal, say Pi[{1,-cart},{2,-cart}]
 *)
 
 SetCompName[varname_, compindexlist_, coordinate_] :=
