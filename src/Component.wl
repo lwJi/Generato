@@ -72,17 +72,13 @@ GetMapComponentToVarlist[] :=
 Protect[GetMapComponentToVarlist];
 
 SetMapComponentToVarlist[map_] :=
-  Module[{},
-    $MapComponentToVarlist = map
-  ];
+  $MapComponentToVarlist = map;
 
 GetProcessNewVarlist[] :=
   Return[$ProcessNewVarlist];
 
 SetProcessNewVarlist[isnew_] :=
-  Module[{},
-    $ProcessNewVarlist = isnew
-  ];
+  $ProcessNewVarlist = isnew;
 
 Protect[SetProcessNewVarlist];
 
@@ -92,9 +88,7 @@ GetSimplifyEquation[] :=
 Protect[GetSimplifyEquation];
 
 SetSimplifyEquation[simplify_] :=
-  Module[{},
-    $SimplifyEquation = simplify
-  ];
+  $SimplifyEquation = simplify;
 
 Protect[SetSimplifyEquation];
 
@@ -104,9 +98,7 @@ GetUseLetterForTensorComponet[] :=
 Protect[GetUseLetterForTensorComponet];
 
 SetUseLetterForTensorComponet[useletter_] :=
-  Module[{},
-    $UseLetterForTensorComponet = useletter
-  ];
+  $UseLetterForTensorComponet = useletter;
 
 Protect[SetUseLetterForTensorComponet];
 
@@ -116,9 +108,7 @@ GetTempVariableType[] :=
 Protect[GetTempVariableType];
 
 SetTempVariableType[type_] :=
-  Module[{},
-    $TempVariableType = type
-  ];
+  $TempVariableType = type;
 
 Protect[SetTempVariableType];
 
@@ -128,9 +118,7 @@ GetInterfaceWithNonCoordBasis[] :=
 Protect[GetInterfaceWithNonCoordBasis];
 
 SetInterfaceWithNonCoordBasis[noncoordbasis_] :=
-  Module[{},
-    $InterfaceWithNonCoordBasis = noncoordbasis
-  ];
+  $InterfaceWithNonCoordBasis = noncoordbasis;
 
 Protect[SetInterfaceWithNonCoordBasis];
 
@@ -140,9 +128,7 @@ GetSuffixName[] :=
 Protect[GetSuffixName];
 
 SetSuffixName[suffix_] :=
-  Module[{},
-    $SuffixName = suffix
-  ];
+  $SuffixName = suffix;
 
 Protect[SetSuffixName];
 
@@ -152,9 +138,7 @@ GetPrefixDt[] :=
 Protect[GetPrefixDt];
 
 SetPrefixDt[Prefix_] :=
-  Module[{},
-    $PrefixDt = Prefix
-  ];
+  $PrefixDt = Prefix;
 
 Protect[SetPrefixDt];
 
@@ -186,19 +170,17 @@ ParseComponent::EMode = "ParseMode unrecognized!";
 Protect[ParseComponent];
 
 PrintComponent[coordinate_, varinfo_, compname_, extrareplacerules_] :=
-  Module[{},
-    Which[
-      GetParsePrintCompMode[Initializations],
-        PrintVerbose["    PrintComponentInitialization ", compname, "..."];
-        Global`PrintComponentInitialization[varinfo, compname]
-      ,
-      GetParsePrintCompMode[Equations],
-        PrintVerbose["    PrintComponentEquation ", compname, "..."];
-        Global`PrintComponentEquation[coordinate, compname, extrareplacerules]
-      ,
-      True,
-        Throw @ Message[PrintComponent::EMode]
-    ]
+  Which[
+    GetParsePrintCompMode[Initializations],
+      PrintVerbose["    PrintComponentInitialization ", compname, "..."];
+      Global`PrintComponentInitialization[varinfo, compname]
+    ,
+    GetParsePrintCompMode[Equations],
+      PrintVerbose["    PrintComponentEquation ", compname, "..."];
+      Global`PrintComponentEquation[coordinate, compname, extrareplacerules]
+    ,
+    True,
+      Throw @ Message[PrintComponent::EMode]
   ];
 
 PrintComponent::EMode = "PrintMode unrecognized!";
@@ -296,14 +278,10 @@ SetExprName[varname_, compindexlist_, coordinate_] :=
   ];
 
 Is3DAbstractIndex[idx_] :=
-  Module[{},
-    LetterNumber[StringPart[ToString[idx /. {-1 x_ :> x}], 1]] >= LetterNumber["i"]
-  ];
+  LetterNumber[StringPart[ToString[idx /. {-1 x_ :> x}], 1]] >= LetterNumber["i"];
 
 Is4DCompIndexIn3DTensor[idx_, idxcomp_] :=
-  Module[{},
-    Is3DAbstractIndex[idx] && (idxcomp == 0)
-  ];
+  Is3DAbstractIndex[idx] && (idxcomp == 0);
 
 Is4DCompIndexListIn3DTensor[idxcomplist_, varname_] :=
   Module[{is4Didxcomplist = False},
