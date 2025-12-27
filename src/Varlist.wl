@@ -10,11 +10,11 @@ Needs["Generato`ParseMode`"];
 
 Needs["Generato`Component`"];
 
-Print["------------------------------------------------------------"];
+System`Print["------------------------------------------------------------"];
 
-Print["Package Generato`Varlist`, {2024, 1, 11}"];
+System`Print["Package Generato`Varlist`, {2024, 1, 11}"];
 
-Print["------------------------------------------------------------"];
+System`Print["------------------------------------------------------------"];
 
 ParseVarlist::usage = "ParseVarlist[varlist, chartname] process a varlist.";
 
