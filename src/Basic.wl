@@ -96,9 +96,7 @@ GetCheckInputEquations[] :=
 Protect[GetCheckInputEquations];
 
 SetCheckInputEquations[checkinput_] :=
-  Module[{},
-    $CheckInputEquations = checkinput
-  ];
+  $CheckInputEquations = checkinput;
 
 Protect[SetCheckInputEquations];
 
@@ -106,9 +104,7 @@ GetPVerbose[] :=
   Return[$PVerbose];
 
 SetPVerbose[verbose_] :=
-  Module[{},
-    $PVerbose = verbose
-  ];
+  $PVerbose = verbose;
 
 Protect[SetPVerbose];
 
@@ -118,9 +114,7 @@ GetPrintDate[] :=
 Protect[GetPrintDate];
 
 SetPrintDate[print_] :=
-  Module[{},
-    $PrintDate = print
-  ];
+  $PrintDate = print;
 
 Protect[SetPrintDate];
 
@@ -130,9 +124,7 @@ GetPrintHeaderMacro[] :=
 Protect[GetPrintHeaderMacro];
 
 SetPrintHeaderMacro[print_] :=
-  Module[{},
-    $PrintHeaderMacro = print
-  ];
+  $PrintHeaderMacro = print;
 
 Protect[SetPrintHeaderMacro];
 
@@ -142,9 +134,7 @@ GetGridPointIndex[] :=
 Protect[GetGridPointIndex];
 
 SetGridPointIndex[gridindex_] :=
-  Module[{},
-    $GridPointIndex = gridindex
-  ];
+  $GridPointIndex = gridindex;
 
 Protect[SetGridPointIndex];
 
@@ -154,9 +144,7 @@ GetTilePointIndex[] :=
 Protect[GetTilePointIndex];
 
 SetTilePointIndex[tileindex_] :=
-  Module[{},
-    $TilePointIndex = tileindex
-  ];
+  $TilePointIndex = tileindex;
 
 Protect[SetTilePointIndex];
 
@@ -166,9 +154,7 @@ GetSuffixUnprotected[] :=
 Protect[GetSuffixUnprotected];
 
 SetSuffixUnprotected[suffix_] :=
-  Module[{},
-    $SuffixUnprotected = suffix
-  ];
+  $SuffixUnprotected = suffix;
 
 Protect[SetSuffixUnprotected];
 
@@ -178,9 +164,7 @@ GetOutputFile[] :=
 Protect[GetOutputFile];
 
 SetOutputFile[filename_] :=
-  Module[{},
-    $OutputFile = filename
-  ];
+  $OutputFile = filename;
 
 Protect[SetOutputFile];
 
@@ -190,9 +174,7 @@ GetProject[] :=
 Protect[GetProject];
 
 SetProject[name_] :=
-  Module[{},
-    $Project = name
-  ];
+  $Project = name;
 
 Protect[SetProject];
 
@@ -384,10 +366,8 @@ SetEQNDelayed[OptionsPattern[], var_, varrhs_] :=
 Protect[SetEQNDelayed];
 
 PrintVerbose[var__:""] :=
-  Module[{},
-    If[GetPVerbose[],
-      System`Print[var]
-    ]
+  If[GetPVerbose[],
+    System`Print[var]
   ];
 
 Protect[PrintVerbose];
