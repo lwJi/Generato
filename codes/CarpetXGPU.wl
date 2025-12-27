@@ -131,7 +131,7 @@ PrintFDExpression[OptionsPattern[],
       (Sum[
         index = stencils[[i]];
         (Subscript[c, index] /. solution) gf[[GetGFIndexName[index]]],
-        {i, 1, Length[stencils]}] // Simplify)
+        {i, 1, Length[stencils]}] // Simplify) *
       If[fordiss, invdx, Product[invdx, {i, 1, fdOrd}]]
     ]] <> ";";
     pr[StringReplace[buf, rule]];
@@ -152,9 +152,9 @@ PrintFDExpressionMix2nd[accuracyOrd_?IntegerQ, strIdx_?StringQ] :=
       (Sum[
         index1 = stencils[[i]];
         index2 = stencils[[j]];
-        (Subscript[c, index1] /. solution) (Subscript[c, index2] /. solution)
+        (Subscript[c, index1] /. solution) (Subscript[c, index2] /. solution) *
         gf[[GetGFIndexNameMix2nd[index1, index2]]],
-      {i, 1, Length[stencils]}, {j, 1, Length[stencils]}] // Simplify)
+      {i, 1, Length[stencils]}, {j, 1, Length[stencils]}] // Simplify) *
       invdx1 invdx2
     ]] <> ";";
     pr[StringReplace[buf, rule]];

@@ -92,7 +92,7 @@ PrintFDExpressionMix2nd[accuracyOrd_?IntegerQ,
       (Sum[
         index1 = stencils[[i]];
         index2 = stencils[[j]];
-        (Subscript[c, index1] /. solution) (Subscript[c, index2] /. solution)
+        (Subscript[c, index1] /. solution) (Subscript[c, index2] /. solution) *
         gf[[GetGFIndexNameMix2nd[index1, index2]]],
       {i, 1, Length[stencils]}, {j, 1, Length[stencils]}] // Simplify)
       / (dx1 dx2)
