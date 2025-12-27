@@ -151,9 +151,9 @@ GetPrefixDt[] :=
 
 Protect[GetPrefixDt];
 
-SetPrefixDt[Prefix_] :=
+SetPrefixDt[prefix_] :=
   Module[{},
-    $PrefixDt = Prefix
+    $PrefixDt = prefix
   ];
 
 Protect[SetPrefixDt];
@@ -297,7 +297,7 @@ SetExprName[varname_, compindexlist_, coordinate_] :=
 
 Is3DAbstractIndex[idx_] :=
   Module[{},
-    LetterNumber[StringPart[ToString[idx /. {-1 x_ :> x}], 1]] >= LetterNumber["i"]
+    LetterNumber[StringPart[ToString[idx /. {Times[-1, x_] :> x}], 1]] >= LetterNumber["i"]
   ];
 
 Is4DCompIndexIn3DTensor[idx_, idxcomp_] :=
