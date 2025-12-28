@@ -10,7 +10,7 @@ SetPVerbose[False];
 
 SetPrintDate[False];
 
-SetGridPointIndex[""];
+SetGridPointIndex["[[pI]]"];
 
 SetTempVariableType["vreal"];
 
