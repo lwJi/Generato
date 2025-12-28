@@ -13,12 +13,14 @@ SetPVerbose[False];
 SetPrintDate[False];
 
 (* ========================================= *)
-(* Setup: Define test manifold *)
+(* Setup: Use existing test manifold from BasicTests *)
 (* ========================================= *)
 
-If[!MemberQ[$Manifolds, VarTestM3],
-  DefManifold[VarTestM3, 3, IndexRange[a, z]];
-  DefChart[varTestCart, VarTestM3, {1, 2, 3}, {VarX[], VarY[], VarZ[]}, ChartColor -> Blue];
+(* Reuse TestM3 manifold if it exists, otherwise define it *)
+If[!MemberQ[$Manifolds, TestM3],
+  DefManifold[TestM3, 3, IndexRange[a, z]];
+  DefChart[testCart, TestM3, {1, 2, 3}, {TX[], TY[], TZ[]}, ChartColor -> Blue];
+  DefMetric[1, testEuclid[-i, -j], testCD];
 ];
 
 (* ========================================= *)
