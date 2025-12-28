@@ -64,9 +64,11 @@ VerificationTest[
 (* ========================================= *)
 
 (* Setup a simple manifold for equation tests *)
-DefManifold[TestM3, 3, IndexRange[a, z]];
-DefChart[testCart, TestM3, {1, 2, 3}, {TX[], TY[], TZ[]}, ChartColor -> Blue];
-DefMetric[1, testEuclid[-i, -j], testCD];
+If[!MemberQ[$Manifolds, TestM3],
+  DefManifold[TestM3, 3, IndexRange[a, z]];
+  DefChart[testCart, TestM3, {1, 2, 3}, {TX[], TY[], TZ[]}, ChartColor -> Blue];
+  DefMetric[1, testEuclid[-i, -j], testCD];
+];
 
 (* Define test tensors *)
 testVarlist = GridTensors[{testVec[i], PrintAs -> "tv"}];
