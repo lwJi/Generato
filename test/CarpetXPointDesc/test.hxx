@@ -1,79 +1,79 @@
-(p.I)/(p.I)*(p.I) (p.I)t(p.I)e(p.I)s(p.I)t(p.I).(p.I)h(p.I)x(p.I)x(p.I) (p.I)*(p.I)/(p.I)
-(p.I)/(p.I)*(p.I) (p.I)P(p.I)r(p.I)o(p.I)d(p.I)u(p.I)c(p.I)e(p.I)d(p.I) (p.I)w(p.I)i(p.I)t(p.I)h(p.I) (p.I)G(p.I)e(p.I)n(p.I)e(p.I)r(p.I)a(p.I)t(p.I)o(p.I) (p.I)*(p.I)/(p.I)
-(p.I)
-(p.I)#(p.I)i(p.I)f(p.I)n(p.I)d(p.I)e(p.I)f(p.I) (p.I)T(p.I)E(p.I)S(p.I)T(p.I)_(p.I)H(p.I)X(p.I)X(p.I)
-(p.I)#(p.I)d(p.I)e(p.I)f(p.I)i(p.I)n(p.I)e(p.I) (p.I)T(p.I)E(p.I)S(p.I)T(p.I)_(p.I)H(p.I)X(p.I)X(p.I)
-(p.I)
-(p.I)
-(p.I)c(p.I)o(p.I)n(p.I)s(p.I)t(p.I) (p.I)a(p.I)u(p.I)t(p.I)o(p.I) (p.I)&(p.I)r(p.I)U(p.I)1(p.I) (p.I)=(p.I) (p.I)g(p.I)f(p.I)_(p.I)r(p.I)U(p.I)[(p.I)0(p.I)](p.I);(p.I)
-(p.I)c(p.I)o(p.I)n(p.I)s(p.I)t(p.I) (p.I)a(p.I)u(p.I)t(p.I)o(p.I) (p.I)&(p.I)r(p.I)U(p.I)2(p.I) (p.I)=(p.I) (p.I)g(p.I)f(p.I)_(p.I)r(p.I)U(p.I)[(p.I)1(p.I)](p.I);(p.I)
-(p.I)c(p.I)o(p.I)n(p.I)s(p.I)t(p.I) (p.I)a(p.I)u(p.I)t(p.I)o(p.I) (p.I)&(p.I)r(p.I)U(p.I)3(p.I) (p.I)=(p.I) (p.I)g(p.I)f(p.I)_(p.I)r(p.I)U(p.I)[(p.I)2(p.I)](p.I);(p.I)
-(p.I)c(p.I)o(p.I)n(p.I)s(p.I)t(p.I) (p.I)a(p.I)u(p.I)t(p.I)o(p.I) (p.I)&(p.I)u(p.I)U(p.I)1(p.I) (p.I)=(p.I) (p.I)g(p.I)f(p.I)_(p.I)u(p.I)U(p.I)[(p.I)0(p.I)](p.I);(p.I)
-(p.I)c(p.I)o(p.I)n(p.I)s(p.I)t(p.I) (p.I)a(p.I)u(p.I)t(p.I)o(p.I) (p.I)&(p.I)u(p.I)U(p.I)2(p.I) (p.I)=(p.I) (p.I)g(p.I)f(p.I)_(p.I)u(p.I)U(p.I)[(p.I)1(p.I)](p.I);(p.I)
-(p.I)c(p.I)o(p.I)n(p.I)s(p.I)t(p.I) (p.I)a(p.I)u(p.I)t(p.I)o(p.I) (p.I)&(p.I)u(p.I)U(p.I)3(p.I) (p.I)=(p.I) (p.I)g(p.I)f(p.I)_(p.I)u(p.I)U(p.I)[(p.I)2(p.I)](p.I);(p.I)
-(p.I)c(p.I)o(p.I)n(p.I)s(p.I)t(p.I) (p.I)a(p.I)u(p.I)t(p.I)o(p.I) (p.I)&(p.I)M(p.I)D(p.I)D(p.I)1(p.I)1(p.I) (p.I)=(p.I) (p.I)g(p.I)f(p.I)_(p.I)M(p.I)D(p.I)D(p.I)[(p.I)0(p.I)](p.I);(p.I)
-(p.I)c(p.I)o(p.I)n(p.I)s(p.I)t(p.I) (p.I)a(p.I)u(p.I)t(p.I)o(p.I) (p.I)&(p.I)M(p.I)D(p.I)D(p.I)1(p.I)2(p.I) (p.I)=(p.I) (p.I)g(p.I)f(p.I)_(p.I)M(p.I)D(p.I)D(p.I)[(p.I)1(p.I)](p.I);(p.I)
-(p.I)c(p.I)o(p.I)n(p.I)s(p.I)t(p.I) (p.I)a(p.I)u(p.I)t(p.I)o(p.I) (p.I)&(p.I)M(p.I)D(p.I)D(p.I)1(p.I)3(p.I) (p.I)=(p.I) (p.I)g(p.I)f(p.I)_(p.I)M(p.I)D(p.I)D(p.I)[(p.I)2(p.I)](p.I);(p.I)
-(p.I)c(p.I)o(p.I)n(p.I)s(p.I)t(p.I) (p.I)a(p.I)u(p.I)t(p.I)o(p.I) (p.I)&(p.I)M(p.I)D(p.I)D(p.I)2(p.I)2(p.I) (p.I)=(p.I) (p.I)g(p.I)f(p.I)_(p.I)M(p.I)D(p.I)D(p.I)[(p.I)3(p.I)](p.I);(p.I)
-(p.I)c(p.I)o(p.I)n(p.I)s(p.I)t(p.I) (p.I)a(p.I)u(p.I)t(p.I)o(p.I) (p.I)&(p.I)M(p.I)D(p.I)D(p.I)2(p.I)3(p.I) (p.I)=(p.I) (p.I)g(p.I)f(p.I)_(p.I)M(p.I)D(p.I)D(p.I)[(p.I)4(p.I)](p.I);(p.I)
-(p.I)c(p.I)o(p.I)n(p.I)s(p.I)t(p.I) (p.I)a(p.I)u(p.I)t(p.I)o(p.I) (p.I)&(p.I)M(p.I)D(p.I)D(p.I)3(p.I)3(p.I) (p.I)=(p.I) (p.I)g(p.I)f(p.I)_(p.I)M(p.I)D(p.I)D(p.I)[(p.I)5(p.I)](p.I);(p.I)
-(p.I)
-(p.I)c(p.I)o(p.I)n(p.I)s(p.I)t(p.I) (p.I)v(p.I)r(p.I)e(p.I)a(p.I)l(p.I) (p.I)
-(p.I)v(p.I)U(p.I)1(p.I)
-(p.I)=(p.I)
-(p.I)M(p.I)D(p.I)D(p.I)1(p.I)1(p.I)*(p.I)u(p.I)U(p.I)1(p.I) (p.I)+(p.I) (p.I)M(p.I)D(p.I)D(p.I)1(p.I)2(p.I)*(p.I)u(p.I)U(p.I)2(p.I) (p.I)+(p.I) (p.I)M(p.I)D(p.I)D(p.I)1(p.I)3(p.I)*(p.I)u(p.I)U(p.I)3(p.I)
-(p.I);(p.I)
-(p.I)
-(p.I)c(p.I)o(p.I)n(p.I)s(p.I)t(p.I) (p.I)v(p.I)r(p.I)e(p.I)a(p.I)l(p.I) (p.I)
-(p.I)v(p.I)U(p.I)2(p.I)
-(p.I)=(p.I)
-(p.I)M(p.I)D(p.I)D(p.I)1(p.I)2(p.I)*(p.I)u(p.I)U(p.I)1(p.I) (p.I)+(p.I) (p.I)M(p.I)D(p.I)D(p.I)2(p.I)2(p.I)*(p.I)u(p.I)U(p.I)2(p.I) (p.I)+(p.I) (p.I)M(p.I)D(p.I)D(p.I)2(p.I)3(p.I)*(p.I)u(p.I)U(p.I)3(p.I)
-(p.I);(p.I)
-(p.I)
-(p.I)c(p.I)o(p.I)n(p.I)s(p.I)t(p.I) (p.I)v(p.I)r(p.I)e(p.I)a(p.I)l(p.I) (p.I)
-(p.I)v(p.I)U(p.I)3(p.I)
-(p.I)=(p.I)
-(p.I)M(p.I)D(p.I)D(p.I)1(p.I)3(p.I)*(p.I)u(p.I)U(p.I)1(p.I) (p.I)+(p.I) (p.I)M(p.I)D(p.I)D(p.I)2(p.I)3(p.I)*(p.I)u(p.I)U(p.I)2(p.I) (p.I)+(p.I) (p.I)M(p.I)D(p.I)D(p.I)3(p.I)3(p.I)*(p.I)u(p.I)U(p.I)3(p.I)
-(p.I);(p.I)
-(p.I)
-(p.I)
-(p.I)i(p.I)f(p.I)((p.I)M(p.I)s(p.I)q(p.I)r(p.I))(p.I)
-(p.I){(p.I)
-(p.I)r(p.I)U(p.I)1(p.I)
-(p.I)=(p.I)
-(p.I)M(p.I)D(p.I)D(p.I)1(p.I)1(p.I)*(p.I)v(p.I)U(p.I)1(p.I) (p.I)+(p.I) (p.I)M(p.I)D(p.I)D(p.I)1(p.I)2(p.I)*(p.I)v(p.I)U(p.I)2(p.I) (p.I)+(p.I) (p.I)M(p.I)D(p.I)D(p.I)1(p.I)3(p.I)*(p.I)v(p.I)U(p.I)3(p.I)
-(p.I);(p.I)
-(p.I)
-(p.I)r(p.I)U(p.I)2(p.I)
-(p.I)=(p.I)
-(p.I)M(p.I)D(p.I)D(p.I)1(p.I)2(p.I)*(p.I)v(p.I)U(p.I)1(p.I) (p.I)+(p.I) (p.I)M(p.I)D(p.I)D(p.I)2(p.I)2(p.I)*(p.I)v(p.I)U(p.I)2(p.I) (p.I)+(p.I) (p.I)M(p.I)D(p.I)D(p.I)2(p.I)3(p.I)*(p.I)v(p.I)U(p.I)3(p.I)
-(p.I);(p.I)
-(p.I)
-(p.I)r(p.I)U(p.I)3(p.I)
-(p.I)=(p.I)
-(p.I)M(p.I)D(p.I)D(p.I)1(p.I)3(p.I)*(p.I)v(p.I)U(p.I)1(p.I) (p.I)+(p.I) (p.I)M(p.I)D(p.I)D(p.I)2(p.I)3(p.I)*(p.I)v(p.I)U(p.I)2(p.I) (p.I)+(p.I) (p.I)M(p.I)D(p.I)D(p.I)3(p.I)3(p.I)*(p.I)v(p.I)U(p.I)3(p.I)
-(p.I);(p.I)
-(p.I)
-(p.I)}(p.I)
-(p.I)e(p.I)l(p.I)s(p.I)e(p.I)
-(p.I){(p.I)
-(p.I)r(p.I)U(p.I)1(p.I)
-(p.I)=(p.I)
-(p.I)v(p.I)U(p.I)1(p.I)
-(p.I);(p.I)
-(p.I)
-(p.I)r(p.I)U(p.I)2(p.I)
-(p.I)=(p.I)
-(p.I)v(p.I)U(p.I)2(p.I)
-(p.I);(p.I)
-(p.I)
-(p.I)r(p.I)U(p.I)3(p.I)
-(p.I)=(p.I)
-(p.I)v(p.I)U(p.I)3(p.I)
-(p.I);(p.I)
-(p.I)
-(p.I)}(p.I)
-(p.I)
-(p.I)#(p.I)e(p.I)n(p.I)d(p.I)i(p.I)f(p.I) (p.I)/(p.I)/(p.I) (p.I)#(p.I)i(p.I)f(p.I)n(p.I)d(p.I)e(p.I)f(p.I) (p.I)T(p.I)E(p.I)S(p.I)T(p.I)_(p.I)H(p.I)X(p.I)X(p.I)
-(p.I)
-(p.I)/(p.I)*(p.I) (p.I)t(p.I)e(p.I)s(p.I)t(p.I).(p.I)h(p.I)x(p.I)x(p.I) (p.I)*(p.I)/(p.I)
+/* test.hxx */
+/* Produced with Generato */
+
+#ifndef TEST_HXX
+#define TEST_HXX
+
+
+const auto &rU1 = gf_rU[0];
+const auto &rU2 = gf_rU[1];
+const auto &rU3 = gf_rU[2];
+const auto &uU1 = gf_uU[0];
+const auto &uU2 = gf_uU[1];
+const auto &uU3 = gf_uU[2];
+const auto &MDD11 = gf_MDD[0];
+const auto &MDD12 = gf_MDD[1];
+const auto &MDD13 = gf_MDD[2];
+const auto &MDD22 = gf_MDD[3];
+const auto &MDD23 = gf_MDD[4];
+const auto &MDD33 = gf_MDD[5];
+
+const vreal
+vU1
+=
+MDD11(p.I)*uU1(p.I) + MDD12(p.I)*uU2(p.I) + MDD13(p.I)*uU3(p.I)
+;
+
+const vreal
+vU2
+=
+MDD12(p.I)*uU1(p.I) + MDD22(p.I)*uU2(p.I) + MDD23(p.I)*uU3(p.I)
+;
+
+const vreal
+vU3
+=
+MDD13(p.I)*uU1(p.I) + MDD23(p.I)*uU2(p.I) + MDD33(p.I)*uU3(p.I)
+;
+
+
+if(Msqr)
+{
+rU1(p.I)
+=
+vU1*MDD11(p.I) + vU2*MDD12(p.I) + vU3*MDD13(p.I)
+;
+
+rU2(p.I)
+=
+vU1*MDD12(p.I) + vU2*MDD22(p.I) + vU3*MDD23(p.I)
+;
+
+rU3(p.I)
+=
+vU1*MDD13(p.I) + vU2*MDD23(p.I) + vU3*MDD33(p.I)
+;
+
+}
+else
+{
+rU1(p.I)
+=
+vU1
+;
+
+rU2(p.I)
+=
+vU2
+;
+
+rU3(p.I)
+=
+vU3
+;
+
+}
+
+#endif // #ifndef TEST_HXX
+
+/* test.hxx */
