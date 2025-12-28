@@ -16,6 +16,8 @@ SetParseMode::usage = "SetParseMode[key] add/update the mode correspond to the k
 
 SetParseModeAllToFalse::usage = "SetParseModeAllToFalse[] set all the modes to false";
 
+CleanParseMode::usage = "CleanParseMode[] empty the association";
+
 SetComp::usage = "ParseMode option.";
 
 PrintComp::usage = "ParseMode option.";
@@ -29,6 +31,8 @@ GetParseSetCompMode::usage = "GetParseSetCompMode[key] returns the mode correspo
 SetParseSetCompMode::usage = "SetParseSetCompMode[key] add/update the mode correspond to the key";
 
 SetParseSetCompModeAllToFalse::usage = "SetParseSetCompModeAllToFalse[] set all the modes to false";
+
+CleanParseSetCompMode::usage = "CleanParseSetCompMode[] empty the association";
 
 IndependentVarlistIndex::usage = "ParseSetCompMode option.";
 
@@ -47,6 +51,8 @@ GetParsePrintCompMode::usage = "GetParsePrintCompMode[key] returns the mode corr
 SetParsePrintCompMode::usage = "SetParsePrintCompMode[key] add/update the mode correspond to the key";
 
 SetParsePrintCompModeAllToFalse::usage = "SetParsePrintCompModeAllToFalse[] set all the modes to false";
+
+CleanParsePrintCompMode::usage = "CleanParsePrintCompMode[] empty the association";
 
 Initializations::usage = "ParsePrintCompMode option.";
 
@@ -125,6 +131,11 @@ SetParseModeAllToFalse[] :=
 
 Protect[SetParseModeAllToFalse];
 
+CleanParseMode[] :=
+  Module[{},
+    $ParseModeAssociation = <||>
+  ];
+
 GetParseSetCompMode[key_] :=
   Return[
     If[KeyExistsQ[$ParseSetCompModeAssociation, key],
@@ -150,6 +161,11 @@ SetParseSetCompModeAllToFalse[] :=
 
 Protect[SetParseSetCompModeAllToFalse];
 
+CleanParseSetCompMode[] :=
+  Module[{},
+    $ParseSetCompModeAssociation = <||>
+  ];
+
 GetParsePrintCompMode[key_] :=
   Return[
     If[KeyExistsQ[$ParsePrintCompModeAssociation, key],
@@ -174,6 +190,11 @@ SetParsePrintCompModeAllToFalse[] :=
   ];
 
 Protect[SetParsePrintCompModeAllToFalse];
+
+CleanParsePrintCompMode[] :=
+  Module[{},
+    $ParsePrintCompModeAssociation = <||>
+  ];
 
 GetParsePrintCompInitMode[key_] :=
   Return[
