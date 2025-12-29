@@ -48,13 +48,10 @@ Generato GHG_rhs.wl
 ## Running Tests
 
 ```bash
-# Run all tests (integration + golden file comparison)
+# Run all tests (regenerate outputs, compare against golden files, cleanup)
 ./test/run_tests.sh
 
-# Run only golden file comparison (no regeneration)
-./test/run_tests.sh --compare
-
-# Regenerate all test outputs
+# Update golden files with new outputs
 ./test/run_tests.sh --generate
 
 # Run via Wolfram (unit tests + regression tests)
