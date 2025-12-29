@@ -22,7 +22,6 @@ NC='\033[0m' # No Color
 
 # Parse arguments
 GENERATE=false
-COMPARE_ONLY=false
 
 for arg in "$@"; do
   case $arg in
@@ -30,14 +29,9 @@ for arg in "$@"; do
       GENERATE=true
       shift
       ;;
-    --compare)
-      COMPARE_ONLY=true
-      shift
-      ;;
     --help)
       echo "Usage: $0 [options]"
-      echo "  --generate    Regenerate all test outputs"
-      echo "  --compare     Compare outputs against golden files only"
+      echo "  --generate    Update golden files with new outputs"
       echo "  --help        Show this help message"
       exit 0
       ;;
@@ -116,6 +110,17 @@ update_golden() {
   echo -e "${GREEN}  UPDATED: ${backend}/${test_name}${ext}${NC}"
 }
 
+# Function to cleanup generated outputs
+cleanup_outputs() {
+  for entry in "${BACKENDS[@]}"; do
+    IFS=':' read -r backend test_name ext <<< "$entry"
+    local output_file="$SCRIPT_DIR/$backend/${test_name}${ext}"
+    if [ -f "$output_file" ]; then
+      rm "$output_file"
+    fi
+  done
+}
+
 # Track results
 PASSED=0
 FAILED=0
@@ -135,28 +140,26 @@ while IFS= read -r line || [ -n "$line" ]; do
   BACKENDS+=("$line")
 done < "$CONFIG_FILE"
 
-if [ "$COMPARE_ONLY" = false ]; then
-  echo "--- Integration Tests ---"
-  echo ""
+echo "--- Integration Tests ---"
+echo ""
 
-  for entry in "${BACKENDS[@]}"; do
-    IFS=':' read -r backend test_name ext <<< "$entry"
+for entry in "${BACKENDS[@]}"; do
+  IFS=':' read -r backend test_name ext <<< "$entry"
 
-    # Skip if test file doesn't exist
-    if [ ! -f "$SCRIPT_DIR/$backend/${test_name}.wl" ]; then
-      echo -e "${YELLOW}SKIP: ${backend}/${test_name}.wl not found${NC}"
-      continue
-    fi
+  # Skip if test file doesn't exist
+  if [ ! -f "$SCRIPT_DIR/$backend/${test_name}.wl" ]; then
+    echo -e "${YELLOW}SKIP: ${backend}/${test_name}.wl not found${NC}"
+    continue
+  fi
 
-    if run_test "$backend" "$test_name"; then
-      ((PASSED++)) || true
-    else
-      ((FAILED++)) || true
-    fi
-  done
+  if run_test "$backend" "$test_name"; then
+    ((PASSED++)) || true
+  else
+    ((FAILED++)) || true
+  fi
+done
 
-  echo ""
-fi
+echo ""
 
 if [ "$GENERATE" = true ]; then
   echo "--- Updating Golden Files ---"
@@ -176,15 +179,16 @@ else
   done
 fi
 
+# Cleanup generated outputs
+cleanup_outputs
+
 echo ""
 echo "========================================"
 echo "  Summary"
 echo "========================================"
 echo ""
 
-if [ "$COMPARE_ONLY" = false ]; then
-  echo "Integration: Passed: $PASSED, Failed: $FAILED"
-fi
+echo "Integration: Passed: $PASSED, Failed: $FAILED"
 
 if [ "$FAILED" -gt 0 ]; then
   echo -e "${RED}TESTS FAILED${NC}"
