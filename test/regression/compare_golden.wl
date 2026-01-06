@@ -74,17 +74,23 @@ RunGoldenTests[] := Module[
   If[failed > 0,
     Print[""];
     Print["REGRESSION DETECTED"];
-    Exit[1],
+    If[Length[$ScriptCommandLine] > 0 && MemberQ[StringContainsQ[#, "compare_golden.wl"] & /@ $ScriptCommandLine, True],
+      Exit[1],
+      $Failed
+    ],
     Print[""];
     Print["ALL TESTS PASSED"];
-    Exit[0]
+    If[Length[$ScriptCommandLine] > 0 && MemberQ[StringContainsQ[#, "compare_golden.wl"] & /@ $ScriptCommandLine, True],
+      Exit[0],
+      True
+    ]
   ]
 ];
 
 End[];
 EndPackage[];
 
-(* Run tests when executed directly *)
-If[Length[$ScriptCommandLine] > 0,
+(* Run tests only when executed directly (not when loaded via Get[]) *)
+If[Length[$ScriptCommandLine] > 0 && MemberQ[StringContainsQ[#, "compare_golden.wl"] & /@ $ScriptCommandLine, True],
   RunGoldenTests[]
 ];
