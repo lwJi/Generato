@@ -16,11 +16,11 @@ System`Print["Package Generato`Varlist`, {2024, 1, 11}"];
 
 System`Print["------------------------------------------------------------"];
 
-ParseVarlist::usage = "ParseVarlist[varlist, chartname] process a varlist.";
+ParseVarlist::usage = "ParseVarlist[varlist, chartname] processes a varlist, setting or printing components for each tensor.\nParseVarlist[{ExtraReplaceRules->rules}, varlist, chartname] processes with additional replacement rules.";
 
-ParseVar::usage = "ParseVar[var] return {varname, symmetry, printname} in order";
+ParseVar::usage = "ParseVar[var] parses a variable specification and returns {varname, symmetry, printname}.";
 
-DefineTensor::usage = "DefineTensor[varname, symmetry, printname] DefTensor, given varname, symmetry and printname";
+DefineTensor::usage = "DefineTensor[varname, symmetry, printname] defines a tensor using DefTensor with the given symmetry and print name.";
 
 Begin["`Private`"];
 

@@ -12,59 +12,59 @@ System`Print["Package Generato`Basic`, {2024, 1, 11}"];
 
 System`Print["------------------------------------------------------------"];
 
-GetCheckInputEquations::usage = "GetCheckInputEquations[] return the Boolean variable specifying if we are checking input equations.";
+GetCheckInputEquations::usage = "GetCheckInputEquations[] returns True if input equation checking is enabled.";
 
-SetCheckInputEquations::usage = "SetCheckInputEquations[True] update the Boolean variable specifying if we are checking input equations.";
+SetCheckInputEquations::usage = "SetCheckInputEquations[bool] enables or disables checking of input equations.";
 
-SetPVerbose::usage = "SetPVerbose[True] update the Boolean variable specifying if print more messages.";
+SetPVerbose::usage = "SetPVerbose[bool] enables or disables verbose printing of messages.";
 
-GetPrintDate::usage = "GetPrintDate[] return the Boolean variable specifying if print date in file.";
+GetPrintDate::usage = "GetPrintDate[] returns True if the date is printed in output files.";
 
-SetPrintDate::usage = "SetPrintDate[True] update the Boolean variable specifying if print date in file.";
+SetPrintDate::usage = "SetPrintDate[bool] enables or disables printing the date in output files.";
 
-GetPrintHeaderMacro::usage = "GetPrintHeaderMacro[] return the Boolean variable specifying if print date in file.";
+GetPrintHeaderMacro::usage = "GetPrintHeaderMacro[] returns True if header guard macros are printed in output files.";
 
-SetPrintHeaderMacro::usage = "SetPrintHeaderMacro[True] update the Boolean variable specifying if print date in file.";
+SetPrintHeaderMacro::usage = "SetPrintHeaderMacro[bool] enables or disables printing header guard macros in output files.";
 
-GetGridPointIndex::usage = "GetGridPointIndex[] return the grid index name.";
+GetGridPointIndex::usage = "GetGridPointIndex[] returns the grid point index string appended to variable names.";
 
-SetGridPointIndex::usage = "SetGridPointIndex[girdindex] reset the grid index name.";
+SetGridPointIndex::usage = "SetGridPointIndex[index] sets the grid point index string appended to variable names.";
 
-GetTilePointIndex::usage = "GetTilePointIndex[] return the tile index name.";
+GetTilePointIndex::usage = "GetTilePointIndex[] returns the tile point index string appended to variable names.";
 
-SetTilePointIndex::usage = "SetTilePointIndex[girdindex] reset the tile index name.";
+SetTilePointIndex::usage = "SetTilePointIndex[index] sets the tile point index string appended to variable names.";
 
-GetSuffixUnprotected::usage = "GetSuffixUnprotected[] returns the suffix added to vars which would conflict with system default otherwise.";
+GetSuffixUnprotected::usage = "GetSuffixUnprotected[] returns the suffix added to variable names that would conflict with system symbols.";
 
-SetSuffixUnprotected::usage = "SetSuffixUnprotected[suffix] reset the suffix added to vars which would conflict with system default otherwise.";
+SetSuffixUnprotected::usage = "SetSuffixUnprotected[suffix] sets the suffix added to variable names that would conflict with system symbols.";
 
-GetOutputFile::usage = "GetOutputFile[] return the variable storing the output file name.";
+GetOutputFile::usage = "GetOutputFile[] returns the output file name.";
 
-SetOutputFile::usage = "SetOutputFile[name] update the variable storing the output file name.";
+SetOutputFile::usage = "SetOutputFile[name] sets the output file name.";
 
-GetProject::usage = "GetProject[] return the project name we are generating file for.";
+GetProject::usage = "GetProject[] returns the project name used in code generation.";
 
-SetProject::usage = "SetProject[name] update the project name we are generating file for.";
+SetProject::usage = "SetProject[name] sets the project name used in code generation.";
 
-GetDefaultChart::usage = "GetDefaultChart[] return the default chart we are using.";
+GetDefaultChart::usage = "GetDefaultChart[] returns the default coordinate chart of the first defined manifold.";
 
-GetDim::usage = "GetDim[] return the dimension of the manifold.";
+GetDim::usage = "GetDim[] returns the dimension of the first defined manifold.";
 
-IsDefined::usage = "IsDefined[term] return True/False if term is defined or not.";
+IsDefined::usage = "IsDefined[term] returns True if term is a defined tensor or constant, False otherwise.";
 
-IndexType::usage = "IndexType[compindex, indextype] return True if second compindex is indextype.";
+IndexType::usage = "IndexType[compindexlist, indextype] returns True if the second component index satisfies indextype.";
 
-IndexType3D::usage = "IndexType3D[compindex, indextype] return True if second compindex is indextype and it's a 3D index.";
+IndexType3D::usage = "IndexType3D[compindexlist, indextype] returns True if the second component index satisfies indextype and is a 3D index.";
 
-RHSOf::usage = "RHSOf[var, suffix] return the expression of 'var$RHS' or 'varsuffix$RHS' (if suffix is not empty).";
+RHSOf::usage = "RHSOf[var] returns the symbol var$RHS.\nRHSOf[var, suffix] returns the symbol varsuffix$RHS.";
 
-SetEQN::usage = "SetEQN[{CheckRHS->..., Suffix->...}, var, varrhs] set 'var$RHS/varsuffix$RHS' equal to 'varrhs', considering if CheckRHS.";
+SetEQN::usage = "SetEQN[var, varrhs] assigns varrhs to var$RHS using IndexSet.\nSetEQN[{CheckRHS->bool, SuffixName->suffix}, var, varrhs] assigns with options.";
 
-CheckRHS::usage = "CheckRHS is an option for SetEQN specifying if check there are undefined terms in varrhs.";
+CheckRHS::usage = "CheckRHS is an option for SetEQN that specifies whether to verify all terms in the right-hand side are defined.";
 
-SetEQNDelayed::usage = "SetEQNDelayed[{Suffix->...}, var, varrhs] set 'var$RHS/varsuffix$RHS' equal to varrhs for if cases.";
+SetEQNDelayed::usage = "SetEQNDelayed[var, varrhs] assigns varrhs to var$RHS using IndexSetDelayed.\nSetEQNDelayed[{SuffixName->suffix}, var, varrhs] assigns with a suffix.";
 
-PrintVerbose::usage = "PrintVerbose[var] print var only if GetPVerbose[] is True.";
+PrintVerbose::usage = "PrintVerbose[expr] prints expr if verbose mode is enabled.";
 
 Begin["`Private`"];
 

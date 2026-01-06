@@ -18,77 +18,77 @@ System`Print["Package Generato`Interface`, {2024, 1, 11}"];
 
 System`Print["------------------------------------------------------------"];
 
-DefTensors::usage = "DefTensors[vars] define tensors (without setting its components)";
+DefTensors::usage = "DefTensors[var1, var2, ...] defines tensors without setting their components.";
 
-GridTensors::usage = "GridTensors[vars] define grid tensors (with grid point index), set components and return the varlist";
+GridTensors::usage = "GridTensors[var1, var2, ...] defines tensors with grid point indices, sets their components, and returns the varlist.";
 
-TileTensors::usage = "TileTensors[vars] define grid tensors (with tile point index), set components and return the varlist";
+TileTensors::usage = "TileTensors[var1, var2, ...] defines tensors with tile point indices, sets their components, and returns the varlist.";
 
-TempTensors::usage = "TempTensors[vars] define temp tensors (without grid point index), set components and return the varlist";
+TempTensors::usage = "TempTensors[var1, var2, ...] defines temporary tensors without grid point indices, sets their components, and returns the varlist.";
 
-SetComponents::usage = "SetComponents[{ChartName->..., IndependentIndexForEachVar->..., WithoutGridPointIndex->...}, varlist] set components of varlist.";
+SetComponents::usage = "SetComponents[varlist] sets tensor components for the given varlist.\nSetComponents[{opts}, varlist] sets components with options ChartName, IndependentIndexForEachVar, WithoutGridPointIndex, UseTilePointIndex.";
 
-PrintEquations::usage = "PrintEquations[{ChartName->..., SuffixName->..., Mode->...}, varlist] print equations of varlist.";
+PrintEquations::usage = "PrintEquations[varlist] prints equations for tensor components in the varlist.\nPrintEquations[{opts}, varlist] prints with options ChartName, SuffixName, Mode, ExtraReplaceRules.";
 
-NewVar::usage = "PrintEquations option.";
+NewVar::usage = "NewVar is a PrintEquations Mode option that declares new temporary variables before assignment.";
 
 Protect[NewVar];
 
-Main::usage = "PrintEquations option.";
+Main::usage = "Main is a PrintEquations Mode option that generates the main equation assignments.";
 
 Protect[Main];
 
-AddToMain::usage = "PrintEquations option.";
+AddToMain::usage = "AddToMain is a PrintEquations Mode option that adds terms to existing equation assignments.";
 
 Protect[AddToMain];
 
-PrintInitializations::usage = "PrintInitializations[{ChartName->..., Mode->...}, varlist] print initialization of varlist.";
+PrintInitializations::usage = "PrintInitializations[varlist] prints initialization code for tensor components.\nPrintInitializations[{opts}, varlist] prints with options ChartName, Mode, TensorType, StorageType, DerivsOrder, AccuracyOrder.";
 
-MainOut::usage = "PrintInitializations option."
+MainOut::usage = "MainOut is a PrintInitializations Mode option that generates output variable declarations."
 
 Protect[MainOut];
 
-MainIn::usage = "PrintInitializations option."
+MainIn::usage = "MainIn is a PrintInitializations Mode option that generates input variable declarations."
 
 Protect[MainIn];
 
-Derivs::usage = "PrintInitializations option."
+Derivs::usage = "Derivs is a PrintInitializations Mode option that generates derivative variable declarations."
 
 Protect[Derivs];
 
-DerivsOrder::usage = "PrintInitializations option."
+DerivsOrder::usage = "DerivsOrder is a PrintInitializations option that specifies the derivative order (default 1)."
 
 Protect[DerivsOrder];
 
-DerivsAccuracy::usage = "PrintInitializations option."
+DerivsAccuracy::usage = "DerivsAccuracy is a PrintInitializations option that specifies the finite difference accuracy order (default 4)."
 
 Protect[DerivsAccuracy];
 
-MoreInOut::usage = "PrintInitializations option."
+MoreInOut::usage = "MoreInOut is a PrintInitializations Mode option that generates additional input/output declarations."
 
 Protect[MoreInOut];
 
-Temp::usage = "PrintInitializations option."
+Temp::usage = "Temp is a PrintInitializations Mode option that generates temporary variable declarations."
 
 Protect[Temp];
 
-Scal::usage = "PrintInitializations tensor type option."
+Scal::usage = "Scal is a PrintInitializations TensorType option indicating a scalar quantity."
 
 Protect[Scal];
 
-Vect::usage = "PrintInitializations tensor type option."
+Vect::usage = "Vect is a PrintInitializations TensorType option indicating a vector quantity."
 
 Protect[Vect];
 
-Smat::usage = "PrintInitializations tensor type option."
+Smat::usage = "Smat is a PrintInitializations TensorType option indicating a symmetric matrix quantity."
 
 Protect[Smat];
 
-GF::usage = "PrintInitializations storage type option."
+GF::usage = "GF is a PrintInitializations StorageType option indicating grid function storage."
 
 Protect[GF];
 
-Tile::usage = "PrintInitializations storage type option."
+Tile::usage = "Tile is a PrintInitializations StorageType option indicating tile-based storage."
 
 Protect[Tile];
 

@@ -30,17 +30,17 @@ VerificationTest[
 ];
 
 VerificationTest[
-  SetUseLetterForTensorComponet[True];
-  GetUseLetterForTensorComponet[],
+  SetUseLetterForTensorComponent[True];
+  GetUseLetterForTensorComponent[],
   True,
-  TestID -> "GetSetUseLetterForTensorComponet-True"
+  TestID -> "GetSetUseLetterForTensorComponent-True"
 ];
 
 VerificationTest[
-  SetUseLetterForTensorComponet[False];
-  GetUseLetterForTensorComponet[],
+  SetUseLetterForTensorComponent[False];
+  GetUseLetterForTensorComponent[],
   False,
-  TestID -> "GetSetUseLetterForTensorComponet-False"
+  TestID -> "GetSetUseLetterForTensorComponent-False"
 ];
 
 VerificationTest[
@@ -130,7 +130,7 @@ VerificationTest[
 
 (* Reset state *)
 SetSimplifyEquation[True];
-SetUseLetterForTensorComponet[False];
+SetUseLetterForTensorComponent[False];
 SetTempVariableType["double"];
 SetInterfaceWithNonCoordBasis[False];
 SetSuffixName[""];
