@@ -12,9 +12,11 @@ System`Print["Package Generato`FiniteDifferenceStencils`, {2025, 1, 21}"];
 
 System`Print["------------------------------------------------------------"];
 
-GetFiniteDifferenceCoefficients::usage = "GetFiniteDifferenceCoefficients[sample, order] return coeffients of finite difference stencils.";
+GetFiniteDifferenceCoefficients::usage = "GetFiniteDifferenceCoefficients[sample, order] returns the finite difference coefficients for the given sample points and derivative order.";
 
-GetCenteringStencils::usage = "GetCenteringStencils[ord] return the centering finite difference stencils of order ord.";
+GetCenteringStencils::usage = "GetCenteringStencils[order] returns the centering stencil points for the given accuracy order.";
+
+GetUpwindCoefficients::usage = "GetUpwindCoefficients[sample] returns the symmetric and antisymmetric upwind coefficients for the given sample points.";
 
 Begin["`Private`"];
 

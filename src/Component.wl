@@ -14,35 +14,35 @@ System`Print["Package Generato`Component`, {2024, 1, 11}"];
 
 System`Print["------------------------------------------------------------"];
 
-GetMapComponentToVarlist::usage = "GetMapComponentToVarlist[] returns the map between tensor components and varlist indexes.";
+GetMapComponentToVarlist::usage = "GetMapComponentToVarlist[] returns the Association mapping tensor components to varlist indices.";
 
-SetProcessNewVarlist::usage = "SetProcessNewVarlist[True] updates the Boolean variable specifying if we are processing a new varlist.";
+SetProcessNewVarlist::usage = "SetProcessNewVarlist[bool] sets whether the next varlist is treated as a new varlist for index numbering.";
 
-GetSimplifyEquation::usage = "GetSimplifyEquation[] returns the Boolean variable specifying if Simplify the equations.";
+GetSimplifyEquation::usage = "GetSimplifyEquation[] returns True if equations are simplified before output.";
 
-SetSimplifyEquation::usage = "SetSimplifyEquation[True] updates the Boolean variable specifying if Simplify the equations.";
+SetSimplifyEquation::usage = "SetSimplifyEquation[bool] enables or disables simplification of equations before output.";
 
-GetUseLetterForTensorComponet::usage = "GetUseLetterForTensorComponet[] returns the Boolean variable specifying if use letter for tensor components (instead of number).";
+GetUseLetterForTensorComponent::usage = "GetUseLetterForTensorComponent[] returns True if letters are used for tensor component indices instead of numbers.";
 
-SetUseLetterForTensorComponet::usage = "SetUseLetterForTensorComponet[True] updates the Boolean variable specifying if use letter for tensor components (instead of number).";
+SetUseLetterForTensorComponent::usage = "SetUseLetterForTensorComponent[bool] sets whether to use letters for tensor component indices instead of numbers.";
 
-GetTempVariableType::usage = "GetTempVariableType[] returns the type of temporary variable.";
+GetTempVariableType::usage = "GetTempVariableType[] returns the C type string used for temporary variables.";
 
-SetTempVariableType::usage = "SetTempVariableType[CCTK_REAL] updates the type of temporary variable.";
+SetTempVariableType::usage = "SetTempVariableType[type] sets the C type string used for temporary variables.";
 
-GetInterfaceWithNonCoordBasis::usage = "GetInterfaceWithNonCoordBasis[] returns the Boolean variable specifying if we are interfacing with non-coordinate basis.";
+GetInterfaceWithNonCoordBasis::usage = "GetInterfaceWithNonCoordBasis[] returns True if interfacing with non-coordinate basis tensors.";
 
-SetInterfaceWithNonCoordBasis::usage = "SetInterfaceWithNonCoordBasis[True] updates the Boolean variable specifying if we are interfacing with non-coordinate basis.";
+SetInterfaceWithNonCoordBasis::usage = "SetInterfaceWithNonCoordBasis[bool] enables or disables interfacing with non-coordinate basis tensors.";
 
-GetSuffixName::usage = "GetSuffixName[] returns the suffix added to vars in the current list.";
+GetSuffixName::usage = "GetSuffixName[] returns the suffix appended to variable names in the current varlist.";
 
-SetSuffixName::usage = "SetSuffixName[suffix] updates the suffix added to vars in the current list.";
+SetSuffixName::usage = "SetSuffixName[suffix] sets the suffix appended to variable names in the current varlist.";
 
-GetPrefixDt::usage = "GetPrefixDt[] return the prefix used for dt of vars.";
+GetPrefixDt::usage = "GetPrefixDt[] returns the prefix used for time derivatives of variables.";
 
-ParseComponent::usage = "ParseComponent[varinfo, compindexlist, coordinate] process a component.";
+ParseComponent::usage = "ParseComponent[varinfo, compindexlist, coordinate, extrareplacerules] processes a single tensor component for setting or printing.";
 
-Is3DAbstractIndex::usage = "Is3DAbstractIndex[abstractindex] return True if the abstract index is after letter 'i' and only the first letter matters (say h <=> h1 <=> h2 ...).";
+Is3DAbstractIndex::usage = "Is3DAbstractIndex[index] returns True if the abstract index represents a 3D spatial index (first letter >= 'i').";
 
 Begin["`Private`"];
 
@@ -54,7 +54,7 @@ $ProcessNewVarlist = True;
 
 $SimplifyEquation = True;
 
-$UseLetterForTensorComponet = False;
+$UseLetterForTensorComponent = False;
 
 $TempVariableType = "double";
 
@@ -98,17 +98,17 @@ SetSimplifyEquation[simplify_] :=
 
 Protect[SetSimplifyEquation];
 
-GetUseLetterForTensorComponet[] :=
-  Return[$UseLetterForTensorComponet];
+GetUseLetterForTensorComponent[] :=
+  Return[$UseLetterForTensorComponent];
 
-Protect[GetUseLetterForTensorComponet];
+Protect[GetUseLetterForTensorComponent];
 
-SetUseLetterForTensorComponet[useletter_] :=
+SetUseLetterForTensorComponent[useletter_] :=
   Module[{},
-    $UseLetterForTensorComponet = useletter
+    $UseLetterForTensorComponent = useletter
   ];
 
-Protect[SetUseLetterForTensorComponet];
+Protect[SetUseLetterForTensorComponent];
 
 GetTempVariableType[] :=
   Return[$TempVariableType];
@@ -273,7 +273,7 @@ SetExprName[varname_, compindexlist_, coordinate_] :=
       Do[
         exprname =
           exprname <>
-            If[GetUseLetterForTensorComponet[],
+            If[GetUseLetterForTensorComponent[],
               colist[[compindexlist[[icomp]] + 1]]
               ,
               ToString @ compindexlist[[icomp]]

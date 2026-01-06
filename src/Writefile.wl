@@ -16,13 +16,13 @@ System`Print["Package Generato`Writefile`, {2025, 1, 23}"];
 
 System`Print["------------------------------------------------------------"];
 
-SetMainPrint::usage = "SetMainPrint[content] update the variable storing function printing more main content.";
+SetMainPrint::usage = "SetMainPrint[content] sets the content to be written as the main body of the output file.";
 
-GetMainPrint::usage = "GetMainPrint[content] return the variable storing function printing more main content.";
+GetMainPrint::usage = "GetMainPrint[] returns and evaluates the content set by SetMainPrint.";
 
-WriteToFile::usage = "WriteToFile[] writing contents to a file.";
+WriteToFile::usage = "WriteToFile[filename] writes the main content to the specified file with header and footer.";
 
-ReplaceGFIndexName::usage = "ReplaceGFIndexName[] writing contents to a file.";
+ReplaceGFIndexName::usage = "ReplaceGFIndexName[filename, rule] applies string replacement rule to the contents of filename.";
 
 Begin["`Private`"];
 

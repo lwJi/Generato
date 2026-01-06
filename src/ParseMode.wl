@@ -10,35 +10,35 @@ System`Print["Package Generato`ParseMode`, {2024, 7, 06}"];
 
 System`Print["------------------------------------------------------------"];
 
-GetParseMode::usage = "GetParseMode[key] returns the mode correspond to the key";
+GetParseMode::usage = "GetParseMode[key] returns True if the specified parsing mode is active, False otherwise.";
 
-SetParseMode::usage = "SetParseMode[key] add/update the mode correspond to the key";
+SetParseMode::usage = "SetParseMode[key->value] sets the specified parsing mode.";
 
-SetParseModeAllToFalse::usage = "SetParseModeAllToFalse[] set all the modes to false";
+SetParseModeAllToFalse::usage = "SetParseModeAllToFalse[] deactivates all parsing modes.";
 
-CleanParseMode::usage = "CleanParseMode[] empty the association";
+CleanParseMode::usage = "CleanParseMode[] clears the parsing mode association.";
 
-SetComp::usage = "ParseMode option.";
+SetComp::usage = "SetComp is a ParseMode option that indicates component-setting phase, where tensor components are assigned to expressions.";
 
-PrintComp::usage = "ParseMode option.";
+PrintComp::usage = "PrintComp is a ParseMode option that indicates component-printing phase, where tensor components are written to output.";
 
 Protect[SetComp];
 
 Protect[PrintComp];
 
-GetParseSetCompMode::usage = "GetParseSetCompMode[key] returns the mode correspond to the key";
+GetParseSetCompMode::usage = "GetParseSetCompMode[key] returns True if the specified SetComp mode is active, False otherwise.";
 
-SetParseSetCompMode::usage = "SetParseSetCompMode[key] add/update the mode correspond to the key";
+SetParseSetCompMode::usage = "SetParseSetCompMode[key->value] sets the specified SetComp mode.";
 
-SetParseSetCompModeAllToFalse::usage = "SetParseSetCompModeAllToFalse[] set all the modes to false";
+SetParseSetCompModeAllToFalse::usage = "SetParseSetCompModeAllToFalse[] deactivates all SetComp modes.";
 
-CleanParseSetCompMode::usage = "CleanParseSetCompMode[] empty the association";
+CleanParseSetCompMode::usage = "CleanParseSetCompMode[] clears the SetComp mode association.";
 
-IndependentVarlistIndex::usage = "ParseSetCompMode option.";
+IndependentVarlistIndex::usage = "IndependentVarlistIndex is a SetComp mode option that resets component indices for each new variable in the varlist.";
 
-WithoutGridPointIndex::usage = "ParseSetCompMode option.";
+WithoutGridPointIndex::usage = "WithoutGridPointIndex is a SetComp mode option that omits the grid point index suffix from variable names.";
 
-UseTilePointIndex::usage = "ParseSetCompMode option.";
+UseTilePointIndex::usage = "UseTilePointIndex is a SetComp mode option that uses tile point index instead of grid point index.";
 
 Protect[IndependentVarlistIndex];
 
@@ -46,45 +46,45 @@ Protect[WithoutGridPointIndex];
 
 Protect[UseTilePointIndex];
 
-GetParsePrintCompMode::usage = "GetParsePrintCompMode[key] returns the mode correspond to the key";
+GetParsePrintCompMode::usage = "GetParsePrintCompMode[key] returns True if the specified PrintComp mode is active, False otherwise.";
 
-SetParsePrintCompMode::usage = "SetParsePrintCompMode[key] add/update the mode correspond to the key";
+SetParsePrintCompMode::usage = "SetParsePrintCompMode[key->value] sets the specified PrintComp mode.";
 
-SetParsePrintCompModeAllToFalse::usage = "SetParsePrintCompModeAllToFalse[] set all the modes to false";
+SetParsePrintCompModeAllToFalse::usage = "SetParsePrintCompModeAllToFalse[] deactivates all PrintComp modes.";
 
-CleanParsePrintCompMode::usage = "CleanParsePrintCompMode[] empty the association";
+CleanParsePrintCompMode::usage = "CleanParsePrintCompMode[] clears the PrintComp mode association.";
 
-Initializations::usage = "ParsePrintCompMode option.";
+Initializations::usage = "Initializations is a PrintComp mode option that indicates initialization code generation phase.";
 
-Equations::usage = "ParsePrintCompMode option.";
+Equations::usage = "Equations is a PrintComp mode option that indicates equation code generation phase.";
 
 Protect[Initializations];
 
 Protect[Equations];
 
-GetParsePrintCompInitMode::usage = "GetParsePrintCompInitMode[key] returns the mode correspond to the key";
+GetParsePrintCompInitMode::usage = "GetParsePrintCompInitMode[key] returns the value for the specified initialization mode key.";
 
-SetParsePrintCompInitMode::usage = "SetParsePrintCompInitMode[key] add/update the mode correspond to the key";
+SetParsePrintCompInitMode::usage = "SetParsePrintCompInitMode[key->value] sets the specified initialization mode.";
 
-CleanParsePrintCompInitMode::usage = "CleanParsePrintCompInitMode[] empty the association";
+CleanParsePrintCompInitMode::usage = "CleanParsePrintCompInitMode[] clears the initialization mode association.";
 
-GetParsePrintCompEQNMode::usage = "GetParsePrintCompEQNMode[key] returns the mode correspond to the key";
+GetParsePrintCompEQNMode::usage = "GetParsePrintCompEQNMode[key] returns True if the specified equation mode is active, False otherwise.";
 
-SetParsePrintCompEQNMode::usage = "SetParsePrintCompEQNMode[key] add/update the mode correspond to the key";
+SetParsePrintCompEQNMode::usage = "SetParsePrintCompEQNMode[key->value] sets the specified equation mode.";
 
-CleanParsePrintCompEQNMode::usage = "CleanParsePrintCompEQNMode[] empty the association";
+CleanParsePrintCompEQNMode::usage = "CleanParsePrintCompEQNMode[] clears the equation mode association.";
 
-GetParsePrintCompInitTensorType::usage = "GetParsePrintCompInitTensorType[key] returns the mode correspond to the key";
+GetParsePrintCompInitTensorType::usage = "GetParsePrintCompInitTensorType[key] returns True if the specified tensor type is active, False otherwise.";
 
-SetParsePrintCompInitTensorType::usage = "SetParsePrintCompInitTensorType[key] add/update the mode correspond to the key";
+SetParsePrintCompInitTensorType::usage = "SetParsePrintCompInitTensorType[key->value] sets the specified tensor type mode.";
 
-CleanParsePrintCompInitTensorType::usage = "CleanParsePrintCompInitTensorType[] empty the association";
+CleanParsePrintCompInitTensorType::usage = "CleanParsePrintCompInitTensorType[] clears the tensor type association.";
 
-GetParsePrintCompInitStorageType::usage = "GetParsePrintCompInitStorageType[key] returns the mode correspond to the key";
+GetParsePrintCompInitStorageType::usage = "GetParsePrintCompInitStorageType[key] returns True if the specified storage type is active, False otherwise.";
 
-SetParsePrintCompInitStorageType::usage = "SetParsePrintCompInitStorageType[key] add/update the mode correspond to the key";
+SetParsePrintCompInitStorageType::usage = "SetParsePrintCompInitStorageType[key->value] sets the specified storage type mode.";
 
-CleanParsePrintCompInitStorageType::usage = "CleanParsePrintCompInitStorageType[] empty the association";
+CleanParsePrintCompInitStorageType::usage = "CleanParsePrintCompInitStorageType[] clears the storage type association.";
 
 Begin["`Private`"];
 
