@@ -60,14 +60,14 @@ Each backend implements `PrintComponentInitialization` and `PrintComponentEquati
 ## Running Tests
 
 ```bash
-# Run all tests (regenerate outputs, compare against golden files, cleanup)
+# Run all tests (recommended - runs unit tests + regression tests)
+wolframscript -f test/AllTests.wl
+
+# Alternative: Run via bash script
 ./test/run_tests.sh
 
 # Update golden files with new outputs
 ./test/run_tests.sh --generate
-
-# Run via Wolfram (unit tests + regression tests)
-wolframscript -f test/AllTests.wl
 ```
 
 The test suite includes:
