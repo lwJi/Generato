@@ -57,6 +57,9 @@ $TestCases = Select[
   Length[#] == 3 && !StringStartsQ[#[[1]], "#"] &
 ];
 
+(* Validate shell input to prevent injection *)
+ValidShellInput[str_String] := StringMatchQ[str, RegularExpression["^[a-zA-Z0-9_./\\-]+$"]];
+
 (* Generate outputs for each test case *)
 Print["Generating test outputs..."];
 Print[""];
@@ -67,6 +70,13 @@ Do[
   testFile = FileNameJoin[{$TestDir, backend, testName <> ".wl"}];
 
   If[FileExistsQ[testFile],
+    (* Validate inputs before shell execution *)
+    If[!ValidShellInput[backend] || !ValidShellInput[testName],
+      Print["  ERROR: Invalid characters in backend or testName"];
+      $GenerationFailed = True;
+      Continue[];
+    ];
+
     Print["  Generating: ", backend, "/", testName, ".wl"];
     (* Run Generato from the test directory *)
     result = Run["cd " <> FileNameJoin[{$TestDir, backend}] <> " && \"$GENERATO/Generato\" " <> testName <> ".wl 2>&1"];
@@ -99,7 +109,10 @@ Do[
   {backend, testName, ext} = testCase;
   outputFile = FileNameJoin[{$TestDir, backend, testName <> ext}];
   If[FileExistsQ[outputFile],
-    DeleteFile[outputFile];
+    Check[
+      DeleteFile[outputFile],
+      Print["  Warning: Failed to delete ", outputFile]
+    ];
   ],
   {testCase, $TestCases}
 ];
