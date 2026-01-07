@@ -28,7 +28,7 @@ MetricInBasis[euclid, cart, DiagonalMatrix[{1, 1, 1}]];
 (* Variables for derivative test *)
 EvolVarlist = GridTensors[{phi[], PrintAs -> "phi"}];
 
-DerivVarlist = GridTensors[{dphi[i], PrintAs -> "dphi"}];
+DerivVarlist = GridTensors[{dphi[-i], PrintAs -> "dphi"}];
 
 TempVarlist = TempTensors[{psi[], PrintAs -> "psi"}];
 
@@ -44,7 +44,7 @@ SetMainPrint[
   (* Test Mode->Derivs with DerivsOrder and AccuracyOrder *)
   PrintInitializations[{Mode -> "Derivs", TensorType -> "Vect", DerivsOrder -> 1, AccuracyOrder -> 4}, DerivVarlist];
   pr[];
-  PrintEquations[{Mode -> "Temp", ChartName -> cart}, TempVarlist];
+  PrintEquations[{Mode -> "Temp"}, TempVarlist];
 ];
 
 Import[FileNameJoin[{Environment["GENERATO"], "codes/CarpetXGPU.wl"}]];
