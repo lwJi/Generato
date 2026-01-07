@@ -69,4 +69,58 @@ VerificationTest[
   TestID -> "TempTensors-ReturnsList"
 ];
 
+(* ========================================= *)
+(* Test: DefTensors *)
+(* ========================================= *)
+
+VerificationTest[
+  (* DefTensors should define tensors without setting components *)
+  defList = DefTensors[{intDefTest[i], PrintAs -> "idt"}];
+  ListQ[defList],
+  True,
+  TestID -> "DefTensors-ReturnsList"
+];
+
+VerificationTest[
+  (* DefTensors with symmetric tensor *)
+  defList = DefTensors[{intDefSym[-i, -j], Symmetric[{-i, -j}], PrintAs -> "ids"}];
+  Length[defList] >= 1,
+  True,
+  TestID -> "DefTensors-SymmetricTensor"
+];
+
+(* ========================================= *)
+(* Test: TileTensors *)
+(* ========================================= *)
+
+VerificationTest[
+  (* TileTensors should return a list *)
+  tileList = TileTensors[{intTileTest[i], PrintAs -> "itile"}];
+  ListQ[tileList],
+  True,
+  TestID -> "TileTensors-ReturnsList"
+];
+
+(* ========================================= *)
+(* Test: SetComponents options *)
+(* ========================================= *)
+
+VerificationTest[
+  (* SetComponents with WithoutGridPointIndex *)
+  varlist = {{intNoGP[i], PrintAs -> "ing"}};
+  SetComponents[{WithoutGridPointIndex -> True}, varlist];
+  True,
+  True,
+  TestID -> "SetComponents-WithoutGridPointIndex"
+];
+
+VerificationTest[
+  (* SetComponents with UseTilePointIndex *)
+  varlist = {{intTileGP[i], PrintAs -> "itg"}};
+  SetComponents[{UseTilePointIndex -> True}, varlist];
+  True,
+  True,
+  TestID -> "SetComponents-UseTilePointIndex"
+];
+
 Print["InterfaceTests.wl completed."];

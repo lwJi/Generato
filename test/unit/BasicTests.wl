@@ -100,6 +100,75 @@ VerificationTest[
   TestID -> "SetEQN-WithSuffix-NoError"
 ];
 
+(* ========================================= *)
+(* Test: GetCheckInputEquations / SetCheckInputEquations *)
+(* ========================================= *)
+
+VerificationTest[
+  SetCheckInputEquations[True];
+  GetCheckInputEquations[],
+  True,
+  TestID -> "GetSetCheckInputEquations-True"
+];
+
+VerificationTest[
+  SetCheckInputEquations[False];
+  GetCheckInputEquations[],
+  False,
+  TestID -> "GetSetCheckInputEquations-False"
+];
+
+(* ========================================= *)
+(* Test: GetPrintHeaderMacro / SetPrintHeaderMacro *)
+(* ========================================= *)
+
+VerificationTest[
+  SetPrintHeaderMacro[True];
+  GetPrintHeaderMacro[],
+  True,
+  TestID -> "GetSetPrintHeaderMacro-True"
+];
+
+VerificationTest[
+  SetPrintHeaderMacro[False];
+  GetPrintHeaderMacro[],
+  False,
+  TestID -> "GetSetPrintHeaderMacro-False"
+];
+
+(* ========================================= *)
+(* Test: GetSuffixUnprotected / SetSuffixUnprotected *)
+(* ========================================= *)
+
+VerificationTest[
+  SetSuffixUnprotected["_test"];
+  GetSuffixUnprotected[],
+  "_test",
+  TestID -> "GetSetSuffixUnprotected-String"
+];
+
+(* ========================================= *)
+(* Test: GetDefaultChart *)
+(* ========================================= *)
+
+VerificationTest[
+  (* GetDefaultChart should return a symbol *)
+  Head[GetDefaultChart[]] === Symbol || GetDefaultChart[] === Null,
+  True,
+  TestID -> "GetDefaultChart-ReturnsSymbolOrNull"
+];
+
+(* ========================================= *)
+(* Test: GetDim *)
+(* ========================================= *)
+
+VerificationTest[
+  (* GetDim should return an integer *)
+  IntegerQ[GetDim[]],
+  True,
+  TestID -> "GetDim-ReturnsInteger"
+];
+
 (* Reset to clean state *)
 SetPVerbose[False];
 SetGridPointIndex[""];

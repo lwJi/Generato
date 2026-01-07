@@ -1,0 +1,24 @@
+/* testDerivs.hxx */
+/* Produced with Generato */
+
+#ifndef TESTDERIVS_HXX
+#define TESTDERIVS_HXX
+
+
+const auto phi = gf_phi;
+
+const auto dphi1 = calcderivs1_1(phi, p.i, p.j, p.k);
+const auto dphi2 = calcderivs1_2(phi, p.i, p.j, p.k);
+const auto dphi3 = calcderivs1_3(phi, p.i, p.j, p.k);
+
+const vreal
+psi
+=
+Power(dphi(List(1,-cart)),2) + Power(dphi(List(2,-cart)),2) +
+  Power(dphi(List(3,-cart)),2)
+;
+
+
+#endif // #ifndef TESTDERIVS_HXX
+
+/* testDerivs.hxx */

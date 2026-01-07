@@ -1,0 +1,49 @@
+/* testTile.hxx */
+/* Produced with Generato */
+
+#ifndef TESTTILE_HXX
+#define TESTTILE_HXX
+
+
+const GF3D2<CCTK_REAL> &local_tileU1[[tI]] = gf_tileU(0);
+const GF3D2<CCTK_REAL> &local_tileU2[[tI]] = gf_tileU(1);
+const GF3D2<CCTK_REAL> &local_tileU3[[tI]] = gf_tileU(2);
+const vreal gridU1 = tmp_gridU(0);
+const vreal gridU2 = tmp_gridU(1);
+const vreal gridU3 = tmp_gridU(2);
+
+vreal
+tempU1
+=
+gridU1
+;
+
+vreal
+tempU2
+=
+gridU2
+;
+
+vreal
+tempU3
+=
+gridU3
+;
+
+
+local_tileU1[tI].store(mask, index2,
+tempU1
+);
+
+local_tileU2[tI].store(mask, index2,
+tempU2
+);
+
+local_tileU3[tI].store(mask, index2,
+tempU3
+);
+
+
+#endif // #ifndef TESTTILE_HXX
+
+/* testTile.hxx */
