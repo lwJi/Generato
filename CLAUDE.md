@@ -61,13 +61,17 @@ Each backend implements `PrintComponentInitialization` and `PrintComponentEquati
 
 ```bash
 # Run all tests (recommended - runs unit tests + regression tests)
-wolframscript -f test/AllTests.wl
-
-# Alternative: Run via bash script
 ./test/run_tests.sh
+
+# Quiet mode - shows only checkmark on success or failures on error
+./test/run_tests.sh --quiet
 
 # Update golden files with new outputs
 ./test/run_tests.sh --generate
+
+# Alternative: Run via wolframscript directly
+wolframscript -script test/AllTests.wl           # verbose
+wolframscript -script test/AllTests.wl -quiet    # quiet mode
 ```
 
 The test suite includes:

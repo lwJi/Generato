@@ -4,8 +4,6 @@
 (* Unit tests for Generato`Interface module *)
 (* Tests: GridTensors, TileTensors, TempTensors *)
 
-Print["Loading InterfaceTests.wl..."];
-
 (* Load Generato if not already loaded *)
 If[!MemberQ[$Packages, "Generato`Interface`"],
   Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"}]]
@@ -122,5 +120,3 @@ VerificationTest[
   True,
   TestID -> "SetComponents-UseTilePointIndex"
 ];
-
-Print["InterfaceTests.wl completed."];

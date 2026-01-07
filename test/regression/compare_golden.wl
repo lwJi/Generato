@@ -14,17 +14,32 @@ Begin["`Private`"];
 $TestDir = DirectoryName[$InputFileName];
 $GoldenDir = FileNameJoin[{$TestDir, "..", "golden"}];
 
+(* Check if quiet mode is set by parent (AllTests.wl) *)
+$LocalQuietMode = If[ValueQ[Global`$QuietMode], Global`$QuietMode, False];
+
+(* Conditional print - only prints when not in quiet mode *)
+QPrint[args___] := If[!$LocalQuietMode, Print[args]];
+
+(* Add failure to parent's failure list if available *)
+AddFailure[msg_String] := If[ValueQ[Global`$FailureMessages],
+  AppendTo[Global`$FailureMessages, msg]
+];
+
 (* Compare two files, return True if identical *)
 CompareGoldenFile[currentFile_String, goldenFile_String] := Module[
-  {current, golden, result},
+  {current, golden, result, failMsg},
 
   If[!FileExistsQ[currentFile],
-    Print["FAIL: Current file not found: ", currentFile];
+    failMsg = "FAIL: Current file not found: " <> currentFile;
+    QPrint[failMsg];
+    AddFailure[failMsg];
     Return[$Failed]
   ];
 
   If[!FileExistsQ[goldenFile],
-    Print["FAIL: Golden file not found: ", goldenFile];
+    failMsg = "FAIL: Golden file not found: " <> goldenFile;
+    QPrint[failMsg];
+    AddFailure[failMsg];
     Return[$Failed]
   ];
 
@@ -32,11 +47,13 @@ CompareGoldenFile[currentFile_String, goldenFile_String] := Module[
   golden = Import[goldenFile, "Text"];
 
   If[current === golden,
-    Print["PASS: ", FileNameTake[currentFile]];
+    QPrint["PASS: ", FileNameTake[currentFile]];
     True,
-    Print["FAIL: ", FileNameTake[currentFile], " differs from golden"];
-    Print["  Current: ", StringLength[current], " chars"];
-    Print["  Golden:  ", StringLength[golden], " chars"];
+    failMsg = "FAIL: " <> FileNameTake[currentFile] <> " differs from golden";
+    QPrint[failMsg];
+    QPrint["  Current: ", StringLength[current], " chars"];
+    QPrint["  Golden:  ", StringLength[golden], " chars"];
+    AddFailure[failMsg];
     $Failed
   ]
 ];
@@ -52,8 +69,8 @@ $TestCases = Select[
 RunGoldenTests[] := Module[
   {results, passed, failed, backend, testName, ext, currentFile, goldenFile},
 
-  Print["=== Golden File Regression Tests ==="];
-  Print[""];
+  QPrint["=== Golden File Regression Tests ==="];
+  QPrint[""];
 
   results = Table[
     {backend, testName, ext} = testCase;
@@ -66,20 +83,20 @@ RunGoldenTests[] := Module[
   passed = Count[results, True];
   failed = Count[results, $Failed];
 
-  Print[""];
-  Print["=== Summary ==="];
-  Print["Passed: ", passed, "/", Length[results]];
-  Print["Failed: ", failed, "/", Length[results]];
+  QPrint[""];
+  QPrint["=== Summary ==="];
+  QPrint["Passed: ", passed, "/", Length[results]];
+  QPrint["Failed: ", failed, "/", Length[results]];
 
   If[failed > 0,
-    Print[""];
-    Print["REGRESSION DETECTED"];
+    QPrint[""];
+    QPrint["REGRESSION DETECTED"];
     If[Length[$ScriptCommandLine] > 0 && MemberQ[StringContainsQ[#, "compare_golden.wl"] & /@ $ScriptCommandLine, True],
       Exit[1],
       $Failed
     ],
-    Print[""];
-    Print["ALL TESTS PASSED"];
+    QPrint[""];
+    QPrint["ALL TESTS PASSED"];
     If[Length[$ScriptCommandLine] > 0 && MemberQ[StringContainsQ[#, "compare_golden.wl"] & /@ $ScriptCommandLine, True],
       Exit[0],
       True

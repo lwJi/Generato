@@ -6,12 +6,6 @@
 
 BeginPackage["Generato`Basic`", {"xAct`xTensor`", "xAct`xCoba`"}];
 
-System`Print["------------------------------------------------------------"];
-
-System`Print["Package Generato`Basic`, {2024, 1, 11}"];
-
-System`Print["------------------------------------------------------------"];
-
 GetCheckInputEquations::usage = "GetCheckInputEquations[] returns True if input equation checking is enabled.";
 
 SetCheckInputEquations::usage = "SetCheckInputEquations[bool] enables or disables checking of input equations.";

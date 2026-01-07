@@ -22,6 +22,7 @@ NC='\033[0m' # No Color
 
 # Parse arguments
 GENERATE=false
+QUIET_MODE=false
 
 for arg in "$@"; do
   case $arg in
@@ -29,15 +30,22 @@ for arg in "$@"; do
       GENERATE=true
       shift
       ;;
+    --quiet|-q)
+      QUIET_MODE=true
+      shift
+      ;;
     --help)
       echo "Usage: $0 [options]"
       echo "  --generate    Update golden files with new outputs"
+      echo "  --quiet, -q   Show only checkmark on success or failures on error"
       echo "  --help        Show this help message"
       exit 0
       ;;
   esac
 done
 
+# Main test execution function
+run_all_tests() {
 echo ""
 echo "========================================"
 echo "  Generato Test Suite"
@@ -192,8 +200,32 @@ echo "Integration: Passed: $PASSED, Failed: $FAILED"
 
 if [ "$FAILED" -gt 0 ]; then
   echo -e "${RED}TESTS FAILED${NC}"
-  exit 1
+  return 1
 else
   echo -e "${GREEN}ALL TESTS PASSED${NC}"
-  exit 0
+  return 0
+fi
+}
+
+# Execute tests with quiet mode handling
+if [ "$QUIET_MODE" = true ]; then
+  TEMP_OUTPUT=$(mktemp)
+  trap "rm -f $TEMP_OUTPUT" EXIT
+
+  # Run tests with output captured
+  set +e
+  run_all_tests > "$TEMP_OUTPUT" 2>&1
+  EXIT_CODE=$?
+  set -e
+
+  if [ $EXIT_CODE -eq 0 ]; then
+    echo "✓ tests"
+  else
+    echo "✗ tests"
+    grep -E "(FAIL|FAILED)" "$TEMP_OUTPUT" || true
+  fi
+  exit $EXIT_CODE
+else
+  run_all_tests
+  exit $?
 fi

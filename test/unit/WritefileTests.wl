@@ -3,8 +3,6 @@
 (* WritefileTests.wl *)
 (* Unit tests for Generato`Writefile module *)
 
-Print["Loading WritefileTests.wl..."];
-
 (* Load Generato which includes Writefile *)
 If[!MemberQ[$Packages, "Generato`Writefile`"],
   Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"}]]
@@ -99,5 +97,3 @@ VerificationTest[
   True,
   TestID -> "WriteToFile-NoHeaderMacro"
 ];
-
-Print["WritefileTests.wl completed."];

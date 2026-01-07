@@ -4,12 +4,6 @@
 
 BeginPackage["Generato`Derivation`"];
 
-System`Print["------------------------------------------------------------"];
-
-System`Print["Package Generato`Derivation`, {2024, 1, 18}"];
-
-System`Print["------------------------------------------------------------"];
-
 TestEQN::usage = "TestEQN[bool, label] prints 'SUCCEED' if bool is True, otherwise prints 'FAILED' and aborts.";
 
 Begin["`Private`"];

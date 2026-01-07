@@ -4,12 +4,6 @@
 
 BeginPackage["Generato`ParseMode`"];
 
-System`Print["------------------------------------------------------------"];
-
-System`Print["Package Generato`ParseMode`, {2024, 7, 06}"];
-
-System`Print["------------------------------------------------------------"];
-
 GetParseMode::usage = "GetParseMode[key] returns True if the specified parsing mode is active, False otherwise.";
 
 SetParseMode::usage = "SetParseMode[key->value] sets the specified parsing mode.";

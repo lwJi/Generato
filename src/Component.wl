@@ -8,12 +8,6 @@ Needs["Generato`Basic`"];
 
 Needs["Generato`ParseMode`"];
 
-System`Print["------------------------------------------------------------"];
-
-System`Print["Package Generato`Component`, {2024, 1, 11}"];
-
-System`Print["------------------------------------------------------------"];
-
 GetMapComponentToVarlist::usage = "GetMapComponentToVarlist[] returns the Association mapping tensor components to varlist indices.";
 
 SetProcessNewVarlist::usage = "SetProcessNewVarlist[bool] sets whether the next varlist is treated as a new varlist for index numbering.";

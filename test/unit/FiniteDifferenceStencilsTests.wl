@@ -3,8 +3,6 @@
 (* FiniteDifferenceStencilsTests.wl *)
 (* Unit tests for Generato`FiniteDifferenceStencils module *)
 
-Print["Loading FiniteDifferenceStencilsTests.wl..."];
-
 (* Load the stencils package *)
 Needs["Generato`FiniteDifferenceStencils`", FileNameJoin[{Environment["GENERATO"], "src/stencils/FiniteDifferenceStencils.wl"}]];
 
@@ -123,5 +121,3 @@ VerificationTest[
   True,
   TestID -> "GetUpwindCoefficients-HasSymmetricAndAntisymmetric"
 ];
-
-Print["FiniteDifferenceStencilsTests.wl completed."];

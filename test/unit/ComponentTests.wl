@@ -3,8 +3,6 @@
 (* ComponentTests.wl *)
 (* Unit tests for Generato`Component module *)
 
-Print["Loading ComponentTests.wl..."];
-
 (* Load Generato *)
 Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"}]];
 
@@ -145,5 +143,3 @@ SetUseLetterForTensorComponent[False];
 SetTempVariableType["double"];
 SetInterfaceWithNonCoordBasis[False];
 SetSuffixName[""];
-
-Print["ComponentTests.wl completed."];

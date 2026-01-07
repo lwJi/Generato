@@ -10,12 +10,6 @@ Needs["Generato`Basic`"];
 
 Needs["Generato`Component`"];
 
-System`Print["------------------------------------------------------------"];
-
-System`Print["Package Generato`Writefile`, {2025, 1, 23}"];
-
-System`Print["------------------------------------------------------------"];
-
 SetMainPrint::usage = "SetMainPrint[content] sets the content to be written as the main body of the output file.";
 
 GetMainPrint::usage = "GetMainPrint[] returns and evaluates the content set by SetMainPrint.";

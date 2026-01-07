@@ -2,15 +2,25 @@
 
 (* AllTests.wl *)
 (* Master test runner for Generato *)
-(* Usage: wolframscript -f test/AllTests.wl *)
+(* Usage: wolframscript -script test/AllTests.wl [-quiet] *)
 
 $TestDir = DirectoryName[$InputFileName];
 
-Print[""];
-Print["========================================"];
-Print["  Generato Test Suite"];
-Print["========================================"];
-Print[""];
+(* Parse command line for quiet mode *)
+$QuietMode = MemberQ[$ScriptCommandLine, "-quiet"];
+
+(* Conditional print - only prints when not in quiet mode *)
+QPrint[args___] := If[!$QuietMode, Print[args]];
+
+(* Failure message collection for quiet mode output *)
+$FailureMessages = {};
+AppendFailure[msg_String] := AppendTo[$FailureMessages, msg];
+
+QPrint[""];
+QPrint["========================================"];
+QPrint["  Generato Test Suite"];
+QPrint["========================================"];
+QPrint[""];
 
 (* Collect all verification tests *)
 $AllTests = {};
@@ -19,36 +29,40 @@ $AllTests = {};
 (* PHASE 1: Unit Tests *)
 (* ========================================= *)
 
-Print["--- Unit Tests ---"];
-Print[""];
+QPrint["--- Unit Tests ---"];
+QPrint[""];
 
 unitTestFiles = FileNames["*.wl", FileNameJoin[{$TestDir, "unit"}]];
 
 If[Length[unitTestFiles] > 0,
   Do[
-    Print["Running: ", FileNameTake[file]];
-    Get[file],
+    QPrint["Running: ", FileNameTake[file]];
+    (* In quiet mode, suppress Print output from unit tests *)
+    If[$QuietMode,
+      Block[{Print = Null &}, Get[file]],
+      Get[file]
+    ],
     {file, unitTestFiles}
   ],
-  Print["No unit test files found in test/unit/"]
+  QPrint["No unit test files found in test/unit/"]
 ];
 
-Print[""];
+QPrint[""];
 
 (* Generate test report if VerificationTests were run *)
 If[Length[$AllTests] > 0,
-  Print["Generating TestReport..."];
+  QPrint["Generating TestReport..."];
   report = TestReport[$AllTests];
-  Print["Tests Passed: ", report["TestsSucceededCount"], "/", report["TestsSucceededCount"] + report["TestsFailedCount"]];
-  Print[""];
+  QPrint["Tests Passed: ", report["TestsSucceededCount"], "/", report["TestsSucceededCount"] + report["TestsFailedCount"]];
+  QPrint[""];
 ];
 
 (* ========================================= *)
 (* PHASE 2: Golden File Regression Tests *)
 (* ========================================= *)
 
-Print["--- Regression Tests (Golden Files) ---"];
-Print[""];
+QPrint["--- Regression Tests (Golden Files) ---"];
+QPrint[""];
 
 (* Load test cases from config file *)
 $ConfigFile = FileNameJoin[{$TestDir, "test_cases.txt"}];
@@ -61,8 +75,8 @@ $TestCases = Select[
 ValidShellInput[str_String] := StringMatchQ[str, RegularExpression["^[a-zA-Z0-9_./\\-]+$"]];
 
 (* Generate outputs for each test case *)
-Print["Generating test outputs..."];
-Print[""];
+QPrint["Generating test outputs..."];
+QPrint[""];
 
 $GenerationFailed = False;
 Do[
@@ -72,27 +86,37 @@ Do[
   If[FileExistsQ[testFile],
     (* Validate inputs before shell execution *)
     If[!ValidShellInput[backend] || !ValidShellInput[testName],
-      Print["  ERROR: Invalid characters in backend or testName"];
+      QPrint["  ERROR: Invalid characters in backend or testName"];
+      AppendFailure["FAILED: Invalid characters in " <> backend <> "/" <> testName];
       $GenerationFailed = True;
       Continue[];
     ];
 
-    Print["  Generating: ", backend, "/", testName, ".wl"];
+    QPrint["  Generating: ", backend, "/", testName, ".wl"];
     (* Run Generato from the test directory *)
-    result = Run["cd " <> FileNameJoin[{$TestDir, backend}] <> " && \"$GENERATO/Generato\" " <> testName <> ".wl 2>&1"];
+    (* In quiet mode, suppress subprocess output *)
+    result = If[$QuietMode,
+      Run["cd " <> FileNameJoin[{$TestDir, backend}] <> " && \"$GENERATO/Generato\" " <> testName <> ".wl > /dev/null 2>&1"],
+      Run["cd " <> FileNameJoin[{$TestDir, backend}] <> " && \"$GENERATO/Generato\" " <> testName <> ".wl 2>&1"]
+    ];
     If[result != 0,
-      Print["    FAILED to generate ", testName, ext];
+      QPrint["    FAILED to generate ", testName, ext];
+      AppendFailure["FAILED to generate " <> testName <> ext];
       $GenerationFailed = True;
     ],
-    Print["  SKIP: ", testFile, " not found"];
+    QPrint["  SKIP: ", testFile, " not found"];
   ],
   {testCase, $TestCases}
 ];
 
-Print[""];
+QPrint[""];
 
 If[$GenerationFailed,
-  Print["ERROR: Some outputs failed to generate"];
+  QPrint["ERROR: Some outputs failed to generate"];
+  If[$QuietMode,
+    Print["✗ tests"];
+    Print /@ $FailureMessages;
+  ];
   Exit[1]
 ];
 
@@ -103,15 +127,15 @@ Get[FileNameJoin[{$TestDir, "regression", "compare_golden.wl"}]];
 $RegressionResult = GoldenTest`RunGoldenTests[];
 
 (* Cleanup generated output files *)
-Print[""];
-Print["Cleaning up generated files..."];
+QPrint[""];
+QPrint["Cleaning up generated files..."];
 Do[
   {backend, testName, ext} = testCase;
   outputFile = FileNameJoin[{$TestDir, backend, testName <> ext}];
   If[FileExistsQ[outputFile],
     Check[
       DeleteFile[outputFile],
-      Print["  Warning: Failed to delete ", outputFile]
+      QPrint["  Warning: Failed to delete ", outputFile]
     ];
   ],
   {testCase, $TestCases}
@@ -119,6 +143,13 @@ Do[
 
 (* Exit with appropriate status *)
 If[$RegressionResult === $Failed,
+  If[$QuietMode,
+    Print["✗ tests"];
+    Print /@ $FailureMessages;
+  ];
   Exit[1],
+  If[$QuietMode,
+    Print["✓ tests"];
+  ];
   Exit[0]
 ];
