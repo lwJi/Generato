@@ -10,11 +10,11 @@ Needs["Generato`Basic`"];
 
 Needs["Generato`Component`"];
 
-System`Print["------------------------------------------------------------"];
-
-System`Print["Package Generato`Writefile`, {2025, 1, 23}"];
-
-System`Print["------------------------------------------------------------"];
+If[Environment["QUIET"] =!= "1",
+  System`Print["------------------------------------------------------------"];
+  System`Print["Package Generato`Writefile`, {2025, 1, 23}"];
+  System`Print["------------------------------------------------------------"];
+];
 
 SetMainPrint::usage = "SetMainPrint[content] sets the content to be written as the main body of the output file.";
 
@@ -46,9 +46,9 @@ Protect[SetMainPrint];
 
 WriteToFile[outputfile_] :=
   Module[{},
-    System`Print["Writing to \"", outputfile, "\"...\n"];
+    If[Environment["QUIET"] =!= "1", System`Print["Writing to \"", outputfile, "\"...\n"]];
     If[FileExistsQ[outputfile],
-      System`Print["\"", outputfile, "\" already exist, replacing it ...\n"];
+      If[Environment["QUIET"] =!= "1", System`Print["\"", outputfile, "\" already exist, replacing it ...\n"]];
       DeleteFile[outputfile]
     ];
     (* define pr *)
@@ -84,7 +84,7 @@ WriteToFile[outputfile_] :=
       Global`pr[]
     ];
     Global`pr["/* " <> FileNameTake[outputfile] <> " */"];
-    System`Print["Done generating \"", outputfile, "\"\n"];
+    If[Environment["QUIET"] =!= "1", System`Print["Done generating \"", outputfile, "\"\n"]];
     Close[filepointer]
   ];
 

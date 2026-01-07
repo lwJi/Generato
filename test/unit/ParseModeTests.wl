@@ -3,7 +3,7 @@
 (* ParseModeTests.wl *)
 (* Unit tests for Generato`ParseMode module *)
 
-Print["Loading ParseModeTests.wl..."];
+If[Environment["QUIET"] =!= "1", Print["Loading ParseModeTests.wl..."]];
 
 (* Load Generato *)
 Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"}]];
@@ -215,4 +215,4 @@ CleanParsePrintCompEQNMode[];
 CleanParsePrintCompInitTensorType[];
 CleanParsePrintCompInitStorageType[];
 
-Print["ParseModeTests.wl completed."];
+If[Environment["QUIET"] =!= "1", Print["ParseModeTests.wl completed."]];

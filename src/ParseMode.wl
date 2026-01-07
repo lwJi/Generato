@@ -4,11 +4,11 @@
 
 BeginPackage["Generato`ParseMode`"];
 
-System`Print["------------------------------------------------------------"];
-
-System`Print["Package Generato`ParseMode`, {2024, 7, 06}"];
-
-System`Print["------------------------------------------------------------"];
+If[Environment["QUIET"] =!= "1",
+  System`Print["------------------------------------------------------------"];
+  System`Print["Package Generato`ParseMode`, {2024, 7, 06}"];
+  System`Print["------------------------------------------------------------"];
+];
 
 GetParseMode::usage = "GetParseMode[key] returns True if the specified parsing mode is active, False otherwise.";
 

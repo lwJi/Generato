@@ -4,13 +4,17 @@
 
 (* (c) Liwei Ji, 01/2024 *)
 
-BeginPackage["Generato`Basic`", {"xAct`xTensor`", "xAct`xCoba`"}];
+(* Suppress xAct loading banners in quiet mode *)
+If[Environment["QUIET"] === "1",
+  Block[{Print}, BeginPackage["Generato`Basic`", {"xAct`xTensor`", "xAct`xCoba`"}]],
+  BeginPackage["Generato`Basic`", {"xAct`xTensor`", "xAct`xCoba`"}]
+];
 
-System`Print["------------------------------------------------------------"];
-
-System`Print["Package Generato`Basic`, {2024, 1, 11}"];
-
-System`Print["------------------------------------------------------------"];
+If[Environment["QUIET"] =!= "1",
+  System`Print["------------------------------------------------------------"];
+  System`Print["Package Generato`Basic`, {2024, 1, 11}"];
+  System`Print["------------------------------------------------------------"];
+];
 
 GetCheckInputEquations::usage = "GetCheckInputEquations[] returns True if input equation checking is enabled.";
 
@@ -73,6 +77,9 @@ Begin["`Private`"];
 $CheckInputEquations = False;
 
 $PVerbose = False;
+
+(* Quiet mode - suppress all output when QUIET=1 environment variable is set *)
+$QuietMode = (Environment["QUIET"] === "1");
 
 $PrintDate = True;
 

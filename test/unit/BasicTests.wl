@@ -3,7 +3,7 @@
 (* BasicTests.wl *)
 (* Unit tests for Generato`Basic module *)
 
-Print["Loading BasicTests.wl..."];
+If[Environment["QUIET"] =!= "1", Print["Loading BasicTests.wl..."]];
 
 (* Load Generato *)
 Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"}]];
@@ -174,4 +174,4 @@ SetPVerbose[False];
 SetGridPointIndex[""];
 SetTilePointIndex[""];
 
-Print["BasicTests.wl completed."];
+If[Environment["QUIET"] =!= "1", Print["BasicTests.wl completed."]];

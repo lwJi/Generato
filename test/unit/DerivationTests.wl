@@ -3,7 +3,7 @@
 (* DerivationTests.wl *)
 (* Unit tests for Generato`Derivation module *)
 
-Print["Loading DerivationTests.wl..."];
+If[Environment["QUIET"] =!= "1", Print["Loading DerivationTests.wl..."]];
 
 (* Load the Derivation package *)
 Needs["Generato`Derivation`", FileNameJoin[{Environment["GENERATO"], "src/Derivation.wl"}]];
@@ -54,4 +54,4 @@ VerificationTest[
   TestID -> "TestEQN-RecoveryAfterAbort"
 ];
 
-Print["DerivationTests.wl completed."];
+If[Environment["QUIET"] =!= "1", Print["DerivationTests.wl completed."]];
