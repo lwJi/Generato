@@ -3,7 +3,7 @@
 # Generato Script (c) 2023 Liwei Ji
 # A script to process *.wl files, generate corresponding .hxx files, and clean up trailing spaces.
 
-echo "Generato (c) 2023 Liwei Ji"
+[[ "$QUIET" != "1" ]] && echo "Generato (c) 2023 Liwei Ji"
 
 # Function to display help message
 show_help() {
@@ -44,19 +44,20 @@ for input_file in "$@"; do
   output_file="${base_name}.hxx"
 
   # Run wolframscript on the input file
-  echo "Processing '$input_file'..."
+  [[ "$QUIET" != "1" ]] && echo "Processing '$input_file'..."
   wolframscript -f "$input_file"
 
   # Check if the expected output file was created
   if [[ -f "$output_file" ]]; then
     # Remove trailing spaces from the output file
-    echo "Removing trailing spaces in '$output_file'..."
+    [[ "$QUIET" != "1" ]] && echo "Removing trailing spaces in '$output_file'..."
     sed -i.bak -E 's/[[:space:]]+$//' "$output_file" && rm "${output_file}.bak"
   else
     echo "Error: Expected output file '$output_file' not found."
   fi
 
-  echo
+  [[ "$QUIET" != "1" ]] && echo
 done
 
-echo "DONE."
+[[ "$QUIET" != "1" ]] && echo "DONE."
+exit 0

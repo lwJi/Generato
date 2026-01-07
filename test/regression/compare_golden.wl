@@ -11,6 +11,12 @@ RunGoldenTests::usage = "RunGoldenTests[] runs all golden file comparisons and r
 
 Begin["`Private`"];
 
+(* Use QuietPrint if available (from AllTests.wl), otherwise use Print *)
+GoldenPrint[args___] := If[ValueQ[Global`$QuietMode] && Global`$QuietMode === True,
+  Null,  (* Suppress output in quiet mode *)
+  Print[args]
+];
+
 $TestDir = DirectoryName[$InputFileName];
 $GoldenDir = FileNameJoin[{$TestDir, "..", "golden"}];
 
@@ -19,12 +25,12 @@ CompareGoldenFile[currentFile_String, goldenFile_String] := Module[
   {current, golden, result},
 
   If[!FileExistsQ[currentFile],
-    Print["FAIL: Current file not found: ", currentFile];
+    GoldenPrint["FAIL: Current file not found: ", currentFile];
     Return[$Failed]
   ];
 
   If[!FileExistsQ[goldenFile],
-    Print["FAIL: Golden file not found: ", goldenFile];
+    GoldenPrint["FAIL: Golden file not found: ", goldenFile];
     Return[$Failed]
   ];
 
@@ -32,11 +38,11 @@ CompareGoldenFile[currentFile_String, goldenFile_String] := Module[
   golden = Import[goldenFile, "Text"];
 
   If[current === golden,
-    Print["PASS: ", FileNameTake[currentFile]];
+    GoldenPrint["PASS: ", FileNameTake[currentFile]];
     True,
-    Print["FAIL: ", FileNameTake[currentFile], " differs from golden"];
-    Print["  Current: ", StringLength[current], " chars"];
-    Print["  Golden:  ", StringLength[golden], " chars"];
+    GoldenPrint["FAIL: ", FileNameTake[currentFile], " differs from golden"];
+    GoldenPrint["  Current: ", StringLength[current], " chars"];
+    GoldenPrint["  Golden:  ", StringLength[golden], " chars"];
     $Failed
   ]
 ];
@@ -52,8 +58,8 @@ $TestCases = Select[
 RunGoldenTests[] := Module[
   {results, passed, failed, backend, testName, ext, currentFile, goldenFile},
 
-  Print["=== Golden File Regression Tests ==="];
-  Print[""];
+  GoldenPrint["=== Golden File Regression Tests ==="];
+  GoldenPrint[""];
 
   results = Table[
     {backend, testName, ext} = testCase;
@@ -66,20 +72,20 @@ RunGoldenTests[] := Module[
   passed = Count[results, True];
   failed = Count[results, $Failed];
 
-  Print[""];
-  Print["=== Summary ==="];
-  Print["Passed: ", passed, "/", Length[results]];
-  Print["Failed: ", failed, "/", Length[results]];
+  GoldenPrint[""];
+  GoldenPrint["=== Summary ==="];
+  GoldenPrint["Passed: ", passed, "/", Length[results]];
+  GoldenPrint["Failed: ", failed, "/", Length[results]];
 
   If[failed > 0,
-    Print[""];
-    Print["REGRESSION DETECTED"];
+    GoldenPrint[""];
+    GoldenPrint["REGRESSION DETECTED"];
     If[Length[$ScriptCommandLine] > 0 && MemberQ[StringContainsQ[#, "compare_golden.wl"] & /@ $ScriptCommandLine, True],
       Exit[1],
       $Failed
     ],
-    Print[""];
-    Print["ALL TESTS PASSED"];
+    GoldenPrint[""];
+    GoldenPrint["ALL TESTS PASSED"];
     If[Length[$ScriptCommandLine] > 0 && MemberQ[StringContainsQ[#, "compare_golden.wl"] & /@ $ScriptCommandLine, True],
       Exit[0],
       True

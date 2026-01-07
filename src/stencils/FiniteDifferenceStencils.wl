@@ -6,11 +6,11 @@
 
 BeginPackage["Generato`FiniteDifferenceStencils`"];
 
-System`Print["------------------------------------------------------------"];
-
-System`Print["Package Generato`FiniteDifferenceStencils`, {2025, 1, 21}"];
-
-System`Print["------------------------------------------------------------"];
+If[Environment["QUIET"] =!= "1",
+  System`Print["------------------------------------------------------------"];
+  System`Print["Package Generato`FiniteDifferenceStencils`, {2025, 1, 21}"];
+  System`Print["------------------------------------------------------------"];
+];
 
 GetFiniteDifferenceCoefficients::usage = "GetFiniteDifferenceCoefficients[sample, order] returns the finite difference coefficients for the given sample points and derivative order.";
 

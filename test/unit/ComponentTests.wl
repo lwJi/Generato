@@ -3,7 +3,7 @@
 (* ComponentTests.wl *)
 (* Unit tests for Generato`Component module *)
 
-Print["Loading ComponentTests.wl..."];
+If[Environment["QUIET"] =!= "1", Print["Loading ComponentTests.wl..."]];
 
 (* Load Generato *)
 Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"}]];
@@ -146,4 +146,4 @@ SetTempVariableType["double"];
 SetInterfaceWithNonCoordBasis[False];
 SetSuffixName[""];
 
-Print["ComponentTests.wl completed."];
+If[Environment["QUIET"] =!= "1", Print["ComponentTests.wl completed."]];

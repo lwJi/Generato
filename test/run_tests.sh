@@ -20,6 +20,37 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
+# Quiet mode support
+quiet_print() {
+  [[ "$QUIET" != "1" ]] && echo -e "$@" || true
+}
+
+quiet_print_always() {
+  echo -e "$@"
+}
+
+# Run a phase with output capture in quiet mode
+run_phase() {
+  local phase_name=$1
+  shift
+
+  if [[ "$QUIET" == "1" ]]; then
+    local output
+    local exit_code
+    output=$("$@" 2>&1) && exit_code=$? || exit_code=$?
+
+    if [[ $exit_code -eq 0 ]]; then
+      echo -e "${GREEN}PASS: ${phase_name}${NC}"
+    else
+      echo "$output"
+      echo -e "${RED}FAIL: ${phase_name}${NC}"
+    fi
+    return $exit_code
+  else
+    "$@"
+  fi
+}
+
 # Parse arguments
 GENERATE=false
 
@@ -38,11 +69,11 @@ for arg in "$@"; do
   esac
 done
 
-echo ""
-echo "========================================"
-echo "  Generato Test Suite"
-echo "========================================"
-echo ""
+quiet_print ""
+quiet_print "========================================"
+quiet_print "  Generato Test Suite"
+quiet_print "========================================"
+quiet_print ""
 
 # Function to run a test
 run_test() {
@@ -121,6 +152,68 @@ cleanup_outputs() {
   done
 }
 
+# Function to run integration tests phase
+run_integration_tests() {
+  local passed=0
+  local failed=0
+
+  echo "--- Integration Tests ---"
+  echo ""
+
+  for entry in "${BACKENDS[@]}"; do
+    IFS=':' read -r backend test_name ext <<< "$entry"
+
+    # Skip if test file doesn't exist
+    if [ ! -f "$SCRIPT_DIR/$backend/${test_name}.wl" ]; then
+      echo -e "${YELLOW}SKIP: ${backend}/${test_name}.wl not found${NC}"
+      continue
+    fi
+
+    if run_test "$backend" "$test_name"; then
+      ((passed++)) || true
+    else
+      ((failed++)) || true
+    fi
+  done
+
+  echo ""
+  echo "Integration: Passed: $passed, Failed: $failed"
+
+  # Set global counts for summary
+  PASSED=$passed
+  FAILED=$failed
+
+  [[ $failed -eq 0 ]]
+}
+
+# Function to run golden file comparison phase
+run_golden_comparison() {
+  local failed=0
+
+  echo "--- Golden File Comparison ---"
+  echo ""
+
+  for entry in "${BACKENDS[@]}"; do
+    IFS=':' read -r backend test_name ext <<< "$entry"
+    if ! compare_golden "$backend" "$test_name" "$ext"; then
+      ((failed++)) || true
+    fi
+  done
+
+  [[ $failed -eq 0 ]]
+}
+
+# Function to update golden files
+run_update_golden() {
+  echo "--- Updating Golden Files ---"
+  echo ""
+
+  for entry in "${BACKENDS[@]}"; do
+    IFS=':' read -r backend test_name ext <<< "$entry"
+    update_golden "$backend" "$test_name" "$ext"
+  done
+}
+
 # Track results
 PASSED=0
 FAILED=0
@@ -140,60 +233,34 @@ while IFS= read -r line || [ -n "$line" ]; do
   BACKENDS+=("$line")
 done < "$CONFIG_FILE"
 
-echo "--- Integration Tests ---"
-echo ""
+# Run integration tests
+INTEGRATION_RESULT=0
+run_phase "integration" run_integration_tests || INTEGRATION_RESULT=$?
 
-for entry in "${BACKENDS[@]}"; do
-  IFS=':' read -r backend test_name ext <<< "$entry"
-
-  # Skip if test file doesn't exist
-  if [ ! -f "$SCRIPT_DIR/$backend/${test_name}.wl" ]; then
-    echo -e "${YELLOW}SKIP: ${backend}/${test_name}.wl not found${NC}"
-    continue
-  fi
-
-  if run_test "$backend" "$test_name"; then
-    ((PASSED++)) || true
-  else
-    ((FAILED++)) || true
-  fi
-done
-
-echo ""
-
+# Run golden comparison or update
+GOLDEN_RESULT=0
 if [ "$GENERATE" = true ]; then
-  echo "--- Updating Golden Files ---"
-  echo ""
-
-  for entry in "${BACKENDS[@]}"; do
-    IFS=':' read -r backend test_name ext <<< "$entry"
-    update_golden "$backend" "$test_name" "$ext"
-  done
+  run_phase "golden-update" run_update_golden || GOLDEN_RESULT=$?
 else
-  echo "--- Golden File Comparison ---"
-  echo ""
-
-  for entry in "${BACKENDS[@]}"; do
-    IFS=':' read -r backend test_name ext <<< "$entry"
-    compare_golden "$backend" "$test_name" "$ext"
-  done
+  run_phase "golden" run_golden_comparison || GOLDEN_RESULT=$?
 fi
 
 # Cleanup generated outputs
 cleanup_outputs
 
-echo ""
-echo "========================================"
-echo "  Summary"
-echo "========================================"
-echo ""
+# Show summary (only in verbose mode)
+quiet_print ""
+quiet_print "========================================"
+quiet_print "  Summary"
+quiet_print "========================================"
+quiet_print ""
 
-echo "Integration: Passed: $PASSED, Failed: $FAILED"
+quiet_print "Integration: Passed: $PASSED, Failed: $FAILED"
 
-if [ "$FAILED" -gt 0 ]; then
-  echo -e "${RED}TESTS FAILED${NC}"
+if [ "$INTEGRATION_RESULT" -ne 0 ] || [ "$GOLDEN_RESULT" -ne 0 ]; then
+  quiet_print "${RED}TESTS FAILED${NC}"
   exit 1
 else
-  echo -e "${GREEN}ALL TESTS PASSED${NC}"
+  quiet_print "${GREEN}ALL TESTS PASSED${NC}"
   exit 0
 fi

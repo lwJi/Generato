@@ -4,7 +4,7 @@
 (* Unit tests for Generato`Interface module *)
 (* Tests: GridTensors, TileTensors, TempTensors *)
 
-Print["Loading InterfaceTests.wl..."];
+If[Environment["QUIET"] =!= "1", Print["Loading InterfaceTests.wl..."]];
 
 (* Load Generato if not already loaded *)
 If[!MemberQ[$Packages, "Generato`Interface`"],
@@ -123,4 +123,4 @@ VerificationTest[
   TestID -> "SetComponents-UseTilePointIndex"
 ];
 
-Print["InterfaceTests.wl completed."];
+If[Environment["QUIET"] =!= "1", Print["InterfaceTests.wl completed."]];

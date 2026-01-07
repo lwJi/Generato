@@ -3,7 +3,7 @@
 (* WritefileTests.wl *)
 (* Unit tests for Generato`Writefile module *)
 
-Print["Loading WritefileTests.wl..."];
+If[Environment["QUIET"] =!= "1", Print["Loading WritefileTests.wl..."]];
 
 (* Load Generato which includes Writefile *)
 If[!MemberQ[$Packages, "Generato`Writefile`"],
@@ -100,4 +100,4 @@ VerificationTest[
   TestID -> "WriteToFile-NoHeaderMacro"
 ];
 
-Print["WritefileTests.wl completed."];
+If[Environment["QUIET"] =!= "1", Print["WritefileTests.wl completed."]];

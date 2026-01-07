@@ -4,7 +4,7 @@
 (* Unit tests for Generato`Varlist module *)
 (* Tests: ParseVar, DefineTensor *)
 
-Print["Loading VarlistTests.wl..."];
+If[Environment["QUIET"] =!= "1", Print["Loading VarlistTests.wl..."]];
 
 (* Load Generato *)
 Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"}]];
@@ -158,4 +158,4 @@ VerificationTest[
   TestID -> "ParseVarlist-BasicSmoke"
 ];
 
-Print["VarlistTests.wl completed."];
+If[Environment["QUIET"] =!= "1", Print["VarlistTests.wl completed."]];

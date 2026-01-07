@@ -26,7 +26,7 @@
 
 <<stencils/FiniteDifferenceStencils.wl
 
-System`Print[];
+If[Environment["QUIET"] =!= "1", System`Print[]];
 
 (***********)
 
