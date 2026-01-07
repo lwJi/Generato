@@ -128,6 +128,17 @@ VerificationTest[
   TestID -> "GetMapComponentToVarlist-ReturnsAssociation"
 ];
 
+(* ========================================= *)
+(* Test: GetPrefixDt *)
+(* ========================================= *)
+
+VerificationTest[
+  (* GetPrefixDt should return a string *)
+  StringQ[GetPrefixDt[]],
+  True,
+  TestID -> "GetPrefixDt-ReturnsString"
+];
+
 (* Reset state *)
 SetSimplifyEquation[True];
 SetUseLetterForTensorComponent[False];

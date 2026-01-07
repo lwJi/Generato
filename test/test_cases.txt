@@ -3,6 +3,8 @@
 # Lines starting with # are comments
 CarpetX:test:.hxx
 CarpetX:testGPU:.hxx
+CarpetX:testTile:.hxx
+CarpetX:testDerivs:.hxx
 CarpetXPointDesc:test:.hxx
 Carpet:test:.hxx
 AMReX:test:.hxx
