@@ -16,7 +16,11 @@ DefManifold[M4, 4, Union[Complement[IndexRange[a, z], {g}], Table[ToExpression["
 
 DefChart[cart, M4, {0, 1, 2, 3}, {T[], X[], Y[], Z[]}, ChartColor -> Blue];
 
-dtEvolVarlist = GridTensors[{dtg[-a, -b], Symmetric[{-a, -b}]}, {dtPi[-a, -b], Symmetric[{-a, -b}], PrintAs -> "dt\[CapitalPi]"}, {dtPhi[-k, -a, -b], Symmetric[{-a, -b}], PrintAs -> "dt\[CapitalPhi]"}];
+dtEvolVarlist = GridTensors[
+  {dtg[-a, -b], Symmetric[{-a, -b}]},
+  (*{dtPi[-a, -b], Symmetric[{-a, -b}], PrintAs -> "dt\[CapitalPi]"},*)
+  {dtPhi[-k, -a, -b], Symmetric[{-a, -b}], PrintAs -> "dt\[CapitalPhi]"}
+];
 
 EvolVarlist = GridTensors[{g[-a, -b], Symmetric[{-a, -b}]}, {Pi$Upt[-a, -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalPi]"}, {Phi[-k, -a, -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalPhi]"}, {H[-a]}];
 
@@ -77,7 +81,9 @@ SetEQN[trGam[c_], invg[a, b] Gam[c, -a, -b]];
 
 SetEQN[dtg[a_, b_], -Adg[a, b] interior - alpha[] Pi$Upt[a, b] - gamma1 beta[c] Phi[-c, a, b]];
 
+(*
 SetEQN[dtPi[a_, b_], -AdPi[a, b] interior + 2 alpha[] invg[c, d] (invh[i, j] Phi[-i, -c, a] Phi[-j, -d, b] - Pi$Upt[-c, a] Pi$Upt[-d, b] - invg[e, f] Gam[a, -c, -e] Gam[b, -d, -f]) - 1/2 alpha[] nvec[c] nvec[d] Pi$Upt[-c, -d] Pi$Upt[a, b] - alpha[] nvec[c] Pi$Upt[-c, -i] invh[i, j] Phi[-j, a, b] + 2 alpha[] (invg[c, d] Gam[-c, a, b] H[-d]) + gamma0 alpha[] ((H[a] + trGam[a]) ndua[b] + (H[b] + trGam[b]) ndua[a] - g[a, b] nvec[c] (H[-c] + trGam[-c])) - gamma1 gamma2 beta[i] Phi[-i, a, b] - srcSdH[a, b]];
+*)
 
 SetEQN[dtPhi[i_, a_, b_], -AdPhi[i, a, b] interior + 1/2 alpha[] nvec[c] nvec[d] Phi[i, -c, -d] Pi$Upt[a, b] + alpha[] invh[j, k] nvec[c] Phi[i, -j, -c] Phi[-k, a, b] - gamma2 alpha[] Phi[i, a, b]];
 
