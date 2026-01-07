@@ -14,8 +14,7 @@ const auto dphi3 = calcderivs1_3(phi, p.i, p.j, p.k);
 const vreal
 psi
 =
-Power(dphi(List(1,-cart)),2) + Power(dphi(List(2,-cart)),2) +
-  Power(dphi(List(3,-cart)),2)
+dphi1*dphi1 + dphi2*dphi2 + dphi3*dphi3
 ;
 
 

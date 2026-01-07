@@ -44,7 +44,7 @@ SetMainPrint[
   (* Test Mode->Derivs with DerivsOrder and AccuracyOrder *)
   PrintInitializations[{Mode -> "Derivs", TensorType -> "Vect", DerivsOrder -> 1, AccuracyOrder -> 4}, DerivVarlist];
   pr[];
-  PrintEquations[{Mode -> "Temp"}, TempVarlist];
+  PrintEquations[{Mode -> "Temp", ChartName -> cart}, TempVarlist];
 ];
 
 Import[FileNameJoin[{Environment["GENERATO"], "codes/CarpetXGPU.wl"}]];
