@@ -26,6 +26,7 @@ RunPhase[phaseName_String, phaseCode_] := Module[{},
   ];
   $PhaseSuccess
 ];
+SetAttributes[RunPhase, HoldAll];
 
 QuietPrint[""];
 QuietPrint["========================================"];
