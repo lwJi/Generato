@@ -12,20 +12,24 @@ Needs["Generato`Derivation`", FileNameJoin[{Environment["GENERATO"], "src/Deriva
 (* Test: TestEQN with True condition *)
 (* ========================================= *)
 
-VerificationTest[
-  (* TestEQN should not abort when condition is True *)
-  TestEQN[True, "TrueCondition"];
-  True,
-  True,
-  TestID -> "TestEQN-TrueCondition-NoAbort"
+AppendTo[$AllTests,
+  VerificationTest[
+    (* TestEQN should not abort when condition is True *)
+    TestEQN[True, "TrueCondition"];
+    True,
+    True,
+    TestID -> "TestEQN-TrueCondition-NoAbort"
+  ]
 ];
 
-VerificationTest[
-  (* TestEQN with empty label *)
-  TestEQN[True, ""];
-  True,
-  True,
-  TestID -> "TestEQN-TrueCondition-EmptyLabel"
+AppendTo[$AllTests,
+  VerificationTest[
+    (* TestEQN with empty label *)
+    TestEQN[True, ""];
+    True,
+    True,
+    TestID -> "TestEQN-TrueCondition-EmptyLabel"
+  ]
 ];
 
 (* ========================================= *)
@@ -33,25 +37,29 @@ VerificationTest[
 (* Should abort - use CheckAbort to catch *)
 (* ========================================= *)
 
-VerificationTest[
-  (* TestEQN should abort when condition is False *)
-  result = CheckAbort[
-    TestEQN[False, "FalseCondition"];
-    "did-not-abort",
-    "aborted"
-  ];
-  result,
-  "aborted",
-  TestID -> "TestEQN-FalseCondition-Aborts"
+AppendTo[$AllTests,
+  VerificationTest[
+    (* TestEQN should abort when condition is False *)
+    result = CheckAbort[
+      TestEQN[False, "FalseCondition"];
+      "did-not-abort",
+      "aborted"
+    ];
+    result,
+    "aborted",
+    TestID -> "TestEQN-FalseCondition-Aborts"
+  ]
 ];
 
-VerificationTest[
-  (* Verify we can continue after catching the abort *)
-  CheckAbort[TestEQN[False, "Test"], "caught"];
-  TestEQN[True, "Recovery"];
-  True,
-  True,
-  TestID -> "TestEQN-RecoveryAfterAbort"
+AppendTo[$AllTests,
+  VerificationTest[
+    (* Verify we can continue after catching the abort *)
+    CheckAbort[TestEQN[False, "Test"], "caught"];
+    TestEQN[True, "Recovery"];
+    True,
+    True,
+    TestID -> "TestEQN-RecoveryAfterAbort"
+  ]
 ];
 
 If[Environment["QUIET"] =!= "1", Print["DerivationTests.wl completed."]];

@@ -2,11 +2,13 @@
 # Format: backend:test_name:extension
 # Lines starting with # are comments
 CarpetX:test:.hxx
-CarpetX:testGPU:.hxx
+CarpetXGPU:testGPU:.hxx
 CarpetX:testTile:.hxx
-CarpetX:testDerivs:.hxx
+CarpetXGPU:testDerivs:.hxx
 CarpetXPointDesc:test:.hxx
 Carpet:test:.hxx
 AMReX:test:.hxx
 Nmesh:test:.c
 Nmesh:GHG_rhs:.c
+
+# Note: test/Nmesh/GHG_rhs.ipynb is documentation-only and not part of the test suite
