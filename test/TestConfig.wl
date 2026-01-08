@@ -20,7 +20,8 @@ LoadTestCases[] := Module[{configFile, lines, parsed, valid, skipped},
   (* Check if config file exists *)
   If[!FileExistsQ[configFile],
     Print["ERROR: test_cases.txt not found at ", configFile];
-    Return[{}]
+    Print["ERROR: Test suite cannot proceed without test configuration"];
+    Return[$Failed]
   ];
 
   lines = Import[configFile, "Lines"];
