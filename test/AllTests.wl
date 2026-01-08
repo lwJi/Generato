@@ -2,7 +2,7 @@
 
 (* AllTests.wl *)
 (* Master test runner for Generato *)
-(* Usage: wolframscript -f test/AllTests.wl [--verbose] [--unit-only] *)
+(* Usage: wolframscript -script test/AllTests.wl [--verbose] [--unit-only] [--generate] *)
 
 $TestDir = DirectoryName[$InputFileName];
 
@@ -10,6 +10,8 @@ $TestDir = DirectoryName[$InputFileName];
 $QuietMode = !MemberQ[$CommandLine, "--verbose"];
 (* Unit-only mode - use --unit-only flag to skip regression tests *)
 $UnitOnlyMode = MemberQ[$CommandLine, "--unit-only"];
+(* Generate mode - use --generate flag to update golden files *)
+$GenerateMode = MemberQ[$CommandLine, "--generate"];
 QuietPrint[args___] := If[!$QuietMode, Print[args]];
 (* Suppress all Print output during package loading in quiet mode *)
 QuietGet[file_] := Block[{Print}, Get[file]];
@@ -129,6 +131,55 @@ ValidateGoldenFiles[] := Module[{backend, testName, ext, goldenFile, missing},
   missing
 ];
 
+(* Generate golden files from current outputs *)
+GenerateGoldenFiles[] := Module[{backend, testName, ext, testFile, result, outputFile, goldenFile, goldenDir, quietPrefix},
+  Print["--- Generating Golden Files ---"];
+  Print[""];
+
+  quietPrefix = "QUIET=1 ";
+
+  Do[
+    {backend, testName, ext} = testCase;
+    testFile = FileNameJoin[{$TestDir, backend, testName <> ".wl"}];
+    outputFile = FileNameJoin[{$TestDir, backend, testName <> ext}];
+    goldenFile = FileNameJoin[{$TestDir, "golden", backend, testName <> ext <> ".golden"}];
+    goldenDir = DirectoryName[goldenFile];
+
+    If[FileExistsQ[testFile],
+      (* Validate inputs before shell execution *)
+      If[!ValidShellInput[backend] || !ValidShellInput[testName],
+        Print["ERROR: Invalid characters in backend or testName"];
+        Continue[];
+      ];
+
+      Print["  Generating: ", backend, "/", testName, ".wl"];
+      result = Run["cd " <> FileNameJoin[{$TestDir, backend}] <> " && " <> quietPrefix <> "\"$GENERATO/Generato\" " <> testName <> ".wl 2>&1"];
+      If[result != 0,
+        Print["    \033[0;31mFAILED\033[0m to generate ", testName, ext];
+        Continue[];
+      ];
+
+      (* Create golden directory if needed *)
+      If[!DirectoryQ[goldenDir],
+        CreateDirectory[goldenDir];
+      ];
+
+      (* Copy output to golden file *)
+      If[FileExistsQ[outputFile],
+        CopyFile[outputFile, goldenFile, OverwriteTarget -> True];
+        Print["    \033[0;32mUpdated\033[0m: ", goldenFile];
+        (* Clean up generated file *)
+        DeleteFile[outputFile];
+      ],
+      Print["  SKIP: ", testFile, " not found"];
+    ],
+    {testCase, $TestCases}
+  ];
+
+  Print[""];
+  Print["Golden file generation complete."];
+];
+
 RunRegressionTests[] := Module[{backend, testName, ext, testFile, result, outputFile, quietPrefix, missingGolden},
   QuietPrint["--- Regression Tests (Golden Files) ---"];
   QuietPrint[""];
@@ -210,15 +261,21 @@ RunRegressionTests[] := Module[{backend, testName, ext, testFile, result, output
   ];
 ];
 
-(* Run the test phases *)
-$UnitTestsSuccess = RunPhase["unit", RunUnitTests[]];
-$RegressionTestsSuccess = If[$UnitOnlyMode,
-  True,
-  RunPhase["regression", RunRegressionTests[]]
-];
+(* Run the test phases or generate golden files *)
+If[$GenerateMode,
+  (* Generate mode: update golden files *)
+  GenerateGoldenFiles[];
+  Exit[0],
+  (* Test mode: run unit and regression tests *)
+  $UnitTestsSuccess = RunPhase["unit", RunUnitTests[]];
+  $RegressionTestsSuccess = If[$UnitOnlyMode,
+    True,
+    RunPhase["regression", RunRegressionTests[]]
+  ];
 
-(* Exit with appropriate status *)
-If[!$UnitTestsSuccess || !$RegressionTestsSuccess,
-  Exit[1],
-  Exit[0]
+  (* Exit with appropriate status *)
+  If[!$UnitTestsSuccess || !$RegressionTestsSuccess,
+    Exit[1],
+    Exit[0]
+  ]
 ];
