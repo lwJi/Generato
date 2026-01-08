@@ -2,12 +2,12 @@
 
 (* AllTests.wl *)
 (* Master test runner for Generato *)
-(* Usage: wolframscript -f test/AllTests.wl *)
+(* Usage: wolframscript -f test/AllTests.wl [--verbose] *)
 
 $TestDir = DirectoryName[$InputFileName];
 
-(* Quiet mode support *)
-$QuietMode = (Environment["QUIET"] === "1");
+(* Quiet mode support - use --verbose flag to enable verbose output *)
+$QuietMode = !MemberQ[$CommandLine, "--verbose"];
 QuietPrint[args___] := If[!$QuietMode, Print[args]];
 (* Suppress all Print output during package loading in quiet mode *)
 QuietGet[file_] := Block[{Print}, Get[file]];

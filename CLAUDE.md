@@ -61,10 +61,14 @@ Each backend implements `PrintComponentInitialization` and `PrintComponentEquati
 
 ```bash
 # Run all tests (recommended - runs unit tests + regression tests)
-wolframscript -f test/AllTests.wl
+wolframscript -script test/AllTests.wl
+
+# Run with verbose output
+wolframscript -script test/AllTests.wl --verbose
 
 # Alternative: Run via bash script
 ./test/run_tests.sh
+./test/run_tests.sh --verbose
 
 # Update golden files with new outputs
 ./test/run_tests.sh --generate

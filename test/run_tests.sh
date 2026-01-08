@@ -3,8 +3,8 @@
 # run_tests.sh - Run all Generato tests
 #
 # Usage: ./test/run_tests.sh [options]
+#   --verbose     Show detailed output (default: quiet mode)
 #   --generate    Regenerate all test outputs
-#   --compare     Compare outputs against golden files only
 #   --help        Show this help message
 
 set -e
@@ -53,15 +53,21 @@ run_phase() {
 
 # Parse arguments
 GENERATE=false
+QUIET="${QUIET:-1}"  # Default to quiet mode
 
 for arg in "$@"; do
   case $arg in
+    --verbose)
+      QUIET=0
+      shift
+      ;;
     --generate)
       GENERATE=true
       shift
       ;;
     --help)
       echo "Usage: $0 [options]"
+      echo "  --verbose     Show detailed output (default: quiet mode)"
       echo "  --generate    Update golden files with new outputs"
       echo "  --help        Show this help message"
       exit 0
