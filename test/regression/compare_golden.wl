@@ -54,6 +54,16 @@ $TestCases = Select[
   Length[#] == 3 && !StringStartsQ[#[[1]], "#"] &
 ];
 
+(* Validate that generated file has expected extension *)
+ValidateExtension[file_String, expectedExt_String] := Module[{actualExt},
+  actualExt = FileExtension[file];
+  If[actualExt =!= StringTrim[expectedExt, "."],
+    GoldenPrint["WARNING: Extension mismatch - expected ", expectedExt, " got .", actualExt];
+    False,
+    True
+  ]
+];
+
 (* Run all golden file comparisons *)
 RunGoldenTests[] := Module[
   {results, passed, failed, backend, testName, ext, currentFile, goldenFile},

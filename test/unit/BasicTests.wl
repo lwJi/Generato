@@ -16,47 +16,59 @@ SetPrintDate[False];
 (* Test: Global Configuration Functions *)
 (* ========================================= *)
 
-VerificationTest[
-  SetPVerbose[True];
-  (* PVerbose should be settable without error *)
-  True,
-  True,
-  TestID -> "SetPVerbose-NoError"
+AppendTo[$AllTests,
+  VerificationTest[
+    SetPVerbose[True];
+    (* PVerbose should be settable without error *)
+    True,
+    True,
+    TestID -> "SetPVerbose-NoError"
+  ]
 ];
 
-VerificationTest[
-  SetPrintDate[False];
-  GetPrintDate[],
-  False,
-  TestID -> "GetSetPrintDate"
+AppendTo[$AllTests,
+  VerificationTest[
+    SetPrintDate[False];
+    GetPrintDate[],
+    False,
+    TestID -> "GetSetPrintDate-ReturnsFalse"
+  ]
 ];
 
-VerificationTest[
-  SetGridPointIndex["[[ijk]]"];
-  GetGridPointIndex[],
-  "[[ijk]]",
-  TestID -> "GetSetGridPointIndex"
+AppendTo[$AllTests,
+  VerificationTest[
+    SetGridPointIndex["[[ijk]]"];
+    GetGridPointIndex[],
+    "[[ijk]]",
+    TestID -> "GetSetGridPointIndex-ReturnsValue"
+  ]
 ];
 
-VerificationTest[
-  SetTilePointIndex["(ti,tj,tk)"];
-  GetTilePointIndex[],
-  "(ti,tj,tk)",
-  TestID -> "GetSetTilePointIndex"
+AppendTo[$AllTests,
+  VerificationTest[
+    SetTilePointIndex["(ti,tj,tk)"];
+    GetTilePointIndex[],
+    "(ti,tj,tk)",
+    TestID -> "GetSetTilePointIndex-ReturnsValue"
+  ]
 ];
 
-VerificationTest[
-  SetOutputFile["/tmp/test_output.c"];
-  GetOutputFile[],
-  "/tmp/test_output.c",
-  TestID -> "GetSetOutputFile"
+AppendTo[$AllTests,
+  VerificationTest[
+    SetOutputFile["/tmp/test_output.c"];
+    GetOutputFile[],
+    "/tmp/test_output.c",
+    TestID -> "GetSetOutputFile-ReturnsPath"
+  ]
 ];
 
-VerificationTest[
-  SetProject["TestProject"];
-  GetProject[],
-  "TestProject",
-  TestID -> "GetSetProject"
+AppendTo[$AllTests,
+  VerificationTest[
+    SetProject["TestProject"];
+    GetProject[],
+    "TestProject",
+    TestID -> "GetSetProject-ReturnsValue"
+  ]
 ];
 
 (* ========================================= *)
@@ -73,100 +85,120 @@ If[!MemberQ[$Manifolds, TestM3],
 (* Define test tensors *)
 testVarlist = GridTensors[{testVec[i], PrintAs -> "tv"}];
 
-VerificationTest[
-  (* SetEQN should set an equation without error *)
-  SetEQN[testVec[i_], 2 testVec[i]];
-  True,
-  True,
-  TestID -> "SetEQN-Basic-NoError"
+AppendTo[$AllTests,
+  VerificationTest[
+    (* SetEQN should set an equation without error *)
+    SetEQN[testVec[i_], 2 testVec[i]];
+    True,
+    True,
+    TestID -> "SetEQN-Basic-NoError"
+  ]
 ];
 
-VerificationTest[
-  (* RHSOf should retrieve the set equation *)
-  rhs = RHSOf[testVec];
-  Head[rhs] =!= Null,
-  True,
-  TestID -> "RHSOf-ReturnsValue"
+AppendTo[$AllTests,
+  VerificationTest[
+    (* RHSOf should retrieve the set equation *)
+    rhs = RHSOf[testVec];
+    Head[rhs] =!= Null,
+    True,
+    TestID -> "RHSOf-ReturnsValue"
+  ]
 ];
 
 (* ========================================= *)
 (* Test: Suffix handling *)
 (* ========================================= *)
 
-VerificationTest[
-  SetEQN[{SuffixName -> "testSuffix"}, testVec[i_], 3 testVec[i]];
-  True,
-  True,
-  TestID -> "SetEQN-WithSuffix-NoError"
+AppendTo[$AllTests,
+  VerificationTest[
+    SetEQN[{SuffixName -> "testSuffix"}, testVec[i_], 3 testVec[i]];
+    True,
+    True,
+    TestID -> "SetEQN-WithSuffix-NoError"
+  ]
 ];
 
 (* ========================================= *)
 (* Test: GetCheckInputEquations / SetCheckInputEquations *)
 (* ========================================= *)
 
-VerificationTest[
-  SetCheckInputEquations[True];
-  GetCheckInputEquations[],
-  True,
-  TestID -> "GetSetCheckInputEquations-True"
+AppendTo[$AllTests,
+  VerificationTest[
+    SetCheckInputEquations[True];
+    GetCheckInputEquations[],
+    True,
+    TestID -> "GetSetCheckInputEquations-True"
+  ]
 ];
 
-VerificationTest[
-  SetCheckInputEquations[False];
-  GetCheckInputEquations[],
-  False,
-  TestID -> "GetSetCheckInputEquations-False"
+AppendTo[$AllTests,
+  VerificationTest[
+    SetCheckInputEquations[False];
+    GetCheckInputEquations[],
+    False,
+    TestID -> "GetSetCheckInputEquations-False"
+  ]
 ];
 
 (* ========================================= *)
 (* Test: GetPrintHeaderMacro / SetPrintHeaderMacro *)
 (* ========================================= *)
 
-VerificationTest[
-  SetPrintHeaderMacro[True];
-  GetPrintHeaderMacro[],
-  True,
-  TestID -> "GetSetPrintHeaderMacro-True"
+AppendTo[$AllTests,
+  VerificationTest[
+    SetPrintHeaderMacro[True];
+    GetPrintHeaderMacro[],
+    True,
+    TestID -> "GetSetPrintHeaderMacro-True"
+  ]
 ];
 
-VerificationTest[
-  SetPrintHeaderMacro[False];
-  GetPrintHeaderMacro[],
-  False,
-  TestID -> "GetSetPrintHeaderMacro-False"
+AppendTo[$AllTests,
+  VerificationTest[
+    SetPrintHeaderMacro[False];
+    GetPrintHeaderMacro[],
+    False,
+    TestID -> "GetSetPrintHeaderMacro-False"
+  ]
 ];
 
 (* ========================================= *)
 (* Test: GetSuffixUnprotected / SetSuffixUnprotected *)
 (* ========================================= *)
 
-VerificationTest[
-  SetSuffixUnprotected["_test"];
-  GetSuffixUnprotected[],
-  "_test",
-  TestID -> "GetSetSuffixUnprotected-String"
+AppendTo[$AllTests,
+  VerificationTest[
+    SetSuffixUnprotected["_test"];
+    GetSuffixUnprotected[],
+    "_test",
+    TestID -> "GetSetSuffixUnprotected-String"
+  ]
 ];
 
 (* ========================================= *)
 (* Test: GetDefaultChart *)
 (* ========================================= *)
 
-VerificationTest[
-  (* GetDefaultChart should return a symbol *)
-  Head[GetDefaultChart[]] === Symbol || GetDefaultChart[] === Null,
-  True,
-  TestID -> "GetDefaultChart-ReturnsSymbolOrNull"
+AppendTo[$AllTests,
+  VerificationTest[
+    (* GetDefaultChart should return a symbol *)
+    Head[GetDefaultChart[]] === Symbol || GetDefaultChart[] === Null,
+    True,
+    TestID -> "GetDefaultChart-ReturnsSymbolOrNull"
+  ]
 ];
 
 (* ========================================= *)
 (* Test: GetDim *)
 (* ========================================= *)
 
-VerificationTest[
-  (* GetDim should return an integer *)
-  IntegerQ[GetDim[]],
-  True,
-  TestID -> "GetDim-ReturnsInteger"
+AppendTo[$AllTests,
+  VerificationTest[
+    (* GetDim should return an integer *)
+    IntegerQ[GetDim[]],
+    True,
+    TestID -> "GetDim-ReturnsInteger"
+  ]
 ];
 
 (* Reset to clean state *)

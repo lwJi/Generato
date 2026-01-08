@@ -85,9 +85,34 @@ $TestCases = Select[
 (* Validate shell input to prevent injection *)
 ValidShellInput[str_String] := StringMatchQ[str, RegularExpression["^[a-zA-Z0-9_./\\-]+$"]];
 
-RunRegressionTests[] := Module[{backend, testName, ext, testFile, result, outputFile, quietPrefix},
+(* Validate golden files exist before running tests *)
+ValidateGoldenFiles[] := Module[{backend, testName, ext, goldenFile, missing},
+  missing = {};
+  Do[
+    {backend, testName, ext} = testCase;
+    goldenFile = FileNameJoin[{$TestDir, "golden", backend, testName <> ext <> ".golden"}];
+    If[!FileExistsQ[goldenFile],
+      AppendTo[missing, goldenFile];
+    ],
+    {testCase, $TestCases}
+  ];
+  If[Length[missing] > 0,
+    QuietPrint["WARNING: Missing golden files:"];
+    Do[QuietPrint["  ", f], {f, missing}];
+  ];
+  missing
+];
+
+RunRegressionTests[] := Module[{backend, testName, ext, testFile, result, outputFile, quietPrefix, missingGolden},
   QuietPrint["--- Regression Tests (Golden Files) ---"];
   QuietPrint[""];
+
+  (* Validate golden files first *)
+  missingGolden = ValidateGoldenFiles[];
+  If[Length[missingGolden] > 0,
+    QuietPrint["Run with --generate to create missing golden files"];
+    QuietPrint[""];
+  ];
 
   (* Generate outputs for each test case *)
   QuietPrint["Generating test outputs..."];
@@ -104,7 +129,7 @@ RunRegressionTests[] := Module[{backend, testName, ext, testFile, result, output
     If[FileExistsQ[testFile],
       (* Validate inputs before shell execution *)
       If[!ValidShellInput[backend] || !ValidShellInput[testName],
-        QuietPrint["  ERROR: Invalid characters in backend or testName"];
+        QuietPrint["ERROR: Invalid characters in backend or testName"];
         $GenerationFailed = True;
         Continue[];
       ];
@@ -142,9 +167,12 @@ RunRegressionTests[] := Module[{backend, testName, ext, testFile, result, output
     {backend, testName, ext} = testCase;
     outputFile = FileNameJoin[{$TestDir, backend, testName <> ext}];
     If[FileExistsQ[outputFile],
-      Check[
+      Quiet[
         DeleteFile[outputFile],
-        QuietPrint["  Warning: Failed to delete ", outputFile]
+        DeleteFile::fdnfnd  (* Suppress "file doesn't exist" which is fine *)
+      ];
+      If[FileExistsQ[outputFile],
+        QuietPrint["WARNING: Failed to delete ", outputFile];
       ];
     ],
     {testCase, $TestCases}
