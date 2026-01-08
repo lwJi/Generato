@@ -11,14 +11,17 @@ RunGoldenTests::usage = "RunGoldenTests[] runs all golden file comparisons and r
 
 Begin["`Private`"];
 
+(* Load shared test configuration *)
+Get[FileNameJoin[{DirectoryName[$InputFileName], "..", "TestConfig.wl"}]];
+
 (* Use QuietPrint if available (from AllTests.wl), otherwise use Print *)
 GoldenPrint[args___] := If[ValueQ[Global`$QuietMode] && Global`$QuietMode === True,
   Null,  (* Suppress output in quiet mode *)
   Print[args]
 ];
 
-$TestDir = DirectoryName[$InputFileName];
-$GoldenDir = FileNameJoin[{$TestDir, "..", "golden"}];
+$TestDir = TestConfig`GetTestDir[];
+$GoldenDir = FileNameJoin[{$TestDir, "golden"}];
 
 (* Compare two files, return True if identical *)
 CompareGoldenFile[currentFile_String, goldenFile_String] := Module[
@@ -47,23 +50,6 @@ CompareGoldenFile[currentFile_String, goldenFile_String] := Module[
   ]
 ];
 
-(* Load test cases from shared config file *)
-$ConfigFile = FileNameJoin[{$TestDir, "..", "test_cases.txt"}];
-$TestCases = Select[
-  StringSplit[#, ":"] & /@ Import[$ConfigFile, "Lines"],
-  Length[#] == 3 && !StringStartsQ[#[[1]], "#"] &
-];
-
-(* Validate that generated file has expected extension *)
-ValidateExtension[file_String, expectedExt_String] := Module[{actualExt},
-  actualExt = FileExtension[file];
-  If[actualExt =!= StringTrim[expectedExt, "."],
-    GoldenPrint["WARNING: Extension mismatch - expected ", expectedExt, " got .", actualExt];
-    False,
-    True
-  ]
-];
-
 (* Run all golden file comparisons *)
 RunGoldenTests[] := Module[
   {results, passed, failed, backend, testName, ext, currentFile, goldenFile},
@@ -73,10 +59,10 @@ RunGoldenTests[] := Module[
 
   results = Table[
     {backend, testName, ext} = testCase;
-    currentFile = FileNameJoin[{$TestDir, "..", backend, testName <> ext}];
+    currentFile = FileNameJoin[{$TestDir, backend, testName <> ext}];
     goldenFile = FileNameJoin[{$GoldenDir, backend, testName <> ext <> ".golden"}];
     CompareGoldenFile[currentFile, goldenFile],
-    {testCase, $TestCases}
+    {testCase, TestConfig`LoadTestCases[]}
   ];
 
   passed = Count[results, True];
@@ -105,8 +91,3 @@ RunGoldenTests[] := Module[
 
 End[];
 EndPackage[];
-
-(* Run tests only when executed directly (not when loaded via Get[]) *)
-If[Length[$ScriptCommandLine] > 0 && MemberQ[StringContainsQ[#, "compare_golden.wl"] & /@ $ScriptCommandLine, True],
-  RunGoldenTests[]
-];

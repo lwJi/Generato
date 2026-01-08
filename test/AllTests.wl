@@ -16,6 +16,9 @@ QuietPrint[args___] := If[!$QuietMode, Print[args]];
 (* Suppress all Print output during package loading in quiet mode *)
 QuietGet[file_] := Block[{Print}, Get[file]];
 
+(* Load shared test configuration *)
+Get[FileNameJoin[{$TestDir, "TestConfig.wl"}]];
+
 (* Phase tracking for quiet mode *)
 $PhaseSuccess = True;
 
@@ -104,12 +107,8 @@ RunUnitTests[] := Module[{unitTestFiles, report},
 (* PHASE 2: Golden File Regression Tests *)
 (* ========================================= *)
 
-(* Load test cases from config file *)
-$ConfigFile = FileNameJoin[{$TestDir, "test_cases.txt"}];
-$TestCases = Select[
-  StringSplit[#, ":"] & /@ Import[$ConfigFile, "Lines"],
-  Length[#] == 3 && !StringStartsQ[#[[1]], "#"] &
-];
+(* Load test cases from shared config *)
+$TestCases = TestConfig`LoadTestCases[];
 
 (* Validate shell input to prevent injection *)
 ValidShellInput[str_String] := StringMatchQ[str, RegularExpression["^[a-zA-Z0-9_./\\-]+$"]];
