@@ -67,6 +67,30 @@ RunUnitTests[] := Module[{unitTestFiles, report},
     (* Mark phase as failed if any tests failed *)
     If[report["TestsFailedCount"] > 0,
       $PhaseSuccess = False;
+      (* Print detailed failure information - always show errors even in quiet mode *)
+      (* Flatten all failed test categories (WrongResults, WithMessages, WithErrors) *)
+      Module[{failedAssocs, allFailedTests},
+        failedAssocs = Values[report["TestsFailed"]];
+        allFailedTests = Flatten[Values /@ failedAssocs];
+        Print[""];
+        Print["=== UNIT TEST FAILURES ==="];
+        Print[""];
+        Do[
+          Module[{testResult, testID, actual, expected, outcome},
+            testResult = allFailedTests[[i]];
+            testID = testResult["TestID"];
+            outcome = testResult["Outcome"];
+            actual = testResult["ActualOutput"];
+            expected = testResult["ExpectedOutput"];
+            Print["FAILED: ", testID];
+            Print["  Outcome:  ", outcome];
+            Print["  Expected: ", expected];
+            Print["  Actual:   ", actual];
+            Print[""];
+          ],
+          {i, Length[allFailedTests]}
+        ];
+      ];
     ];
   ];
 ];
