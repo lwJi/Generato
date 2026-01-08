@@ -10,7 +10,7 @@ $TestDir = DirectoryName[$InputFileName];
 $QuietMode = (Environment["QUIET"] === "1");
 QuietPrint[args___] := If[!$QuietMode, Print[args]];
 (* Suppress all Print output during package loading in quiet mode *)
-QuietGet[file_] := If[$QuietMode, Block[{Print}, Get[file]], Get[file]];
+QuietGet[file_] := Block[{Print}, Get[file]];
 
 (* Phase tracking for quiet mode *)
 $PhaseSuccess = True;
@@ -118,8 +118,8 @@ RunRegressionTests[] := Module[{backend, testName, ext, testFile, result, output
   QuietPrint["Generating test outputs..."];
   QuietPrint[""];
 
-  (* Pass QUIET to subprocess if in quiet mode *)
-  quietPrefix = If[$QuietMode, "QUIET=1 ", ""];
+  (* Always suppress package loading messages in subprocess *)
+  quietPrefix = "QUIET=1 ";
 
   $GenerationFailed = False;
   Do[

@@ -84,7 +84,7 @@ run_test() {
 
   cd "$SCRIPT_DIR/$backend"
 
-  if "$GENERATO_DIR/Generato" "${test_name}.wl" 2>&1; then
+  if QUIET=1 "$GENERATO_DIR/Generato" "${test_name}.wl" 2>&1; then
     echo -e "${GREEN}  OK${NC}"
     return 0
   else
