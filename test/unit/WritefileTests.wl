@@ -61,14 +61,14 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    (* Multiple replacements *)
+    (* Multiple replacements - Import["Text"] strips trailing newlines *)
     tempFile = FileNameJoin[{$TemporaryDirectory, "test_replace_multi.txt"}];
     Export[tempFile, "a[[ijk]] + b[[ijk]]", "Text"];
     ReplaceGFIndexName[tempFile, "[[ijk]]" -> ""];
     result = Import[tempFile, "Text"];
     DeleteFile[tempFile];
     result,
-    "a + b\n",
+    "a + b",
     TestID -> "ReplaceGFIndexName-MultipleReplacements"
   ]
 ];

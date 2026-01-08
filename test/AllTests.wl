@@ -21,7 +21,8 @@ $PhaseSuccess = True;
 
 RunPhase[phaseName_String, phaseCode_] := Module[{},
   $PhaseSuccess = True;
-  Check[phaseCode, $PhaseSuccess = False];
+  (* Evaluate the phase code - $PhaseSuccess is set by the phase itself on failure *)
+  phaseCode;
   If[$QuietMode,
     If[$PhaseSuccess,
       Print["\033[0;32mPASS: " <> phaseName <> "\033[0m"],
