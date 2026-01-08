@@ -110,6 +110,12 @@ RunUnitTests[] := Module[{unitTestFiles, report},
 (* Load test cases from shared config *)
 $TestCases = TestConfig`LoadTestCases[];
 
+(* Abort if test configuration failed to load *)
+If[$TestCases === $Failed,
+  Print["FATAL: Failed to load test configuration"];
+  Exit[1]
+];
+
 (* Validate shell input to prevent injection *)
 ValidShellInput[str_String] := StringMatchQ[str, RegularExpression["^[a-zA-Z0-9_./\\-]+$"]];
 

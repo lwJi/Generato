@@ -46,6 +46,10 @@ CompareGoldenFile[currentFile_String, goldenFile_String] := Module[
     GoldenPrint["FAIL: ", FileNameTake[currentFile], " differs from golden"];
     GoldenPrint["  Current: ", StringLength[current], " chars"];
     GoldenPrint["  Golden:  ", StringLength[golden], " chars"];
+    (* Always print failure details even in quiet mode *)
+    If[ValueQ[Global`$QuietMode] && Global`$QuietMode === True,
+      Print["  FAIL: ", FileNameTake[currentFile], " (", StringLength[current], " vs ", StringLength[golden], " chars)"]
+    ];
     $Failed
   ]
 ];
@@ -76,16 +80,10 @@ RunGoldenTests[] := Module[
   If[failed > 0,
     GoldenPrint[""];
     GoldenPrint["REGRESSION DETECTED"];
-    If[Length[$ScriptCommandLine] > 0 && MemberQ[StringContainsQ[#, "compare_golden.wl"] & /@ $ScriptCommandLine, True],
-      Exit[1],
-      $Failed
-    ],
+    $Failed,
     GoldenPrint[""];
     GoldenPrint["ALL TESTS PASSED"];
-    If[Length[$ScriptCommandLine] > 0 && MemberQ[StringContainsQ[#, "compare_golden.wl"] & /@ $ScriptCommandLine, True],
-      Exit[0],
-      True
-    ]
+    True
   ]
 ];
 

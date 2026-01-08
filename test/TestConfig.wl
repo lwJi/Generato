@@ -14,12 +14,29 @@ $TestDir = DirectoryName[$InputFileName];
 
 GetTestDir[] := $TestDir;
 
-LoadTestCases[] := Module[{configFile},
+LoadTestCases[] := Module[{configFile, lines, parsed, valid, skipped},
   configFile = FileNameJoin[{$TestDir, "test_cases.txt"}];
-  Select[
-    StringSplit[#, ":"] & /@ Import[configFile, "Lines"],
-    Length[#] == 3 && !StringStartsQ[#[[1]], "#"] &
-  ]
+
+  (* Check if config file exists *)
+  If[!FileExistsQ[configFile],
+    Print["ERROR: test_cases.txt not found at ", configFile];
+    Print["ERROR: Test suite cannot proceed without test configuration"];
+    Return[$Failed]
+  ];
+
+  lines = Import[configFile, "Lines"];
+  parsed = StringSplit[#, ":"] & /@ lines;
+
+  (* Filter valid entries (3 parts, not comments) *)
+  valid = Select[parsed, Length[#] == 3 && !StringStartsQ[#[[1]], "#"] &];
+
+  (* Warn about malformed lines (non-comments with wrong format) *)
+  skipped = Select[parsed, Length[#] != 3 && Length[#] > 0 && !StringStartsQ[#[[1]], "#"] &];
+  If[Length[skipped] > 0,
+    Print["WARNING: Skipped ", Length[skipped], " malformed line(s) in test_cases.txt"]
+  ];
+
+  valid
 ];
 
 End[];
