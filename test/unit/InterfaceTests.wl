@@ -31,9 +31,9 @@ If[!MemberQ[$Manifolds, TestM3],
 
 AppendTo[$AllTests,
   VerificationTest[
-    (* GridTensors should return a list *)
+    (* GridTensors should return a non-empty list *)
     varlist = GridTensors[{intTestVec[i], PrintAs -> "itv"}];
-    ListQ[varlist],
+    ListQ[varlist] && Length[varlist] >= 1,
     True,
     TestID -> "GridTensors-ReturnsList"
   ]
@@ -69,9 +69,9 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    (* TempTensors should return a list *)
+    (* TempTensors should return a non-empty list *)
     tempList = TempTensors[{intTestTemp[i], PrintAs -> "itt"}];
-    ListQ[tempList],
+    ListQ[tempList] && Length[tempList] >= 1,
     True,
     TestID -> "TempTensors-ReturnsList"
   ]
@@ -83,9 +83,9 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    (* DefTensors should define tensors without setting components *)
+    (* DefTensors should define tensors and return non-empty list *)
     defList = DefTensors[{intDefTest[i], PrintAs -> "idt"}];
-    ListQ[defList],
+    ListQ[defList] && Length[defList] >= 1,
     True,
     TestID -> "DefTensors-ReturnsList"
   ]
@@ -107,9 +107,9 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    (* TileTensors should return a list *)
+    (* TileTensors should return a non-empty list *)
     tileList = TileTensors[{intTileTest[i], PrintAs -> "itile"}];
-    ListQ[tileList],
+    ListQ[tileList] && Length[tileList] >= 1,
     True,
     TestID -> "TileTensors-ReturnsList"
   ]
@@ -140,5 +140,9 @@ AppendTo[$AllTests,
     TestID -> "SetComponents-UseTilePointIndex"
   ]
 ];
+
+(* Reset state *)
+SetPVerbose[False];
+SetPrintDate[False];
 
 If[Environment["QUIET"] =!= "1", Print["InterfaceTests.wl completed."]];

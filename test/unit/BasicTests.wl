@@ -97,9 +97,9 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    (* RHSOf should retrieve the set equation *)
+    (* RHSOf should return a symbol referencing the tensor's RHS *)
     rhs = RHSOf[testVec];
-    Head[rhs] =!= Null,
+    Head[rhs] === Symbol && StringContainsQ[ToString[rhs], "RHS"],
     True,
     TestID -> "RHSOf-ReturnsValue"
   ]
@@ -194,16 +194,24 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    (* GetDim should return an integer *)
-    IntegerQ[GetDim[]],
+    (* GetDim should return a valid dimension (1-10) *)
+    Module[{dim = GetDim[]},
+      IntegerQ[dim] && dim >= 1 && dim <= 10
+    ],
     True,
-    TestID -> "GetDim-ReturnsInteger"
+    TestID -> "GetDim-ReturnsValidDimension"
   ]
 ];
 
-(* Reset to clean state *)
+(* Reset to clean state - all modified variables *)
 SetPVerbose[False];
+SetPrintDate[False];
 SetGridPointIndex[""];
 SetTilePointIndex[""];
+SetOutputFile[""];
+SetProject[""];
+SetCheckInputEquations[True];
+SetPrintHeaderMacro[True];
+SetSuffixUnprotected[""];
 
 If[Environment["QUIET"] =!= "1", Print["BasicTests.wl completed."]];
