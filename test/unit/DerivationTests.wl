@@ -9,49 +9,67 @@ If[Environment["QUIET"] =!= "1", Print["Loading DerivationTests.wl..."]];
 Needs["Generato`Derivation`", FileNameJoin[{Environment["GENERATO"], "src/Derivation.wl"}]];
 
 (* ========================================= *)
-(* Test: TestEQN with True condition *)
+(* Run tests with suppressed Print output *)
+(* (TestEQN prints "FAILED!" when testing abort behavior - this is expected) *)
 (* ========================================= *)
 
-VerificationTest[
-  (* TestEQN should not abort when condition is True *)
-  TestEQN[True, "TrueCondition"];
-  True,
-  True,
-  TestID -> "TestEQN-TrueCondition-NoAbort"
-];
+Block[{System`Print},
 
-VerificationTest[
-  (* TestEQN with empty label *)
-  TestEQN[True, ""];
-  True,
-  True,
-  TestID -> "TestEQN-TrueCondition-EmptyLabel"
-];
-
-(* ========================================= *)
-(* Test: TestEQN with False condition *)
-(* Should abort - use CheckAbort to catch *)
-(* ========================================= *)
-
-VerificationTest[
-  (* TestEQN should abort when condition is False *)
-  result = CheckAbort[
-    TestEQN[False, "FalseCondition"];
-    "did-not-abort",
-    "aborted"
+  (* Test: TestEQN with True condition *)
+  test1 = VerificationTest[
+    TestEQN[True, "TrueCondition"];
+    True,
+    True,
+    TestID -> "TestEQN-TrueCondition-NoAbort"
   ];
-  result,
-  "aborted",
-  TestID -> "TestEQN-FalseCondition-Aborts"
+
+  test2 = VerificationTest[
+    TestEQN[True, ""];
+    True,
+    True,
+    TestID -> "TestEQN-TrueCondition-EmptyLabel"
+  ];
+
+  (* Test: TestEQN with False condition - should abort *)
+  test3 = VerificationTest[
+    result = CheckAbort[
+      TestEQN[False, "FalseCondition"];
+      "did-not-abort",
+      "aborted"
+    ];
+    result,
+    "aborted",
+    TestID -> "TestEQN-FalseCondition-Aborts"
+  ];
+
+  test4 = VerificationTest[
+    CheckAbort[TestEQN[False, "Test"], "caught"];
+    TestEQN[True, "Recovery"];
+    True,
+    True,
+    TestID -> "TestEQN-RecoveryAfterAbort"
+  ];
+
 ];
 
-VerificationTest[
-  (* Verify we can continue after catching the abort *)
-  CheckAbort[TestEQN[False, "Test"], "caught"];
-  TestEQN[True, "Recovery"];
-  True,
-  True,
-  TestID -> "TestEQN-RecoveryAfterAbort"
+(* ========================================= *)
+(* Report test results *)
+(* ========================================= *)
+
+$DerivationTestResults = {test1, test2, test3, test4};
+$DerivationTestReport = TestReport[$DerivationTestResults];
+
+If[Environment["QUIET"] =!= "1",
+  Print["DerivationTests.wl: ",
+    $DerivationTestReport["TestsSucceededCount"], "/",
+    $DerivationTestReport["TestsSucceededCount"] + $DerivationTestReport["TestsFailedCount"],
+    " tests passed"]
 ];
 
-If[Environment["QUIET"] =!= "1", Print["DerivationTests.wl completed."]];
+(* Exit with error code if any tests failed (when run standalone) *)
+If[$DerivationTestReport["TestsFailedCount"] > 0,
+  If[Environment["QUIET"] =!= "1",
+    Print["Failed tests: ", $DerivationTestReport["TestsFailedWrappers"][[All, "TestID"]]]
+  ];
+  Exit[1]
+];
