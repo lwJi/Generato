@@ -49,7 +49,7 @@ Generato GHG_rhs.wl
 
 ```bash
 # Run all tests (recommended - runs unit tests + regression tests)
-wolframscript -f test/AllTests.wl
+wolframscript -script test/AllTests.wl
 
 # Alternative: Run via bash script
 ./test/run_tests.sh
