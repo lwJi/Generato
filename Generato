@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Generato Script (c) 2023 Liwei Ji
-# A script to process *.wl files, generate corresponding .hxx files, and clean up trailing spaces.
+# A script to process *.wl files, generate corresponding output files, and clean up trailing spaces.
 
 [[ "$QUIET" != "1" ]] && echo "Generato (c) 2023 Liwei Ji"
 
@@ -12,7 +12,7 @@ show_help() {
   echo
   echo "DESCRIPTION:"
   echo "  Processes the specified Wolfram Language (*.wl) files using wolframscript."
-  echo "  Removes trailing spaces from the generated *.hxx files."
+  echo "  Removes trailing spaces from generated output files (.hxx, .cxx, .c, .h)."
   echo
   echo "EXAMPLES:"
   echo "  Generato C3GH_set_profile_ADM.wl"
@@ -31,6 +31,9 @@ if ! command -v wolframscript &> /dev/null; then
   exit 1
 fi
 
+# Supported output file extensions
+OUTPUT_EXTENSIONS=(".hxx" ".cxx" ".c" ".h")
+
 # Process each file passed as an argument
 for input_file in "$@"; do
   # Ensure the file exists
@@ -41,19 +44,25 @@ for input_file in "$@"; do
 
   # Remove .wl extension to form the base name
   base_name="${input_file%.wl}"
-  output_file="${base_name}.hxx"
 
   # Run wolframscript on the input file
   [[ "$QUIET" != "1" ]] && echo "Processing '$input_file'..."
   wolframscript -f "$input_file"
 
-  # Check if the expected output file was created
-  if [[ -f "$output_file" ]]; then
-    # Remove trailing spaces from the output file
-    [[ "$QUIET" != "1" ]] && echo "Removing trailing spaces in '$output_file'..."
-    sed -i.bak -E 's/[[:space:]]+$//' "$output_file" && rm "${output_file}.bak"
-  else
-    echo "Error: Expected output file '$output_file' not found."
+  # Check for any supported output file extensions and clean them
+  found_output=false
+  for ext in "${OUTPUT_EXTENSIONS[@]}"; do
+    output_file="${base_name}${ext}"
+    if [[ -f "$output_file" ]]; then
+      found_output=true
+      # Remove trailing spaces from the output file
+      [[ "$QUIET" != "1" ]] && echo "Removing trailing spaces in '$output_file'..."
+      sed -i.bak -E 's/[[:space:]]+$//' "$output_file" && rm "${output_file}.bak"
+    fi
+  done
+
+  if [[ "$found_output" == false ]]; then
+    echo "Warning: No output file found for '$input_file' (checked: ${OUTPUT_EXTENSIONS[*]})"
   fi
 
   [[ "$QUIET" != "1" ]] && echo

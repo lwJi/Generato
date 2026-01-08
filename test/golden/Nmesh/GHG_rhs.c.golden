@@ -201,8 +201,8 @@ gamma2 = gammas[2];
 
 double detinvh
 =
--(1/(Power(g13[ijk],2)*g22[ijk] - 2*g12[ijk]*g13[ijk]*g23[ijk] + 
-      Power(g12[ijk],2)*g33[ijk] + 
+-(1/(Power(g13[ijk],2)*g22[ijk] - 2*g12[ijk]*g13[ijk]*g23[ijk] +
+      Power(g12[ijk],2)*g33[ijk] +
       g11[ijk]*(Power(g23[ijk],2) - g22[ijk]*g33[ijk])))
 ;
 
@@ -328,61 +328,61 @@ invh33 - Power(nvec3,2)
 
 double dginFO000
 =
-beta1[ijk]*Phi100[ijk] + beta2[ijk]*Phi200[ijk] + beta3[ijk]*Phi300[ijk] - 
+beta1[ijk]*Phi100[ijk] + beta2[ijk]*Phi200[ijk] + beta3[ijk]*Phi300[ijk] -
   alpha[ijk]*Pi00[ijk]
 ;
 
 double dginFO001
 =
-beta1[ijk]*Phi101[ijk] + beta2[ijk]*Phi201[ijk] + beta3[ijk]*Phi301[ijk] - 
+beta1[ijk]*Phi101[ijk] + beta2[ijk]*Phi201[ijk] + beta3[ijk]*Phi301[ijk] -
   alpha[ijk]*Pi01[ijk]
 ;
 
 double dginFO002
 =
-beta1[ijk]*Phi102[ijk] + beta2[ijk]*Phi202[ijk] + beta3[ijk]*Phi302[ijk] - 
+beta1[ijk]*Phi102[ijk] + beta2[ijk]*Phi202[ijk] + beta3[ijk]*Phi302[ijk] -
   alpha[ijk]*Pi02[ijk]
 ;
 
 double dginFO003
 =
-beta1[ijk]*Phi103[ijk] + beta2[ijk]*Phi203[ijk] + beta3[ijk]*Phi303[ijk] - 
+beta1[ijk]*Phi103[ijk] + beta2[ijk]*Phi203[ijk] + beta3[ijk]*Phi303[ijk] -
   alpha[ijk]*Pi03[ijk]
 ;
 
 double dginFO011
 =
-beta1[ijk]*Phi111[ijk] + beta2[ijk]*Phi211[ijk] + beta3[ijk]*Phi311[ijk] - 
+beta1[ijk]*Phi111[ijk] + beta2[ijk]*Phi211[ijk] + beta3[ijk]*Phi311[ijk] -
   alpha[ijk]*Pi11[ijk]
 ;
 
 double dginFO012
 =
-beta1[ijk]*Phi112[ijk] + beta2[ijk]*Phi212[ijk] + beta3[ijk]*Phi312[ijk] - 
+beta1[ijk]*Phi112[ijk] + beta2[ijk]*Phi212[ijk] + beta3[ijk]*Phi312[ijk] -
   alpha[ijk]*Pi12[ijk]
 ;
 
 double dginFO013
 =
-beta1[ijk]*Phi113[ijk] + beta2[ijk]*Phi213[ijk] + beta3[ijk]*Phi313[ijk] - 
+beta1[ijk]*Phi113[ijk] + beta2[ijk]*Phi213[ijk] + beta3[ijk]*Phi313[ijk] -
   alpha[ijk]*Pi13[ijk]
 ;
 
 double dginFO022
 =
-beta1[ijk]*Phi122[ijk] + beta2[ijk]*Phi222[ijk] + beta3[ijk]*Phi322[ijk] - 
+beta1[ijk]*Phi122[ijk] + beta2[ijk]*Phi222[ijk] + beta3[ijk]*Phi322[ijk] -
   alpha[ijk]*Pi22[ijk]
 ;
 
 double dginFO023
 =
-beta1[ijk]*Phi123[ijk] + beta2[ijk]*Phi223[ijk] + beta3[ijk]*Phi323[ijk] - 
+beta1[ijk]*Phi123[ijk] + beta2[ijk]*Phi223[ijk] + beta3[ijk]*Phi323[ijk] -
   alpha[ijk]*Pi23[ijk]
 ;
 
 double dginFO033
 =
-beta1[ijk]*Phi133[ijk] + beta2[ijk]*Phi233[ijk] + beta3[ijk]*Phi333[ijk] - 
+beta1[ijk]*Phi133[ijk] + beta2[ijk]*Phi233[ijk] + beta3[ijk]*Phi333[ijk] -
   alpha[ijk]*Pi33[ijk]
 ;
 
@@ -738,1335 +738,1335 @@ dginFO333/2.
 
 double trGam0
 =
-Gam000*invg00 + 2*Gam001*invg01 + 2*Gam002*invg02 + 2*Gam003*invg03 + 
-  Gam011*invg11 + 2*Gam012*invg12 + 2*Gam013*invg13 + Gam022*invg22 + 
+Gam000*invg00 + 2*Gam001*invg01 + 2*Gam002*invg02 + 2*Gam003*invg03 +
+  Gam011*invg11 + 2*Gam012*invg12 + 2*Gam013*invg13 + Gam022*invg22 +
   2*Gam023*invg23 + Gam033*invg33
 ;
 
 double trGam1
 =
-Gam100*invg00 + 2*Gam101*invg01 + 2*Gam102*invg02 + 2*Gam103*invg03 + 
-  Gam111*invg11 + 2*Gam112*invg12 + 2*Gam113*invg13 + Gam122*invg22 + 
+Gam100*invg00 + 2*Gam101*invg01 + 2*Gam102*invg02 + 2*Gam103*invg03 +
+  Gam111*invg11 + 2*Gam112*invg12 + 2*Gam113*invg13 + Gam122*invg22 +
   2*Gam123*invg23 + Gam133*invg33
 ;
 
 double trGam2
 =
-Gam200*invg00 + 2*Gam201*invg01 + 2*Gam202*invg02 + 2*Gam203*invg03 + 
-  Gam211*invg11 + 2*Gam212*invg12 + 2*Gam213*invg13 + Gam222*invg22 + 
+Gam200*invg00 + 2*Gam201*invg01 + 2*Gam202*invg02 + 2*Gam203*invg03 +
+  Gam211*invg11 + 2*Gam212*invg12 + 2*Gam213*invg13 + Gam222*invg22 +
   2*Gam223*invg23 + Gam233*invg33
 ;
 
 double trGam3
 =
-Gam300*invg00 + 2*Gam301*invg01 + 2*Gam302*invg02 + 2*Gam303*invg03 + 
-  Gam311*invg11 + 2*Gam312*invg12 + 2*Gam313*invg13 + Gam322*invg22 + 
+Gam300*invg00 + 2*Gam301*invg01 + 2*Gam302*invg02 + 2*Gam303*invg03 +
+  Gam311*invg11 + 2*Gam312*invg12 + 2*Gam313*invg13 + Gam322*invg22 +
   2*Gam323*invg23 + Gam333*invg33
 ;
 
 
 dtg00[ijk]
 =
--(interior*Adg00[ijk]) - gamma1*beta1[ijk]*Phi100[ijk] - 
-  gamma1*beta2[ijk]*Phi200[ijk] - gamma1*beta3[ijk]*Phi300[ijk] - 
+-(interior*Adg00[ijk]) - gamma1*beta1[ijk]*Phi100[ijk] -
+  gamma1*beta2[ijk]*Phi200[ijk] - gamma1*beta3[ijk]*Phi300[ijk] -
   alpha[ijk]*Pi00[ijk]
 ;
 
 dtg01[ijk]
 =
--(interior*Adg01[ijk]) - gamma1*beta1[ijk]*Phi101[ijk] - 
-  gamma1*beta2[ijk]*Phi201[ijk] - gamma1*beta3[ijk]*Phi301[ijk] - 
+-(interior*Adg01[ijk]) - gamma1*beta1[ijk]*Phi101[ijk] -
+  gamma1*beta2[ijk]*Phi201[ijk] - gamma1*beta3[ijk]*Phi301[ijk] -
   alpha[ijk]*Pi01[ijk]
 ;
 
 dtg02[ijk]
 =
--(interior*Adg02[ijk]) - gamma1*beta1[ijk]*Phi102[ijk] - 
-  gamma1*beta2[ijk]*Phi202[ijk] - gamma1*beta3[ijk]*Phi302[ijk] - 
+-(interior*Adg02[ijk]) - gamma1*beta1[ijk]*Phi102[ijk] -
+  gamma1*beta2[ijk]*Phi202[ijk] - gamma1*beta3[ijk]*Phi302[ijk] -
   alpha[ijk]*Pi02[ijk]
 ;
 
 dtg03[ijk]
 =
--(interior*Adg03[ijk]) - gamma1*beta1[ijk]*Phi103[ijk] - 
-  gamma1*beta2[ijk]*Phi203[ijk] - gamma1*beta3[ijk]*Phi303[ijk] - 
+-(interior*Adg03[ijk]) - gamma1*beta1[ijk]*Phi103[ijk] -
+  gamma1*beta2[ijk]*Phi203[ijk] - gamma1*beta3[ijk]*Phi303[ijk] -
   alpha[ijk]*Pi03[ijk]
 ;
 
 dtg11[ijk]
 =
--(interior*Adg11[ijk]) - gamma1*beta1[ijk]*Phi111[ijk] - 
-  gamma1*beta2[ijk]*Phi211[ijk] - gamma1*beta3[ijk]*Phi311[ijk] - 
+-(interior*Adg11[ijk]) - gamma1*beta1[ijk]*Phi111[ijk] -
+  gamma1*beta2[ijk]*Phi211[ijk] - gamma1*beta3[ijk]*Phi311[ijk] -
   alpha[ijk]*Pi11[ijk]
 ;
 
 dtg12[ijk]
 =
--(interior*Adg12[ijk]) - gamma1*beta1[ijk]*Phi112[ijk] - 
-  gamma1*beta2[ijk]*Phi212[ijk] - gamma1*beta3[ijk]*Phi312[ijk] - 
+-(interior*Adg12[ijk]) - gamma1*beta1[ijk]*Phi112[ijk] -
+  gamma1*beta2[ijk]*Phi212[ijk] - gamma1*beta3[ijk]*Phi312[ijk] -
   alpha[ijk]*Pi12[ijk]
 ;
 
 dtg13[ijk]
 =
--(interior*Adg13[ijk]) - gamma1*beta1[ijk]*Phi113[ijk] - 
-  gamma1*beta2[ijk]*Phi213[ijk] - gamma1*beta3[ijk]*Phi313[ijk] - 
+-(interior*Adg13[ijk]) - gamma1*beta1[ijk]*Phi113[ijk] -
+  gamma1*beta2[ijk]*Phi213[ijk] - gamma1*beta3[ijk]*Phi313[ijk] -
   alpha[ijk]*Pi13[ijk]
 ;
 
 dtg22[ijk]
 =
--(interior*Adg22[ijk]) - gamma1*beta1[ijk]*Phi122[ijk] - 
-  gamma1*beta2[ijk]*Phi222[ijk] - gamma1*beta3[ijk]*Phi322[ijk] - 
+-(interior*Adg22[ijk]) - gamma1*beta1[ijk]*Phi122[ijk] -
+  gamma1*beta2[ijk]*Phi222[ijk] - gamma1*beta3[ijk]*Phi322[ijk] -
   alpha[ijk]*Pi22[ijk]
 ;
 
 dtg23[ijk]
 =
--(interior*Adg23[ijk]) - gamma1*beta1[ijk]*Phi123[ijk] - 
-  gamma1*beta2[ijk]*Phi223[ijk] - gamma1*beta3[ijk]*Phi323[ijk] - 
+-(interior*Adg23[ijk]) - gamma1*beta1[ijk]*Phi123[ijk] -
+  gamma1*beta2[ijk]*Phi223[ijk] - gamma1*beta3[ijk]*Phi323[ijk] -
   alpha[ijk]*Pi23[ijk]
 ;
 
 dtg33[ijk]
 =
--(interior*Adg33[ijk]) - gamma1*beta1[ijk]*Phi133[ijk] - 
-  gamma1*beta2[ijk]*Phi233[ijk] - gamma1*beta3[ijk]*Phi333[ijk] - 
+-(interior*Adg33[ijk]) - gamma1*beta1[ijk]*Phi133[ijk] -
+  gamma1*beta2[ijk]*Phi233[ijk] - gamma1*beta3[ijk]*Phi333[ijk] -
   alpha[ijk]*Pi33[ijk]
 ;
 
 dtPhi100[ijk]
 =
 -(interior*AdPhi100[ijk]) + (alpha[ijk]*
-     (2*invh22*nvec0*Phi102[ijk]*Phi200[ijk] + 
-       2*invh23*nvec0*Phi103[ijk]*Phi200[ijk] + 
-       2*invh12*nvec1*Phi111[ijk]*Phi200[ijk] + 
-       2*invh22*nvec1*Phi112[ijk]*Phi200[ijk] + 
-       2*invh12*nvec2*Phi112[ijk]*Phi200[ijk] + 
-       2*invh23*nvec1*Phi113[ijk]*Phi200[ijk] + 
-       2*invh12*nvec3*Phi113[ijk]*Phi200[ijk] + 
-       2*invh22*nvec2*Phi122[ijk]*Phi200[ijk] + 
-       2*invh23*nvec2*Phi123[ijk]*Phi200[ijk] + 
-       2*invh22*nvec3*Phi123[ijk]*Phi200[ijk] + 
-       2*invh23*nvec3*Phi133[ijk]*Phi200[ijk] + 
-       2*invh23*nvec0*Phi102[ijk]*Phi300[ijk] + 
-       2*invh33*nvec0*Phi103[ijk]*Phi300[ijk] + 
-       2*invh13*nvec1*Phi111[ijk]*Phi300[ijk] + 
-       2*invh23*nvec1*Phi112[ijk]*Phi300[ijk] + 
-       2*invh13*nvec2*Phi112[ijk]*Phi300[ijk] + 
-       2*invh33*nvec1*Phi113[ijk]*Phi300[ijk] + 
-       2*invh13*nvec3*Phi113[ijk]*Phi300[ijk] + 
-       2*invh23*nvec2*Phi122[ijk]*Phi300[ijk] + 
-       2*invh33*nvec2*Phi123[ijk]*Phi300[ijk] + 
-       2*invh23*nvec3*Phi123[ijk]*Phi300[ijk] + 
-       2*invh33*nvec3*Phi133[ijk]*Phi300[ijk] + 
-       2*nvec0*nvec2*Phi102[ijk]*Pi00[ijk] + 
-       2*nvec0*nvec3*Phi103[ijk]*Pi00[ijk] + 
-       Power(nvec1,2)*Phi111[ijk]*Pi00[ijk] + 
-       2*nvec1*nvec2*Phi112[ijk]*Pi00[ijk] + 
-       2*nvec1*nvec3*Phi113[ijk]*Pi00[ijk] + 
-       Power(nvec2,2)*Phi122[ijk]*Pi00[ijk] + 
-       2*nvec2*nvec3*Phi123[ijk]*Pi00[ijk] + 
-       Power(nvec3,2)*Phi133[ijk]*Pi00[ijk] + 
-       Phi100[ijk]*(-2*gamma2 + 2*invh11*nvec0*Phi101[ijk] + 
-          2*invh12*nvec0*Phi102[ijk] + 2*invh13*nvec0*Phi103[ijk] + 
-          2*invh11*nvec1*Phi111[ijk] + 2*invh12*nvec1*Phi112[ijk] + 
-          2*invh11*nvec2*Phi112[ijk] + 2*invh13*nvec1*Phi113[ijk] + 
-          2*invh11*nvec3*Phi113[ijk] + 2*invh12*nvec2*Phi122[ijk] + 
-          2*invh13*nvec2*Phi123[ijk] + 2*invh12*nvec3*Phi123[ijk] + 
-          2*invh13*nvec3*Phi133[ijk] + Power(nvec0,2)*Pi00[ijk]) + 
-       2*nvec0*Phi101[ijk]*(invh12*Phi200[ijk] + invh13*Phi300[ijk] + 
+     (2*invh22*nvec0*Phi102[ijk]*Phi200[ijk] +
+       2*invh23*nvec0*Phi103[ijk]*Phi200[ijk] +
+       2*invh12*nvec1*Phi111[ijk]*Phi200[ijk] +
+       2*invh22*nvec1*Phi112[ijk]*Phi200[ijk] +
+       2*invh12*nvec2*Phi112[ijk]*Phi200[ijk] +
+       2*invh23*nvec1*Phi113[ijk]*Phi200[ijk] +
+       2*invh12*nvec3*Phi113[ijk]*Phi200[ijk] +
+       2*invh22*nvec2*Phi122[ijk]*Phi200[ijk] +
+       2*invh23*nvec2*Phi123[ijk]*Phi200[ijk] +
+       2*invh22*nvec3*Phi123[ijk]*Phi200[ijk] +
+       2*invh23*nvec3*Phi133[ijk]*Phi200[ijk] +
+       2*invh23*nvec0*Phi102[ijk]*Phi300[ijk] +
+       2*invh33*nvec0*Phi103[ijk]*Phi300[ijk] +
+       2*invh13*nvec1*Phi111[ijk]*Phi300[ijk] +
+       2*invh23*nvec1*Phi112[ijk]*Phi300[ijk] +
+       2*invh13*nvec2*Phi112[ijk]*Phi300[ijk] +
+       2*invh33*nvec1*Phi113[ijk]*Phi300[ijk] +
+       2*invh13*nvec3*Phi113[ijk]*Phi300[ijk] +
+       2*invh23*nvec2*Phi122[ijk]*Phi300[ijk] +
+       2*invh33*nvec2*Phi123[ijk]*Phi300[ijk] +
+       2*invh23*nvec3*Phi123[ijk]*Phi300[ijk] +
+       2*invh33*nvec3*Phi133[ijk]*Phi300[ijk] +
+       2*nvec0*nvec2*Phi102[ijk]*Pi00[ijk] +
+       2*nvec0*nvec3*Phi103[ijk]*Pi00[ijk] +
+       Power(nvec1,2)*Phi111[ijk]*Pi00[ijk] +
+       2*nvec1*nvec2*Phi112[ijk]*Pi00[ijk] +
+       2*nvec1*nvec3*Phi113[ijk]*Pi00[ijk] +
+       Power(nvec2,2)*Phi122[ijk]*Pi00[ijk] +
+       2*nvec2*nvec3*Phi123[ijk]*Pi00[ijk] +
+       Power(nvec3,2)*Phi133[ijk]*Pi00[ijk] +
+       Phi100[ijk]*(-2*gamma2 + 2*invh11*nvec0*Phi101[ijk] +
+          2*invh12*nvec0*Phi102[ijk] + 2*invh13*nvec0*Phi103[ijk] +
+          2*invh11*nvec1*Phi111[ijk] + 2*invh12*nvec1*Phi112[ijk] +
+          2*invh11*nvec2*Phi112[ijk] + 2*invh13*nvec1*Phi113[ijk] +
+          2*invh11*nvec3*Phi113[ijk] + 2*invh12*nvec2*Phi122[ijk] +
+          2*invh13*nvec2*Phi123[ijk] + 2*invh12*nvec3*Phi123[ijk] +
+          2*invh13*nvec3*Phi133[ijk] + Power(nvec0,2)*Pi00[ijk]) +
+       2*nvec0*Phi101[ijk]*(invh12*Phi200[ijk] + invh13*Phi300[ijk] +
           nvec1*Pi00[ijk])))/2.
 ;
 
 dtPhi101[ijk]
 =
 -(interior*AdPhi101[ijk]) + (alpha[ijk]*
-     (2*invh11*nvec0*Power(Phi101[ijk],2) + 
-       2*invh23*nvec0*Phi103[ijk]*Phi201[ijk] + 
-       2*invh12*nvec1*Phi111[ijk]*Phi201[ijk] + 
-       2*invh22*nvec1*Phi112[ijk]*Phi201[ijk] + 
-       2*invh12*nvec2*Phi112[ijk]*Phi201[ijk] + 
-       2*invh23*nvec1*Phi113[ijk]*Phi201[ijk] + 
-       2*invh12*nvec3*Phi113[ijk]*Phi201[ijk] + 
-       2*invh22*nvec2*Phi122[ijk]*Phi201[ijk] + 
-       2*invh23*nvec2*Phi123[ijk]*Phi201[ijk] + 
-       2*invh22*nvec3*Phi123[ijk]*Phi201[ijk] + 
-       2*invh23*nvec3*Phi133[ijk]*Phi201[ijk] + 
-       2*invh33*nvec0*Phi103[ijk]*Phi301[ijk] + 
-       2*invh13*nvec1*Phi111[ijk]*Phi301[ijk] + 
-       2*invh23*nvec1*Phi112[ijk]*Phi301[ijk] + 
-       2*invh13*nvec2*Phi112[ijk]*Phi301[ijk] + 
-       2*invh33*nvec1*Phi113[ijk]*Phi301[ijk] + 
-       2*invh13*nvec3*Phi113[ijk]*Phi301[ijk] + 
-       2*invh23*nvec2*Phi122[ijk]*Phi301[ijk] + 
-       2*invh33*nvec2*Phi123[ijk]*Phi301[ijk] + 
-       2*invh23*nvec3*Phi123[ijk]*Phi301[ijk] + 
-       2*invh33*nvec3*Phi133[ijk]*Phi301[ijk] + 
-       Power(nvec0,2)*Phi100[ijk]*Pi01[ijk] + 
-       2*nvec0*nvec3*Phi103[ijk]*Pi01[ijk] + 
-       Power(nvec1,2)*Phi111[ijk]*Pi01[ijk] + 
-       2*nvec1*nvec2*Phi112[ijk]*Pi01[ijk] + 
-       2*nvec1*nvec3*Phi113[ijk]*Pi01[ijk] + 
-       Power(nvec2,2)*Phi122[ijk]*Pi01[ijk] + 
-       2*nvec2*nvec3*Phi123[ijk]*Pi01[ijk] + 
-       Power(nvec3,2)*Phi133[ijk]*Pi01[ijk] + 
-       2*Phi101[ijk]*(-gamma2 + invh12*nvec0*Phi102[ijk] + 
-          invh13*nvec0*Phi103[ijk] + invh11*nvec1*Phi111[ijk] + 
-          invh12*nvec1*Phi112[ijk] + invh11*nvec2*Phi112[ijk] + 
-          invh13*nvec1*Phi113[ijk] + invh11*nvec3*Phi113[ijk] + 
-          invh12*nvec2*Phi122[ijk] + invh13*nvec2*Phi123[ijk] + 
-          invh12*nvec3*Phi123[ijk] + invh13*nvec3*Phi133[ijk] + 
-          invh12*nvec0*Phi201[ijk] + invh13*nvec0*Phi301[ijk] + 
-          nvec0*nvec1*Pi01[ijk]) + 
-       2*nvec0*Phi102[ijk]*(invh22*Phi201[ijk] + invh23*Phi301[ijk] + 
+     (2*invh11*nvec0*Power(Phi101[ijk],2) +
+       2*invh23*nvec0*Phi103[ijk]*Phi201[ijk] +
+       2*invh12*nvec1*Phi111[ijk]*Phi201[ijk] +
+       2*invh22*nvec1*Phi112[ijk]*Phi201[ijk] +
+       2*invh12*nvec2*Phi112[ijk]*Phi201[ijk] +
+       2*invh23*nvec1*Phi113[ijk]*Phi201[ijk] +
+       2*invh12*nvec3*Phi113[ijk]*Phi201[ijk] +
+       2*invh22*nvec2*Phi122[ijk]*Phi201[ijk] +
+       2*invh23*nvec2*Phi123[ijk]*Phi201[ijk] +
+       2*invh22*nvec3*Phi123[ijk]*Phi201[ijk] +
+       2*invh23*nvec3*Phi133[ijk]*Phi201[ijk] +
+       2*invh33*nvec0*Phi103[ijk]*Phi301[ijk] +
+       2*invh13*nvec1*Phi111[ijk]*Phi301[ijk] +
+       2*invh23*nvec1*Phi112[ijk]*Phi301[ijk] +
+       2*invh13*nvec2*Phi112[ijk]*Phi301[ijk] +
+       2*invh33*nvec1*Phi113[ijk]*Phi301[ijk] +
+       2*invh13*nvec3*Phi113[ijk]*Phi301[ijk] +
+       2*invh23*nvec2*Phi122[ijk]*Phi301[ijk] +
+       2*invh33*nvec2*Phi123[ijk]*Phi301[ijk] +
+       2*invh23*nvec3*Phi123[ijk]*Phi301[ijk] +
+       2*invh33*nvec3*Phi133[ijk]*Phi301[ijk] +
+       Power(nvec0,2)*Phi100[ijk]*Pi01[ijk] +
+       2*nvec0*nvec3*Phi103[ijk]*Pi01[ijk] +
+       Power(nvec1,2)*Phi111[ijk]*Pi01[ijk] +
+       2*nvec1*nvec2*Phi112[ijk]*Pi01[ijk] +
+       2*nvec1*nvec3*Phi113[ijk]*Pi01[ijk] +
+       Power(nvec2,2)*Phi122[ijk]*Pi01[ijk] +
+       2*nvec2*nvec3*Phi123[ijk]*Pi01[ijk] +
+       Power(nvec3,2)*Phi133[ijk]*Pi01[ijk] +
+       2*Phi101[ijk]*(-gamma2 + invh12*nvec0*Phi102[ijk] +
+          invh13*nvec0*Phi103[ijk] + invh11*nvec1*Phi111[ijk] +
+          invh12*nvec1*Phi112[ijk] + invh11*nvec2*Phi112[ijk] +
+          invh13*nvec1*Phi113[ijk] + invh11*nvec3*Phi113[ijk] +
+          invh12*nvec2*Phi122[ijk] + invh13*nvec2*Phi123[ijk] +
+          invh12*nvec3*Phi123[ijk] + invh13*nvec3*Phi133[ijk] +
+          invh12*nvec0*Phi201[ijk] + invh13*nvec0*Phi301[ijk] +
+          nvec0*nvec1*Pi01[ijk]) +
+       2*nvec0*Phi102[ijk]*(invh22*Phi201[ijk] + invh23*Phi301[ijk] +
           nvec2*Pi01[ijk])))/2.
 ;
 
 dtPhi102[ijk]
 =
 -(interior*AdPhi102[ijk]) + (alpha[ijk]*
-     (2*invh12*nvec0*Power(Phi102[ijk],2) + 
-       2*invh23*nvec0*Phi103[ijk]*Phi202[ijk] + 
-       2*invh12*nvec1*Phi111[ijk]*Phi202[ijk] + 
-       2*invh22*nvec1*Phi112[ijk]*Phi202[ijk] + 
-       2*invh12*nvec2*Phi112[ijk]*Phi202[ijk] + 
-       2*invh23*nvec1*Phi113[ijk]*Phi202[ijk] + 
-       2*invh12*nvec3*Phi113[ijk]*Phi202[ijk] + 
-       2*invh22*nvec2*Phi122[ijk]*Phi202[ijk] + 
-       2*invh23*nvec2*Phi123[ijk]*Phi202[ijk] + 
-       2*invh22*nvec3*Phi123[ijk]*Phi202[ijk] + 
-       2*invh23*nvec3*Phi133[ijk]*Phi202[ijk] + 
-       2*invh33*nvec0*Phi103[ijk]*Phi302[ijk] + 
-       2*invh13*nvec1*Phi111[ijk]*Phi302[ijk] + 
-       2*invh23*nvec1*Phi112[ijk]*Phi302[ijk] + 
-       2*invh13*nvec2*Phi112[ijk]*Phi302[ijk] + 
-       2*invh33*nvec1*Phi113[ijk]*Phi302[ijk] + 
-       2*invh13*nvec3*Phi113[ijk]*Phi302[ijk] + 
-       2*invh23*nvec2*Phi122[ijk]*Phi302[ijk] + 
-       2*invh33*nvec2*Phi123[ijk]*Phi302[ijk] + 
-       2*invh23*nvec3*Phi123[ijk]*Phi302[ijk] + 
-       2*invh33*nvec3*Phi133[ijk]*Phi302[ijk] + 
-       Power(nvec0,2)*Phi100[ijk]*Pi02[ijk] + 
-       2*nvec0*nvec3*Phi103[ijk]*Pi02[ijk] + 
-       Power(nvec1,2)*Phi111[ijk]*Pi02[ijk] + 
-       2*nvec1*nvec2*Phi112[ijk]*Pi02[ijk] + 
-       2*nvec1*nvec3*Phi113[ijk]*Pi02[ijk] + 
-       Power(nvec2,2)*Phi122[ijk]*Pi02[ijk] + 
-       2*nvec2*nvec3*Phi123[ijk]*Pi02[ijk] + 
-       Power(nvec3,2)*Phi133[ijk]*Pi02[ijk] + 
-       2*nvec0*Phi101[ijk]*(invh12*Phi202[ijk] + invh13*Phi302[ijk] + 
+     (2*invh12*nvec0*Power(Phi102[ijk],2) +
+       2*invh23*nvec0*Phi103[ijk]*Phi202[ijk] +
+       2*invh12*nvec1*Phi111[ijk]*Phi202[ijk] +
+       2*invh22*nvec1*Phi112[ijk]*Phi202[ijk] +
+       2*invh12*nvec2*Phi112[ijk]*Phi202[ijk] +
+       2*invh23*nvec1*Phi113[ijk]*Phi202[ijk] +
+       2*invh12*nvec3*Phi113[ijk]*Phi202[ijk] +
+       2*invh22*nvec2*Phi122[ijk]*Phi202[ijk] +
+       2*invh23*nvec2*Phi123[ijk]*Phi202[ijk] +
+       2*invh22*nvec3*Phi123[ijk]*Phi202[ijk] +
+       2*invh23*nvec3*Phi133[ijk]*Phi202[ijk] +
+       2*invh33*nvec0*Phi103[ijk]*Phi302[ijk] +
+       2*invh13*nvec1*Phi111[ijk]*Phi302[ijk] +
+       2*invh23*nvec1*Phi112[ijk]*Phi302[ijk] +
+       2*invh13*nvec2*Phi112[ijk]*Phi302[ijk] +
+       2*invh33*nvec1*Phi113[ijk]*Phi302[ijk] +
+       2*invh13*nvec3*Phi113[ijk]*Phi302[ijk] +
+       2*invh23*nvec2*Phi122[ijk]*Phi302[ijk] +
+       2*invh33*nvec2*Phi123[ijk]*Phi302[ijk] +
+       2*invh23*nvec3*Phi123[ijk]*Phi302[ijk] +
+       2*invh33*nvec3*Phi133[ijk]*Phi302[ijk] +
+       Power(nvec0,2)*Phi100[ijk]*Pi02[ijk] +
+       2*nvec0*nvec3*Phi103[ijk]*Pi02[ijk] +
+       Power(nvec1,2)*Phi111[ijk]*Pi02[ijk] +
+       2*nvec1*nvec2*Phi112[ijk]*Pi02[ijk] +
+       2*nvec1*nvec3*Phi113[ijk]*Pi02[ijk] +
+       Power(nvec2,2)*Phi122[ijk]*Pi02[ijk] +
+       2*nvec2*nvec3*Phi123[ijk]*Pi02[ijk] +
+       Power(nvec3,2)*Phi133[ijk]*Pi02[ijk] +
+       2*nvec0*Phi101[ijk]*(invh12*Phi202[ijk] + invh13*Phi302[ijk] +
           nvec1*Pi02[ijk]) + 2*Phi102[ijk]*
-        (-gamma2 + invh11*nvec0*Phi101[ijk] + invh13*nvec0*Phi103[ijk] + 
-          invh11*nvec1*Phi111[ijk] + invh12*nvec1*Phi112[ijk] + 
-          invh11*nvec2*Phi112[ijk] + invh13*nvec1*Phi113[ijk] + 
-          invh11*nvec3*Phi113[ijk] + invh12*nvec2*Phi122[ijk] + 
-          invh13*nvec2*Phi123[ijk] + invh12*nvec3*Phi123[ijk] + 
-          invh13*nvec3*Phi133[ijk] + invh22*nvec0*Phi202[ijk] + 
+        (-gamma2 + invh11*nvec0*Phi101[ijk] + invh13*nvec0*Phi103[ijk] +
+          invh11*nvec1*Phi111[ijk] + invh12*nvec1*Phi112[ijk] +
+          invh11*nvec2*Phi112[ijk] + invh13*nvec1*Phi113[ijk] +
+          invh11*nvec3*Phi113[ijk] + invh12*nvec2*Phi122[ijk] +
+          invh13*nvec2*Phi123[ijk] + invh12*nvec3*Phi123[ijk] +
+          invh13*nvec3*Phi133[ijk] + invh22*nvec0*Phi202[ijk] +
           invh23*nvec0*Phi302[ijk] + nvec0*nvec2*Pi02[ijk])))/2.
 ;
 
 dtPhi103[ijk]
 =
 -(interior*AdPhi103[ijk]) + (alpha[ijk]*
-     (2*invh13*nvec0*Power(Phi103[ijk],2) + 
-       2*invh22*nvec0*Phi102[ijk]*Phi203[ijk] + 
-       2*invh12*nvec1*Phi111[ijk]*Phi203[ijk] + 
-       2*invh22*nvec1*Phi112[ijk]*Phi203[ijk] + 
-       2*invh12*nvec2*Phi112[ijk]*Phi203[ijk] + 
-       2*invh23*nvec1*Phi113[ijk]*Phi203[ijk] + 
-       2*invh12*nvec3*Phi113[ijk]*Phi203[ijk] + 
-       2*invh22*nvec2*Phi122[ijk]*Phi203[ijk] + 
-       2*invh23*nvec2*Phi123[ijk]*Phi203[ijk] + 
-       2*invh22*nvec3*Phi123[ijk]*Phi203[ijk] + 
-       2*invh23*nvec3*Phi133[ijk]*Phi203[ijk] + 
-       2*invh23*nvec0*Phi102[ijk]*Phi303[ijk] + 
-       2*invh13*nvec1*Phi111[ijk]*Phi303[ijk] + 
-       2*invh23*nvec1*Phi112[ijk]*Phi303[ijk] + 
-       2*invh13*nvec2*Phi112[ijk]*Phi303[ijk] + 
-       2*invh33*nvec1*Phi113[ijk]*Phi303[ijk] + 
-       2*invh13*nvec3*Phi113[ijk]*Phi303[ijk] + 
-       2*invh23*nvec2*Phi122[ijk]*Phi303[ijk] + 
-       2*invh33*nvec2*Phi123[ijk]*Phi303[ijk] + 
-       2*invh23*nvec3*Phi123[ijk]*Phi303[ijk] + 
-       2*invh33*nvec3*Phi133[ijk]*Phi303[ijk] + 
-       Power(nvec0,2)*Phi100[ijk]*Pi03[ijk] + 
-       2*nvec0*nvec2*Phi102[ijk]*Pi03[ijk] + 
-       Power(nvec1,2)*Phi111[ijk]*Pi03[ijk] + 
-       2*nvec1*nvec2*Phi112[ijk]*Pi03[ijk] + 
-       2*nvec1*nvec3*Phi113[ijk]*Pi03[ijk] + 
-       Power(nvec2,2)*Phi122[ijk]*Pi03[ijk] + 
-       2*nvec2*nvec3*Phi123[ijk]*Pi03[ijk] + 
-       Power(nvec3,2)*Phi133[ijk]*Pi03[ijk] + 
-       2*nvec0*Phi101[ijk]*(invh12*Phi203[ijk] + invh13*Phi303[ijk] + 
+     (2*invh13*nvec0*Power(Phi103[ijk],2) +
+       2*invh22*nvec0*Phi102[ijk]*Phi203[ijk] +
+       2*invh12*nvec1*Phi111[ijk]*Phi203[ijk] +
+       2*invh22*nvec1*Phi112[ijk]*Phi203[ijk] +
+       2*invh12*nvec2*Phi112[ijk]*Phi203[ijk] +
+       2*invh23*nvec1*Phi113[ijk]*Phi203[ijk] +
+       2*invh12*nvec3*Phi113[ijk]*Phi203[ijk] +
+       2*invh22*nvec2*Phi122[ijk]*Phi203[ijk] +
+       2*invh23*nvec2*Phi123[ijk]*Phi203[ijk] +
+       2*invh22*nvec3*Phi123[ijk]*Phi203[ijk] +
+       2*invh23*nvec3*Phi133[ijk]*Phi203[ijk] +
+       2*invh23*nvec0*Phi102[ijk]*Phi303[ijk] +
+       2*invh13*nvec1*Phi111[ijk]*Phi303[ijk] +
+       2*invh23*nvec1*Phi112[ijk]*Phi303[ijk] +
+       2*invh13*nvec2*Phi112[ijk]*Phi303[ijk] +
+       2*invh33*nvec1*Phi113[ijk]*Phi303[ijk] +
+       2*invh13*nvec3*Phi113[ijk]*Phi303[ijk] +
+       2*invh23*nvec2*Phi122[ijk]*Phi303[ijk] +
+       2*invh33*nvec2*Phi123[ijk]*Phi303[ijk] +
+       2*invh23*nvec3*Phi123[ijk]*Phi303[ijk] +
+       2*invh33*nvec3*Phi133[ijk]*Phi303[ijk] +
+       Power(nvec0,2)*Phi100[ijk]*Pi03[ijk] +
+       2*nvec0*nvec2*Phi102[ijk]*Pi03[ijk] +
+       Power(nvec1,2)*Phi111[ijk]*Pi03[ijk] +
+       2*nvec1*nvec2*Phi112[ijk]*Pi03[ijk] +
+       2*nvec1*nvec3*Phi113[ijk]*Pi03[ijk] +
+       Power(nvec2,2)*Phi122[ijk]*Pi03[ijk] +
+       2*nvec2*nvec3*Phi123[ijk]*Pi03[ijk] +
+       Power(nvec3,2)*Phi133[ijk]*Pi03[ijk] +
+       2*nvec0*Phi101[ijk]*(invh12*Phi203[ijk] + invh13*Phi303[ijk] +
           nvec1*Pi03[ijk]) + 2*Phi103[ijk]*
-        (-gamma2 + invh11*nvec0*Phi101[ijk] + invh12*nvec0*Phi102[ijk] + 
-          invh11*nvec1*Phi111[ijk] + invh12*nvec1*Phi112[ijk] + 
-          invh11*nvec2*Phi112[ijk] + invh13*nvec1*Phi113[ijk] + 
-          invh11*nvec3*Phi113[ijk] + invh12*nvec2*Phi122[ijk] + 
-          invh13*nvec2*Phi123[ijk] + invh12*nvec3*Phi123[ijk] + 
-          invh13*nvec3*Phi133[ijk] + invh23*nvec0*Phi203[ijk] + 
+        (-gamma2 + invh11*nvec0*Phi101[ijk] + invh12*nvec0*Phi102[ijk] +
+          invh11*nvec1*Phi111[ijk] + invh12*nvec1*Phi112[ijk] +
+          invh11*nvec2*Phi112[ijk] + invh13*nvec1*Phi113[ijk] +
+          invh11*nvec3*Phi113[ijk] + invh12*nvec2*Phi122[ijk] +
+          invh13*nvec2*Phi123[ijk] + invh12*nvec3*Phi123[ijk] +
+          invh13*nvec3*Phi133[ijk] + invh23*nvec0*Phi203[ijk] +
           invh33*nvec0*Phi303[ijk] + nvec0*nvec3*Pi03[ijk])))/2.
 ;
 
 dtPhi111[ijk]
 =
 -(interior*AdPhi111[ijk]) + (alpha[ijk]*
-     (2*invh11*nvec1*Power(Phi111[ijk],2) + 
-       2*invh22*nvec0*Phi102[ijk]*Phi211[ijk] + 
-       2*invh23*nvec0*Phi103[ijk]*Phi211[ijk] + 
-       2*invh22*nvec1*Phi112[ijk]*Phi211[ijk] + 
-       2*invh12*nvec2*Phi112[ijk]*Phi211[ijk] + 
-       2*invh23*nvec1*Phi113[ijk]*Phi211[ijk] + 
-       2*invh12*nvec3*Phi113[ijk]*Phi211[ijk] + 
-       2*invh22*nvec2*Phi122[ijk]*Phi211[ijk] + 
-       2*invh23*nvec2*Phi123[ijk]*Phi211[ijk] + 
-       2*invh22*nvec3*Phi123[ijk]*Phi211[ijk] + 
-       2*invh23*nvec3*Phi133[ijk]*Phi211[ijk] + 
-       2*invh23*nvec0*Phi102[ijk]*Phi311[ijk] + 
-       2*invh33*nvec0*Phi103[ijk]*Phi311[ijk] + 
-       2*invh23*nvec1*Phi112[ijk]*Phi311[ijk] + 
-       2*invh13*nvec2*Phi112[ijk]*Phi311[ijk] + 
-       2*invh33*nvec1*Phi113[ijk]*Phi311[ijk] + 
-       2*invh13*nvec3*Phi113[ijk]*Phi311[ijk] + 
-       2*invh23*nvec2*Phi122[ijk]*Phi311[ijk] + 
-       2*invh33*nvec2*Phi123[ijk]*Phi311[ijk] + 
-       2*invh23*nvec3*Phi123[ijk]*Phi311[ijk] + 
-       2*invh33*nvec3*Phi133[ijk]*Phi311[ijk] + 
-       Power(nvec0,2)*Phi100[ijk]*Pi11[ijk] + 
-       2*nvec0*nvec2*Phi102[ijk]*Pi11[ijk] + 
-       2*nvec0*nvec3*Phi103[ijk]*Pi11[ijk] + 
-       2*nvec1*nvec2*Phi112[ijk]*Pi11[ijk] + 
-       2*nvec1*nvec3*Phi113[ijk]*Pi11[ijk] + 
-       Power(nvec2,2)*Phi122[ijk]*Pi11[ijk] + 
-       2*nvec2*nvec3*Phi123[ijk]*Pi11[ijk] + 
-       Power(nvec3,2)*Phi133[ijk]*Pi11[ijk] + 
-       2*nvec0*Phi101[ijk]*(invh12*Phi211[ijk] + invh13*Phi311[ijk] + 
+     (2*invh11*nvec1*Power(Phi111[ijk],2) +
+       2*invh22*nvec0*Phi102[ijk]*Phi211[ijk] +
+       2*invh23*nvec0*Phi103[ijk]*Phi211[ijk] +
+       2*invh22*nvec1*Phi112[ijk]*Phi211[ijk] +
+       2*invh12*nvec2*Phi112[ijk]*Phi211[ijk] +
+       2*invh23*nvec1*Phi113[ijk]*Phi211[ijk] +
+       2*invh12*nvec3*Phi113[ijk]*Phi211[ijk] +
+       2*invh22*nvec2*Phi122[ijk]*Phi211[ijk] +
+       2*invh23*nvec2*Phi123[ijk]*Phi211[ijk] +
+       2*invh22*nvec3*Phi123[ijk]*Phi211[ijk] +
+       2*invh23*nvec3*Phi133[ijk]*Phi211[ijk] +
+       2*invh23*nvec0*Phi102[ijk]*Phi311[ijk] +
+       2*invh33*nvec0*Phi103[ijk]*Phi311[ijk] +
+       2*invh23*nvec1*Phi112[ijk]*Phi311[ijk] +
+       2*invh13*nvec2*Phi112[ijk]*Phi311[ijk] +
+       2*invh33*nvec1*Phi113[ijk]*Phi311[ijk] +
+       2*invh13*nvec3*Phi113[ijk]*Phi311[ijk] +
+       2*invh23*nvec2*Phi122[ijk]*Phi311[ijk] +
+       2*invh33*nvec2*Phi123[ijk]*Phi311[ijk] +
+       2*invh23*nvec3*Phi123[ijk]*Phi311[ijk] +
+       2*invh33*nvec3*Phi133[ijk]*Phi311[ijk] +
+       Power(nvec0,2)*Phi100[ijk]*Pi11[ijk] +
+       2*nvec0*nvec2*Phi102[ijk]*Pi11[ijk] +
+       2*nvec0*nvec3*Phi103[ijk]*Pi11[ijk] +
+       2*nvec1*nvec2*Phi112[ijk]*Pi11[ijk] +
+       2*nvec1*nvec3*Phi113[ijk]*Pi11[ijk] +
+       Power(nvec2,2)*Phi122[ijk]*Pi11[ijk] +
+       2*nvec2*nvec3*Phi123[ijk]*Pi11[ijk] +
+       Power(nvec3,2)*Phi133[ijk]*Pi11[ijk] +
+       2*nvec0*Phi101[ijk]*(invh12*Phi211[ijk] + invh13*Phi311[ijk] +
           nvec1*Pi11[ijk]) + Phi111[ijk]*
-        (-2*gamma2 + 2*invh11*nvec0*Phi101[ijk] + 
-          2*invh12*nvec0*Phi102[ijk] + 2*invh13*nvec0*Phi103[ijk] + 
-          2*invh12*nvec1*Phi112[ijk] + 2*invh11*nvec2*Phi112[ijk] + 
-          2*invh13*nvec1*Phi113[ijk] + 2*invh11*nvec3*Phi113[ijk] + 
-          2*invh12*nvec2*Phi122[ijk] + 2*invh13*nvec2*Phi123[ijk] + 
-          2*invh12*nvec3*Phi123[ijk] + 2*invh13*nvec3*Phi133[ijk] + 
-          2*invh12*nvec1*Phi211[ijk] + 2*invh13*nvec1*Phi311[ijk] + 
+        (-2*gamma2 + 2*invh11*nvec0*Phi101[ijk] +
+          2*invh12*nvec0*Phi102[ijk] + 2*invh13*nvec0*Phi103[ijk] +
+          2*invh12*nvec1*Phi112[ijk] + 2*invh11*nvec2*Phi112[ijk] +
+          2*invh13*nvec1*Phi113[ijk] + 2*invh11*nvec3*Phi113[ijk] +
+          2*invh12*nvec2*Phi122[ijk] + 2*invh13*nvec2*Phi123[ijk] +
+          2*invh12*nvec3*Phi123[ijk] + 2*invh13*nvec3*Phi133[ijk] +
+          2*invh12*nvec1*Phi211[ijk] + 2*invh13*nvec1*Phi311[ijk] +
           Power(nvec1,2)*Pi11[ijk])))/2.
 ;
 
 dtPhi112[ijk]
 =
 -(interior*AdPhi112[ijk]) + (alpha[ijk]*
-     (2*(invh12*nvec1 + invh11*nvec2)*Power(Phi112[ijk],2) + 
-       2*invh22*nvec0*Phi102[ijk]*Phi212[ijk] + 
-       2*invh23*nvec0*Phi103[ijk]*Phi212[ijk] + 
-       2*invh12*nvec1*Phi111[ijk]*Phi212[ijk] + 
-       2*invh23*nvec1*Phi113[ijk]*Phi212[ijk] + 
-       2*invh12*nvec3*Phi113[ijk]*Phi212[ijk] + 
-       2*invh22*nvec2*Phi122[ijk]*Phi212[ijk] + 
-       2*invh23*nvec2*Phi123[ijk]*Phi212[ijk] + 
-       2*invh22*nvec3*Phi123[ijk]*Phi212[ijk] + 
-       2*invh23*nvec3*Phi133[ijk]*Phi212[ijk] + 
-       2*invh23*nvec0*Phi102[ijk]*Phi312[ijk] + 
-       2*invh33*nvec0*Phi103[ijk]*Phi312[ijk] + 
-       2*invh13*nvec1*Phi111[ijk]*Phi312[ijk] + 
-       2*invh33*nvec1*Phi113[ijk]*Phi312[ijk] + 
-       2*invh13*nvec3*Phi113[ijk]*Phi312[ijk] + 
-       2*invh23*nvec2*Phi122[ijk]*Phi312[ijk] + 
-       2*invh33*nvec2*Phi123[ijk]*Phi312[ijk] + 
-       2*invh23*nvec3*Phi123[ijk]*Phi312[ijk] + 
-       2*invh33*nvec3*Phi133[ijk]*Phi312[ijk] + 
-       Power(nvec0,2)*Phi100[ijk]*Pi12[ijk] + 
-       2*nvec0*nvec2*Phi102[ijk]*Pi12[ijk] + 
-       2*nvec0*nvec3*Phi103[ijk]*Pi12[ijk] + 
-       Power(nvec1,2)*Phi111[ijk]*Pi12[ijk] + 
-       2*nvec1*nvec3*Phi113[ijk]*Pi12[ijk] + 
-       Power(nvec2,2)*Phi122[ijk]*Pi12[ijk] + 
-       2*nvec2*nvec3*Phi123[ijk]*Pi12[ijk] + 
-       Power(nvec3,2)*Phi133[ijk]*Pi12[ijk] + 
-       2*nvec0*Phi101[ijk]*(invh12*Phi212[ijk] + invh13*Phi312[ijk] + 
+     (2*(invh12*nvec1 + invh11*nvec2)*Power(Phi112[ijk],2) +
+       2*invh22*nvec0*Phi102[ijk]*Phi212[ijk] +
+       2*invh23*nvec0*Phi103[ijk]*Phi212[ijk] +
+       2*invh12*nvec1*Phi111[ijk]*Phi212[ijk] +
+       2*invh23*nvec1*Phi113[ijk]*Phi212[ijk] +
+       2*invh12*nvec3*Phi113[ijk]*Phi212[ijk] +
+       2*invh22*nvec2*Phi122[ijk]*Phi212[ijk] +
+       2*invh23*nvec2*Phi123[ijk]*Phi212[ijk] +
+       2*invh22*nvec3*Phi123[ijk]*Phi212[ijk] +
+       2*invh23*nvec3*Phi133[ijk]*Phi212[ijk] +
+       2*invh23*nvec0*Phi102[ijk]*Phi312[ijk] +
+       2*invh33*nvec0*Phi103[ijk]*Phi312[ijk] +
+       2*invh13*nvec1*Phi111[ijk]*Phi312[ijk] +
+       2*invh33*nvec1*Phi113[ijk]*Phi312[ijk] +
+       2*invh13*nvec3*Phi113[ijk]*Phi312[ijk] +
+       2*invh23*nvec2*Phi122[ijk]*Phi312[ijk] +
+       2*invh33*nvec2*Phi123[ijk]*Phi312[ijk] +
+       2*invh23*nvec3*Phi123[ijk]*Phi312[ijk] +
+       2*invh33*nvec3*Phi133[ijk]*Phi312[ijk] +
+       Power(nvec0,2)*Phi100[ijk]*Pi12[ijk] +
+       2*nvec0*nvec2*Phi102[ijk]*Pi12[ijk] +
+       2*nvec0*nvec3*Phi103[ijk]*Pi12[ijk] +
+       Power(nvec1,2)*Phi111[ijk]*Pi12[ijk] +
+       2*nvec1*nvec3*Phi113[ijk]*Pi12[ijk] +
+       Power(nvec2,2)*Phi122[ijk]*Pi12[ijk] +
+       2*nvec2*nvec3*Phi123[ijk]*Pi12[ijk] +
+       Power(nvec3,2)*Phi133[ijk]*Pi12[ijk] +
+       2*nvec0*Phi101[ijk]*(invh12*Phi212[ijk] + invh13*Phi312[ijk] +
           nvec1*Pi12[ijk]) + 2*Phi112[ijk]*
-        (-gamma2 + invh11*nvec0*Phi101[ijk] + invh12*nvec0*Phi102[ijk] + 
-          invh13*nvec0*Phi103[ijk] + invh11*nvec1*Phi111[ijk] + 
-          invh13*nvec1*Phi113[ijk] + invh11*nvec3*Phi113[ijk] + 
-          invh12*nvec2*Phi122[ijk] + invh13*nvec2*Phi123[ijk] + 
-          invh12*nvec3*Phi123[ijk] + invh13*nvec3*Phi133[ijk] + 
-          invh22*nvec1*Phi212[ijk] + invh12*nvec2*Phi212[ijk] + 
-          invh23*nvec1*Phi312[ijk] + invh13*nvec2*Phi312[ijk] + 
+        (-gamma2 + invh11*nvec0*Phi101[ijk] + invh12*nvec0*Phi102[ijk] +
+          invh13*nvec0*Phi103[ijk] + invh11*nvec1*Phi111[ijk] +
+          invh13*nvec1*Phi113[ijk] + invh11*nvec3*Phi113[ijk] +
+          invh12*nvec2*Phi122[ijk] + invh13*nvec2*Phi123[ijk] +
+          invh12*nvec3*Phi123[ijk] + invh13*nvec3*Phi133[ijk] +
+          invh22*nvec1*Phi212[ijk] + invh12*nvec2*Phi212[ijk] +
+          invh23*nvec1*Phi312[ijk] + invh13*nvec2*Phi312[ijk] +
           nvec1*nvec2*Pi12[ijk])))/2.
 ;
 
 dtPhi113[ijk]
 =
 -(interior*AdPhi113[ijk]) + (alpha[ijk]*
-     (2*(invh13*nvec1 + invh11*nvec3)*Power(Phi113[ijk],2) + 
-       2*invh22*nvec0*Phi102[ijk]*Phi213[ijk] + 
-       2*invh23*nvec0*Phi103[ijk]*Phi213[ijk] + 
-       2*invh12*nvec1*Phi111[ijk]*Phi213[ijk] + 
-       2*invh22*nvec1*Phi112[ijk]*Phi213[ijk] + 
-       2*invh12*nvec2*Phi112[ijk]*Phi213[ijk] + 
-       2*invh22*nvec2*Phi122[ijk]*Phi213[ijk] + 
-       2*invh23*nvec2*Phi123[ijk]*Phi213[ijk] + 
-       2*invh22*nvec3*Phi123[ijk]*Phi213[ijk] + 
-       2*invh23*nvec3*Phi133[ijk]*Phi213[ijk] + 
-       2*invh23*nvec0*Phi102[ijk]*Phi313[ijk] + 
-       2*invh33*nvec0*Phi103[ijk]*Phi313[ijk] + 
-       2*invh13*nvec1*Phi111[ijk]*Phi313[ijk] + 
-       2*invh23*nvec1*Phi112[ijk]*Phi313[ijk] + 
-       2*invh13*nvec2*Phi112[ijk]*Phi313[ijk] + 
-       2*invh23*nvec2*Phi122[ijk]*Phi313[ijk] + 
-       2*invh33*nvec2*Phi123[ijk]*Phi313[ijk] + 
-       2*invh23*nvec3*Phi123[ijk]*Phi313[ijk] + 
-       2*invh33*nvec3*Phi133[ijk]*Phi313[ijk] + 
-       Power(nvec0,2)*Phi100[ijk]*Pi13[ijk] + 
-       2*nvec0*nvec2*Phi102[ijk]*Pi13[ijk] + 
-       2*nvec0*nvec3*Phi103[ijk]*Pi13[ijk] + 
-       Power(nvec1,2)*Phi111[ijk]*Pi13[ijk] + 
-       2*nvec1*nvec2*Phi112[ijk]*Pi13[ijk] + 
-       Power(nvec2,2)*Phi122[ijk]*Pi13[ijk] + 
-       2*nvec2*nvec3*Phi123[ijk]*Pi13[ijk] + 
-       Power(nvec3,2)*Phi133[ijk]*Pi13[ijk] + 
-       2*nvec0*Phi101[ijk]*(invh12*Phi213[ijk] + invh13*Phi313[ijk] + 
+     (2*(invh13*nvec1 + invh11*nvec3)*Power(Phi113[ijk],2) +
+       2*invh22*nvec0*Phi102[ijk]*Phi213[ijk] +
+       2*invh23*nvec0*Phi103[ijk]*Phi213[ijk] +
+       2*invh12*nvec1*Phi111[ijk]*Phi213[ijk] +
+       2*invh22*nvec1*Phi112[ijk]*Phi213[ijk] +
+       2*invh12*nvec2*Phi112[ijk]*Phi213[ijk] +
+       2*invh22*nvec2*Phi122[ijk]*Phi213[ijk] +
+       2*invh23*nvec2*Phi123[ijk]*Phi213[ijk] +
+       2*invh22*nvec3*Phi123[ijk]*Phi213[ijk] +
+       2*invh23*nvec3*Phi133[ijk]*Phi213[ijk] +
+       2*invh23*nvec0*Phi102[ijk]*Phi313[ijk] +
+       2*invh33*nvec0*Phi103[ijk]*Phi313[ijk] +
+       2*invh13*nvec1*Phi111[ijk]*Phi313[ijk] +
+       2*invh23*nvec1*Phi112[ijk]*Phi313[ijk] +
+       2*invh13*nvec2*Phi112[ijk]*Phi313[ijk] +
+       2*invh23*nvec2*Phi122[ijk]*Phi313[ijk] +
+       2*invh33*nvec2*Phi123[ijk]*Phi313[ijk] +
+       2*invh23*nvec3*Phi123[ijk]*Phi313[ijk] +
+       2*invh33*nvec3*Phi133[ijk]*Phi313[ijk] +
+       Power(nvec0,2)*Phi100[ijk]*Pi13[ijk] +
+       2*nvec0*nvec2*Phi102[ijk]*Pi13[ijk] +
+       2*nvec0*nvec3*Phi103[ijk]*Pi13[ijk] +
+       Power(nvec1,2)*Phi111[ijk]*Pi13[ijk] +
+       2*nvec1*nvec2*Phi112[ijk]*Pi13[ijk] +
+       Power(nvec2,2)*Phi122[ijk]*Pi13[ijk] +
+       2*nvec2*nvec3*Phi123[ijk]*Pi13[ijk] +
+       Power(nvec3,2)*Phi133[ijk]*Pi13[ijk] +
+       2*nvec0*Phi101[ijk]*(invh12*Phi213[ijk] + invh13*Phi313[ijk] +
           nvec1*Pi13[ijk]) + 2*Phi113[ijk]*
-        (-gamma2 + invh11*nvec0*Phi101[ijk] + invh12*nvec0*Phi102[ijk] + 
-          invh13*nvec0*Phi103[ijk] + invh11*nvec1*Phi111[ijk] + 
-          invh12*nvec1*Phi112[ijk] + invh11*nvec2*Phi112[ijk] + 
-          invh12*nvec2*Phi122[ijk] + invh13*nvec2*Phi123[ijk] + 
-          invh12*nvec3*Phi123[ijk] + invh13*nvec3*Phi133[ijk] + 
-          invh23*nvec1*Phi213[ijk] + invh12*nvec3*Phi213[ijk] + 
-          invh33*nvec1*Phi313[ijk] + invh13*nvec3*Phi313[ijk] + 
+        (-gamma2 + invh11*nvec0*Phi101[ijk] + invh12*nvec0*Phi102[ijk] +
+          invh13*nvec0*Phi103[ijk] + invh11*nvec1*Phi111[ijk] +
+          invh12*nvec1*Phi112[ijk] + invh11*nvec2*Phi112[ijk] +
+          invh12*nvec2*Phi122[ijk] + invh13*nvec2*Phi123[ijk] +
+          invh12*nvec3*Phi123[ijk] + invh13*nvec3*Phi133[ijk] +
+          invh23*nvec1*Phi213[ijk] + invh12*nvec3*Phi213[ijk] +
+          invh33*nvec1*Phi313[ijk] + invh13*nvec3*Phi313[ijk] +
           nvec1*nvec3*Pi13[ijk])))/2.
 ;
 
 dtPhi122[ijk]
 =
 -(interior*AdPhi122[ijk]) + (alpha[ijk]*
-     (2*invh12*nvec2*Power(Phi122[ijk],2) + 
-       2*invh22*nvec0*Phi102[ijk]*Phi222[ijk] + 
-       2*invh23*nvec0*Phi103[ijk]*Phi222[ijk] + 
-       2*invh12*nvec1*Phi111[ijk]*Phi222[ijk] + 
-       2*invh22*nvec1*Phi112[ijk]*Phi222[ijk] + 
-       2*invh12*nvec2*Phi112[ijk]*Phi222[ijk] + 
-       2*invh23*nvec1*Phi113[ijk]*Phi222[ijk] + 
-       2*invh12*nvec3*Phi113[ijk]*Phi222[ijk] + 
-       2*invh23*nvec2*Phi123[ijk]*Phi222[ijk] + 
-       2*invh22*nvec3*Phi123[ijk]*Phi222[ijk] + 
-       2*invh23*nvec3*Phi133[ijk]*Phi222[ijk] + 
-       2*invh23*nvec0*Phi102[ijk]*Phi322[ijk] + 
-       2*invh33*nvec0*Phi103[ijk]*Phi322[ijk] + 
-       2*invh13*nvec1*Phi111[ijk]*Phi322[ijk] + 
-       2*invh23*nvec1*Phi112[ijk]*Phi322[ijk] + 
-       2*invh13*nvec2*Phi112[ijk]*Phi322[ijk] + 
-       2*invh33*nvec1*Phi113[ijk]*Phi322[ijk] + 
-       2*invh13*nvec3*Phi113[ijk]*Phi322[ijk] + 
-       2*invh33*nvec2*Phi123[ijk]*Phi322[ijk] + 
-       2*invh23*nvec3*Phi123[ijk]*Phi322[ijk] + 
-       2*invh33*nvec3*Phi133[ijk]*Phi322[ijk] + 
-       Power(nvec0,2)*Phi100[ijk]*Pi22[ijk] + 
-       2*nvec0*nvec2*Phi102[ijk]*Pi22[ijk] + 
-       2*nvec0*nvec3*Phi103[ijk]*Pi22[ijk] + 
-       Power(nvec1,2)*Phi111[ijk]*Pi22[ijk] + 
-       2*nvec1*nvec2*Phi112[ijk]*Pi22[ijk] + 
-       2*nvec1*nvec3*Phi113[ijk]*Pi22[ijk] + 
-       2*nvec2*nvec3*Phi123[ijk]*Pi22[ijk] + 
-       Power(nvec3,2)*Phi133[ijk]*Pi22[ijk] + 
-       2*nvec0*Phi101[ijk]*(invh12*Phi222[ijk] + invh13*Phi322[ijk] + 
+     (2*invh12*nvec2*Power(Phi122[ijk],2) +
+       2*invh22*nvec0*Phi102[ijk]*Phi222[ijk] +
+       2*invh23*nvec0*Phi103[ijk]*Phi222[ijk] +
+       2*invh12*nvec1*Phi111[ijk]*Phi222[ijk] +
+       2*invh22*nvec1*Phi112[ijk]*Phi222[ijk] +
+       2*invh12*nvec2*Phi112[ijk]*Phi222[ijk] +
+       2*invh23*nvec1*Phi113[ijk]*Phi222[ijk] +
+       2*invh12*nvec3*Phi113[ijk]*Phi222[ijk] +
+       2*invh23*nvec2*Phi123[ijk]*Phi222[ijk] +
+       2*invh22*nvec3*Phi123[ijk]*Phi222[ijk] +
+       2*invh23*nvec3*Phi133[ijk]*Phi222[ijk] +
+       2*invh23*nvec0*Phi102[ijk]*Phi322[ijk] +
+       2*invh33*nvec0*Phi103[ijk]*Phi322[ijk] +
+       2*invh13*nvec1*Phi111[ijk]*Phi322[ijk] +
+       2*invh23*nvec1*Phi112[ijk]*Phi322[ijk] +
+       2*invh13*nvec2*Phi112[ijk]*Phi322[ijk] +
+       2*invh33*nvec1*Phi113[ijk]*Phi322[ijk] +
+       2*invh13*nvec3*Phi113[ijk]*Phi322[ijk] +
+       2*invh33*nvec2*Phi123[ijk]*Phi322[ijk] +
+       2*invh23*nvec3*Phi123[ijk]*Phi322[ijk] +
+       2*invh33*nvec3*Phi133[ijk]*Phi322[ijk] +
+       Power(nvec0,2)*Phi100[ijk]*Pi22[ijk] +
+       2*nvec0*nvec2*Phi102[ijk]*Pi22[ijk] +
+       2*nvec0*nvec3*Phi103[ijk]*Pi22[ijk] +
+       Power(nvec1,2)*Phi111[ijk]*Pi22[ijk] +
+       2*nvec1*nvec2*Phi112[ijk]*Pi22[ijk] +
+       2*nvec1*nvec3*Phi113[ijk]*Pi22[ijk] +
+       2*nvec2*nvec3*Phi123[ijk]*Pi22[ijk] +
+       Power(nvec3,2)*Phi133[ijk]*Pi22[ijk] +
+       2*nvec0*Phi101[ijk]*(invh12*Phi222[ijk] + invh13*Phi322[ijk] +
           nvec1*Pi22[ijk]) + Phi122[ijk]*
-        (-2*gamma2 + 2*invh11*nvec0*Phi101[ijk] + 
-          2*invh12*nvec0*Phi102[ijk] + 2*invh13*nvec0*Phi103[ijk] + 
-          2*invh11*nvec1*Phi111[ijk] + 2*invh12*nvec1*Phi112[ijk] + 
-          2*invh11*nvec2*Phi112[ijk] + 2*invh13*nvec1*Phi113[ijk] + 
-          2*invh11*nvec3*Phi113[ijk] + 2*invh13*nvec2*Phi123[ijk] + 
-          2*invh12*nvec3*Phi123[ijk] + 2*invh13*nvec3*Phi133[ijk] + 
-          2*invh22*nvec2*Phi222[ijk] + 2*invh23*nvec2*Phi322[ijk] + 
+        (-2*gamma2 + 2*invh11*nvec0*Phi101[ijk] +
+          2*invh12*nvec0*Phi102[ijk] + 2*invh13*nvec0*Phi103[ijk] +
+          2*invh11*nvec1*Phi111[ijk] + 2*invh12*nvec1*Phi112[ijk] +
+          2*invh11*nvec2*Phi112[ijk] + 2*invh13*nvec1*Phi113[ijk] +
+          2*invh11*nvec3*Phi113[ijk] + 2*invh13*nvec2*Phi123[ijk] +
+          2*invh12*nvec3*Phi123[ijk] + 2*invh13*nvec3*Phi133[ijk] +
+          2*invh22*nvec2*Phi222[ijk] + 2*invh23*nvec2*Phi322[ijk] +
           Power(nvec2,2)*Pi22[ijk])))/2.
 ;
 
 dtPhi123[ijk]
 =
 -(interior*AdPhi123[ijk]) + (alpha[ijk]*
-     (2*(invh13*nvec2 + invh12*nvec3)*Power(Phi123[ijk],2) + 
-       2*invh22*nvec0*Phi102[ijk]*Phi223[ijk] + 
-       2*invh23*nvec0*Phi103[ijk]*Phi223[ijk] + 
-       2*invh12*nvec1*Phi111[ijk]*Phi223[ijk] + 
-       2*invh22*nvec1*Phi112[ijk]*Phi223[ijk] + 
-       2*invh12*nvec2*Phi112[ijk]*Phi223[ijk] + 
-       2*invh23*nvec1*Phi113[ijk]*Phi223[ijk] + 
-       2*invh12*nvec3*Phi113[ijk]*Phi223[ijk] + 
-       2*invh22*nvec2*Phi122[ijk]*Phi223[ijk] + 
-       2*invh23*nvec3*Phi133[ijk]*Phi223[ijk] + 
-       2*invh23*nvec0*Phi102[ijk]*Phi323[ijk] + 
-       2*invh33*nvec0*Phi103[ijk]*Phi323[ijk] + 
-       2*invh13*nvec1*Phi111[ijk]*Phi323[ijk] + 
-       2*invh23*nvec1*Phi112[ijk]*Phi323[ijk] + 
-       2*invh13*nvec2*Phi112[ijk]*Phi323[ijk] + 
-       2*invh33*nvec1*Phi113[ijk]*Phi323[ijk] + 
-       2*invh13*nvec3*Phi113[ijk]*Phi323[ijk] + 
-       2*invh23*nvec2*Phi122[ijk]*Phi323[ijk] + 
-       2*invh33*nvec3*Phi133[ijk]*Phi323[ijk] + 
-       Power(nvec0,2)*Phi100[ijk]*Pi23[ijk] + 
-       2*nvec0*nvec2*Phi102[ijk]*Pi23[ijk] + 
-       2*nvec0*nvec3*Phi103[ijk]*Pi23[ijk] + 
-       Power(nvec1,2)*Phi111[ijk]*Pi23[ijk] + 
-       2*nvec1*nvec2*Phi112[ijk]*Pi23[ijk] + 
-       2*nvec1*nvec3*Phi113[ijk]*Pi23[ijk] + 
-       Power(nvec2,2)*Phi122[ijk]*Pi23[ijk] + 
-       Power(nvec3,2)*Phi133[ijk]*Pi23[ijk] + 
-       2*nvec0*Phi101[ijk]*(invh12*Phi223[ijk] + invh13*Phi323[ijk] + 
+     (2*(invh13*nvec2 + invh12*nvec3)*Power(Phi123[ijk],2) +
+       2*invh22*nvec0*Phi102[ijk]*Phi223[ijk] +
+       2*invh23*nvec0*Phi103[ijk]*Phi223[ijk] +
+       2*invh12*nvec1*Phi111[ijk]*Phi223[ijk] +
+       2*invh22*nvec1*Phi112[ijk]*Phi223[ijk] +
+       2*invh12*nvec2*Phi112[ijk]*Phi223[ijk] +
+       2*invh23*nvec1*Phi113[ijk]*Phi223[ijk] +
+       2*invh12*nvec3*Phi113[ijk]*Phi223[ijk] +
+       2*invh22*nvec2*Phi122[ijk]*Phi223[ijk] +
+       2*invh23*nvec3*Phi133[ijk]*Phi223[ijk] +
+       2*invh23*nvec0*Phi102[ijk]*Phi323[ijk] +
+       2*invh33*nvec0*Phi103[ijk]*Phi323[ijk] +
+       2*invh13*nvec1*Phi111[ijk]*Phi323[ijk] +
+       2*invh23*nvec1*Phi112[ijk]*Phi323[ijk] +
+       2*invh13*nvec2*Phi112[ijk]*Phi323[ijk] +
+       2*invh33*nvec1*Phi113[ijk]*Phi323[ijk] +
+       2*invh13*nvec3*Phi113[ijk]*Phi323[ijk] +
+       2*invh23*nvec2*Phi122[ijk]*Phi323[ijk] +
+       2*invh33*nvec3*Phi133[ijk]*Phi323[ijk] +
+       Power(nvec0,2)*Phi100[ijk]*Pi23[ijk] +
+       2*nvec0*nvec2*Phi102[ijk]*Pi23[ijk] +
+       2*nvec0*nvec3*Phi103[ijk]*Pi23[ijk] +
+       Power(nvec1,2)*Phi111[ijk]*Pi23[ijk] +
+       2*nvec1*nvec2*Phi112[ijk]*Pi23[ijk] +
+       2*nvec1*nvec3*Phi113[ijk]*Pi23[ijk] +
+       Power(nvec2,2)*Phi122[ijk]*Pi23[ijk] +
+       Power(nvec3,2)*Phi133[ijk]*Pi23[ijk] +
+       2*nvec0*Phi101[ijk]*(invh12*Phi223[ijk] + invh13*Phi323[ijk] +
           nvec1*Pi23[ijk]) + 2*Phi123[ijk]*
-        (-gamma2 + invh11*nvec0*Phi101[ijk] + invh12*nvec0*Phi102[ijk] + 
-          invh13*nvec0*Phi103[ijk] + invh11*nvec1*Phi111[ijk] + 
-          invh12*nvec1*Phi112[ijk] + invh11*nvec2*Phi112[ijk] + 
-          invh13*nvec1*Phi113[ijk] + invh11*nvec3*Phi113[ijk] + 
-          invh12*nvec2*Phi122[ijk] + invh13*nvec3*Phi133[ijk] + 
-          invh23*nvec2*Phi223[ijk] + invh22*nvec3*Phi223[ijk] + 
-          invh33*nvec2*Phi323[ijk] + invh23*nvec3*Phi323[ijk] + 
+        (-gamma2 + invh11*nvec0*Phi101[ijk] + invh12*nvec0*Phi102[ijk] +
+          invh13*nvec0*Phi103[ijk] + invh11*nvec1*Phi111[ijk] +
+          invh12*nvec1*Phi112[ijk] + invh11*nvec2*Phi112[ijk] +
+          invh13*nvec1*Phi113[ijk] + invh11*nvec3*Phi113[ijk] +
+          invh12*nvec2*Phi122[ijk] + invh13*nvec3*Phi133[ijk] +
+          invh23*nvec2*Phi223[ijk] + invh22*nvec3*Phi223[ijk] +
+          invh33*nvec2*Phi323[ijk] + invh23*nvec3*Phi323[ijk] +
           nvec2*nvec3*Pi23[ijk])))/2.
 ;
 
 dtPhi133[ijk]
 =
 -(interior*AdPhi133[ijk]) + (alpha[ijk]*
-     (2*invh13*nvec3*Power(Phi133[ijk],2) + 
-       2*invh22*nvec0*Phi102[ijk]*Phi233[ijk] + 
-       2*invh23*nvec0*Phi103[ijk]*Phi233[ijk] + 
-       2*invh12*nvec1*Phi111[ijk]*Phi233[ijk] + 
-       2*invh22*nvec1*Phi112[ijk]*Phi233[ijk] + 
-       2*invh12*nvec2*Phi112[ijk]*Phi233[ijk] + 
-       2*invh23*nvec1*Phi113[ijk]*Phi233[ijk] + 
-       2*invh12*nvec3*Phi113[ijk]*Phi233[ijk] + 
-       2*invh22*nvec2*Phi122[ijk]*Phi233[ijk] + 
-       2*invh23*nvec2*Phi123[ijk]*Phi233[ijk] + 
-       2*invh22*nvec3*Phi123[ijk]*Phi233[ijk] + 
-       2*invh23*nvec0*Phi102[ijk]*Phi333[ijk] + 
-       2*invh33*nvec0*Phi103[ijk]*Phi333[ijk] + 
-       2*invh13*nvec1*Phi111[ijk]*Phi333[ijk] + 
-       2*invh23*nvec1*Phi112[ijk]*Phi333[ijk] + 
-       2*invh13*nvec2*Phi112[ijk]*Phi333[ijk] + 
-       2*invh33*nvec1*Phi113[ijk]*Phi333[ijk] + 
-       2*invh13*nvec3*Phi113[ijk]*Phi333[ijk] + 
-       2*invh23*nvec2*Phi122[ijk]*Phi333[ijk] + 
-       2*invh33*nvec2*Phi123[ijk]*Phi333[ijk] + 
-       2*invh23*nvec3*Phi123[ijk]*Phi333[ijk] + 
-       Power(nvec0,2)*Phi100[ijk]*Pi33[ijk] + 
-       2*nvec0*nvec2*Phi102[ijk]*Pi33[ijk] + 
-       2*nvec0*nvec3*Phi103[ijk]*Pi33[ijk] + 
-       Power(nvec1,2)*Phi111[ijk]*Pi33[ijk] + 
-       2*nvec1*nvec2*Phi112[ijk]*Pi33[ijk] + 
-       2*nvec1*nvec3*Phi113[ijk]*Pi33[ijk] + 
-       Power(nvec2,2)*Phi122[ijk]*Pi33[ijk] + 
-       2*nvec2*nvec3*Phi123[ijk]*Pi33[ijk] + 
-       2*nvec0*Phi101[ijk]*(invh12*Phi233[ijk] + invh13*Phi333[ijk] + 
+     (2*invh13*nvec3*Power(Phi133[ijk],2) +
+       2*invh22*nvec0*Phi102[ijk]*Phi233[ijk] +
+       2*invh23*nvec0*Phi103[ijk]*Phi233[ijk] +
+       2*invh12*nvec1*Phi111[ijk]*Phi233[ijk] +
+       2*invh22*nvec1*Phi112[ijk]*Phi233[ijk] +
+       2*invh12*nvec2*Phi112[ijk]*Phi233[ijk] +
+       2*invh23*nvec1*Phi113[ijk]*Phi233[ijk] +
+       2*invh12*nvec3*Phi113[ijk]*Phi233[ijk] +
+       2*invh22*nvec2*Phi122[ijk]*Phi233[ijk] +
+       2*invh23*nvec2*Phi123[ijk]*Phi233[ijk] +
+       2*invh22*nvec3*Phi123[ijk]*Phi233[ijk] +
+       2*invh23*nvec0*Phi102[ijk]*Phi333[ijk] +
+       2*invh33*nvec0*Phi103[ijk]*Phi333[ijk] +
+       2*invh13*nvec1*Phi111[ijk]*Phi333[ijk] +
+       2*invh23*nvec1*Phi112[ijk]*Phi333[ijk] +
+       2*invh13*nvec2*Phi112[ijk]*Phi333[ijk] +
+       2*invh33*nvec1*Phi113[ijk]*Phi333[ijk] +
+       2*invh13*nvec3*Phi113[ijk]*Phi333[ijk] +
+       2*invh23*nvec2*Phi122[ijk]*Phi333[ijk] +
+       2*invh33*nvec2*Phi123[ijk]*Phi333[ijk] +
+       2*invh23*nvec3*Phi123[ijk]*Phi333[ijk] +
+       Power(nvec0,2)*Phi100[ijk]*Pi33[ijk] +
+       2*nvec0*nvec2*Phi102[ijk]*Pi33[ijk] +
+       2*nvec0*nvec3*Phi103[ijk]*Pi33[ijk] +
+       Power(nvec1,2)*Phi111[ijk]*Pi33[ijk] +
+       2*nvec1*nvec2*Phi112[ijk]*Pi33[ijk] +
+       2*nvec1*nvec3*Phi113[ijk]*Pi33[ijk] +
+       Power(nvec2,2)*Phi122[ijk]*Pi33[ijk] +
+       2*nvec2*nvec3*Phi123[ijk]*Pi33[ijk] +
+       2*nvec0*Phi101[ijk]*(invh12*Phi233[ijk] + invh13*Phi333[ijk] +
           nvec1*Pi33[ijk]) + Phi133[ijk]*
-        (-2*gamma2 + 2*invh11*nvec0*Phi101[ijk] + 
-          2*invh12*nvec0*Phi102[ijk] + 2*invh13*nvec0*Phi103[ijk] + 
-          2*invh11*nvec1*Phi111[ijk] + 2*invh12*nvec1*Phi112[ijk] + 
-          2*invh11*nvec2*Phi112[ijk] + 2*invh13*nvec1*Phi113[ijk] + 
-          2*invh11*nvec3*Phi113[ijk] + 2*invh12*nvec2*Phi122[ijk] + 
-          2*invh13*nvec2*Phi123[ijk] + 2*invh12*nvec3*Phi123[ijk] + 
-          2*invh23*nvec3*Phi233[ijk] + 2*invh33*nvec3*Phi333[ijk] + 
+        (-2*gamma2 + 2*invh11*nvec0*Phi101[ijk] +
+          2*invh12*nvec0*Phi102[ijk] + 2*invh13*nvec0*Phi103[ijk] +
+          2*invh11*nvec1*Phi111[ijk] + 2*invh12*nvec1*Phi112[ijk] +
+          2*invh11*nvec2*Phi112[ijk] + 2*invh13*nvec1*Phi113[ijk] +
+          2*invh11*nvec3*Phi113[ijk] + 2*invh12*nvec2*Phi122[ijk] +
+          2*invh13*nvec2*Phi123[ijk] + 2*invh12*nvec3*Phi123[ijk] +
+          2*invh23*nvec3*Phi233[ijk] + 2*invh33*nvec3*Phi333[ijk] +
           Power(nvec3,2)*Pi33[ijk])))/2.
 ;
 
 dtPhi200[ijk]
 =
 -(interior*AdPhi200[ijk]) + (alpha[ijk]*
-     (2*Phi100[ijk]*(invh11*nvec0*Phi201[ijk] + invh12*nvec0*Phi202[ijk] + 
-          invh13*nvec0*Phi203[ijk] + invh11*nvec1*Phi211[ijk] + 
-          invh12*nvec1*Phi212[ijk] + invh11*nvec2*Phi212[ijk] + 
-          invh13*nvec1*Phi213[ijk] + invh11*nvec3*Phi213[ijk] + 
-          invh12*nvec2*Phi222[ijk] + invh13*nvec2*Phi223[ijk] + 
-          invh12*nvec3*Phi223[ijk] + invh13*nvec3*Phi233[ijk]) + 
-       2*invh13*nvec0*Phi201[ijk]*Phi300[ijk] + 
-       2*invh23*nvec0*Phi202[ijk]*Phi300[ijk] + 
-       2*invh33*nvec0*Phi203[ijk]*Phi300[ijk] + 
-       2*invh13*nvec1*Phi211[ijk]*Phi300[ijk] + 
-       2*invh23*nvec1*Phi212[ijk]*Phi300[ijk] + 
-       2*invh13*nvec2*Phi212[ijk]*Phi300[ijk] + 
-       2*invh33*nvec1*Phi213[ijk]*Phi300[ijk] + 
-       2*invh13*nvec3*Phi213[ijk]*Phi300[ijk] + 
-       2*invh23*nvec2*Phi222[ijk]*Phi300[ijk] + 
-       2*invh33*nvec2*Phi223[ijk]*Phi300[ijk] + 
-       2*invh23*nvec3*Phi223[ijk]*Phi300[ijk] + 
-       2*invh33*nvec3*Phi233[ijk]*Phi300[ijk] + 
-       2*nvec0*nvec1*Phi201[ijk]*Pi00[ijk] + 
-       2*nvec0*nvec2*Phi202[ijk]*Pi00[ijk] + 
-       2*nvec0*nvec3*Phi203[ijk]*Pi00[ijk] + 
-       Power(nvec1,2)*Phi211[ijk]*Pi00[ijk] + 
-       2*nvec1*nvec2*Phi212[ijk]*Pi00[ijk] + 
-       2*nvec1*nvec3*Phi213[ijk]*Pi00[ijk] + 
-       Power(nvec2,2)*Phi222[ijk]*Pi00[ijk] + 
-       2*nvec2*nvec3*Phi223[ijk]*Pi00[ijk] + 
-       Power(nvec3,2)*Phi233[ijk]*Pi00[ijk] + 
-       Phi200[ijk]*(-2*gamma2 + 2*invh12*nvec0*Phi201[ijk] + 
-          2*invh22*nvec0*Phi202[ijk] + 2*invh23*nvec0*Phi203[ijk] + 
-          2*invh12*nvec1*Phi211[ijk] + 2*invh22*nvec1*Phi212[ijk] + 
-          2*invh12*nvec2*Phi212[ijk] + 2*invh23*nvec1*Phi213[ijk] + 
-          2*invh12*nvec3*Phi213[ijk] + 2*invh22*nvec2*Phi222[ijk] + 
-          2*invh23*nvec2*Phi223[ijk] + 2*invh22*nvec3*Phi223[ijk] + 
+     (2*Phi100[ijk]*(invh11*nvec0*Phi201[ijk] + invh12*nvec0*Phi202[ijk] +
+          invh13*nvec0*Phi203[ijk] + invh11*nvec1*Phi211[ijk] +
+          invh12*nvec1*Phi212[ijk] + invh11*nvec2*Phi212[ijk] +
+          invh13*nvec1*Phi213[ijk] + invh11*nvec3*Phi213[ijk] +
+          invh12*nvec2*Phi222[ijk] + invh13*nvec2*Phi223[ijk] +
+          invh12*nvec3*Phi223[ijk] + invh13*nvec3*Phi233[ijk]) +
+       2*invh13*nvec0*Phi201[ijk]*Phi300[ijk] +
+       2*invh23*nvec0*Phi202[ijk]*Phi300[ijk] +
+       2*invh33*nvec0*Phi203[ijk]*Phi300[ijk] +
+       2*invh13*nvec1*Phi211[ijk]*Phi300[ijk] +
+       2*invh23*nvec1*Phi212[ijk]*Phi300[ijk] +
+       2*invh13*nvec2*Phi212[ijk]*Phi300[ijk] +
+       2*invh33*nvec1*Phi213[ijk]*Phi300[ijk] +
+       2*invh13*nvec3*Phi213[ijk]*Phi300[ijk] +
+       2*invh23*nvec2*Phi222[ijk]*Phi300[ijk] +
+       2*invh33*nvec2*Phi223[ijk]*Phi300[ijk] +
+       2*invh23*nvec3*Phi223[ijk]*Phi300[ijk] +
+       2*invh33*nvec3*Phi233[ijk]*Phi300[ijk] +
+       2*nvec0*nvec1*Phi201[ijk]*Pi00[ijk] +
+       2*nvec0*nvec2*Phi202[ijk]*Pi00[ijk] +
+       2*nvec0*nvec3*Phi203[ijk]*Pi00[ijk] +
+       Power(nvec1,2)*Phi211[ijk]*Pi00[ijk] +
+       2*nvec1*nvec2*Phi212[ijk]*Pi00[ijk] +
+       2*nvec1*nvec3*Phi213[ijk]*Pi00[ijk] +
+       Power(nvec2,2)*Phi222[ijk]*Pi00[ijk] +
+       2*nvec2*nvec3*Phi223[ijk]*Pi00[ijk] +
+       Power(nvec3,2)*Phi233[ijk]*Pi00[ijk] +
+       Phi200[ijk]*(-2*gamma2 + 2*invh12*nvec0*Phi201[ijk] +
+          2*invh22*nvec0*Phi202[ijk] + 2*invh23*nvec0*Phi203[ijk] +
+          2*invh12*nvec1*Phi211[ijk] + 2*invh22*nvec1*Phi212[ijk] +
+          2*invh12*nvec2*Phi212[ijk] + 2*invh23*nvec1*Phi213[ijk] +
+          2*invh12*nvec3*Phi213[ijk] + 2*invh22*nvec2*Phi222[ijk] +
+          2*invh23*nvec2*Phi223[ijk] + 2*invh22*nvec3*Phi223[ijk] +
           2*invh23*nvec3*Phi233[ijk] + Power(nvec0,2)*Pi00[ijk])))/2.
 ;
 
 dtPhi201[ijk]
 =
 -(interior*AdPhi201[ijk]) + (alpha[ijk]*
-     (2*invh12*nvec0*Power(Phi201[ijk],2) + 
-       2*Phi101[ijk]*(invh12*nvec0*Phi202[ijk] + 
-          invh13*nvec0*Phi203[ijk] + invh11*nvec1*Phi211[ijk] + 
-          invh12*nvec1*Phi212[ijk] + invh11*nvec2*Phi212[ijk] + 
-          invh13*nvec1*Phi213[ijk] + invh11*nvec3*Phi213[ijk] + 
-          invh12*nvec2*Phi222[ijk] + invh13*nvec2*Phi223[ijk] + 
-          invh12*nvec3*Phi223[ijk] + invh13*nvec3*Phi233[ijk]) + 
-       2*invh23*nvec0*Phi202[ijk]*Phi301[ijk] + 
-       2*invh33*nvec0*Phi203[ijk]*Phi301[ijk] + 
-       2*invh13*nvec1*Phi211[ijk]*Phi301[ijk] + 
-       2*invh23*nvec1*Phi212[ijk]*Phi301[ijk] + 
-       2*invh13*nvec2*Phi212[ijk]*Phi301[ijk] + 
-       2*invh33*nvec1*Phi213[ijk]*Phi301[ijk] + 
-       2*invh13*nvec3*Phi213[ijk]*Phi301[ijk] + 
-       2*invh23*nvec2*Phi222[ijk]*Phi301[ijk] + 
-       2*invh33*nvec2*Phi223[ijk]*Phi301[ijk] + 
-       2*invh23*nvec3*Phi223[ijk]*Phi301[ijk] + 
-       2*invh33*nvec3*Phi233[ijk]*Phi301[ijk] + 
-       Power(nvec0,2)*Phi200[ijk]*Pi01[ijk] + 
-       2*nvec0*nvec2*Phi202[ijk]*Pi01[ijk] + 
-       2*nvec0*nvec3*Phi203[ijk]*Pi01[ijk] + 
-       Power(nvec1,2)*Phi211[ijk]*Pi01[ijk] + 
-       2*nvec1*nvec2*Phi212[ijk]*Pi01[ijk] + 
-       2*nvec1*nvec3*Phi213[ijk]*Pi01[ijk] + 
-       Power(nvec2,2)*Phi222[ijk]*Pi01[ijk] + 
-       2*nvec2*nvec3*Phi223[ijk]*Pi01[ijk] + 
-       Power(nvec3,2)*Phi233[ijk]*Pi01[ijk] + 
-       2*Phi201[ijk]*(-gamma2 + invh11*nvec0*Phi101[ijk] + 
-          invh22*nvec0*Phi202[ijk] + invh23*nvec0*Phi203[ijk] + 
-          invh12*nvec1*Phi211[ijk] + invh22*nvec1*Phi212[ijk] + 
-          invh12*nvec2*Phi212[ijk] + invh23*nvec1*Phi213[ijk] + 
-          invh12*nvec3*Phi213[ijk] + invh22*nvec2*Phi222[ijk] + 
-          invh23*nvec2*Phi223[ijk] + invh22*nvec3*Phi223[ijk] + 
-          invh23*nvec3*Phi233[ijk] + invh13*nvec0*Phi301[ijk] + 
+     (2*invh12*nvec0*Power(Phi201[ijk],2) +
+       2*Phi101[ijk]*(invh12*nvec0*Phi202[ijk] +
+          invh13*nvec0*Phi203[ijk] + invh11*nvec1*Phi211[ijk] +
+          invh12*nvec1*Phi212[ijk] + invh11*nvec2*Phi212[ijk] +
+          invh13*nvec1*Phi213[ijk] + invh11*nvec3*Phi213[ijk] +
+          invh12*nvec2*Phi222[ijk] + invh13*nvec2*Phi223[ijk] +
+          invh12*nvec3*Phi223[ijk] + invh13*nvec3*Phi233[ijk]) +
+       2*invh23*nvec0*Phi202[ijk]*Phi301[ijk] +
+       2*invh33*nvec0*Phi203[ijk]*Phi301[ijk] +
+       2*invh13*nvec1*Phi211[ijk]*Phi301[ijk] +
+       2*invh23*nvec1*Phi212[ijk]*Phi301[ijk] +
+       2*invh13*nvec2*Phi212[ijk]*Phi301[ijk] +
+       2*invh33*nvec1*Phi213[ijk]*Phi301[ijk] +
+       2*invh13*nvec3*Phi213[ijk]*Phi301[ijk] +
+       2*invh23*nvec2*Phi222[ijk]*Phi301[ijk] +
+       2*invh33*nvec2*Phi223[ijk]*Phi301[ijk] +
+       2*invh23*nvec3*Phi223[ijk]*Phi301[ijk] +
+       2*invh33*nvec3*Phi233[ijk]*Phi301[ijk] +
+       Power(nvec0,2)*Phi200[ijk]*Pi01[ijk] +
+       2*nvec0*nvec2*Phi202[ijk]*Pi01[ijk] +
+       2*nvec0*nvec3*Phi203[ijk]*Pi01[ijk] +
+       Power(nvec1,2)*Phi211[ijk]*Pi01[ijk] +
+       2*nvec1*nvec2*Phi212[ijk]*Pi01[ijk] +
+       2*nvec1*nvec3*Phi213[ijk]*Pi01[ijk] +
+       Power(nvec2,2)*Phi222[ijk]*Pi01[ijk] +
+       2*nvec2*nvec3*Phi223[ijk]*Pi01[ijk] +
+       Power(nvec3,2)*Phi233[ijk]*Pi01[ijk] +
+       2*Phi201[ijk]*(-gamma2 + invh11*nvec0*Phi101[ijk] +
+          invh22*nvec0*Phi202[ijk] + invh23*nvec0*Phi203[ijk] +
+          invh12*nvec1*Phi211[ijk] + invh22*nvec1*Phi212[ijk] +
+          invh12*nvec2*Phi212[ijk] + invh23*nvec1*Phi213[ijk] +
+          invh12*nvec3*Phi213[ijk] + invh22*nvec2*Phi222[ijk] +
+          invh23*nvec2*Phi223[ijk] + invh22*nvec3*Phi223[ijk] +
+          invh23*nvec3*Phi233[ijk] + invh13*nvec0*Phi301[ijk] +
           nvec0*nvec1*Pi01[ijk])))/2.
 ;
 
 dtPhi202[ijk]
 =
 -(interior*AdPhi202[ijk]) + (alpha[ijk]*
-     (2*invh22*nvec0*Power(Phi202[ijk],2) + 
-       2*Phi102[ijk]*(invh11*nvec0*Phi201[ijk] + 
-          invh12*nvec0*Phi202[ijk] + invh13*nvec0*Phi203[ijk] + 
-          invh11*nvec1*Phi211[ijk] + invh12*nvec1*Phi212[ijk] + 
-          invh11*nvec2*Phi212[ijk] + invh13*nvec1*Phi213[ijk] + 
-          invh11*nvec3*Phi213[ijk] + invh12*nvec2*Phi222[ijk] + 
-          invh13*nvec2*Phi223[ijk] + invh12*nvec3*Phi223[ijk] + 
-          invh13*nvec3*Phi233[ijk]) + 
-       2*invh13*nvec0*Phi201[ijk]*Phi302[ijk] + 
-       2*invh33*nvec0*Phi203[ijk]*Phi302[ijk] + 
-       2*invh13*nvec1*Phi211[ijk]*Phi302[ijk] + 
-       2*invh23*nvec1*Phi212[ijk]*Phi302[ijk] + 
-       2*invh13*nvec2*Phi212[ijk]*Phi302[ijk] + 
-       2*invh33*nvec1*Phi213[ijk]*Phi302[ijk] + 
-       2*invh13*nvec3*Phi213[ijk]*Phi302[ijk] + 
-       2*invh23*nvec2*Phi222[ijk]*Phi302[ijk] + 
-       2*invh33*nvec2*Phi223[ijk]*Phi302[ijk] + 
-       2*invh23*nvec3*Phi223[ijk]*Phi302[ijk] + 
-       2*invh33*nvec3*Phi233[ijk]*Phi302[ijk] + 
-       Power(nvec0,2)*Phi200[ijk]*Pi02[ijk] + 
-       2*nvec0*nvec1*Phi201[ijk]*Pi02[ijk] + 
-       2*nvec0*nvec3*Phi203[ijk]*Pi02[ijk] + 
-       Power(nvec1,2)*Phi211[ijk]*Pi02[ijk] + 
-       2*nvec1*nvec2*Phi212[ijk]*Pi02[ijk] + 
-       2*nvec1*nvec3*Phi213[ijk]*Pi02[ijk] + 
-       Power(nvec2,2)*Phi222[ijk]*Pi02[ijk] + 
-       2*nvec2*nvec3*Phi223[ijk]*Pi02[ijk] + 
-       Power(nvec3,2)*Phi233[ijk]*Pi02[ijk] + 
-       2*Phi202[ijk]*(-gamma2 + invh12*nvec0*Phi201[ijk] + 
-          invh23*nvec0*Phi203[ijk] + invh12*nvec1*Phi211[ijk] + 
-          invh22*nvec1*Phi212[ijk] + invh12*nvec2*Phi212[ijk] + 
-          invh23*nvec1*Phi213[ijk] + invh12*nvec3*Phi213[ijk] + 
-          invh22*nvec2*Phi222[ijk] + invh23*nvec2*Phi223[ijk] + 
-          invh22*nvec3*Phi223[ijk] + invh23*nvec3*Phi233[ijk] + 
+     (2*invh22*nvec0*Power(Phi202[ijk],2) +
+       2*Phi102[ijk]*(invh11*nvec0*Phi201[ijk] +
+          invh12*nvec0*Phi202[ijk] + invh13*nvec0*Phi203[ijk] +
+          invh11*nvec1*Phi211[ijk] + invh12*nvec1*Phi212[ijk] +
+          invh11*nvec2*Phi212[ijk] + invh13*nvec1*Phi213[ijk] +
+          invh11*nvec3*Phi213[ijk] + invh12*nvec2*Phi222[ijk] +
+          invh13*nvec2*Phi223[ijk] + invh12*nvec3*Phi223[ijk] +
+          invh13*nvec3*Phi233[ijk]) +
+       2*invh13*nvec0*Phi201[ijk]*Phi302[ijk] +
+       2*invh33*nvec0*Phi203[ijk]*Phi302[ijk] +
+       2*invh13*nvec1*Phi211[ijk]*Phi302[ijk] +
+       2*invh23*nvec1*Phi212[ijk]*Phi302[ijk] +
+       2*invh13*nvec2*Phi212[ijk]*Phi302[ijk] +
+       2*invh33*nvec1*Phi213[ijk]*Phi302[ijk] +
+       2*invh13*nvec3*Phi213[ijk]*Phi302[ijk] +
+       2*invh23*nvec2*Phi222[ijk]*Phi302[ijk] +
+       2*invh33*nvec2*Phi223[ijk]*Phi302[ijk] +
+       2*invh23*nvec3*Phi223[ijk]*Phi302[ijk] +
+       2*invh33*nvec3*Phi233[ijk]*Phi302[ijk] +
+       Power(nvec0,2)*Phi200[ijk]*Pi02[ijk] +
+       2*nvec0*nvec1*Phi201[ijk]*Pi02[ijk] +
+       2*nvec0*nvec3*Phi203[ijk]*Pi02[ijk] +
+       Power(nvec1,2)*Phi211[ijk]*Pi02[ijk] +
+       2*nvec1*nvec2*Phi212[ijk]*Pi02[ijk] +
+       2*nvec1*nvec3*Phi213[ijk]*Pi02[ijk] +
+       Power(nvec2,2)*Phi222[ijk]*Pi02[ijk] +
+       2*nvec2*nvec3*Phi223[ijk]*Pi02[ijk] +
+       Power(nvec3,2)*Phi233[ijk]*Pi02[ijk] +
+       2*Phi202[ijk]*(-gamma2 + invh12*nvec0*Phi201[ijk] +
+          invh23*nvec0*Phi203[ijk] + invh12*nvec1*Phi211[ijk] +
+          invh22*nvec1*Phi212[ijk] + invh12*nvec2*Phi212[ijk] +
+          invh23*nvec1*Phi213[ijk] + invh12*nvec3*Phi213[ijk] +
+          invh22*nvec2*Phi222[ijk] + invh23*nvec2*Phi223[ijk] +
+          invh22*nvec3*Phi223[ijk] + invh23*nvec3*Phi233[ijk] +
           invh23*nvec0*Phi302[ijk] + nvec0*nvec2*Pi02[ijk])))/2.
 ;
 
 dtPhi203[ijk]
 =
 -(interior*AdPhi203[ijk]) + (alpha[ijk]*
-     (2*invh23*nvec0*Power(Phi203[ijk],2) + 
-       2*Phi103[ijk]*(invh11*nvec0*Phi201[ijk] + 
-          invh12*nvec0*Phi202[ijk] + invh13*nvec0*Phi203[ijk] + 
-          invh11*nvec1*Phi211[ijk] + invh12*nvec1*Phi212[ijk] + 
-          invh11*nvec2*Phi212[ijk] + invh13*nvec1*Phi213[ijk] + 
-          invh11*nvec3*Phi213[ijk] + invh12*nvec2*Phi222[ijk] + 
-          invh13*nvec2*Phi223[ijk] + invh12*nvec3*Phi223[ijk] + 
-          invh13*nvec3*Phi233[ijk]) + 
-       2*invh13*nvec0*Phi201[ijk]*Phi303[ijk] + 
-       2*invh23*nvec0*Phi202[ijk]*Phi303[ijk] + 
-       2*invh13*nvec1*Phi211[ijk]*Phi303[ijk] + 
-       2*invh23*nvec1*Phi212[ijk]*Phi303[ijk] + 
-       2*invh13*nvec2*Phi212[ijk]*Phi303[ijk] + 
-       2*invh33*nvec1*Phi213[ijk]*Phi303[ijk] + 
-       2*invh13*nvec3*Phi213[ijk]*Phi303[ijk] + 
-       2*invh23*nvec2*Phi222[ijk]*Phi303[ijk] + 
-       2*invh33*nvec2*Phi223[ijk]*Phi303[ijk] + 
-       2*invh23*nvec3*Phi223[ijk]*Phi303[ijk] + 
-       2*invh33*nvec3*Phi233[ijk]*Phi303[ijk] + 
-       Power(nvec0,2)*Phi200[ijk]*Pi03[ijk] + 
-       2*nvec0*nvec1*Phi201[ijk]*Pi03[ijk] + 
-       2*nvec0*nvec2*Phi202[ijk]*Pi03[ijk] + 
-       Power(nvec1,2)*Phi211[ijk]*Pi03[ijk] + 
-       2*nvec1*nvec2*Phi212[ijk]*Pi03[ijk] + 
-       2*nvec1*nvec3*Phi213[ijk]*Pi03[ijk] + 
-       Power(nvec2,2)*Phi222[ijk]*Pi03[ijk] + 
-       2*nvec2*nvec3*Phi223[ijk]*Pi03[ijk] + 
-       Power(nvec3,2)*Phi233[ijk]*Pi03[ijk] + 
-       2*Phi203[ijk]*(-gamma2 + invh12*nvec0*Phi201[ijk] + 
-          invh22*nvec0*Phi202[ijk] + invh12*nvec1*Phi211[ijk] + 
-          invh22*nvec1*Phi212[ijk] + invh12*nvec2*Phi212[ijk] + 
-          invh23*nvec1*Phi213[ijk] + invh12*nvec3*Phi213[ijk] + 
-          invh22*nvec2*Phi222[ijk] + invh23*nvec2*Phi223[ijk] + 
-          invh22*nvec3*Phi223[ijk] + invh23*nvec3*Phi233[ijk] + 
+     (2*invh23*nvec0*Power(Phi203[ijk],2) +
+       2*Phi103[ijk]*(invh11*nvec0*Phi201[ijk] +
+          invh12*nvec0*Phi202[ijk] + invh13*nvec0*Phi203[ijk] +
+          invh11*nvec1*Phi211[ijk] + invh12*nvec1*Phi212[ijk] +
+          invh11*nvec2*Phi212[ijk] + invh13*nvec1*Phi213[ijk] +
+          invh11*nvec3*Phi213[ijk] + invh12*nvec2*Phi222[ijk] +
+          invh13*nvec2*Phi223[ijk] + invh12*nvec3*Phi223[ijk] +
+          invh13*nvec3*Phi233[ijk]) +
+       2*invh13*nvec0*Phi201[ijk]*Phi303[ijk] +
+       2*invh23*nvec0*Phi202[ijk]*Phi303[ijk] +
+       2*invh13*nvec1*Phi211[ijk]*Phi303[ijk] +
+       2*invh23*nvec1*Phi212[ijk]*Phi303[ijk] +
+       2*invh13*nvec2*Phi212[ijk]*Phi303[ijk] +
+       2*invh33*nvec1*Phi213[ijk]*Phi303[ijk] +
+       2*invh13*nvec3*Phi213[ijk]*Phi303[ijk] +
+       2*invh23*nvec2*Phi222[ijk]*Phi303[ijk] +
+       2*invh33*nvec2*Phi223[ijk]*Phi303[ijk] +
+       2*invh23*nvec3*Phi223[ijk]*Phi303[ijk] +
+       2*invh33*nvec3*Phi233[ijk]*Phi303[ijk] +
+       Power(nvec0,2)*Phi200[ijk]*Pi03[ijk] +
+       2*nvec0*nvec1*Phi201[ijk]*Pi03[ijk] +
+       2*nvec0*nvec2*Phi202[ijk]*Pi03[ijk] +
+       Power(nvec1,2)*Phi211[ijk]*Pi03[ijk] +
+       2*nvec1*nvec2*Phi212[ijk]*Pi03[ijk] +
+       2*nvec1*nvec3*Phi213[ijk]*Pi03[ijk] +
+       Power(nvec2,2)*Phi222[ijk]*Pi03[ijk] +
+       2*nvec2*nvec3*Phi223[ijk]*Pi03[ijk] +
+       Power(nvec3,2)*Phi233[ijk]*Pi03[ijk] +
+       2*Phi203[ijk]*(-gamma2 + invh12*nvec0*Phi201[ijk] +
+          invh22*nvec0*Phi202[ijk] + invh12*nvec1*Phi211[ijk] +
+          invh22*nvec1*Phi212[ijk] + invh12*nvec2*Phi212[ijk] +
+          invh23*nvec1*Phi213[ijk] + invh12*nvec3*Phi213[ijk] +
+          invh22*nvec2*Phi222[ijk] + invh23*nvec2*Phi223[ijk] +
+          invh22*nvec3*Phi223[ijk] + invh23*nvec3*Phi233[ijk] +
           invh33*nvec0*Phi303[ijk] + nvec0*nvec3*Pi03[ijk])))/2.
 ;
 
 dtPhi211[ijk]
 =
 -(interior*AdPhi211[ijk]) + (alpha[ijk]*
-     (2*invh12*nvec1*Power(Phi211[ijk],2) + 
-       2*Phi111[ijk]*(invh11*nvec0*Phi201[ijk] + 
-          invh12*nvec0*Phi202[ijk] + invh13*nvec0*Phi203[ijk] + 
-          invh11*nvec1*Phi211[ijk] + invh12*nvec1*Phi212[ijk] + 
-          invh11*nvec2*Phi212[ijk] + invh13*nvec1*Phi213[ijk] + 
-          invh11*nvec3*Phi213[ijk] + invh12*nvec2*Phi222[ijk] + 
-          invh13*nvec2*Phi223[ijk] + invh12*nvec3*Phi223[ijk] + 
-          invh13*nvec3*Phi233[ijk]) + 
-       2*invh13*nvec0*Phi201[ijk]*Phi311[ijk] + 
-       2*invh23*nvec0*Phi202[ijk]*Phi311[ijk] + 
-       2*invh33*nvec0*Phi203[ijk]*Phi311[ijk] + 
-       2*invh23*nvec1*Phi212[ijk]*Phi311[ijk] + 
-       2*invh13*nvec2*Phi212[ijk]*Phi311[ijk] + 
-       2*invh33*nvec1*Phi213[ijk]*Phi311[ijk] + 
-       2*invh13*nvec3*Phi213[ijk]*Phi311[ijk] + 
-       2*invh23*nvec2*Phi222[ijk]*Phi311[ijk] + 
-       2*invh33*nvec2*Phi223[ijk]*Phi311[ijk] + 
-       2*invh23*nvec3*Phi223[ijk]*Phi311[ijk] + 
-       2*invh33*nvec3*Phi233[ijk]*Phi311[ijk] + 
-       Power(nvec0,2)*Phi200[ijk]*Pi11[ijk] + 
-       2*nvec0*nvec1*Phi201[ijk]*Pi11[ijk] + 
-       2*nvec0*nvec2*Phi202[ijk]*Pi11[ijk] + 
-       2*nvec0*nvec3*Phi203[ijk]*Pi11[ijk] + 
-       2*nvec1*nvec2*Phi212[ijk]*Pi11[ijk] + 
-       2*nvec1*nvec3*Phi213[ijk]*Pi11[ijk] + 
-       Power(nvec2,2)*Phi222[ijk]*Pi11[ijk] + 
-       2*nvec2*nvec3*Phi223[ijk]*Pi11[ijk] + 
-       Power(nvec3,2)*Phi233[ijk]*Pi11[ijk] + 
-       Phi211[ijk]*(-2*gamma2 + 2*invh12*nvec0*Phi201[ijk] + 
-          2*invh22*nvec0*Phi202[ijk] + 2*invh23*nvec0*Phi203[ijk] + 
-          2*invh22*nvec1*Phi212[ijk] + 2*invh12*nvec2*Phi212[ijk] + 
-          2*invh23*nvec1*Phi213[ijk] + 2*invh12*nvec3*Phi213[ijk] + 
-          2*invh22*nvec2*Phi222[ijk] + 2*invh23*nvec2*Phi223[ijk] + 
-          2*invh22*nvec3*Phi223[ijk] + 2*invh23*nvec3*Phi233[ijk] + 
+     (2*invh12*nvec1*Power(Phi211[ijk],2) +
+       2*Phi111[ijk]*(invh11*nvec0*Phi201[ijk] +
+          invh12*nvec0*Phi202[ijk] + invh13*nvec0*Phi203[ijk] +
+          invh11*nvec1*Phi211[ijk] + invh12*nvec1*Phi212[ijk] +
+          invh11*nvec2*Phi212[ijk] + invh13*nvec1*Phi213[ijk] +
+          invh11*nvec3*Phi213[ijk] + invh12*nvec2*Phi222[ijk] +
+          invh13*nvec2*Phi223[ijk] + invh12*nvec3*Phi223[ijk] +
+          invh13*nvec3*Phi233[ijk]) +
+       2*invh13*nvec0*Phi201[ijk]*Phi311[ijk] +
+       2*invh23*nvec0*Phi202[ijk]*Phi311[ijk] +
+       2*invh33*nvec0*Phi203[ijk]*Phi311[ijk] +
+       2*invh23*nvec1*Phi212[ijk]*Phi311[ijk] +
+       2*invh13*nvec2*Phi212[ijk]*Phi311[ijk] +
+       2*invh33*nvec1*Phi213[ijk]*Phi311[ijk] +
+       2*invh13*nvec3*Phi213[ijk]*Phi311[ijk] +
+       2*invh23*nvec2*Phi222[ijk]*Phi311[ijk] +
+       2*invh33*nvec2*Phi223[ijk]*Phi311[ijk] +
+       2*invh23*nvec3*Phi223[ijk]*Phi311[ijk] +
+       2*invh33*nvec3*Phi233[ijk]*Phi311[ijk] +
+       Power(nvec0,2)*Phi200[ijk]*Pi11[ijk] +
+       2*nvec0*nvec1*Phi201[ijk]*Pi11[ijk] +
+       2*nvec0*nvec2*Phi202[ijk]*Pi11[ijk] +
+       2*nvec0*nvec3*Phi203[ijk]*Pi11[ijk] +
+       2*nvec1*nvec2*Phi212[ijk]*Pi11[ijk] +
+       2*nvec1*nvec3*Phi213[ijk]*Pi11[ijk] +
+       Power(nvec2,2)*Phi222[ijk]*Pi11[ijk] +
+       2*nvec2*nvec3*Phi223[ijk]*Pi11[ijk] +
+       Power(nvec3,2)*Phi233[ijk]*Pi11[ijk] +
+       Phi211[ijk]*(-2*gamma2 + 2*invh12*nvec0*Phi201[ijk] +
+          2*invh22*nvec0*Phi202[ijk] + 2*invh23*nvec0*Phi203[ijk] +
+          2*invh22*nvec1*Phi212[ijk] + 2*invh12*nvec2*Phi212[ijk] +
+          2*invh23*nvec1*Phi213[ijk] + 2*invh12*nvec3*Phi213[ijk] +
+          2*invh22*nvec2*Phi222[ijk] + 2*invh23*nvec2*Phi223[ijk] +
+          2*invh22*nvec3*Phi223[ijk] + 2*invh23*nvec3*Phi233[ijk] +
           2*invh13*nvec1*Phi311[ijk] + Power(nvec1,2)*Pi11[ijk])))/2.
 ;
 
 dtPhi212[ijk]
 =
 -(interior*AdPhi212[ijk]) + (alpha[ijk]*
-     (2*(invh22*nvec1 + invh12*nvec2)*Power(Phi212[ijk],2) + 
-       2*Phi112[ijk]*(invh11*nvec0*Phi201[ijk] + 
-          invh12*nvec0*Phi202[ijk] + invh13*nvec0*Phi203[ijk] + 
-          invh11*nvec1*Phi211[ijk] + invh12*nvec1*Phi212[ijk] + 
-          invh11*nvec2*Phi212[ijk] + invh13*nvec1*Phi213[ijk] + 
-          invh11*nvec3*Phi213[ijk] + invh12*nvec2*Phi222[ijk] + 
-          invh13*nvec2*Phi223[ijk] + invh12*nvec3*Phi223[ijk] + 
-          invh13*nvec3*Phi233[ijk]) + 
-       2*invh13*nvec0*Phi201[ijk]*Phi312[ijk] + 
-       2*invh23*nvec0*Phi202[ijk]*Phi312[ijk] + 
-       2*invh33*nvec0*Phi203[ijk]*Phi312[ijk] + 
-       2*invh13*nvec1*Phi211[ijk]*Phi312[ijk] + 
-       2*invh33*nvec1*Phi213[ijk]*Phi312[ijk] + 
-       2*invh13*nvec3*Phi213[ijk]*Phi312[ijk] + 
-       2*invh23*nvec2*Phi222[ijk]*Phi312[ijk] + 
-       2*invh33*nvec2*Phi223[ijk]*Phi312[ijk] + 
-       2*invh23*nvec3*Phi223[ijk]*Phi312[ijk] + 
-       2*invh33*nvec3*Phi233[ijk]*Phi312[ijk] + 
-       Power(nvec0,2)*Phi200[ijk]*Pi12[ijk] + 
-       2*nvec0*nvec1*Phi201[ijk]*Pi12[ijk] + 
-       2*nvec0*nvec2*Phi202[ijk]*Pi12[ijk] + 
-       2*nvec0*nvec3*Phi203[ijk]*Pi12[ijk] + 
-       Power(nvec1,2)*Phi211[ijk]*Pi12[ijk] + 
-       2*nvec1*nvec3*Phi213[ijk]*Pi12[ijk] + 
-       Power(nvec2,2)*Phi222[ijk]*Pi12[ijk] + 
-       2*nvec2*nvec3*Phi223[ijk]*Pi12[ijk] + 
-       Power(nvec3,2)*Phi233[ijk]*Pi12[ijk] + 
-       2*Phi212[ijk]*(-gamma2 + invh12*nvec0*Phi201[ijk] + 
-          invh22*nvec0*Phi202[ijk] + invh23*nvec0*Phi203[ijk] + 
-          invh12*nvec1*Phi211[ijk] + invh23*nvec1*Phi213[ijk] + 
-          invh12*nvec3*Phi213[ijk] + invh22*nvec2*Phi222[ijk] + 
-          invh23*nvec2*Phi223[ijk] + invh22*nvec3*Phi223[ijk] + 
-          invh23*nvec3*Phi233[ijk] + invh23*nvec1*Phi312[ijk] + 
+     (2*(invh22*nvec1 + invh12*nvec2)*Power(Phi212[ijk],2) +
+       2*Phi112[ijk]*(invh11*nvec0*Phi201[ijk] +
+          invh12*nvec0*Phi202[ijk] + invh13*nvec0*Phi203[ijk] +
+          invh11*nvec1*Phi211[ijk] + invh12*nvec1*Phi212[ijk] +
+          invh11*nvec2*Phi212[ijk] + invh13*nvec1*Phi213[ijk] +
+          invh11*nvec3*Phi213[ijk] + invh12*nvec2*Phi222[ijk] +
+          invh13*nvec2*Phi223[ijk] + invh12*nvec3*Phi223[ijk] +
+          invh13*nvec3*Phi233[ijk]) +
+       2*invh13*nvec0*Phi201[ijk]*Phi312[ijk] +
+       2*invh23*nvec0*Phi202[ijk]*Phi312[ijk] +
+       2*invh33*nvec0*Phi203[ijk]*Phi312[ijk] +
+       2*invh13*nvec1*Phi211[ijk]*Phi312[ijk] +
+       2*invh33*nvec1*Phi213[ijk]*Phi312[ijk] +
+       2*invh13*nvec3*Phi213[ijk]*Phi312[ijk] +
+       2*invh23*nvec2*Phi222[ijk]*Phi312[ijk] +
+       2*invh33*nvec2*Phi223[ijk]*Phi312[ijk] +
+       2*invh23*nvec3*Phi223[ijk]*Phi312[ijk] +
+       2*invh33*nvec3*Phi233[ijk]*Phi312[ijk] +
+       Power(nvec0,2)*Phi200[ijk]*Pi12[ijk] +
+       2*nvec0*nvec1*Phi201[ijk]*Pi12[ijk] +
+       2*nvec0*nvec2*Phi202[ijk]*Pi12[ijk] +
+       2*nvec0*nvec3*Phi203[ijk]*Pi12[ijk] +
+       Power(nvec1,2)*Phi211[ijk]*Pi12[ijk] +
+       2*nvec1*nvec3*Phi213[ijk]*Pi12[ijk] +
+       Power(nvec2,2)*Phi222[ijk]*Pi12[ijk] +
+       2*nvec2*nvec3*Phi223[ijk]*Pi12[ijk] +
+       Power(nvec3,2)*Phi233[ijk]*Pi12[ijk] +
+       2*Phi212[ijk]*(-gamma2 + invh12*nvec0*Phi201[ijk] +
+          invh22*nvec0*Phi202[ijk] + invh23*nvec0*Phi203[ijk] +
+          invh12*nvec1*Phi211[ijk] + invh23*nvec1*Phi213[ijk] +
+          invh12*nvec3*Phi213[ijk] + invh22*nvec2*Phi222[ijk] +
+          invh23*nvec2*Phi223[ijk] + invh22*nvec3*Phi223[ijk] +
+          invh23*nvec3*Phi233[ijk] + invh23*nvec1*Phi312[ijk] +
           invh13*nvec2*Phi312[ijk] + nvec1*nvec2*Pi12[ijk])))/2.
 ;
 
 dtPhi213[ijk]
 =
 -(interior*AdPhi213[ijk]) + (alpha[ijk]*
-     (2*(invh23*nvec1 + invh12*nvec3)*Power(Phi213[ijk],2) + 
-       2*Phi113[ijk]*(invh11*nvec0*Phi201[ijk] + 
-          invh12*nvec0*Phi202[ijk] + invh13*nvec0*Phi203[ijk] + 
-          invh11*nvec1*Phi211[ijk] + invh12*nvec1*Phi212[ijk] + 
-          invh11*nvec2*Phi212[ijk] + invh13*nvec1*Phi213[ijk] + 
-          invh11*nvec3*Phi213[ijk] + invh12*nvec2*Phi222[ijk] + 
-          invh13*nvec2*Phi223[ijk] + invh12*nvec3*Phi223[ijk] + 
-          invh13*nvec3*Phi233[ijk]) + 
-       2*invh13*nvec0*Phi201[ijk]*Phi313[ijk] + 
-       2*invh23*nvec0*Phi202[ijk]*Phi313[ijk] + 
-       2*invh33*nvec0*Phi203[ijk]*Phi313[ijk] + 
-       2*invh13*nvec1*Phi211[ijk]*Phi313[ijk] + 
-       2*invh23*nvec1*Phi212[ijk]*Phi313[ijk] + 
-       2*invh13*nvec2*Phi212[ijk]*Phi313[ijk] + 
-       2*invh23*nvec2*Phi222[ijk]*Phi313[ijk] + 
-       2*invh33*nvec2*Phi223[ijk]*Phi313[ijk] + 
-       2*invh23*nvec3*Phi223[ijk]*Phi313[ijk] + 
-       2*invh33*nvec3*Phi233[ijk]*Phi313[ijk] + 
-       Power(nvec0,2)*Phi200[ijk]*Pi13[ijk] + 
-       2*nvec0*nvec1*Phi201[ijk]*Pi13[ijk] + 
-       2*nvec0*nvec2*Phi202[ijk]*Pi13[ijk] + 
-       2*nvec0*nvec3*Phi203[ijk]*Pi13[ijk] + 
-       Power(nvec1,2)*Phi211[ijk]*Pi13[ijk] + 
-       2*nvec1*nvec2*Phi212[ijk]*Pi13[ijk] + 
-       Power(nvec2,2)*Phi222[ijk]*Pi13[ijk] + 
-       2*nvec2*nvec3*Phi223[ijk]*Pi13[ijk] + 
-       Power(nvec3,2)*Phi233[ijk]*Pi13[ijk] + 
-       2*Phi213[ijk]*(-gamma2 + invh12*nvec0*Phi201[ijk] + 
-          invh22*nvec0*Phi202[ijk] + invh23*nvec0*Phi203[ijk] + 
-          invh12*nvec1*Phi211[ijk] + invh22*nvec1*Phi212[ijk] + 
-          invh12*nvec2*Phi212[ijk] + invh22*nvec2*Phi222[ijk] + 
-          invh23*nvec2*Phi223[ijk] + invh22*nvec3*Phi223[ijk] + 
-          invh23*nvec3*Phi233[ijk] + invh33*nvec1*Phi313[ijk] + 
+     (2*(invh23*nvec1 + invh12*nvec3)*Power(Phi213[ijk],2) +
+       2*Phi113[ijk]*(invh11*nvec0*Phi201[ijk] +
+          invh12*nvec0*Phi202[ijk] + invh13*nvec0*Phi203[ijk] +
+          invh11*nvec1*Phi211[ijk] + invh12*nvec1*Phi212[ijk] +
+          invh11*nvec2*Phi212[ijk] + invh13*nvec1*Phi213[ijk] +
+          invh11*nvec3*Phi213[ijk] + invh12*nvec2*Phi222[ijk] +
+          invh13*nvec2*Phi223[ijk] + invh12*nvec3*Phi223[ijk] +
+          invh13*nvec3*Phi233[ijk]) +
+       2*invh13*nvec0*Phi201[ijk]*Phi313[ijk] +
+       2*invh23*nvec0*Phi202[ijk]*Phi313[ijk] +
+       2*invh33*nvec0*Phi203[ijk]*Phi313[ijk] +
+       2*invh13*nvec1*Phi211[ijk]*Phi313[ijk] +
+       2*invh23*nvec1*Phi212[ijk]*Phi313[ijk] +
+       2*invh13*nvec2*Phi212[ijk]*Phi313[ijk] +
+       2*invh23*nvec2*Phi222[ijk]*Phi313[ijk] +
+       2*invh33*nvec2*Phi223[ijk]*Phi313[ijk] +
+       2*invh23*nvec3*Phi223[ijk]*Phi313[ijk] +
+       2*invh33*nvec3*Phi233[ijk]*Phi313[ijk] +
+       Power(nvec0,2)*Phi200[ijk]*Pi13[ijk] +
+       2*nvec0*nvec1*Phi201[ijk]*Pi13[ijk] +
+       2*nvec0*nvec2*Phi202[ijk]*Pi13[ijk] +
+       2*nvec0*nvec3*Phi203[ijk]*Pi13[ijk] +
+       Power(nvec1,2)*Phi211[ijk]*Pi13[ijk] +
+       2*nvec1*nvec2*Phi212[ijk]*Pi13[ijk] +
+       Power(nvec2,2)*Phi222[ijk]*Pi13[ijk] +
+       2*nvec2*nvec3*Phi223[ijk]*Pi13[ijk] +
+       Power(nvec3,2)*Phi233[ijk]*Pi13[ijk] +
+       2*Phi213[ijk]*(-gamma2 + invh12*nvec0*Phi201[ijk] +
+          invh22*nvec0*Phi202[ijk] + invh23*nvec0*Phi203[ijk] +
+          invh12*nvec1*Phi211[ijk] + invh22*nvec1*Phi212[ijk] +
+          invh12*nvec2*Phi212[ijk] + invh22*nvec2*Phi222[ijk] +
+          invh23*nvec2*Phi223[ijk] + invh22*nvec3*Phi223[ijk] +
+          invh23*nvec3*Phi233[ijk] + invh33*nvec1*Phi313[ijk] +
           invh13*nvec3*Phi313[ijk] + nvec1*nvec3*Pi13[ijk])))/2.
 ;
 
 dtPhi222[ijk]
 =
 -(interior*AdPhi222[ijk]) + (alpha[ijk]*
-     (2*invh22*nvec2*Power(Phi222[ijk],2) + 
-       2*Phi122[ijk]*(invh11*nvec0*Phi201[ijk] + 
-          invh12*nvec0*Phi202[ijk] + invh13*nvec0*Phi203[ijk] + 
-          invh11*nvec1*Phi211[ijk] + invh12*nvec1*Phi212[ijk] + 
-          invh11*nvec2*Phi212[ijk] + invh13*nvec1*Phi213[ijk] + 
-          invh11*nvec3*Phi213[ijk] + invh12*nvec2*Phi222[ijk] + 
-          invh13*nvec2*Phi223[ijk] + invh12*nvec3*Phi223[ijk] + 
-          invh13*nvec3*Phi233[ijk]) + 
-       2*invh13*nvec0*Phi201[ijk]*Phi322[ijk] + 
-       2*invh23*nvec0*Phi202[ijk]*Phi322[ijk] + 
-       2*invh33*nvec0*Phi203[ijk]*Phi322[ijk] + 
-       2*invh13*nvec1*Phi211[ijk]*Phi322[ijk] + 
-       2*invh23*nvec1*Phi212[ijk]*Phi322[ijk] + 
-       2*invh13*nvec2*Phi212[ijk]*Phi322[ijk] + 
-       2*invh33*nvec1*Phi213[ijk]*Phi322[ijk] + 
-       2*invh13*nvec3*Phi213[ijk]*Phi322[ijk] + 
-       2*invh33*nvec2*Phi223[ijk]*Phi322[ijk] + 
-       2*invh23*nvec3*Phi223[ijk]*Phi322[ijk] + 
-       2*invh33*nvec3*Phi233[ijk]*Phi322[ijk] + 
-       Power(nvec0,2)*Phi200[ijk]*Pi22[ijk] + 
-       2*nvec0*nvec1*Phi201[ijk]*Pi22[ijk] + 
-       2*nvec0*nvec2*Phi202[ijk]*Pi22[ijk] + 
-       2*nvec0*nvec3*Phi203[ijk]*Pi22[ijk] + 
-       Power(nvec1,2)*Phi211[ijk]*Pi22[ijk] + 
-       2*nvec1*nvec2*Phi212[ijk]*Pi22[ijk] + 
-       2*nvec1*nvec3*Phi213[ijk]*Pi22[ijk] + 
-       2*nvec2*nvec3*Phi223[ijk]*Pi22[ijk] + 
-       Power(nvec3,2)*Phi233[ijk]*Pi22[ijk] + 
-       Phi222[ijk]*(-2*gamma2 + 2*invh12*nvec0*Phi201[ijk] + 
-          2*invh22*nvec0*Phi202[ijk] + 2*invh23*nvec0*Phi203[ijk] + 
-          2*invh12*nvec1*Phi211[ijk] + 2*invh22*nvec1*Phi212[ijk] + 
-          2*invh12*nvec2*Phi212[ijk] + 2*invh23*nvec1*Phi213[ijk] + 
-          2*invh12*nvec3*Phi213[ijk] + 2*invh23*nvec2*Phi223[ijk] + 
-          2*invh22*nvec3*Phi223[ijk] + 2*invh23*nvec3*Phi233[ijk] + 
+     (2*invh22*nvec2*Power(Phi222[ijk],2) +
+       2*Phi122[ijk]*(invh11*nvec0*Phi201[ijk] +
+          invh12*nvec0*Phi202[ijk] + invh13*nvec0*Phi203[ijk] +
+          invh11*nvec1*Phi211[ijk] + invh12*nvec1*Phi212[ijk] +
+          invh11*nvec2*Phi212[ijk] + invh13*nvec1*Phi213[ijk] +
+          invh11*nvec3*Phi213[ijk] + invh12*nvec2*Phi222[ijk] +
+          invh13*nvec2*Phi223[ijk] + invh12*nvec3*Phi223[ijk] +
+          invh13*nvec3*Phi233[ijk]) +
+       2*invh13*nvec0*Phi201[ijk]*Phi322[ijk] +
+       2*invh23*nvec0*Phi202[ijk]*Phi322[ijk] +
+       2*invh33*nvec0*Phi203[ijk]*Phi322[ijk] +
+       2*invh13*nvec1*Phi211[ijk]*Phi322[ijk] +
+       2*invh23*nvec1*Phi212[ijk]*Phi322[ijk] +
+       2*invh13*nvec2*Phi212[ijk]*Phi322[ijk] +
+       2*invh33*nvec1*Phi213[ijk]*Phi322[ijk] +
+       2*invh13*nvec3*Phi213[ijk]*Phi322[ijk] +
+       2*invh33*nvec2*Phi223[ijk]*Phi322[ijk] +
+       2*invh23*nvec3*Phi223[ijk]*Phi322[ijk] +
+       2*invh33*nvec3*Phi233[ijk]*Phi322[ijk] +
+       Power(nvec0,2)*Phi200[ijk]*Pi22[ijk] +
+       2*nvec0*nvec1*Phi201[ijk]*Pi22[ijk] +
+       2*nvec0*nvec2*Phi202[ijk]*Pi22[ijk] +
+       2*nvec0*nvec3*Phi203[ijk]*Pi22[ijk] +
+       Power(nvec1,2)*Phi211[ijk]*Pi22[ijk] +
+       2*nvec1*nvec2*Phi212[ijk]*Pi22[ijk] +
+       2*nvec1*nvec3*Phi213[ijk]*Pi22[ijk] +
+       2*nvec2*nvec3*Phi223[ijk]*Pi22[ijk] +
+       Power(nvec3,2)*Phi233[ijk]*Pi22[ijk] +
+       Phi222[ijk]*(-2*gamma2 + 2*invh12*nvec0*Phi201[ijk] +
+          2*invh22*nvec0*Phi202[ijk] + 2*invh23*nvec0*Phi203[ijk] +
+          2*invh12*nvec1*Phi211[ijk] + 2*invh22*nvec1*Phi212[ijk] +
+          2*invh12*nvec2*Phi212[ijk] + 2*invh23*nvec1*Phi213[ijk] +
+          2*invh12*nvec3*Phi213[ijk] + 2*invh23*nvec2*Phi223[ijk] +
+          2*invh22*nvec3*Phi223[ijk] + 2*invh23*nvec3*Phi233[ijk] +
           2*invh23*nvec2*Phi322[ijk] + Power(nvec2,2)*Pi22[ijk])))/2.
 ;
 
 dtPhi223[ijk]
 =
 -(interior*AdPhi223[ijk]) + (alpha[ijk]*
-     (2*(invh23*nvec2 + invh22*nvec3)*Power(Phi223[ijk],2) + 
-       2*Phi123[ijk]*(invh11*nvec0*Phi201[ijk] + 
-          invh12*nvec0*Phi202[ijk] + invh13*nvec0*Phi203[ijk] + 
-          invh11*nvec1*Phi211[ijk] + invh12*nvec1*Phi212[ijk] + 
-          invh11*nvec2*Phi212[ijk] + invh13*nvec1*Phi213[ijk] + 
-          invh11*nvec3*Phi213[ijk] + invh12*nvec2*Phi222[ijk] + 
-          invh13*nvec2*Phi223[ijk] + invh12*nvec3*Phi223[ijk] + 
-          invh13*nvec3*Phi233[ijk]) + 
-       2*invh13*nvec0*Phi201[ijk]*Phi323[ijk] + 
-       2*invh23*nvec0*Phi202[ijk]*Phi323[ijk] + 
-       2*invh33*nvec0*Phi203[ijk]*Phi323[ijk] + 
-       2*invh13*nvec1*Phi211[ijk]*Phi323[ijk] + 
-       2*invh23*nvec1*Phi212[ijk]*Phi323[ijk] + 
-       2*invh13*nvec2*Phi212[ijk]*Phi323[ijk] + 
-       2*invh33*nvec1*Phi213[ijk]*Phi323[ijk] + 
-       2*invh13*nvec3*Phi213[ijk]*Phi323[ijk] + 
-       2*invh23*nvec2*Phi222[ijk]*Phi323[ijk] + 
-       2*invh33*nvec3*Phi233[ijk]*Phi323[ijk] + 
-       Power(nvec0,2)*Phi200[ijk]*Pi23[ijk] + 
-       2*nvec0*nvec1*Phi201[ijk]*Pi23[ijk] + 
-       2*nvec0*nvec2*Phi202[ijk]*Pi23[ijk] + 
-       2*nvec0*nvec3*Phi203[ijk]*Pi23[ijk] + 
-       Power(nvec1,2)*Phi211[ijk]*Pi23[ijk] + 
-       2*nvec1*nvec2*Phi212[ijk]*Pi23[ijk] + 
-       2*nvec1*nvec3*Phi213[ijk]*Pi23[ijk] + 
-       Power(nvec2,2)*Phi222[ijk]*Pi23[ijk] + 
-       Power(nvec3,2)*Phi233[ijk]*Pi23[ijk] + 
-       2*Phi223[ijk]*(-gamma2 + invh12*nvec0*Phi201[ijk] + 
-          invh22*nvec0*Phi202[ijk] + invh23*nvec0*Phi203[ijk] + 
-          invh12*nvec1*Phi211[ijk] + invh22*nvec1*Phi212[ijk] + 
-          invh12*nvec2*Phi212[ijk] + invh23*nvec1*Phi213[ijk] + 
-          invh12*nvec3*Phi213[ijk] + invh22*nvec2*Phi222[ijk] + 
-          invh23*nvec3*Phi233[ijk] + invh33*nvec2*Phi323[ijk] + 
+     (2*(invh23*nvec2 + invh22*nvec3)*Power(Phi223[ijk],2) +
+       2*Phi123[ijk]*(invh11*nvec0*Phi201[ijk] +
+          invh12*nvec0*Phi202[ijk] + invh13*nvec0*Phi203[ijk] +
+          invh11*nvec1*Phi211[ijk] + invh12*nvec1*Phi212[ijk] +
+          invh11*nvec2*Phi212[ijk] + invh13*nvec1*Phi213[ijk] +
+          invh11*nvec3*Phi213[ijk] + invh12*nvec2*Phi222[ijk] +
+          invh13*nvec2*Phi223[ijk] + invh12*nvec3*Phi223[ijk] +
+          invh13*nvec3*Phi233[ijk]) +
+       2*invh13*nvec0*Phi201[ijk]*Phi323[ijk] +
+       2*invh23*nvec0*Phi202[ijk]*Phi323[ijk] +
+       2*invh33*nvec0*Phi203[ijk]*Phi323[ijk] +
+       2*invh13*nvec1*Phi211[ijk]*Phi323[ijk] +
+       2*invh23*nvec1*Phi212[ijk]*Phi323[ijk] +
+       2*invh13*nvec2*Phi212[ijk]*Phi323[ijk] +
+       2*invh33*nvec1*Phi213[ijk]*Phi323[ijk] +
+       2*invh13*nvec3*Phi213[ijk]*Phi323[ijk] +
+       2*invh23*nvec2*Phi222[ijk]*Phi323[ijk] +
+       2*invh33*nvec3*Phi233[ijk]*Phi323[ijk] +
+       Power(nvec0,2)*Phi200[ijk]*Pi23[ijk] +
+       2*nvec0*nvec1*Phi201[ijk]*Pi23[ijk] +
+       2*nvec0*nvec2*Phi202[ijk]*Pi23[ijk] +
+       2*nvec0*nvec3*Phi203[ijk]*Pi23[ijk] +
+       Power(nvec1,2)*Phi211[ijk]*Pi23[ijk] +
+       2*nvec1*nvec2*Phi212[ijk]*Pi23[ijk] +
+       2*nvec1*nvec3*Phi213[ijk]*Pi23[ijk] +
+       Power(nvec2,2)*Phi222[ijk]*Pi23[ijk] +
+       Power(nvec3,2)*Phi233[ijk]*Pi23[ijk] +
+       2*Phi223[ijk]*(-gamma2 + invh12*nvec0*Phi201[ijk] +
+          invh22*nvec0*Phi202[ijk] + invh23*nvec0*Phi203[ijk] +
+          invh12*nvec1*Phi211[ijk] + invh22*nvec1*Phi212[ijk] +
+          invh12*nvec2*Phi212[ijk] + invh23*nvec1*Phi213[ijk] +
+          invh12*nvec3*Phi213[ijk] + invh22*nvec2*Phi222[ijk] +
+          invh23*nvec3*Phi233[ijk] + invh33*nvec2*Phi323[ijk] +
           invh23*nvec3*Phi323[ijk] + nvec2*nvec3*Pi23[ijk])))/2.
 ;
 
 dtPhi233[ijk]
 =
 -(interior*AdPhi233[ijk]) + (alpha[ijk]*
-     (2*invh23*nvec3*Power(Phi233[ijk],2) + 
-       2*Phi133[ijk]*(invh11*nvec0*Phi201[ijk] + 
-          invh12*nvec0*Phi202[ijk] + invh13*nvec0*Phi203[ijk] + 
-          invh11*nvec1*Phi211[ijk] + invh12*nvec1*Phi212[ijk] + 
-          invh11*nvec2*Phi212[ijk] + invh13*nvec1*Phi213[ijk] + 
-          invh11*nvec3*Phi213[ijk] + invh12*nvec2*Phi222[ijk] + 
-          invh13*nvec2*Phi223[ijk] + invh12*nvec3*Phi223[ijk] + 
-          invh13*nvec3*Phi233[ijk]) + 
-       2*invh13*nvec0*Phi201[ijk]*Phi333[ijk] + 
-       2*invh23*nvec0*Phi202[ijk]*Phi333[ijk] + 
-       2*invh33*nvec0*Phi203[ijk]*Phi333[ijk] + 
-       2*invh13*nvec1*Phi211[ijk]*Phi333[ijk] + 
-       2*invh23*nvec1*Phi212[ijk]*Phi333[ijk] + 
-       2*invh13*nvec2*Phi212[ijk]*Phi333[ijk] + 
-       2*invh33*nvec1*Phi213[ijk]*Phi333[ijk] + 
-       2*invh13*nvec3*Phi213[ijk]*Phi333[ijk] + 
-       2*invh23*nvec2*Phi222[ijk]*Phi333[ijk] + 
-       2*invh33*nvec2*Phi223[ijk]*Phi333[ijk] + 
-       2*invh23*nvec3*Phi223[ijk]*Phi333[ijk] + 
-       Power(nvec0,2)*Phi200[ijk]*Pi33[ijk] + 
-       2*nvec0*nvec1*Phi201[ijk]*Pi33[ijk] + 
-       2*nvec0*nvec2*Phi202[ijk]*Pi33[ijk] + 
-       2*nvec0*nvec3*Phi203[ijk]*Pi33[ijk] + 
-       Power(nvec1,2)*Phi211[ijk]*Pi33[ijk] + 
-       2*nvec1*nvec2*Phi212[ijk]*Pi33[ijk] + 
-       2*nvec1*nvec3*Phi213[ijk]*Pi33[ijk] + 
-       Power(nvec2,2)*Phi222[ijk]*Pi33[ijk] + 
-       2*nvec2*nvec3*Phi223[ijk]*Pi33[ijk] + 
-       Phi233[ijk]*(-2*gamma2 + 2*invh12*nvec0*Phi201[ijk] + 
-          2*invh22*nvec0*Phi202[ijk] + 2*invh23*nvec0*Phi203[ijk] + 
-          2*invh12*nvec1*Phi211[ijk] + 2*invh22*nvec1*Phi212[ijk] + 
-          2*invh12*nvec2*Phi212[ijk] + 2*invh23*nvec1*Phi213[ijk] + 
-          2*invh12*nvec3*Phi213[ijk] + 2*invh22*nvec2*Phi222[ijk] + 
-          2*invh23*nvec2*Phi223[ijk] + 2*invh22*nvec3*Phi223[ijk] + 
+     (2*invh23*nvec3*Power(Phi233[ijk],2) +
+       2*Phi133[ijk]*(invh11*nvec0*Phi201[ijk] +
+          invh12*nvec0*Phi202[ijk] + invh13*nvec0*Phi203[ijk] +
+          invh11*nvec1*Phi211[ijk] + invh12*nvec1*Phi212[ijk] +
+          invh11*nvec2*Phi212[ijk] + invh13*nvec1*Phi213[ijk] +
+          invh11*nvec3*Phi213[ijk] + invh12*nvec2*Phi222[ijk] +
+          invh13*nvec2*Phi223[ijk] + invh12*nvec3*Phi223[ijk] +
+          invh13*nvec3*Phi233[ijk]) +
+       2*invh13*nvec0*Phi201[ijk]*Phi333[ijk] +
+       2*invh23*nvec0*Phi202[ijk]*Phi333[ijk] +
+       2*invh33*nvec0*Phi203[ijk]*Phi333[ijk] +
+       2*invh13*nvec1*Phi211[ijk]*Phi333[ijk] +
+       2*invh23*nvec1*Phi212[ijk]*Phi333[ijk] +
+       2*invh13*nvec2*Phi212[ijk]*Phi333[ijk] +
+       2*invh33*nvec1*Phi213[ijk]*Phi333[ijk] +
+       2*invh13*nvec3*Phi213[ijk]*Phi333[ijk] +
+       2*invh23*nvec2*Phi222[ijk]*Phi333[ijk] +
+       2*invh33*nvec2*Phi223[ijk]*Phi333[ijk] +
+       2*invh23*nvec3*Phi223[ijk]*Phi333[ijk] +
+       Power(nvec0,2)*Phi200[ijk]*Pi33[ijk] +
+       2*nvec0*nvec1*Phi201[ijk]*Pi33[ijk] +
+       2*nvec0*nvec2*Phi202[ijk]*Pi33[ijk] +
+       2*nvec0*nvec3*Phi203[ijk]*Pi33[ijk] +
+       Power(nvec1,2)*Phi211[ijk]*Pi33[ijk] +
+       2*nvec1*nvec2*Phi212[ijk]*Pi33[ijk] +
+       2*nvec1*nvec3*Phi213[ijk]*Pi33[ijk] +
+       Power(nvec2,2)*Phi222[ijk]*Pi33[ijk] +
+       2*nvec2*nvec3*Phi223[ijk]*Pi33[ijk] +
+       Phi233[ijk]*(-2*gamma2 + 2*invh12*nvec0*Phi201[ijk] +
+          2*invh22*nvec0*Phi202[ijk] + 2*invh23*nvec0*Phi203[ijk] +
+          2*invh12*nvec1*Phi211[ijk] + 2*invh22*nvec1*Phi212[ijk] +
+          2*invh12*nvec2*Phi212[ijk] + 2*invh23*nvec1*Phi213[ijk] +
+          2*invh12*nvec3*Phi213[ijk] + 2*invh22*nvec2*Phi222[ijk] +
+          2*invh23*nvec2*Phi223[ijk] + 2*invh22*nvec3*Phi223[ijk] +
           2*invh33*nvec3*Phi333[ijk] + Power(nvec3,2)*Pi33[ijk])))/2.
 ;
 
 dtPhi300[ijk]
 =
 -(interior*AdPhi300[ijk]) + (alpha[ijk]*
-     (2*invh12*nvec0*Phi200[ijk]*Phi301[ijk] + 
-       2*invh22*nvec0*Phi200[ijk]*Phi302[ijk] + 
-       2*invh23*nvec0*Phi200[ijk]*Phi303[ijk] + 
-       2*invh12*nvec1*Phi200[ijk]*Phi311[ijk] + 
-       2*invh22*nvec1*Phi200[ijk]*Phi312[ijk] + 
-       2*invh12*nvec2*Phi200[ijk]*Phi312[ijk] + 
-       2*invh23*nvec1*Phi200[ijk]*Phi313[ijk] + 
-       2*invh12*nvec3*Phi200[ijk]*Phi313[ijk] + 
-       2*invh22*nvec2*Phi200[ijk]*Phi322[ijk] + 
-       2*invh23*nvec2*Phi200[ijk]*Phi323[ijk] + 
-       2*invh22*nvec3*Phi200[ijk]*Phi323[ijk] + 
-       2*invh23*nvec3*Phi200[ijk]*Phi333[ijk] + 
-       2*Phi100[ijk]*(invh11*nvec0*Phi301[ijk] + 
-          invh12*nvec0*Phi302[ijk] + invh13*nvec0*Phi303[ijk] + 
-          invh11*nvec1*Phi311[ijk] + invh12*nvec1*Phi312[ijk] + 
-          invh11*nvec2*Phi312[ijk] + invh13*nvec1*Phi313[ijk] + 
-          invh11*nvec3*Phi313[ijk] + invh12*nvec2*Phi322[ijk] + 
-          invh13*nvec2*Phi323[ijk] + invh12*nvec3*Phi323[ijk] + 
-          invh13*nvec3*Phi333[ijk]) + 2*nvec0*nvec1*Phi301[ijk]*Pi00[ijk] + 
-       2*nvec0*nvec2*Phi302[ijk]*Pi00[ijk] + 
-       2*nvec0*nvec3*Phi303[ijk]*Pi00[ijk] + 
-       Power(nvec1,2)*Phi311[ijk]*Pi00[ijk] + 
-       2*nvec1*nvec2*Phi312[ijk]*Pi00[ijk] + 
-       2*nvec1*nvec3*Phi313[ijk]*Pi00[ijk] + 
-       Power(nvec2,2)*Phi322[ijk]*Pi00[ijk] + 
-       2*nvec2*nvec3*Phi323[ijk]*Pi00[ijk] + 
-       Power(nvec3,2)*Phi333[ijk]*Pi00[ijk] + 
-       Phi300[ijk]*(-2*gamma2 + 2*invh13*nvec0*Phi301[ijk] + 
-          2*invh23*nvec0*Phi302[ijk] + 2*invh33*nvec0*Phi303[ijk] + 
-          2*invh13*nvec1*Phi311[ijk] + 2*invh23*nvec1*Phi312[ijk] + 
-          2*invh13*nvec2*Phi312[ijk] + 2*invh33*nvec1*Phi313[ijk] + 
-          2*invh13*nvec3*Phi313[ijk] + 2*invh23*nvec2*Phi322[ijk] + 
-          2*invh33*nvec2*Phi323[ijk] + 2*invh23*nvec3*Phi323[ijk] + 
+     (2*invh12*nvec0*Phi200[ijk]*Phi301[ijk] +
+       2*invh22*nvec0*Phi200[ijk]*Phi302[ijk] +
+       2*invh23*nvec0*Phi200[ijk]*Phi303[ijk] +
+       2*invh12*nvec1*Phi200[ijk]*Phi311[ijk] +
+       2*invh22*nvec1*Phi200[ijk]*Phi312[ijk] +
+       2*invh12*nvec2*Phi200[ijk]*Phi312[ijk] +
+       2*invh23*nvec1*Phi200[ijk]*Phi313[ijk] +
+       2*invh12*nvec3*Phi200[ijk]*Phi313[ijk] +
+       2*invh22*nvec2*Phi200[ijk]*Phi322[ijk] +
+       2*invh23*nvec2*Phi200[ijk]*Phi323[ijk] +
+       2*invh22*nvec3*Phi200[ijk]*Phi323[ijk] +
+       2*invh23*nvec3*Phi200[ijk]*Phi333[ijk] +
+       2*Phi100[ijk]*(invh11*nvec0*Phi301[ijk] +
+          invh12*nvec0*Phi302[ijk] + invh13*nvec0*Phi303[ijk] +
+          invh11*nvec1*Phi311[ijk] + invh12*nvec1*Phi312[ijk] +
+          invh11*nvec2*Phi312[ijk] + invh13*nvec1*Phi313[ijk] +
+          invh11*nvec3*Phi313[ijk] + invh12*nvec2*Phi322[ijk] +
+          invh13*nvec2*Phi323[ijk] + invh12*nvec3*Phi323[ijk] +
+          invh13*nvec3*Phi333[ijk]) + 2*nvec0*nvec1*Phi301[ijk]*Pi00[ijk] +
+       2*nvec0*nvec2*Phi302[ijk]*Pi00[ijk] +
+       2*nvec0*nvec3*Phi303[ijk]*Pi00[ijk] +
+       Power(nvec1,2)*Phi311[ijk]*Pi00[ijk] +
+       2*nvec1*nvec2*Phi312[ijk]*Pi00[ijk] +
+       2*nvec1*nvec3*Phi313[ijk]*Pi00[ijk] +
+       Power(nvec2,2)*Phi322[ijk]*Pi00[ijk] +
+       2*nvec2*nvec3*Phi323[ijk]*Pi00[ijk] +
+       Power(nvec3,2)*Phi333[ijk]*Pi00[ijk] +
+       Phi300[ijk]*(-2*gamma2 + 2*invh13*nvec0*Phi301[ijk] +
+          2*invh23*nvec0*Phi302[ijk] + 2*invh33*nvec0*Phi303[ijk] +
+          2*invh13*nvec1*Phi311[ijk] + 2*invh23*nvec1*Phi312[ijk] +
+          2*invh13*nvec2*Phi312[ijk] + 2*invh33*nvec1*Phi313[ijk] +
+          2*invh13*nvec3*Phi313[ijk] + 2*invh23*nvec2*Phi322[ijk] +
+          2*invh33*nvec2*Phi323[ijk] + 2*invh23*nvec3*Phi323[ijk] +
           2*invh33*nvec3*Phi333[ijk] + Power(nvec0,2)*Pi00[ijk])))/2.
 ;
 
 dtPhi301[ijk]
 =
 -(interior*AdPhi301[ijk]) + (alpha[ijk]*
-     (2*invh13*nvec0*Power(Phi301[ijk],2) + 
-       2*invh22*nvec0*Phi201[ijk]*Phi302[ijk] + 
-       2*invh23*nvec0*Phi201[ijk]*Phi303[ijk] + 
-       2*invh12*nvec1*Phi201[ijk]*Phi311[ijk] + 
-       2*invh22*nvec1*Phi201[ijk]*Phi312[ijk] + 
-       2*invh12*nvec2*Phi201[ijk]*Phi312[ijk] + 
-       2*invh23*nvec1*Phi201[ijk]*Phi313[ijk] + 
-       2*invh12*nvec3*Phi201[ijk]*Phi313[ijk] + 
-       2*invh22*nvec2*Phi201[ijk]*Phi322[ijk] + 
-       2*invh23*nvec2*Phi201[ijk]*Phi323[ijk] + 
-       2*invh22*nvec3*Phi201[ijk]*Phi323[ijk] + 
-       2*invh23*nvec3*Phi201[ijk]*Phi333[ijk] + 
-       2*Phi101[ijk]*(invh12*nvec0*Phi302[ijk] + 
-          invh13*nvec0*Phi303[ijk] + invh11*nvec1*Phi311[ijk] + 
-          invh12*nvec1*Phi312[ijk] + invh11*nvec2*Phi312[ijk] + 
-          invh13*nvec1*Phi313[ijk] + invh11*nvec3*Phi313[ijk] + 
-          invh12*nvec2*Phi322[ijk] + invh13*nvec2*Phi323[ijk] + 
-          invh12*nvec3*Phi323[ijk] + invh13*nvec3*Phi333[ijk]) + 
-       Power(nvec0,2)*Phi300[ijk]*Pi01[ijk] + 
-       2*nvec0*nvec2*Phi302[ijk]*Pi01[ijk] + 
-       2*nvec0*nvec3*Phi303[ijk]*Pi01[ijk] + 
-       Power(nvec1,2)*Phi311[ijk]*Pi01[ijk] + 
-       2*nvec1*nvec2*Phi312[ijk]*Pi01[ijk] + 
-       2*nvec1*nvec3*Phi313[ijk]*Pi01[ijk] + 
-       Power(nvec2,2)*Phi322[ijk]*Pi01[ijk] + 
-       2*nvec2*nvec3*Phi323[ijk]*Pi01[ijk] + 
-       Power(nvec3,2)*Phi333[ijk]*Pi01[ijk] + 
-       2*Phi301[ijk]*(-gamma2 + invh11*nvec0*Phi101[ijk] + 
-          invh12*nvec0*Phi201[ijk] + invh23*nvec0*Phi302[ijk] + 
-          invh33*nvec0*Phi303[ijk] + invh13*nvec1*Phi311[ijk] + 
-          invh23*nvec1*Phi312[ijk] + invh13*nvec2*Phi312[ijk] + 
-          invh33*nvec1*Phi313[ijk] + invh13*nvec3*Phi313[ijk] + 
-          invh23*nvec2*Phi322[ijk] + invh33*nvec2*Phi323[ijk] + 
-          invh23*nvec3*Phi323[ijk] + invh33*nvec3*Phi333[ijk] + 
+     (2*invh13*nvec0*Power(Phi301[ijk],2) +
+       2*invh22*nvec0*Phi201[ijk]*Phi302[ijk] +
+       2*invh23*nvec0*Phi201[ijk]*Phi303[ijk] +
+       2*invh12*nvec1*Phi201[ijk]*Phi311[ijk] +
+       2*invh22*nvec1*Phi201[ijk]*Phi312[ijk] +
+       2*invh12*nvec2*Phi201[ijk]*Phi312[ijk] +
+       2*invh23*nvec1*Phi201[ijk]*Phi313[ijk] +
+       2*invh12*nvec3*Phi201[ijk]*Phi313[ijk] +
+       2*invh22*nvec2*Phi201[ijk]*Phi322[ijk] +
+       2*invh23*nvec2*Phi201[ijk]*Phi323[ijk] +
+       2*invh22*nvec3*Phi201[ijk]*Phi323[ijk] +
+       2*invh23*nvec3*Phi201[ijk]*Phi333[ijk] +
+       2*Phi101[ijk]*(invh12*nvec0*Phi302[ijk] +
+          invh13*nvec0*Phi303[ijk] + invh11*nvec1*Phi311[ijk] +
+          invh12*nvec1*Phi312[ijk] + invh11*nvec2*Phi312[ijk] +
+          invh13*nvec1*Phi313[ijk] + invh11*nvec3*Phi313[ijk] +
+          invh12*nvec2*Phi322[ijk] + invh13*nvec2*Phi323[ijk] +
+          invh12*nvec3*Phi323[ijk] + invh13*nvec3*Phi333[ijk]) +
+       Power(nvec0,2)*Phi300[ijk]*Pi01[ijk] +
+       2*nvec0*nvec2*Phi302[ijk]*Pi01[ijk] +
+       2*nvec0*nvec3*Phi303[ijk]*Pi01[ijk] +
+       Power(nvec1,2)*Phi311[ijk]*Pi01[ijk] +
+       2*nvec1*nvec2*Phi312[ijk]*Pi01[ijk] +
+       2*nvec1*nvec3*Phi313[ijk]*Pi01[ijk] +
+       Power(nvec2,2)*Phi322[ijk]*Pi01[ijk] +
+       2*nvec2*nvec3*Phi323[ijk]*Pi01[ijk] +
+       Power(nvec3,2)*Phi333[ijk]*Pi01[ijk] +
+       2*Phi301[ijk]*(-gamma2 + invh11*nvec0*Phi101[ijk] +
+          invh12*nvec0*Phi201[ijk] + invh23*nvec0*Phi302[ijk] +
+          invh33*nvec0*Phi303[ijk] + invh13*nvec1*Phi311[ijk] +
+          invh23*nvec1*Phi312[ijk] + invh13*nvec2*Phi312[ijk] +
+          invh33*nvec1*Phi313[ijk] + invh13*nvec3*Phi313[ijk] +
+          invh23*nvec2*Phi322[ijk] + invh33*nvec2*Phi323[ijk] +
+          invh23*nvec3*Phi323[ijk] + invh33*nvec3*Phi333[ijk] +
           nvec0*nvec1*Pi01[ijk])))/2.
 ;
 
 dtPhi302[ijk]
 =
 -(interior*AdPhi302[ijk]) + (alpha[ijk]*
-     (-2*gamma2*Phi302[ijk] + 2*invh13*nvec0*Phi301[ijk]*Phi302[ijk] + 
-       2*invh23*nvec0*Power(Phi302[ijk],2) + 
-       2*invh33*nvec0*Phi302[ijk]*Phi303[ijk] + 
-       2*invh13*nvec1*Phi302[ijk]*Phi311[ijk] + 
-       2*invh23*nvec1*Phi302[ijk]*Phi312[ijk] + 
-       2*invh13*nvec2*Phi302[ijk]*Phi312[ijk] + 
-       2*invh33*nvec1*Phi302[ijk]*Phi313[ijk] + 
-       2*invh13*nvec3*Phi302[ijk]*Phi313[ijk] + 
-       2*invh23*nvec2*Phi302[ijk]*Phi322[ijk] + 
-       2*invh33*nvec2*Phi302[ijk]*Phi323[ijk] + 
-       2*invh23*nvec3*Phi302[ijk]*Phi323[ijk] + 
-       2*invh33*nvec3*Phi302[ijk]*Phi333[ijk] + 
-       2*Phi102[ijk]*(invh11*nvec0*Phi301[ijk] + 
-          invh12*nvec0*Phi302[ijk] + invh13*nvec0*Phi303[ijk] + 
-          invh11*nvec1*Phi311[ijk] + invh12*nvec1*Phi312[ijk] + 
-          invh11*nvec2*Phi312[ijk] + invh13*nvec1*Phi313[ijk] + 
-          invh11*nvec3*Phi313[ijk] + invh12*nvec2*Phi322[ijk] + 
-          invh13*nvec2*Phi323[ijk] + invh12*nvec3*Phi323[ijk] + 
-          invh13*nvec3*Phi333[ijk]) + 
-       2*Phi202[ijk]*(invh12*nvec0*Phi301[ijk] + 
-          invh22*nvec0*Phi302[ijk] + invh23*nvec0*Phi303[ijk] + 
-          invh12*nvec1*Phi311[ijk] + invh22*nvec1*Phi312[ijk] + 
-          invh12*nvec2*Phi312[ijk] + invh23*nvec1*Phi313[ijk] + 
-          invh12*nvec3*Phi313[ijk] + invh22*nvec2*Phi322[ijk] + 
-          invh23*nvec2*Phi323[ijk] + invh22*nvec3*Phi323[ijk] + 
-          invh23*nvec3*Phi333[ijk]) + 
-       Power(nvec0,2)*Phi300[ijk]*Pi02[ijk] + 
-       2*nvec0*nvec1*Phi301[ijk]*Pi02[ijk] + 
-       2*nvec0*nvec2*Phi302[ijk]*Pi02[ijk] + 
-       2*nvec0*nvec3*Phi303[ijk]*Pi02[ijk] + 
-       Power(nvec1,2)*Phi311[ijk]*Pi02[ijk] + 
-       2*nvec1*nvec2*Phi312[ijk]*Pi02[ijk] + 
-       2*nvec1*nvec3*Phi313[ijk]*Pi02[ijk] + 
-       Power(nvec2,2)*Phi322[ijk]*Pi02[ijk] + 
-       2*nvec2*nvec3*Phi323[ijk]*Pi02[ijk] + 
+     (-2*gamma2*Phi302[ijk] + 2*invh13*nvec0*Phi301[ijk]*Phi302[ijk] +
+       2*invh23*nvec0*Power(Phi302[ijk],2) +
+       2*invh33*nvec0*Phi302[ijk]*Phi303[ijk] +
+       2*invh13*nvec1*Phi302[ijk]*Phi311[ijk] +
+       2*invh23*nvec1*Phi302[ijk]*Phi312[ijk] +
+       2*invh13*nvec2*Phi302[ijk]*Phi312[ijk] +
+       2*invh33*nvec1*Phi302[ijk]*Phi313[ijk] +
+       2*invh13*nvec3*Phi302[ijk]*Phi313[ijk] +
+       2*invh23*nvec2*Phi302[ijk]*Phi322[ijk] +
+       2*invh33*nvec2*Phi302[ijk]*Phi323[ijk] +
+       2*invh23*nvec3*Phi302[ijk]*Phi323[ijk] +
+       2*invh33*nvec3*Phi302[ijk]*Phi333[ijk] +
+       2*Phi102[ijk]*(invh11*nvec0*Phi301[ijk] +
+          invh12*nvec0*Phi302[ijk] + invh13*nvec0*Phi303[ijk] +
+          invh11*nvec1*Phi311[ijk] + invh12*nvec1*Phi312[ijk] +
+          invh11*nvec2*Phi312[ijk] + invh13*nvec1*Phi313[ijk] +
+          invh11*nvec3*Phi313[ijk] + invh12*nvec2*Phi322[ijk] +
+          invh13*nvec2*Phi323[ijk] + invh12*nvec3*Phi323[ijk] +
+          invh13*nvec3*Phi333[ijk]) +
+       2*Phi202[ijk]*(invh12*nvec0*Phi301[ijk] +
+          invh22*nvec0*Phi302[ijk] + invh23*nvec0*Phi303[ijk] +
+          invh12*nvec1*Phi311[ijk] + invh22*nvec1*Phi312[ijk] +
+          invh12*nvec2*Phi312[ijk] + invh23*nvec1*Phi313[ijk] +
+          invh12*nvec3*Phi313[ijk] + invh22*nvec2*Phi322[ijk] +
+          invh23*nvec2*Phi323[ijk] + invh22*nvec3*Phi323[ijk] +
+          invh23*nvec3*Phi333[ijk]) +
+       Power(nvec0,2)*Phi300[ijk]*Pi02[ijk] +
+       2*nvec0*nvec1*Phi301[ijk]*Pi02[ijk] +
+       2*nvec0*nvec2*Phi302[ijk]*Pi02[ijk] +
+       2*nvec0*nvec3*Phi303[ijk]*Pi02[ijk] +
+       Power(nvec1,2)*Phi311[ijk]*Pi02[ijk] +
+       2*nvec1*nvec2*Phi312[ijk]*Pi02[ijk] +
+       2*nvec1*nvec3*Phi313[ijk]*Pi02[ijk] +
+       Power(nvec2,2)*Phi322[ijk]*Pi02[ijk] +
+       2*nvec2*nvec3*Phi323[ijk]*Pi02[ijk] +
        Power(nvec3,2)*Phi333[ijk]*Pi02[ijk]))/2.
 ;
 
 dtPhi303[ijk]
 =
 -(interior*AdPhi303[ijk]) + (alpha[ijk]*
-     (-2*gamma2*Phi303[ijk] + 2*invh13*nvec0*Phi301[ijk]*Phi303[ijk] + 
-       2*invh23*nvec0*Phi302[ijk]*Phi303[ijk] + 
-       2*invh33*nvec0*Power(Phi303[ijk],2) + 
-       2*invh13*nvec1*Phi303[ijk]*Phi311[ijk] + 
-       2*invh23*nvec1*Phi303[ijk]*Phi312[ijk] + 
-       2*invh13*nvec2*Phi303[ijk]*Phi312[ijk] + 
-       2*invh33*nvec1*Phi303[ijk]*Phi313[ijk] + 
-       2*invh13*nvec3*Phi303[ijk]*Phi313[ijk] + 
-       2*invh23*nvec2*Phi303[ijk]*Phi322[ijk] + 
-       2*invh33*nvec2*Phi303[ijk]*Phi323[ijk] + 
-       2*invh23*nvec3*Phi303[ijk]*Phi323[ijk] + 
-       2*invh33*nvec3*Phi303[ijk]*Phi333[ijk] + 
-       2*Phi103[ijk]*(invh11*nvec0*Phi301[ijk] + 
-          invh12*nvec0*Phi302[ijk] + invh13*nvec0*Phi303[ijk] + 
-          invh11*nvec1*Phi311[ijk] + invh12*nvec1*Phi312[ijk] + 
-          invh11*nvec2*Phi312[ijk] + invh13*nvec1*Phi313[ijk] + 
-          invh11*nvec3*Phi313[ijk] + invh12*nvec2*Phi322[ijk] + 
-          invh13*nvec2*Phi323[ijk] + invh12*nvec3*Phi323[ijk] + 
-          invh13*nvec3*Phi333[ijk]) + 
-       2*Phi203[ijk]*(invh12*nvec0*Phi301[ijk] + 
-          invh22*nvec0*Phi302[ijk] + invh23*nvec0*Phi303[ijk] + 
-          invh12*nvec1*Phi311[ijk] + invh22*nvec1*Phi312[ijk] + 
-          invh12*nvec2*Phi312[ijk] + invh23*nvec1*Phi313[ijk] + 
-          invh12*nvec3*Phi313[ijk] + invh22*nvec2*Phi322[ijk] + 
-          invh23*nvec2*Phi323[ijk] + invh22*nvec3*Phi323[ijk] + 
-          invh23*nvec3*Phi333[ijk]) + 
-       Power(nvec0,2)*Phi300[ijk]*Pi03[ijk] + 
-       2*nvec0*nvec1*Phi301[ijk]*Pi03[ijk] + 
-       2*nvec0*nvec2*Phi302[ijk]*Pi03[ijk] + 
-       2*nvec0*nvec3*Phi303[ijk]*Pi03[ijk] + 
-       Power(nvec1,2)*Phi311[ijk]*Pi03[ijk] + 
-       2*nvec1*nvec2*Phi312[ijk]*Pi03[ijk] + 
-       2*nvec1*nvec3*Phi313[ijk]*Pi03[ijk] + 
-       Power(nvec2,2)*Phi322[ijk]*Pi03[ijk] + 
-       2*nvec2*nvec3*Phi323[ijk]*Pi03[ijk] + 
+     (-2*gamma2*Phi303[ijk] + 2*invh13*nvec0*Phi301[ijk]*Phi303[ijk] +
+       2*invh23*nvec0*Phi302[ijk]*Phi303[ijk] +
+       2*invh33*nvec0*Power(Phi303[ijk],2) +
+       2*invh13*nvec1*Phi303[ijk]*Phi311[ijk] +
+       2*invh23*nvec1*Phi303[ijk]*Phi312[ijk] +
+       2*invh13*nvec2*Phi303[ijk]*Phi312[ijk] +
+       2*invh33*nvec1*Phi303[ijk]*Phi313[ijk] +
+       2*invh13*nvec3*Phi303[ijk]*Phi313[ijk] +
+       2*invh23*nvec2*Phi303[ijk]*Phi322[ijk] +
+       2*invh33*nvec2*Phi303[ijk]*Phi323[ijk] +
+       2*invh23*nvec3*Phi303[ijk]*Phi323[ijk] +
+       2*invh33*nvec3*Phi303[ijk]*Phi333[ijk] +
+       2*Phi103[ijk]*(invh11*nvec0*Phi301[ijk] +
+          invh12*nvec0*Phi302[ijk] + invh13*nvec0*Phi303[ijk] +
+          invh11*nvec1*Phi311[ijk] + invh12*nvec1*Phi312[ijk] +
+          invh11*nvec2*Phi312[ijk] + invh13*nvec1*Phi313[ijk] +
+          invh11*nvec3*Phi313[ijk] + invh12*nvec2*Phi322[ijk] +
+          invh13*nvec2*Phi323[ijk] + invh12*nvec3*Phi323[ijk] +
+          invh13*nvec3*Phi333[ijk]) +
+       2*Phi203[ijk]*(invh12*nvec0*Phi301[ijk] +
+          invh22*nvec0*Phi302[ijk] + invh23*nvec0*Phi303[ijk] +
+          invh12*nvec1*Phi311[ijk] + invh22*nvec1*Phi312[ijk] +
+          invh12*nvec2*Phi312[ijk] + invh23*nvec1*Phi313[ijk] +
+          invh12*nvec3*Phi313[ijk] + invh22*nvec2*Phi322[ijk] +
+          invh23*nvec2*Phi323[ijk] + invh22*nvec3*Phi323[ijk] +
+          invh23*nvec3*Phi333[ijk]) +
+       Power(nvec0,2)*Phi300[ijk]*Pi03[ijk] +
+       2*nvec0*nvec1*Phi301[ijk]*Pi03[ijk] +
+       2*nvec0*nvec2*Phi302[ijk]*Pi03[ijk] +
+       2*nvec0*nvec3*Phi303[ijk]*Pi03[ijk] +
+       Power(nvec1,2)*Phi311[ijk]*Pi03[ijk] +
+       2*nvec1*nvec2*Phi312[ijk]*Pi03[ijk] +
+       2*nvec1*nvec3*Phi313[ijk]*Pi03[ijk] +
+       Power(nvec2,2)*Phi322[ijk]*Pi03[ijk] +
+       2*nvec2*nvec3*Phi323[ijk]*Pi03[ijk] +
        Power(nvec3,2)*Phi333[ijk]*Pi03[ijk]))/2.
 ;
 
 dtPhi311[ijk]
 =
 -(interior*AdPhi311[ijk]) + (alpha[ijk]*
-     (-2*gamma2*Phi311[ijk] + 2*invh13*nvec0*Phi301[ijk]*Phi311[ijk] + 
-       2*invh23*nvec0*Phi302[ijk]*Phi311[ijk] + 
-       2*invh33*nvec0*Phi303[ijk]*Phi311[ijk] + 
-       2*invh13*nvec1*Power(Phi311[ijk],2) + 
-       2*invh23*nvec1*Phi311[ijk]*Phi312[ijk] + 
-       2*invh13*nvec2*Phi311[ijk]*Phi312[ijk] + 
-       2*invh33*nvec1*Phi311[ijk]*Phi313[ijk] + 
-       2*invh13*nvec3*Phi311[ijk]*Phi313[ijk] + 
-       2*invh23*nvec2*Phi311[ijk]*Phi322[ijk] + 
-       2*invh33*nvec2*Phi311[ijk]*Phi323[ijk] + 
-       2*invh23*nvec3*Phi311[ijk]*Phi323[ijk] + 
-       2*invh33*nvec3*Phi311[ijk]*Phi333[ijk] + 
-       2*Phi111[ijk]*(invh11*nvec0*Phi301[ijk] + 
-          invh12*nvec0*Phi302[ijk] + invh13*nvec0*Phi303[ijk] + 
-          invh11*nvec1*Phi311[ijk] + invh12*nvec1*Phi312[ijk] + 
-          invh11*nvec2*Phi312[ijk] + invh13*nvec1*Phi313[ijk] + 
-          invh11*nvec3*Phi313[ijk] + invh12*nvec2*Phi322[ijk] + 
-          invh13*nvec2*Phi323[ijk] + invh12*nvec3*Phi323[ijk] + 
-          invh13*nvec3*Phi333[ijk]) + 
-       2*Phi211[ijk]*(invh12*nvec0*Phi301[ijk] + 
-          invh22*nvec0*Phi302[ijk] + invh23*nvec0*Phi303[ijk] + 
-          invh12*nvec1*Phi311[ijk] + invh22*nvec1*Phi312[ijk] + 
-          invh12*nvec2*Phi312[ijk] + invh23*nvec1*Phi313[ijk] + 
-          invh12*nvec3*Phi313[ijk] + invh22*nvec2*Phi322[ijk] + 
-          invh23*nvec2*Phi323[ijk] + invh22*nvec3*Phi323[ijk] + 
-          invh23*nvec3*Phi333[ijk]) + 
-       Power(nvec0,2)*Phi300[ijk]*Pi11[ijk] + 
-       2*nvec0*nvec1*Phi301[ijk]*Pi11[ijk] + 
-       2*nvec0*nvec2*Phi302[ijk]*Pi11[ijk] + 
-       2*nvec0*nvec3*Phi303[ijk]*Pi11[ijk] + 
-       Power(nvec1,2)*Phi311[ijk]*Pi11[ijk] + 
-       2*nvec1*nvec2*Phi312[ijk]*Pi11[ijk] + 
-       2*nvec1*nvec3*Phi313[ijk]*Pi11[ijk] + 
-       Power(nvec2,2)*Phi322[ijk]*Pi11[ijk] + 
-       2*nvec2*nvec3*Phi323[ijk]*Pi11[ijk] + 
+     (-2*gamma2*Phi311[ijk] + 2*invh13*nvec0*Phi301[ijk]*Phi311[ijk] +
+       2*invh23*nvec0*Phi302[ijk]*Phi311[ijk] +
+       2*invh33*nvec0*Phi303[ijk]*Phi311[ijk] +
+       2*invh13*nvec1*Power(Phi311[ijk],2) +
+       2*invh23*nvec1*Phi311[ijk]*Phi312[ijk] +
+       2*invh13*nvec2*Phi311[ijk]*Phi312[ijk] +
+       2*invh33*nvec1*Phi311[ijk]*Phi313[ijk] +
+       2*invh13*nvec3*Phi311[ijk]*Phi313[ijk] +
+       2*invh23*nvec2*Phi311[ijk]*Phi322[ijk] +
+       2*invh33*nvec2*Phi311[ijk]*Phi323[ijk] +
+       2*invh23*nvec3*Phi311[ijk]*Phi323[ijk] +
+       2*invh33*nvec3*Phi311[ijk]*Phi333[ijk] +
+       2*Phi111[ijk]*(invh11*nvec0*Phi301[ijk] +
+          invh12*nvec0*Phi302[ijk] + invh13*nvec0*Phi303[ijk] +
+          invh11*nvec1*Phi311[ijk] + invh12*nvec1*Phi312[ijk] +
+          invh11*nvec2*Phi312[ijk] + invh13*nvec1*Phi313[ijk] +
+          invh11*nvec3*Phi313[ijk] + invh12*nvec2*Phi322[ijk] +
+          invh13*nvec2*Phi323[ijk] + invh12*nvec3*Phi323[ijk] +
+          invh13*nvec3*Phi333[ijk]) +
+       2*Phi211[ijk]*(invh12*nvec0*Phi301[ijk] +
+          invh22*nvec0*Phi302[ijk] + invh23*nvec0*Phi303[ijk] +
+          invh12*nvec1*Phi311[ijk] + invh22*nvec1*Phi312[ijk] +
+          invh12*nvec2*Phi312[ijk] + invh23*nvec1*Phi313[ijk] +
+          invh12*nvec3*Phi313[ijk] + invh22*nvec2*Phi322[ijk] +
+          invh23*nvec2*Phi323[ijk] + invh22*nvec3*Phi323[ijk] +
+          invh23*nvec3*Phi333[ijk]) +
+       Power(nvec0,2)*Phi300[ijk]*Pi11[ijk] +
+       2*nvec0*nvec1*Phi301[ijk]*Pi11[ijk] +
+       2*nvec0*nvec2*Phi302[ijk]*Pi11[ijk] +
+       2*nvec0*nvec3*Phi303[ijk]*Pi11[ijk] +
+       Power(nvec1,2)*Phi311[ijk]*Pi11[ijk] +
+       2*nvec1*nvec2*Phi312[ijk]*Pi11[ijk] +
+       2*nvec1*nvec3*Phi313[ijk]*Pi11[ijk] +
+       Power(nvec2,2)*Phi322[ijk]*Pi11[ijk] +
+       2*nvec2*nvec3*Phi323[ijk]*Pi11[ijk] +
        Power(nvec3,2)*Phi333[ijk]*Pi11[ijk]))/2.
 ;
 
 dtPhi312[ijk]
 =
 -(interior*AdPhi312[ijk]) + (alpha[ijk]*
-     (-2*gamma2*Phi312[ijk] + 2*invh13*nvec0*Phi301[ijk]*Phi312[ijk] + 
-       2*invh23*nvec0*Phi302[ijk]*Phi312[ijk] + 
-       2*invh33*nvec0*Phi303[ijk]*Phi312[ijk] + 
-       2*invh13*nvec1*Phi311[ijk]*Phi312[ijk] + 
-       2*invh23*nvec1*Power(Phi312[ijk],2) + 
-       2*invh13*nvec2*Power(Phi312[ijk],2) + 
-       2*invh33*nvec1*Phi312[ijk]*Phi313[ijk] + 
-       2*invh13*nvec3*Phi312[ijk]*Phi313[ijk] + 
-       2*invh23*nvec2*Phi312[ijk]*Phi322[ijk] + 
-       2*invh33*nvec2*Phi312[ijk]*Phi323[ijk] + 
-       2*invh23*nvec3*Phi312[ijk]*Phi323[ijk] + 
-       2*invh33*nvec3*Phi312[ijk]*Phi333[ijk] + 
-       2*Phi112[ijk]*(invh11*nvec0*Phi301[ijk] + 
-          invh12*nvec0*Phi302[ijk] + invh13*nvec0*Phi303[ijk] + 
-          invh11*nvec1*Phi311[ijk] + invh12*nvec1*Phi312[ijk] + 
-          invh11*nvec2*Phi312[ijk] + invh13*nvec1*Phi313[ijk] + 
-          invh11*nvec3*Phi313[ijk] + invh12*nvec2*Phi322[ijk] + 
-          invh13*nvec2*Phi323[ijk] + invh12*nvec3*Phi323[ijk] + 
-          invh13*nvec3*Phi333[ijk]) + 
-       2*Phi212[ijk]*(invh12*nvec0*Phi301[ijk] + 
-          invh22*nvec0*Phi302[ijk] + invh23*nvec0*Phi303[ijk] + 
-          invh12*nvec1*Phi311[ijk] + invh22*nvec1*Phi312[ijk] + 
-          invh12*nvec2*Phi312[ijk] + invh23*nvec1*Phi313[ijk] + 
-          invh12*nvec3*Phi313[ijk] + invh22*nvec2*Phi322[ijk] + 
-          invh23*nvec2*Phi323[ijk] + invh22*nvec3*Phi323[ijk] + 
-          invh23*nvec3*Phi333[ijk]) + 
-       Power(nvec0,2)*Phi300[ijk]*Pi12[ijk] + 
-       2*nvec0*nvec1*Phi301[ijk]*Pi12[ijk] + 
-       2*nvec0*nvec2*Phi302[ijk]*Pi12[ijk] + 
-       2*nvec0*nvec3*Phi303[ijk]*Pi12[ijk] + 
-       Power(nvec1,2)*Phi311[ijk]*Pi12[ijk] + 
-       2*nvec1*nvec2*Phi312[ijk]*Pi12[ijk] + 
-       2*nvec1*nvec3*Phi313[ijk]*Pi12[ijk] + 
-       Power(nvec2,2)*Phi322[ijk]*Pi12[ijk] + 
-       2*nvec2*nvec3*Phi323[ijk]*Pi12[ijk] + 
+     (-2*gamma2*Phi312[ijk] + 2*invh13*nvec0*Phi301[ijk]*Phi312[ijk] +
+       2*invh23*nvec0*Phi302[ijk]*Phi312[ijk] +
+       2*invh33*nvec0*Phi303[ijk]*Phi312[ijk] +
+       2*invh13*nvec1*Phi311[ijk]*Phi312[ijk] +
+       2*invh23*nvec1*Power(Phi312[ijk],2) +
+       2*invh13*nvec2*Power(Phi312[ijk],2) +
+       2*invh33*nvec1*Phi312[ijk]*Phi313[ijk] +
+       2*invh13*nvec3*Phi312[ijk]*Phi313[ijk] +
+       2*invh23*nvec2*Phi312[ijk]*Phi322[ijk] +
+       2*invh33*nvec2*Phi312[ijk]*Phi323[ijk] +
+       2*invh23*nvec3*Phi312[ijk]*Phi323[ijk] +
+       2*invh33*nvec3*Phi312[ijk]*Phi333[ijk] +
+       2*Phi112[ijk]*(invh11*nvec0*Phi301[ijk] +
+          invh12*nvec0*Phi302[ijk] + invh13*nvec0*Phi303[ijk] +
+          invh11*nvec1*Phi311[ijk] + invh12*nvec1*Phi312[ijk] +
+          invh11*nvec2*Phi312[ijk] + invh13*nvec1*Phi313[ijk] +
+          invh11*nvec3*Phi313[ijk] + invh12*nvec2*Phi322[ijk] +
+          invh13*nvec2*Phi323[ijk] + invh12*nvec3*Phi323[ijk] +
+          invh13*nvec3*Phi333[ijk]) +
+       2*Phi212[ijk]*(invh12*nvec0*Phi301[ijk] +
+          invh22*nvec0*Phi302[ijk] + invh23*nvec0*Phi303[ijk] +
+          invh12*nvec1*Phi311[ijk] + invh22*nvec1*Phi312[ijk] +
+          invh12*nvec2*Phi312[ijk] + invh23*nvec1*Phi313[ijk] +
+          invh12*nvec3*Phi313[ijk] + invh22*nvec2*Phi322[ijk] +
+          invh23*nvec2*Phi323[ijk] + invh22*nvec3*Phi323[ijk] +
+          invh23*nvec3*Phi333[ijk]) +
+       Power(nvec0,2)*Phi300[ijk]*Pi12[ijk] +
+       2*nvec0*nvec1*Phi301[ijk]*Pi12[ijk] +
+       2*nvec0*nvec2*Phi302[ijk]*Pi12[ijk] +
+       2*nvec0*nvec3*Phi303[ijk]*Pi12[ijk] +
+       Power(nvec1,2)*Phi311[ijk]*Pi12[ijk] +
+       2*nvec1*nvec2*Phi312[ijk]*Pi12[ijk] +
+       2*nvec1*nvec3*Phi313[ijk]*Pi12[ijk] +
+       Power(nvec2,2)*Phi322[ijk]*Pi12[ijk] +
+       2*nvec2*nvec3*Phi323[ijk]*Pi12[ijk] +
        Power(nvec3,2)*Phi333[ijk]*Pi12[ijk]))/2.
 ;
 
 dtPhi313[ijk]
 =
 -(interior*AdPhi313[ijk]) + (alpha[ijk]*
-     (-2*gamma2*Phi313[ijk] + 2*invh13*nvec0*Phi301[ijk]*Phi313[ijk] + 
-       2*invh23*nvec0*Phi302[ijk]*Phi313[ijk] + 
-       2*invh33*nvec0*Phi303[ijk]*Phi313[ijk] + 
-       2*invh13*nvec1*Phi311[ijk]*Phi313[ijk] + 
-       2*invh23*nvec1*Phi312[ijk]*Phi313[ijk] + 
-       2*invh13*nvec2*Phi312[ijk]*Phi313[ijk] + 
-       2*invh33*nvec1*Power(Phi313[ijk],2) + 
-       2*invh13*nvec3*Power(Phi313[ijk],2) + 
-       2*invh23*nvec2*Phi313[ijk]*Phi322[ijk] + 
-       2*invh33*nvec2*Phi313[ijk]*Phi323[ijk] + 
-       2*invh23*nvec3*Phi313[ijk]*Phi323[ijk] + 
-       2*invh33*nvec3*Phi313[ijk]*Phi333[ijk] + 
-       2*Phi113[ijk]*(invh11*nvec0*Phi301[ijk] + 
-          invh12*nvec0*Phi302[ijk] + invh13*nvec0*Phi303[ijk] + 
-          invh11*nvec1*Phi311[ijk] + invh12*nvec1*Phi312[ijk] + 
-          invh11*nvec2*Phi312[ijk] + invh13*nvec1*Phi313[ijk] + 
-          invh11*nvec3*Phi313[ijk] + invh12*nvec2*Phi322[ijk] + 
-          invh13*nvec2*Phi323[ijk] + invh12*nvec3*Phi323[ijk] + 
-          invh13*nvec3*Phi333[ijk]) + 
-       2*Phi213[ijk]*(invh12*nvec0*Phi301[ijk] + 
-          invh22*nvec0*Phi302[ijk] + invh23*nvec0*Phi303[ijk] + 
-          invh12*nvec1*Phi311[ijk] + invh22*nvec1*Phi312[ijk] + 
-          invh12*nvec2*Phi312[ijk] + invh23*nvec1*Phi313[ijk] + 
-          invh12*nvec3*Phi313[ijk] + invh22*nvec2*Phi322[ijk] + 
-          invh23*nvec2*Phi323[ijk] + invh22*nvec3*Phi323[ijk] + 
-          invh23*nvec3*Phi333[ijk]) + 
-       Power(nvec0,2)*Phi300[ijk]*Pi13[ijk] + 
-       2*nvec0*nvec1*Phi301[ijk]*Pi13[ijk] + 
-       2*nvec0*nvec2*Phi302[ijk]*Pi13[ijk] + 
-       2*nvec0*nvec3*Phi303[ijk]*Pi13[ijk] + 
-       Power(nvec1,2)*Phi311[ijk]*Pi13[ijk] + 
-       2*nvec1*nvec2*Phi312[ijk]*Pi13[ijk] + 
-       2*nvec1*nvec3*Phi313[ijk]*Pi13[ijk] + 
-       Power(nvec2,2)*Phi322[ijk]*Pi13[ijk] + 
-       2*nvec2*nvec3*Phi323[ijk]*Pi13[ijk] + 
+     (-2*gamma2*Phi313[ijk] + 2*invh13*nvec0*Phi301[ijk]*Phi313[ijk] +
+       2*invh23*nvec0*Phi302[ijk]*Phi313[ijk] +
+       2*invh33*nvec0*Phi303[ijk]*Phi313[ijk] +
+       2*invh13*nvec1*Phi311[ijk]*Phi313[ijk] +
+       2*invh23*nvec1*Phi312[ijk]*Phi313[ijk] +
+       2*invh13*nvec2*Phi312[ijk]*Phi313[ijk] +
+       2*invh33*nvec1*Power(Phi313[ijk],2) +
+       2*invh13*nvec3*Power(Phi313[ijk],2) +
+       2*invh23*nvec2*Phi313[ijk]*Phi322[ijk] +
+       2*invh33*nvec2*Phi313[ijk]*Phi323[ijk] +
+       2*invh23*nvec3*Phi313[ijk]*Phi323[ijk] +
+       2*invh33*nvec3*Phi313[ijk]*Phi333[ijk] +
+       2*Phi113[ijk]*(invh11*nvec0*Phi301[ijk] +
+          invh12*nvec0*Phi302[ijk] + invh13*nvec0*Phi303[ijk] +
+          invh11*nvec1*Phi311[ijk] + invh12*nvec1*Phi312[ijk] +
+          invh11*nvec2*Phi312[ijk] + invh13*nvec1*Phi313[ijk] +
+          invh11*nvec3*Phi313[ijk] + invh12*nvec2*Phi322[ijk] +
+          invh13*nvec2*Phi323[ijk] + invh12*nvec3*Phi323[ijk] +
+          invh13*nvec3*Phi333[ijk]) +
+       2*Phi213[ijk]*(invh12*nvec0*Phi301[ijk] +
+          invh22*nvec0*Phi302[ijk] + invh23*nvec0*Phi303[ijk] +
+          invh12*nvec1*Phi311[ijk] + invh22*nvec1*Phi312[ijk] +
+          invh12*nvec2*Phi312[ijk] + invh23*nvec1*Phi313[ijk] +
+          invh12*nvec3*Phi313[ijk] + invh22*nvec2*Phi322[ijk] +
+          invh23*nvec2*Phi323[ijk] + invh22*nvec3*Phi323[ijk] +
+          invh23*nvec3*Phi333[ijk]) +
+       Power(nvec0,2)*Phi300[ijk]*Pi13[ijk] +
+       2*nvec0*nvec1*Phi301[ijk]*Pi13[ijk] +
+       2*nvec0*nvec2*Phi302[ijk]*Pi13[ijk] +
+       2*nvec0*nvec3*Phi303[ijk]*Pi13[ijk] +
+       Power(nvec1,2)*Phi311[ijk]*Pi13[ijk] +
+       2*nvec1*nvec2*Phi312[ijk]*Pi13[ijk] +
+       2*nvec1*nvec3*Phi313[ijk]*Pi13[ijk] +
+       Power(nvec2,2)*Phi322[ijk]*Pi13[ijk] +
+       2*nvec2*nvec3*Phi323[ijk]*Pi13[ijk] +
        Power(nvec3,2)*Phi333[ijk]*Pi13[ijk]))/2.
 ;
 
 dtPhi322[ijk]
 =
 -(interior*AdPhi322[ijk]) + (alpha[ijk]*
-     (-2*gamma2*Phi322[ijk] + 2*invh13*nvec0*Phi301[ijk]*Phi322[ijk] + 
-       2*invh23*nvec0*Phi302[ijk]*Phi322[ijk] + 
-       2*invh33*nvec0*Phi303[ijk]*Phi322[ijk] + 
-       2*invh13*nvec1*Phi311[ijk]*Phi322[ijk] + 
-       2*invh23*nvec1*Phi312[ijk]*Phi322[ijk] + 
-       2*invh13*nvec2*Phi312[ijk]*Phi322[ijk] + 
-       2*invh33*nvec1*Phi313[ijk]*Phi322[ijk] + 
-       2*invh13*nvec3*Phi313[ijk]*Phi322[ijk] + 
-       2*invh23*nvec2*Power(Phi322[ijk],2) + 
-       2*invh33*nvec2*Phi322[ijk]*Phi323[ijk] + 
-       2*invh23*nvec3*Phi322[ijk]*Phi323[ijk] + 
-       2*invh33*nvec3*Phi322[ijk]*Phi333[ijk] + 
-       2*Phi122[ijk]*(invh11*nvec0*Phi301[ijk] + 
-          invh12*nvec0*Phi302[ijk] + invh13*nvec0*Phi303[ijk] + 
-          invh11*nvec1*Phi311[ijk] + invh12*nvec1*Phi312[ijk] + 
-          invh11*nvec2*Phi312[ijk] + invh13*nvec1*Phi313[ijk] + 
-          invh11*nvec3*Phi313[ijk] + invh12*nvec2*Phi322[ijk] + 
-          invh13*nvec2*Phi323[ijk] + invh12*nvec3*Phi323[ijk] + 
-          invh13*nvec3*Phi333[ijk]) + 
-       2*Phi222[ijk]*(invh12*nvec0*Phi301[ijk] + 
-          invh22*nvec0*Phi302[ijk] + invh23*nvec0*Phi303[ijk] + 
-          invh12*nvec1*Phi311[ijk] + invh22*nvec1*Phi312[ijk] + 
-          invh12*nvec2*Phi312[ijk] + invh23*nvec1*Phi313[ijk] + 
-          invh12*nvec3*Phi313[ijk] + invh22*nvec2*Phi322[ijk] + 
-          invh23*nvec2*Phi323[ijk] + invh22*nvec3*Phi323[ijk] + 
-          invh23*nvec3*Phi333[ijk]) + 
-       Power(nvec0,2)*Phi300[ijk]*Pi22[ijk] + 
-       2*nvec0*nvec1*Phi301[ijk]*Pi22[ijk] + 
-       2*nvec0*nvec2*Phi302[ijk]*Pi22[ijk] + 
-       2*nvec0*nvec3*Phi303[ijk]*Pi22[ijk] + 
-       Power(nvec1,2)*Phi311[ijk]*Pi22[ijk] + 
-       2*nvec1*nvec2*Phi312[ijk]*Pi22[ijk] + 
-       2*nvec1*nvec3*Phi313[ijk]*Pi22[ijk] + 
-       Power(nvec2,2)*Phi322[ijk]*Pi22[ijk] + 
-       2*nvec2*nvec3*Phi323[ijk]*Pi22[ijk] + 
+     (-2*gamma2*Phi322[ijk] + 2*invh13*nvec0*Phi301[ijk]*Phi322[ijk] +
+       2*invh23*nvec0*Phi302[ijk]*Phi322[ijk] +
+       2*invh33*nvec0*Phi303[ijk]*Phi322[ijk] +
+       2*invh13*nvec1*Phi311[ijk]*Phi322[ijk] +
+       2*invh23*nvec1*Phi312[ijk]*Phi322[ijk] +
+       2*invh13*nvec2*Phi312[ijk]*Phi322[ijk] +
+       2*invh33*nvec1*Phi313[ijk]*Phi322[ijk] +
+       2*invh13*nvec3*Phi313[ijk]*Phi322[ijk] +
+       2*invh23*nvec2*Power(Phi322[ijk],2) +
+       2*invh33*nvec2*Phi322[ijk]*Phi323[ijk] +
+       2*invh23*nvec3*Phi322[ijk]*Phi323[ijk] +
+       2*invh33*nvec3*Phi322[ijk]*Phi333[ijk] +
+       2*Phi122[ijk]*(invh11*nvec0*Phi301[ijk] +
+          invh12*nvec0*Phi302[ijk] + invh13*nvec0*Phi303[ijk] +
+          invh11*nvec1*Phi311[ijk] + invh12*nvec1*Phi312[ijk] +
+          invh11*nvec2*Phi312[ijk] + invh13*nvec1*Phi313[ijk] +
+          invh11*nvec3*Phi313[ijk] + invh12*nvec2*Phi322[ijk] +
+          invh13*nvec2*Phi323[ijk] + invh12*nvec3*Phi323[ijk] +
+          invh13*nvec3*Phi333[ijk]) +
+       2*Phi222[ijk]*(invh12*nvec0*Phi301[ijk] +
+          invh22*nvec0*Phi302[ijk] + invh23*nvec0*Phi303[ijk] +
+          invh12*nvec1*Phi311[ijk] + invh22*nvec1*Phi312[ijk] +
+          invh12*nvec2*Phi312[ijk] + invh23*nvec1*Phi313[ijk] +
+          invh12*nvec3*Phi313[ijk] + invh22*nvec2*Phi322[ijk] +
+          invh23*nvec2*Phi323[ijk] + invh22*nvec3*Phi323[ijk] +
+          invh23*nvec3*Phi333[ijk]) +
+       Power(nvec0,2)*Phi300[ijk]*Pi22[ijk] +
+       2*nvec0*nvec1*Phi301[ijk]*Pi22[ijk] +
+       2*nvec0*nvec2*Phi302[ijk]*Pi22[ijk] +
+       2*nvec0*nvec3*Phi303[ijk]*Pi22[ijk] +
+       Power(nvec1,2)*Phi311[ijk]*Pi22[ijk] +
+       2*nvec1*nvec2*Phi312[ijk]*Pi22[ijk] +
+       2*nvec1*nvec3*Phi313[ijk]*Pi22[ijk] +
+       Power(nvec2,2)*Phi322[ijk]*Pi22[ijk] +
+       2*nvec2*nvec3*Phi323[ijk]*Pi22[ijk] +
        Power(nvec3,2)*Phi333[ijk]*Pi22[ijk]))/2.
 ;
 
 dtPhi323[ijk]
 =
 -(interior*AdPhi323[ijk]) + (alpha[ijk]*
-     (-2*gamma2*Phi323[ijk] + 2*invh13*nvec0*Phi301[ijk]*Phi323[ijk] + 
-       2*invh23*nvec0*Phi302[ijk]*Phi323[ijk] + 
-       2*invh33*nvec0*Phi303[ijk]*Phi323[ijk] + 
-       2*invh13*nvec1*Phi311[ijk]*Phi323[ijk] + 
-       2*invh23*nvec1*Phi312[ijk]*Phi323[ijk] + 
-       2*invh13*nvec2*Phi312[ijk]*Phi323[ijk] + 
-       2*invh33*nvec1*Phi313[ijk]*Phi323[ijk] + 
-       2*invh13*nvec3*Phi313[ijk]*Phi323[ijk] + 
-       2*invh23*nvec2*Phi322[ijk]*Phi323[ijk] + 
-       2*invh33*nvec2*Power(Phi323[ijk],2) + 
-       2*invh23*nvec3*Power(Phi323[ijk],2) + 
-       2*invh33*nvec3*Phi323[ijk]*Phi333[ijk] + 
-       2*Phi123[ijk]*(invh11*nvec0*Phi301[ijk] + 
-          invh12*nvec0*Phi302[ijk] + invh13*nvec0*Phi303[ijk] + 
-          invh11*nvec1*Phi311[ijk] + invh12*nvec1*Phi312[ijk] + 
-          invh11*nvec2*Phi312[ijk] + invh13*nvec1*Phi313[ijk] + 
-          invh11*nvec3*Phi313[ijk] + invh12*nvec2*Phi322[ijk] + 
-          invh13*nvec2*Phi323[ijk] + invh12*nvec3*Phi323[ijk] + 
-          invh13*nvec3*Phi333[ijk]) + 
-       2*Phi223[ijk]*(invh12*nvec0*Phi301[ijk] + 
-          invh22*nvec0*Phi302[ijk] + invh23*nvec0*Phi303[ijk] + 
-          invh12*nvec1*Phi311[ijk] + invh22*nvec1*Phi312[ijk] + 
-          invh12*nvec2*Phi312[ijk] + invh23*nvec1*Phi313[ijk] + 
-          invh12*nvec3*Phi313[ijk] + invh22*nvec2*Phi322[ijk] + 
-          invh23*nvec2*Phi323[ijk] + invh22*nvec3*Phi323[ijk] + 
-          invh23*nvec3*Phi333[ijk]) + 
-       Power(nvec0,2)*Phi300[ijk]*Pi23[ijk] + 
-       2*nvec0*nvec1*Phi301[ijk]*Pi23[ijk] + 
-       2*nvec0*nvec2*Phi302[ijk]*Pi23[ijk] + 
-       2*nvec0*nvec3*Phi303[ijk]*Pi23[ijk] + 
-       Power(nvec1,2)*Phi311[ijk]*Pi23[ijk] + 
-       2*nvec1*nvec2*Phi312[ijk]*Pi23[ijk] + 
-       2*nvec1*nvec3*Phi313[ijk]*Pi23[ijk] + 
-       Power(nvec2,2)*Phi322[ijk]*Pi23[ijk] + 
-       2*nvec2*nvec3*Phi323[ijk]*Pi23[ijk] + 
+     (-2*gamma2*Phi323[ijk] + 2*invh13*nvec0*Phi301[ijk]*Phi323[ijk] +
+       2*invh23*nvec0*Phi302[ijk]*Phi323[ijk] +
+       2*invh33*nvec0*Phi303[ijk]*Phi323[ijk] +
+       2*invh13*nvec1*Phi311[ijk]*Phi323[ijk] +
+       2*invh23*nvec1*Phi312[ijk]*Phi323[ijk] +
+       2*invh13*nvec2*Phi312[ijk]*Phi323[ijk] +
+       2*invh33*nvec1*Phi313[ijk]*Phi323[ijk] +
+       2*invh13*nvec3*Phi313[ijk]*Phi323[ijk] +
+       2*invh23*nvec2*Phi322[ijk]*Phi323[ijk] +
+       2*invh33*nvec2*Power(Phi323[ijk],2) +
+       2*invh23*nvec3*Power(Phi323[ijk],2) +
+       2*invh33*nvec3*Phi323[ijk]*Phi333[ijk] +
+       2*Phi123[ijk]*(invh11*nvec0*Phi301[ijk] +
+          invh12*nvec0*Phi302[ijk] + invh13*nvec0*Phi303[ijk] +
+          invh11*nvec1*Phi311[ijk] + invh12*nvec1*Phi312[ijk] +
+          invh11*nvec2*Phi312[ijk] + invh13*nvec1*Phi313[ijk] +
+          invh11*nvec3*Phi313[ijk] + invh12*nvec2*Phi322[ijk] +
+          invh13*nvec2*Phi323[ijk] + invh12*nvec3*Phi323[ijk] +
+          invh13*nvec3*Phi333[ijk]) +
+       2*Phi223[ijk]*(invh12*nvec0*Phi301[ijk] +
+          invh22*nvec0*Phi302[ijk] + invh23*nvec0*Phi303[ijk] +
+          invh12*nvec1*Phi311[ijk] + invh22*nvec1*Phi312[ijk] +
+          invh12*nvec2*Phi312[ijk] + invh23*nvec1*Phi313[ijk] +
+          invh12*nvec3*Phi313[ijk] + invh22*nvec2*Phi322[ijk] +
+          invh23*nvec2*Phi323[ijk] + invh22*nvec3*Phi323[ijk] +
+          invh23*nvec3*Phi333[ijk]) +
+       Power(nvec0,2)*Phi300[ijk]*Pi23[ijk] +
+       2*nvec0*nvec1*Phi301[ijk]*Pi23[ijk] +
+       2*nvec0*nvec2*Phi302[ijk]*Pi23[ijk] +
+       2*nvec0*nvec3*Phi303[ijk]*Pi23[ijk] +
+       Power(nvec1,2)*Phi311[ijk]*Pi23[ijk] +
+       2*nvec1*nvec2*Phi312[ijk]*Pi23[ijk] +
+       2*nvec1*nvec3*Phi313[ijk]*Pi23[ijk] +
+       Power(nvec2,2)*Phi322[ijk]*Pi23[ijk] +
+       2*nvec2*nvec3*Phi323[ijk]*Pi23[ijk] +
        Power(nvec3,2)*Phi333[ijk]*Pi23[ijk]))/2.
 ;
 
 dtPhi333[ijk]
 =
 -(interior*AdPhi333[ijk]) + (alpha[ijk]*
-     (-2*gamma2*Phi333[ijk] + 2*invh13*nvec0*Phi301[ijk]*Phi333[ijk] + 
-       2*invh23*nvec0*Phi302[ijk]*Phi333[ijk] + 
-       2*invh33*nvec0*Phi303[ijk]*Phi333[ijk] + 
-       2*invh13*nvec1*Phi311[ijk]*Phi333[ijk] + 
-       2*invh23*nvec1*Phi312[ijk]*Phi333[ijk] + 
-       2*invh13*nvec2*Phi312[ijk]*Phi333[ijk] + 
-       2*invh33*nvec1*Phi313[ijk]*Phi333[ijk] + 
-       2*invh13*nvec3*Phi313[ijk]*Phi333[ijk] + 
-       2*invh23*nvec2*Phi322[ijk]*Phi333[ijk] + 
-       2*invh33*nvec2*Phi323[ijk]*Phi333[ijk] + 
-       2*invh23*nvec3*Phi323[ijk]*Phi333[ijk] + 
-       2*invh33*nvec3*Power(Phi333[ijk],2) + 
-       2*Phi133[ijk]*(invh11*nvec0*Phi301[ijk] + 
-          invh12*nvec0*Phi302[ijk] + invh13*nvec0*Phi303[ijk] + 
-          invh11*nvec1*Phi311[ijk] + invh12*nvec1*Phi312[ijk] + 
-          invh11*nvec2*Phi312[ijk] + invh13*nvec1*Phi313[ijk] + 
-          invh11*nvec3*Phi313[ijk] + invh12*nvec2*Phi322[ijk] + 
-          invh13*nvec2*Phi323[ijk] + invh12*nvec3*Phi323[ijk] + 
-          invh13*nvec3*Phi333[ijk]) + 
-       2*Phi233[ijk]*(invh12*nvec0*Phi301[ijk] + 
-          invh22*nvec0*Phi302[ijk] + invh23*nvec0*Phi303[ijk] + 
-          invh12*nvec1*Phi311[ijk] + invh22*nvec1*Phi312[ijk] + 
-          invh12*nvec2*Phi312[ijk] + invh23*nvec1*Phi313[ijk] + 
-          invh12*nvec3*Phi313[ijk] + invh22*nvec2*Phi322[ijk] + 
-          invh23*nvec2*Phi323[ijk] + invh22*nvec3*Phi323[ijk] + 
-          invh23*nvec3*Phi333[ijk]) + 
-       Power(nvec0,2)*Phi300[ijk]*Pi33[ijk] + 
-       2*nvec0*nvec1*Phi301[ijk]*Pi33[ijk] + 
-       2*nvec0*nvec2*Phi302[ijk]*Pi33[ijk] + 
-       2*nvec0*nvec3*Phi303[ijk]*Pi33[ijk] + 
-       Power(nvec1,2)*Phi311[ijk]*Pi33[ijk] + 
-       2*nvec1*nvec2*Phi312[ijk]*Pi33[ijk] + 
-       2*nvec1*nvec3*Phi313[ijk]*Pi33[ijk] + 
-       Power(nvec2,2)*Phi322[ijk]*Pi33[ijk] + 
-       2*nvec2*nvec3*Phi323[ijk]*Pi33[ijk] + 
+     (-2*gamma2*Phi333[ijk] + 2*invh13*nvec0*Phi301[ijk]*Phi333[ijk] +
+       2*invh23*nvec0*Phi302[ijk]*Phi333[ijk] +
+       2*invh33*nvec0*Phi303[ijk]*Phi333[ijk] +
+       2*invh13*nvec1*Phi311[ijk]*Phi333[ijk] +
+       2*invh23*nvec1*Phi312[ijk]*Phi333[ijk] +
+       2*invh13*nvec2*Phi312[ijk]*Phi333[ijk] +
+       2*invh33*nvec1*Phi313[ijk]*Phi333[ijk] +
+       2*invh13*nvec3*Phi313[ijk]*Phi333[ijk] +
+       2*invh23*nvec2*Phi322[ijk]*Phi333[ijk] +
+       2*invh33*nvec2*Phi323[ijk]*Phi333[ijk] +
+       2*invh23*nvec3*Phi323[ijk]*Phi333[ijk] +
+       2*invh33*nvec3*Power(Phi333[ijk],2) +
+       2*Phi133[ijk]*(invh11*nvec0*Phi301[ijk] +
+          invh12*nvec0*Phi302[ijk] + invh13*nvec0*Phi303[ijk] +
+          invh11*nvec1*Phi311[ijk] + invh12*nvec1*Phi312[ijk] +
+          invh11*nvec2*Phi312[ijk] + invh13*nvec1*Phi313[ijk] +
+          invh11*nvec3*Phi313[ijk] + invh12*nvec2*Phi322[ijk] +
+          invh13*nvec2*Phi323[ijk] + invh12*nvec3*Phi323[ijk] +
+          invh13*nvec3*Phi333[ijk]) +
+       2*Phi233[ijk]*(invh12*nvec0*Phi301[ijk] +
+          invh22*nvec0*Phi302[ijk] + invh23*nvec0*Phi303[ijk] +
+          invh12*nvec1*Phi311[ijk] + invh22*nvec1*Phi312[ijk] +
+          invh12*nvec2*Phi312[ijk] + invh23*nvec1*Phi313[ijk] +
+          invh12*nvec3*Phi313[ijk] + invh22*nvec2*Phi322[ijk] +
+          invh23*nvec2*Phi323[ijk] + invh22*nvec3*Phi323[ijk] +
+          invh23*nvec3*Phi333[ijk]) +
+       Power(nvec0,2)*Phi300[ijk]*Pi33[ijk] +
+       2*nvec0*nvec1*Phi301[ijk]*Pi33[ijk] +
+       2*nvec0*nvec2*Phi302[ijk]*Pi33[ijk] +
+       2*nvec0*nvec3*Phi303[ijk]*Pi33[ijk] +
+       Power(nvec1,2)*Phi311[ijk]*Pi33[ijk] +
+       2*nvec1*nvec2*Phi312[ijk]*Pi33[ijk] +
+       2*nvec1*nvec3*Phi313[ijk]*Pi33[ijk] +
+       Power(nvec2,2)*Phi322[ijk]*Pi33[ijk] +
+       2*nvec2*nvec3*Phi323[ijk]*Pi33[ijk] +
        Power(nvec3,2)*Phi333[ijk]*Pi33[ijk]))/2.
 ;
 
