@@ -48,7 +48,7 @@ Generato GHG_rhs.wl
 ## Running Tests
 
 ```bash
-# Run all tests (recommended - runs unit tests + regression tests)
+# Run all tests (runs unit tests + regression tests)
 wolframscript -script test/AllTests.wl
 
 # Run with verbose output
@@ -57,10 +57,6 @@ wolframscript -script test/AllTests.wl --verbose
 # Run unit tests only (skip regression tests)
 wolframscript -script test/AllTests.wl --unit-only
 
-# Alternative: Run via bash script
-./test/run_tests.sh
-./test/run_tests.sh --verbose
-
 # Update golden files with new outputs
-./test/run_tests.sh --generate
+wolframscript -script test/AllTests.wl --generate
 ```
