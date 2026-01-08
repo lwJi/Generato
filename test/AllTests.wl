@@ -2,12 +2,14 @@
 
 (* AllTests.wl *)
 (* Master test runner for Generato *)
-(* Usage: wolframscript -f test/AllTests.wl [--verbose] *)
+(* Usage: wolframscript -f test/AllTests.wl [--verbose] [--unit-only] *)
 
 $TestDir = DirectoryName[$InputFileName];
 
 (* Quiet mode support - use --verbose flag to enable verbose output *)
 $QuietMode = !MemberQ[$CommandLine, "--verbose"];
+(* Unit-only mode - use --unit-only flag to skip regression tests *)
+$UnitOnlyMode = MemberQ[$CommandLine, "--unit-only"];
 QuietPrint[args___] := If[!$QuietMode, Print[args]];
 (* Suppress all Print output during package loading in quiet mode *)
 QuietGet[file_] := Block[{Print}, Get[file]];
@@ -210,7 +212,10 @@ RunRegressionTests[] := Module[{backend, testName, ext, testFile, result, output
 
 (* Run the test phases *)
 $UnitTestsSuccess = RunPhase["unit", RunUnitTests[]];
-$RegressionTestsSuccess = RunPhase["regression", RunRegressionTests[]];
+$RegressionTestsSuccess = If[$UnitOnlyMode,
+  True,
+  RunPhase["regression", RunRegressionTests[]]
+];
 
 (* Exit with appropriate status *)
 If[!$UnitTestsSuccess || !$RegressionTestsSuccess,
