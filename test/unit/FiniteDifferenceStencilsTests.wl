@@ -109,7 +109,7 @@ AppendTo[$AllTests,
 AppendTo[$AllTests,
   VerificationTest[
     GetFiniteDifferenceCoefficients[{0, 1}, 2],
-    Null,
+    $Failed,
     {GetFiniteDifferenceCoefficients::shortSample},
     TestID -> "GetFiniteDifferenceCoefficients-InsufficientPoints"
   ]
