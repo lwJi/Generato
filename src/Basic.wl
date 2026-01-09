@@ -22,6 +22,8 @@ SetCheckInputEquations::usage = "SetCheckInputEquations[bool] enables or disable
 
 SetPVerbose::usage = "SetPVerbose[bool] enables or disables verbose printing of messages.";
 
+GetPVerbose::usage = "GetPVerbose[] returns True if verbose printing of messages is enabled.";
+
 GetPrintDate::usage = "GetPrintDate[] returns True if the date is printed in output files.";
 
 SetPrintDate::usage = "SetPrintDate[bool] enables or disables printing the date in output files.";
@@ -310,7 +312,7 @@ Protect[AdjustEQNIndexes];
 
 (* Detailed implementation of SetEQN and SetEQNDelayed *)
 
-SetEQNdetail[checkrhs_, suffix_, var_, varrhs_] :=
+SetEQNDetail[checkrhs_, suffix_, var_, varrhs_] :=
   Module[{suffix0, replacetimes = 0},
     suffix0 =
       If[suffix === Null,
@@ -319,23 +321,23 @@ SetEQNdetail[checkrhs_, suffix_, var_, varrhs_] :=
         ToString[suffix]
       ];
     If[IsExprComb[Head[var]],
-      Throw @ Message[SetEQNdetail::Evar, var]
+      Throw @ Message[SetEQNDetail::Evar, var]
     ];
     If[checkrhs && !IsDefined[varrhs],
-      Throw @ Message[SetEQNdetail::Evarrhs, varrhs]
+      Throw @ Message[SetEQNDetail::Evarrhs, varrhs]
     ];
     ReleaseHold[Hold[IndexSet[var, varrhs]] /. {var[[0]] :> RHSOf[ToString[var[[0]]] <> suffix0] /; replacetimes++ == 0}]
   ];
 
-SetEQNdetail::Evarrhs = "There are undefined terms in the RHS '`1`'!";
+SetEQNDetail::Evarrhs = "There are undefined terms in the RHS '`1`'!";
 
-SetEQNdetail::Evar = "Var '`1`' is used with IndexSet before, please use a different name!";
+SetEQNDetail::Evar = "Var '`1`' is used with IndexSet before, please use a different name!";
 
-Protect[SetEQNdetail];
+Protect[SetEQNDetail];
 
-SetAttributes[SetEQNDelayeddetail, {HoldAll, SequenceHold}];
+SetAttributes[SetEQNDelayedDetail, {HoldAll, SequenceHold}];
 
-SetEQNDelayeddetail[suffix_, var_, varrhs_] :=
+SetEQNDelayedDetail[suffix_, var_, varrhs_] :=
   Module[{suffix0, replacetimes = 0},
     suffix0 =
       If[suffix === Null,
@@ -344,14 +346,14 @@ SetEQNDelayeddetail[suffix_, var_, varrhs_] :=
         ToString[suffix]
       ];
     If[IsExprComb[Head[var]],
-      Throw @ Message[SetEQNDelayeddetail::Evar, var]
+      Throw @ Message[SetEQNDelayedDetail::Evar, var]
     ];
     ReleaseHold[Hold[IndexSetDelayed[var, varrhs]] /. {var[[0]] :> RHSOf[ToString[var[[0]]] <> suffix0] /; replacetimes++ == 0}]
   ];
 
-SetEQNDelayeddetail::Evar = "Var '`1`' is used with IndexSet before, please use a different name!";
+SetEQNDelayedDetail::Evar = "Var '`1`' is used with IndexSet before, please use a different name!";
 
-Protect[SetEQNDelayeddetail];
+Protect[SetEQNDelayedDetail];
 
 (*
   Assign var$RHS to varrhs, allowing index patterns such as {1, -cart}.
@@ -366,7 +368,7 @@ SetEQN[OptionsPattern[], var_, varrhs_] :=
   Module[{checkrhs, suffix},
     {checkrhs, suffix} = OptionValue[{CheckRHS, SuffixName}];
     (* If[allowlowerfreeindex, {var0, varrhs0} = AdjustEQNIndexes[var, varrhs]]; *)
-    SetEQNdetail[checkrhs, suffix, var, varrhs]
+    SetEQNDetail[checkrhs, suffix, var, varrhs]
   ];
 
 Protect[SetEQN];
@@ -385,7 +387,7 @@ Options[SetEQNDelayed] = {SuffixName -> Null};
 SetEQNDelayed[OptionsPattern[], var_, varrhs_] :=
   Module[{suffix},
     {suffix} = OptionValue[{SuffixName}];
-    SetEQNDelayeddetail[suffix, var, varrhs]
+    SetEQNDelayedDetail[suffix, var, varrhs]
   ];
 
 Protect[SetEQNDelayed];
