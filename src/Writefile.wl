@@ -46,9 +46,13 @@ Protect[SetMainPrint];
 
 WriteToFile[outputfile_] :=
   Module[{},
-    If[Environment["QUIET"] =!= "1", System`Print["Writing to \"", outputfile, "\"...\n"]];
+    If[Environment["QUIET"] =!= "1",
+      System`Print["Writing to \"", outputfile, "\"...\n"]
+    ];
     If[FileExistsQ[outputfile],
-      If[Environment["QUIET"] =!= "1", System`Print["\"", outputfile, "\" already exist, replacing it ...\n"]];
+      If[Environment["QUIET"] =!= "1",
+        System`Print["\"", outputfile, "\" already exist, replacing it ...\n"]
+      ];
       DeleteFile[outputfile]
     ];
     (* define pr *)
@@ -84,7 +88,9 @@ WriteToFile[outputfile_] :=
       Global`pr[]
     ];
     Global`pr["/* " <> FileNameTake[outputfile] <> " */"];
-    If[Environment["QUIET"] =!= "1", System`Print["Done generating \"", outputfile, "\"\n"]];
+    If[Environment["QUIET"] =!= "1",
+      System`Print["Done generating \"", outputfile, "\"\n"]
+    ];
     Close[filepointer]
   ];
 

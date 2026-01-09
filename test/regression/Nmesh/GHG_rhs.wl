@@ -16,11 +16,13 @@ DefManifold[M4, 4, Union[Complement[IndexRange[a, z], {g}], Table[ToExpression["
 
 DefChart[cart, M4, {0, 1, 2, 3}, {T[], X[], Y[], Z[]}, ChartColor -> Blue];
 
-dtEvolVarlist = GridTensors[
-  {dtg[-a, -b], Symmetric[{-a, -b}]},
-  (*{dtPi[-a, -b], Symmetric[{-a, -b}], PrintAs -> "dt\[CapitalPi]"},*)
-  {dtPhi[-k, -a, -b], Symmetric[{-a, -b}], PrintAs -> "dt\[CapitalPhi]"}
-];
+dtEvolVarlist =
+  GridTensors[
+    {dtg[-a, -b], Symmetric[{-a, -b}]}
+    ,
+    (*{dtPi[-a, -b], Symmetric[{-a, -b}], PrintAs -> "dt\[CapitalPi]"},*)
+    {dtPhi[-k, -a, -b], Symmetric[{-a, -b}], PrintAs -> "dt\[CapitalPhi]"}
+  ];
 
 EvolVarlist = GridTensors[{g[-a, -b], Symmetric[{-a, -b}]}, {Pi$Upt[-a, -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalPi]"}, {Phi[-k, -a, -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalPhi]"}, {H[-a]}];
 

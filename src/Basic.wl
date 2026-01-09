@@ -5,8 +5,12 @@
 (* (c) Liwei Ji, 01/2024 *)
 
 (* Suppress xAct loading banners in quiet mode *)
+
 If[Environment["QUIET"] === "1",
-  Block[{Print}, BeginPackage["Generato`Basic`", {"xAct`xTensor`", "xAct`xCoba`"}]],
+  Block[{Print},
+    BeginPackage["Generato`Basic`", {"xAct`xTensor`", "xAct`xCoba`"}]
+  ]
+  ,
   BeginPackage["Generato`Basic`", {"xAct`xTensor`", "xAct`xCoba`"}]
 ];
 
@@ -83,6 +87,7 @@ $CheckInputEquations = False;
 $PVerbose = False;
 
 (* Quiet mode - suppress all output when QUIET=1 environment variable is set *)
+
 $QuietMode = (Environment["QUIET"] === "1");
 
 $PrintDate = True;
@@ -224,7 +229,8 @@ Protect[GetDefaultManifold];
 GetDefaultChart[] :=
   Module[{manifold = GetDefaultManifold[]},
     If[manifold === $Failed,
-      Return[$Failed],
+      Return[$Failed]
+      ,
       Return[ChartsOfManifold[manifold][[1]]]
     ]
   ];
@@ -234,7 +240,8 @@ Protect[GetDefaultChart];
 GetDim[] :=
   Module[{manifold = GetDefaultManifold[]},
     If[manifold === $Failed,
-      Return[$Failed],
+      Return[$Failed]
+      ,
       Return[DimOfManifold[manifold]]
     ]
   ];
