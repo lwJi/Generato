@@ -62,3 +62,5 @@ Each backend implements `PrintComponentInitialization` and `PrintComponentEquati
 ```bash
 wolframscript -script test/AllTests.wl
 ```
+
+See [README.md](README.md) for more details on test options, directory structure, and adding new tests.
