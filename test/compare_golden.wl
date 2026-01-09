@@ -27,9 +27,47 @@ GoldenPrint[args___] := If[ValueQ[Global`$QuietMode] && Global`$QuietMode === Tr
 $TestDir = TestConfig`GetTestDir[];
 $GoldenDir = FileNameJoin[{$TestDir, "regression", "golden"}];
 
+(* Find the first N differing lines between two strings *)
+FindDifferingLines[current_String, golden_String, maxDiffs_:5] := Module[
+  {currentLines, goldenLines, maxLen, diffs, i},
+  currentLines = StringSplit[current, "\n"];
+  goldenLines = StringSplit[golden, "\n"];
+  maxLen = Max[Length[currentLines], Length[goldenLines]];
+  diffs = {};
+  For[i = 1, i <= maxLen && Length[diffs] < maxDiffs, i++,
+    Module[{currLine, goldLine},
+      currLine = If[i <= Length[currentLines], currentLines[[i]], "<missing>"];
+      goldLine = If[i <= Length[goldenLines], goldenLines[[i]], "<missing>"];
+      If[currLine =!= goldLine,
+        AppendTo[diffs, {i, goldLine, currLine}]
+      ]
+    ]
+  ];
+  diffs
+];
+
+(* Print diff details - always prints (not affected by quiet mode) *)
+PrintDiffDetails[diffs_List, totalCurrentLines_Integer, totalGoldenLines_Integer] := Module[
+  {},
+  Print[""];
+  Do[
+    Module[{lineNum, expected, actual},
+      {lineNum, expected, actual} = diff;
+      Print["         Line ", lineNum, ":"];
+      Print["           - ", StringTake[expected, UpTo[80]]];
+      Print["           + ", StringTake[actual, UpTo[80]]];
+    ],
+    {diff, diffs}
+  ];
+  (* Show if there are more differences *)
+  If[Length[diffs] >= 5,
+    Print["         ... (showing first 5 differences)"]
+  ];
+];
+
 (* Compare two files, return True if identical *)
 CompareGoldenFile[currentFile_String, goldenFile_String] := Module[
-  {current, golden, result},
+  {current, golden, diffs, currentLines, goldenLines},
 
   If[!FileExistsQ[currentFile],
     GoldenPrint["  ", $TagFail, " Current file not found: ", currentFile];
@@ -47,13 +85,19 @@ CompareGoldenFile[currentFile_String, goldenFile_String] := Module[
   If[current === golden,
     GoldenPrint["  ", $TagPass, " ", FileNameTake[currentFile]];
     True,
-    GoldenPrint["  ", $TagFail, " ", FileNameTake[currentFile], " differs from golden"];
-    GoldenPrint["         Current: ", StringLength[current], " chars"];
-    GoldenPrint["         Golden:  ", StringLength[golden], " chars"];
-    (* Always print failure details even in quiet mode *)
-    If[ValueQ[Global`$QuietMode] && Global`$QuietMode === True,
-      Print["  ", $TagFail, " ", FileNameTake[currentFile], " (", StringLength[current], " vs ", StringLength[golden], " chars)"]
-    ];
+    (* Files differ - show details *)
+    currentLines = Length[StringSplit[current, "\n"]];
+    goldenLines = Length[StringSplit[golden, "\n"]];
+
+    (* Always print failure header *)
+    Print["  ", $TagFail, " ", FileNameTake[currentFile], " differs from golden"];
+    Print["         Current: ", StringLength[current], " chars (", currentLines, " lines)"];
+    Print["         Golden:  ", StringLength[golden], " chars (", goldenLines, " lines)"];
+
+    (* Find and display differing lines *)
+    diffs = FindDifferingLines[current, golden, 5];
+    PrintDiffDetails[diffs, currentLines, goldenLines];
+
     $Failed
   ]
 ];
