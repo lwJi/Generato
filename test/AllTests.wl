@@ -124,7 +124,7 @@ ValidateGoldenFiles[] := Module[{backend, testName, ext, goldenFile, missing},
   missing = {};
   Do[
     {backend, testName, ext} = testCase;
-    goldenFile = FileNameJoin[{$TestDir, "golden", backend, testName <> ext <> ".golden"}];
+    goldenFile = FileNameJoin[{$TestDir, "regression", "golden", backend, testName <> ext <> ".golden"}];
     If[!FileExistsQ[goldenFile],
       AppendTo[missing, goldenFile];
     ],
@@ -146,9 +146,9 @@ GenerateGoldenFiles[] := Module[{backend, testName, ext, testFile, result, outpu
 
   Do[
     {backend, testName, ext} = testCase;
-    testFile = FileNameJoin[{$TestDir, backend, testName <> ".wl"}];
-    outputFile = FileNameJoin[{$TestDir, backend, testName <> ext}];
-    goldenFile = FileNameJoin[{$TestDir, "golden", backend, testName <> ext <> ".golden"}];
+    testFile = FileNameJoin[{$TestDir, "regression", backend, testName <> ".wl"}];
+    outputFile = FileNameJoin[{$TestDir, "regression", backend, testName <> ext}];
+    goldenFile = FileNameJoin[{$TestDir, "regression", "golden", backend, testName <> ext <> ".golden"}];
     goldenDir = DirectoryName[goldenFile];
 
     If[FileExistsQ[testFile],
@@ -159,7 +159,7 @@ GenerateGoldenFiles[] := Module[{backend, testName, ext, testFile, result, outpu
       ];
 
       Print["  Generating: ", backend, "/", testName, ".wl"];
-      result = Run["cd " <> FileNameJoin[{$TestDir, backend}] <> " && " <> quietPrefix <> "\"$GENERATO/Generato\" " <> testName <> ".wl 2>&1"];
+      result = Run["cd " <> FileNameJoin[{$TestDir, "regression", backend}] <> " && " <> quietPrefix <> "\"$GENERATO/Generato\" " <> testName <> ".wl 2>&1"];
       If[result != 0,
         Print["    \033[0;31mFAILED\033[0m to generate ", testName, ext];
         Continue[];
@@ -207,7 +207,7 @@ RunRegressionTests[] := Module[{backend, testName, ext, testFile, result, output
   $GenerationFailed = False;
   Do[
     {backend, testName, ext} = testCase;
-    testFile = FileNameJoin[{$TestDir, backend, testName <> ".wl"}];
+    testFile = FileNameJoin[{$TestDir, "regression", backend, testName <> ".wl"}];
 
     If[FileExistsQ[testFile],
       (* Validate inputs before shell execution *)
@@ -219,7 +219,7 @@ RunRegressionTests[] := Module[{backend, testName, ext, testFile, result, output
 
       QuietPrint["  Generating: ", backend, "/", testName, ".wl"];
       (* Run Generato from the test directory, passing QUIET mode *)
-      result = Run["cd " <> FileNameJoin[{$TestDir, backend}] <> " && " <> quietPrefix <> "\"$GENERATO/Generato\" " <> testName <> ".wl 2>&1"];
+      result = Run["cd " <> FileNameJoin[{$TestDir, "regression", backend}] <> " && " <> quietPrefix <> "\"$GENERATO/Generato\" " <> testName <> ".wl 2>&1"];
       If[result != 0,
         QuietPrint["    FAILED to generate ", testName, ext];
         $GenerationFailed = True;
@@ -238,7 +238,7 @@ RunRegressionTests[] := Module[{backend, testName, ext, testFile, result, output
   ];
 
   (* Load golden file comparison module *)
-  QuietGet[FileNameJoin[{$TestDir, "regression", "compare_golden.wl"}]];
+  QuietGet[FileNameJoin[{$TestDir, "compare_golden.wl"}]];
 
   (* Run golden file comparisons *)
   $RegressionResult = GoldenTest`RunGoldenTests[];
@@ -248,7 +248,7 @@ RunRegressionTests[] := Module[{backend, testName, ext, testFile, result, output
   QuietPrint["Cleaning up generated files..."];
   Do[
     {backend, testName, ext} = testCase;
-    outputFile = FileNameJoin[{$TestDir, backend, testName <> ext}];
+    outputFile = FileNameJoin[{$TestDir, "regression", backend, testName <> ext}];
     If[FileExistsQ[outputFile],
       Quiet[
         DeleteFile[outputFile],

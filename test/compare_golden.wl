@@ -12,7 +12,7 @@ RunGoldenTests::usage = "RunGoldenTests[] runs all golden file comparisons and r
 Begin["`Private`"];
 
 (* Load shared test configuration *)
-Get[FileNameJoin[{DirectoryName[$InputFileName], "..", "TestConfig.wl"}]];
+Get[FileNameJoin[{DirectoryName[$InputFileName], "TestConfig.wl"}]];
 
 (* Use QuietPrint if available (from AllTests.wl), otherwise use Print *)
 GoldenPrint[args___] := If[ValueQ[Global`$QuietMode] && Global`$QuietMode === True,
@@ -21,7 +21,7 @@ GoldenPrint[args___] := If[ValueQ[Global`$QuietMode] && Global`$QuietMode === Tr
 ];
 
 $TestDir = TestConfig`GetTestDir[];
-$GoldenDir = FileNameJoin[{$TestDir, "golden"}];
+$GoldenDir = FileNameJoin[{$TestDir, "regression", "golden"}];
 
 (* Compare two files, return True if identical *)
 CompareGoldenFile[currentFile_String, goldenFile_String] := Module[
@@ -63,7 +63,7 @@ RunGoldenTests[] := Module[
 
   results = Table[
     {backend, testName, ext} = testCase;
-    currentFile = FileNameJoin[{$TestDir, backend, testName <> ext}];
+    currentFile = FileNameJoin[{$TestDir, "regression", backend, testName <> ext}];
     goldenFile = FileNameJoin[{$GoldenDir, backend, testName <> ext <> ".golden"}];
     CompareGoldenFile[currentFile, goldenFile],
     {testCase, TestConfig`LoadTestCases[]}
