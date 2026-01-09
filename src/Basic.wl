@@ -52,6 +52,8 @@ GetProject::usage = "GetProject[] returns the project name used in code generati
 
 SetProject::usage = "SetProject[name] sets the project name used in code generation.";
 
+GetDefaultManifold::usage = "GetDefaultManifold[] returns the first defined manifold.";
+
 GetDefaultChart::usage = "GetDefaultChart[] returns the default coordinate chart of the first defined manifold.";
 
 GetDim::usage = "GetDim[] returns the dimension of the first defined manifold.";
@@ -205,11 +207,20 @@ SetProject[name_] :=
 
 Protect[SetProject];
 
+GetDefaultManifold[] :=
+  Return[$Manifolds[[1]]];
+
+Protect[GetDefaultManifold];
+
 GetDefaultChart[] :=
-  Return[ChartsOfManifold[$Manifolds[[1]]][[1]]];
+  Return[ChartsOfManifold[GetDefaultManifold[]][[1]]];
+
+Protect[GetDefaultChart];
 
 GetDim[] :=
-  Return[DimOfManifold[$Manifolds[[1]]]];
+  Return[DimOfManifold[GetDefaultManifold[]]];
+
+Protect[GetDim];
 
 IsDefined[term_] :=
   Module[{head = Head[term]},
