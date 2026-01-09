@@ -1,0 +1,52 @@
+/* testTile.hxx */
+/* Produced with Generato */
+
+#ifndef TESTTILE_HXX
+#define TESTTILE_HXX
+
+
+const auto tileU1[[tI]] = gf_tileU[0];
+const auto tileU2[[tI]] = gf_tileU[1];
+const auto tileU3[[tI]] = gf_tileU[2];
+const auto gridU1 = tl_gridU[0].ptr;
+const auto gridU2 = tl_gridU[1].ptr;
+const auto gridU3 = tl_gridU[2].ptr;
+
+const vreal
+tempU1
+=
+gridU1
+;
+
+const vreal
+tempU2
+=
+gridU2
+;
+
+const vreal
+tempU3
+=
+gridU3
+;
+
+
+tileU1[tI]
+=
+tempU1
+;
+
+tileU2[tI]
+=
+tempU2
+;
+
+tileU3[tI]
+=
+tempU3
+;
+
+
+#endif // #ifndef TESTTILE_HXX
+
+/* testTile.hxx */
