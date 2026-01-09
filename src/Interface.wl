@@ -213,7 +213,7 @@ Options[PrintInitializations] :=
   {ChartName -> GetDefaultChart[], Mode -> "Temp", TensorType -> "Scal", StorageType -> "GF", DerivsOrder -> 1, AccuracyOrder -> 4};
 
 PrintInitializations[OptionsPattern[], varlist_?ListQ] :=
-  Module[{chartname, mode},
+  Module[{chartname, mode, tensortype, storagetype, derivsorder, accuracyorder},
     {chartname, mode, tensortype, storagetype, derivsorder, accuracyorder} = OptionValue[{ChartName, Mode, TensorType, StorageType, DerivsOrder, AccuracyOrder}];
     SetParseMode[{PrintComp -> True, SetComp -> False}];
     SetParsePrintCompMode[{Initializations -> True, Equations -> False}];

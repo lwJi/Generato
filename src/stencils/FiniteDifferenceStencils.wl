@@ -51,7 +51,8 @@ GetFiniteDifferenceCoefficients[sample_?ListQ, order_?IntegerQ] := Module[{numPo
 
   (* Ensure the sample has enough points for the desired order *)
   If[numPoints < order + 1,
-    Return[Message[GetFiniteDifferenceCoefficients::shortSample]];
+    Message[GetFiniteDifferenceCoefficients::shortSample];
+    Return[$Failed];
   ];
 
   (* Generate values array for finite difference coefficients *)
