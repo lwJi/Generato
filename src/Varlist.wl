@@ -210,7 +210,7 @@ ParseVarlist::ESymmetryType = "Symmetry type of the `1`-th var, `2`, in varlist 
 Protect[ParseVarlist];
 
 DefineTensor[varname_, symmetry_, printname_] :=
-  Module[{manifold = $Manifolds[[1]]},
+  Module[{manifold = GetDefaultManifold[]},
     If[symmetry =!= Null && StringLength[printname] > 0,
       DefTensor[varname, manifold, symmetry, PrintAs -> printname]
       ,

@@ -176,6 +176,44 @@ AppendTo[$AllTests,
 ];
 
 (* ========================================= *)
+(* Test: GetDefaultManifold *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* GetDefaultManifold should return a symbol when manifolds exist *)
+    Module[{result = GetDefaultManifold[]},
+      Head[result] === Symbol && MemberQ[$Manifolds, result]
+    ],
+    True,
+    TestID -> "GetDefaultManifold-ReturnsFirstManifold"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* GetDefaultManifold should return the first manifold in $Manifolds *)
+    GetDefaultManifold[] === $Manifolds[[1]],
+    True,
+    TestID -> "GetDefaultManifold-ReturnsFirstInList"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* GetDefaultManifold should return $Failed when no manifolds exist *)
+    Module[{savedManifolds = $Manifolds, result},
+      Block[{$Manifolds = {}},
+        result = Quiet[GetDefaultManifold[]];
+        result === $Failed
+      ]
+    ],
+    True,
+    TestID -> "GetDefaultManifold-EmptyManifolds-ReturnsFailed"
+  ]
+];
+
+(* ========================================= *)
 (* Test: GetDefaultChart *)
 (* ========================================= *)
 
@@ -185,6 +223,20 @@ AppendTo[$AllTests,
     Head[GetDefaultChart[]] === Symbol || GetDefaultChart[] === Null,
     True,
     TestID -> "GetDefaultChart-ReturnsSymbolOrNull"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* GetDefaultChart should return $Failed when no manifolds exist *)
+    Module[{savedManifolds = $Manifolds, result},
+      Block[{$Manifolds = {}},
+        result = Quiet[GetDefaultChart[]];
+        result === $Failed
+      ]
+    ],
+    True,
+    TestID -> "GetDefaultChart-EmptyManifolds-ReturnsFailed"
   ]
 ];
 
@@ -200,6 +252,20 @@ AppendTo[$AllTests,
     ],
     True,
     TestID -> "GetDim-ReturnsValidDimension"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* GetDim should return $Failed when no manifolds exist *)
+    Module[{savedManifolds = $Manifolds, result},
+      Block[{$Manifolds = {}},
+        result = Quiet[GetDim[]];
+        result === $Failed
+      ]
+    ],
+    True,
+    TestID -> "GetDim-EmptyManifolds-ReturnsFailed"
   ]
 ];
 
