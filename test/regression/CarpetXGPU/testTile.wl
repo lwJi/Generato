@@ -51,4 +51,4 @@ SetMainPrint[
   PrintEquations[{Mode -> "Main"}, TileVarlist];
 ];
 
-Import[FileNameJoin[{Environment["GENERATO"], "codes/CarpetX.wl"}]];
+Import[FileNameJoin[{Environment["GENERATO"], "codes/CarpetXGPU.wl"}]];
