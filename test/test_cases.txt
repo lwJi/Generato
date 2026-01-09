@@ -9,6 +9,7 @@ CarpetXGPU:testDerivs:.hxx
 #Carpet:test:.hxx
 AMReX:test:.hxx
 #Nmesh:test:.c
-Nmesh:GHG_rhs:.c
+#Nmesh:GHG_rhs:.c
+Nmesh:GHG_set_profile_ADM:.c
 
 # Note: test/Nmesh/GHG_rhs.ipynb is documentation-only and not part of the test suite

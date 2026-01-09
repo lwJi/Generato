@@ -14,7 +14,7 @@ TestEQN::usage = "TestEQN[bool, label] prints 'SUCCEED' if bool is True, otherwi
 
 Begin["`Private`"];
 
-TestEQN[equal_?BooleanQ, terms_ : ""] :=
+TestEQN[equal_?BooleanQ, terms_:""] :=
   Module[{},
     If[equal,
       System`Print["  Testing " <> terms <> " SUCCEED!"]
