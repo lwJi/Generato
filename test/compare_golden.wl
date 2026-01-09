@@ -14,6 +14,10 @@ Begin["`Private`"];
 (* Load shared test configuration *)
 Get[FileNameJoin[{DirectoryName[$InputFileName], "TestConfig.wl"}]];
 
+(* Status tags with ANSI colors - access from Global if available, else define locally *)
+$TagPass = If[ValueQ[Global`$TagPass], Global`$TagPass, "\033[0;32m[PASS]\033[0m"];
+$TagFail = If[ValueQ[Global`$TagFail], Global`$TagFail, "\033[0;31m[FAIL]\033[0m"];
+
 (* Use QuietPrint if available (from AllTests.wl), otherwise use Print *)
 GoldenPrint[args___] := If[ValueQ[Global`$QuietMode] && Global`$QuietMode === True,
   Null,  (* Suppress output in quiet mode *)
@@ -28,12 +32,12 @@ CompareGoldenFile[currentFile_String, goldenFile_String] := Module[
   {current, golden, result},
 
   If[!FileExistsQ[currentFile],
-    GoldenPrint["FAIL: Current file not found: ", currentFile];
+    GoldenPrint["  ", $TagFail, " Current file not found: ", currentFile];
     Return[$Failed]
   ];
 
   If[!FileExistsQ[goldenFile],
-    GoldenPrint["FAIL: Golden file not found: ", goldenFile];
+    GoldenPrint["  ", $TagFail, " Golden file not found: ", goldenFile];
     Return[$Failed]
   ];
 
@@ -41,14 +45,14 @@ CompareGoldenFile[currentFile_String, goldenFile_String] := Module[
   golden = Import[goldenFile, "Text"];
 
   If[current === golden,
-    GoldenPrint["PASS: ", FileNameTake[currentFile]];
+    GoldenPrint["  ", $TagPass, " ", FileNameTake[currentFile]];
     True,
-    GoldenPrint["FAIL: ", FileNameTake[currentFile], " differs from golden"];
-    GoldenPrint["  Current: ", StringLength[current], " chars"];
-    GoldenPrint["  Golden:  ", StringLength[golden], " chars"];
+    GoldenPrint["  ", $TagFail, " ", FileNameTake[currentFile], " differs from golden"];
+    GoldenPrint["         Current: ", StringLength[current], " chars"];
+    GoldenPrint["         Golden:  ", StringLength[golden], " chars"];
     (* Always print failure details even in quiet mode *)
     If[ValueQ[Global`$QuietMode] && Global`$QuietMode === True,
-      Print["  FAIL: ", FileNameTake[currentFile], " (", StringLength[current], " vs ", StringLength[golden], " chars)"]
+      Print["  ", $TagFail, " ", FileNameTake[currentFile], " (", StringLength[current], " vs ", StringLength[golden], " chars)"]
     ];
     $Failed
   ]
@@ -58,7 +62,8 @@ CompareGoldenFile[currentFile_String, goldenFile_String] := Module[
 RunGoldenTests[] := Module[
   {results, passed, failed, backend, testName, ext, currentFile, goldenFile},
 
-  GoldenPrint["=== Golden File Regression Tests ==="];
+  GoldenPrint[""];
+  GoldenPrint["  Comparing against golden files..."];
   GoldenPrint[""];
 
   results = Table[
@@ -73,16 +78,12 @@ RunGoldenTests[] := Module[
   failed = Count[results, $Failed];
 
   GoldenPrint[""];
-  GoldenPrint["=== Summary ==="];
-  GoldenPrint["Passed: ", passed, "/", Length[results]];
-  GoldenPrint["Failed: ", failed, "/", Length[results]];
+  GoldenPrint["  Golden Tests Summary: ", passed, "/", Length[results], " passed"];
 
   If[failed > 0,
     GoldenPrint[""];
-    GoldenPrint["REGRESSION DETECTED"];
+    GoldenPrint["  ", $TagFail, " REGRESSION DETECTED"];
     $Failed,
-    GoldenPrint[""];
-    GoldenPrint["ALL TESTS PASSED"];
     True
   ]
 ];

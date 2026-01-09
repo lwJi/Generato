@@ -16,6 +16,68 @@ QuietPrint[args___] := If[!$QuietMode, Print[args]];
 (* Suppress all Print output during package loading in quiet mode *)
 QuietGet[file_] := Block[{Print}, Get[file]];
 
+(* ========================================= *)
+(* Formatting Helpers for Beautified Output  *)
+(* ========================================= *)
+
+(* ASCII box characters *)
+$BoxLine = "+==========================================+";
+$BoxSide = "|";
+
+(* Status tags with ANSI colors *)
+$TagPass = "\033[0;32m[PASS]\033[0m";
+$TagFail = "\033[0;31m[FAIL]\033[0m";
+$TagRun  = "\033[0;33m[RUN ]\033[0m";
+$TagWarn = "\033[0;33m[WARN]\033[0m";
+$TagSkip = "\033[0;36m[SKIP]\033[0m";
+
+(* Section header helper - creates "-- Title ----..." *)
+PrintSection[title_String] := Module[{dashes, totalWidth},
+  totalWidth = 50;
+  dashes = StringJoin[Table["-", {Max[1, totalWidth - StringLength[title] - 4]}]];
+  QuietPrint[""];
+  QuietPrint["-- ", title, " ", dashes]
+];
+
+(* Centered box line helper *)
+PrintBoxLine[text_String] := Module[{padding, leftPad, rightPad, boxWidth},
+  boxWidth = 40;
+  padding = boxWidth - StringLength[text];
+  leftPad = Floor[padding/2];
+  rightPad = Ceiling[padding/2];
+  QuietPrint[$BoxSide, StringJoin[Table[" ", {leftPad}]], text, StringJoin[Table[" ", {rightPad}]], $BoxSide]
+];
+
+(* Print the header box *)
+PrintHeader[] := Module[{},
+  QuietPrint[""];
+  QuietPrint[$BoxLine];
+  PrintBoxLine["Generato Test Suite"];
+  PrintBoxLine["--verbose mode"];
+  QuietPrint[$BoxLine];
+  QuietPrint[""]
+];
+
+(* Print final result box - handles ANSI color codes in text *)
+PrintResultBoxLine[text_String, visibleLen_Integer] := Module[{padding, leftPad, rightPad, boxWidth},
+  boxWidth = 40;
+  padding = boxWidth - visibleLen;
+  leftPad = Floor[padding/2];
+  rightPad = Ceiling[padding/2];
+  QuietPrint[$BoxSide, StringJoin[Table[" ", {leftPad}]], text, StringJoin[Table[" ", {rightPad}]], $BoxSide]
+];
+
+PrintResultBox[passed_] := Module[{},
+  QuietPrint[""];
+  QuietPrint[$BoxLine];
+  If[passed,
+    PrintResultBoxLine["\033[0;32mALL TESTS PASSED\033[0m", 15],  (* "ALL TESTS PASSED" = 15 chars *)
+    PrintResultBoxLine["\033[0;31mSOME TESTS FAILED\033[0m", 17]  (* "SOME TESTS FAILED" = 17 chars *)
+  ];
+  QuietPrint[$BoxLine];
+  QuietPrint[""]
+];
+
 (* Load shared test configuration *)
 Get[FileNameJoin[{$TestDir, "TestConfig.wl"}]];
 
@@ -36,11 +98,7 @@ RunPhase[phaseName_String, phaseCode_] := Module[{},
 ];
 SetAttributes[RunPhase, HoldAll];
 
-QuietPrint[""];
-QuietPrint["========================================"];
-QuietPrint["  Generato Test Suite"];
-QuietPrint["========================================"];
-QuietPrint[""];
+PrintHeader[];
 
 (* Collect all verification tests *)
 $AllTests = {};
@@ -50,27 +108,27 @@ $AllTests = {};
 (* ========================================= *)
 
 RunUnitTests[] := Module[{unitTestFiles, report},
-  QuietPrint["--- Unit Tests ---"];
+  PrintSection["Unit Tests"];
   QuietPrint[""];
 
   unitTestFiles = FileNames["*.wl", FileNameJoin[{$TestDir, "unit"}]];
 
   If[Length[unitTestFiles] > 0,
     Do[
-      QuietPrint["Running: ", FileNameTake[file]];
-      QuietGet[file],
+      QuietPrint["  ", $TagRun, " ", FileNameTake[file]];
+      QuietGet[file];
+      QuietPrint["  ", $TagPass, " ", FileNameTake[file]],
       {file, unitTestFiles}
     ],
-    QuietPrint["No unit test files found in test/unit/"]
+    QuietPrint["  ", $TagWarn, " No unit test files found in test/unit/"]
   ];
 
   QuietPrint[""];
 
   (* Generate test report if VerificationTests were run *)
   If[Length[$AllTests] > 0,
-    QuietPrint["Generating TestReport..."];
     report = TestReport[$AllTests];
-    QuietPrint["Tests Passed: ", report["TestsSucceededCount"], "/", report["TestsSucceededCount"] + report["TestsFailedCount"]];
+    QuietPrint["  Unit Tests Summary: ", report["TestsSucceededCount"], "/", report["TestsSucceededCount"] + report["TestsFailedCount"], " passed"];
     QuietPrint[""];
     (* Mark phase as failed if any tests failed *)
     If[report["TestsFailedCount"] > 0,
@@ -81,7 +139,7 @@ RunUnitTests[] := Module[{unitTestFiles, report},
         failedAssocs = Values[report["TestsFailed"]];
         allFailedTests = Flatten[Values /@ failedAssocs];
         Print[""];
-        Print["=== UNIT TEST FAILURES ==="];
+        Print["-- Failures ", StringJoin[Table["-", {38}]]];
         Print[""];
         Do[
           Module[{testResult, testID, actual, expected, outcome},
@@ -90,10 +148,10 @@ RunUnitTests[] := Module[{unitTestFiles, report},
             outcome = testResult["Outcome"];
             actual = testResult["ActualOutput"];
             expected = testResult["ExpectedOutput"];
-            Print["FAILED: ", testID];
-            Print["  Outcome:  ", outcome];
-            Print["  Expected: ", expected];
-            Print["  Actual:   ", actual];
+            Print["  ", $TagFail, " ", testID];
+            Print["         Outcome:  ", outcome];
+            Print["         Expected: ", expected];
+            Print["         Actual:   ", actual];
             Print[""];
           ],
           {i, Length[allFailedTests]}
@@ -131,15 +189,16 @@ ValidateGoldenFiles[] := Module[{backend, testName, ext, goldenFile, missing},
     {testCase, $TestCases}
   ];
   If[Length[missing] > 0,
-    QuietPrint["WARNING: Missing golden files:"];
-    Do[QuietPrint["  ", f], {f, missing}];
+    QuietPrint["  ", $TagWarn, " Missing golden files:"];
+    Do[QuietPrint["           ", FileNameTake[f]], {f, missing}];
   ];
   missing
 ];
 
 (* Generate golden files from current outputs *)
 GenerateGoldenFiles[] := Module[{backend, testName, ext, testFile, result, outputFile, goldenFile, goldenDir, quietPrefix},
-  Print["--- Generating Golden Files ---"];
+  Print[""];
+  Print["-- Generating Golden Files ", StringJoin[Table["-", {28}]]];
   Print[""];
 
   quietPrefix = "QUIET=1 ";
@@ -154,14 +213,14 @@ GenerateGoldenFiles[] := Module[{backend, testName, ext, testFile, result, outpu
     If[FileExistsQ[testFile],
       (* Validate inputs before shell execution *)
       If[!ValidShellInput[backend] || !ValidShellInput[testName],
-        Print["ERROR: Invalid characters in backend or testName"];
+        Print["  ", $TagFail, " Invalid characters in backend or testName"];
         Continue[];
       ];
 
-      Print["  Generating: ", backend, "/", testName, ".wl"];
+      Print["  ", $TagRun, " ", backend, "/", testName, ".wl"];
       result = Run["cd " <> FileNameJoin[{$TestDir, "regression", backend}] <> " && " <> quietPrefix <> "\"$GENERATO/Generato\" " <> testName <> ".wl 2>&1"];
       If[result != 0,
-        Print["    \033[0;31mFAILED\033[0m to generate ", testName, ext];
+        Print["  ", $TagFail, " Failed to generate ", testName, ext];
         Continue[];
       ];
 
@@ -173,32 +232,33 @@ GenerateGoldenFiles[] := Module[{backend, testName, ext, testFile, result, outpu
       (* Copy output to golden file *)
       If[FileExistsQ[outputFile],
         CopyFile[outputFile, goldenFile, OverwriteTarget -> True];
-        Print["    \033[0;32mUpdated\033[0m: ", goldenFile];
+        Print["  ", $TagPass, " Updated: ", FileNameTake[goldenFile]];
         (* Clean up generated file *)
         DeleteFile[outputFile];
       ],
-      Print["  SKIP: ", testFile, " not found"];
+      Print["  ", $TagSkip, " ", testFile, " not found"];
     ],
     {testCase, $TestCases}
   ];
 
   Print[""];
-  Print["Golden file generation complete."];
+  Print["  Golden file generation complete."];
+  Print[""];
 ];
 
 RunRegressionTests[] := Module[{backend, testName, ext, testFile, result, outputFile, quietPrefix, missingGolden},
-  QuietPrint["--- Regression Tests (Golden Files) ---"];
+  PrintSection["Regression Tests (Golden Files)"];
   QuietPrint[""];
 
   (* Validate golden files first *)
   missingGolden = ValidateGoldenFiles[];
   If[Length[missingGolden] > 0,
-    QuietPrint["Run with --generate to create missing golden files"];
+    QuietPrint["           Run with --generate to create missing golden files"];
     QuietPrint[""];
   ];
 
   (* Generate outputs for each test case *)
-  QuietPrint["Generating test outputs..."];
+  QuietPrint["  Generating test outputs..."];
   QuietPrint[""];
 
   (* Always suppress package loading messages in subprocess *)
@@ -212,19 +272,20 @@ RunRegressionTests[] := Module[{backend, testName, ext, testFile, result, output
     If[FileExistsQ[testFile],
       (* Validate inputs before shell execution *)
       If[!ValidShellInput[backend] || !ValidShellInput[testName],
-        QuietPrint["ERROR: Invalid characters in backend or testName"];
+        QuietPrint["  ", $TagFail, " Invalid characters in backend or testName"];
         $GenerationFailed = True;
         Continue[];
       ];
 
-      QuietPrint["  Generating: ", backend, "/", testName, ".wl"];
+      QuietPrint["  ", $TagRun, " ", backend, "/", testName, ".wl"];
       (* Run Generato from the test directory, passing QUIET mode *)
       result = Run["cd " <> FileNameJoin[{$TestDir, "regression", backend}] <> " && " <> quietPrefix <> "\"$GENERATO/Generato\" " <> testName <> ".wl 2>&1"];
       If[result != 0,
-        QuietPrint["    FAILED to generate ", testName, ext];
-        $GenerationFailed = True;
+        QuietPrint["  ", $TagFail, " Failed to generate ", testName, ext];
+        $GenerationFailed = True,
+        QuietPrint["  ", $TagPass, " ", backend, "/", testName, ".wl"]
       ],
-      QuietPrint["  SKIP: ", testFile, " not found"];
+      QuietPrint["  ", $TagSkip, " ", testFile, " not found"];
     ],
     {testCase, $TestCases}
   ];
@@ -232,7 +293,7 @@ RunRegressionTests[] := Module[{backend, testName, ext, testFile, result, output
   QuietPrint[""];
 
   If[$GenerationFailed,
-    QuietPrint["ERROR: Some outputs failed to generate"];
+    QuietPrint["  ", $TagFail, " Some outputs failed to generate"];
     $PhaseSuccess = False;
     Return[];
   ];
@@ -245,7 +306,7 @@ RunRegressionTests[] := Module[{backend, testName, ext, testFile, result, output
 
   (* Cleanup generated output files *)
   QuietPrint[""];
-  QuietPrint["Cleaning up generated files..."];
+  QuietPrint["  Cleaning up generated files..."];
   Do[
     {backend, testName, ext} = testCase;
     outputFile = FileNameJoin[{$TestDir, "regression", backend, testName <> ext}];
@@ -255,7 +316,7 @@ RunRegressionTests[] := Module[{backend, testName, ext, testFile, result, output
         DeleteFile::fdnfnd  (* Suppress "file doesn't exist" which is fine *)
       ];
       If[FileExistsQ[outputFile],
-        QuietPrint["WARNING: Failed to delete ", outputFile];
+        QuietPrint["  ", $TagWarn, " Failed to delete ", outputFile];
       ];
     ],
     {testCase, $TestCases}
@@ -278,6 +339,9 @@ If[$GenerateMode,
     True,
     RunPhase["regression", RunRegressionTests[]]
   ];
+
+  (* Print final result box *)
+  PrintResultBox[$UnitTestsSuccess && $RegressionTestsSuccess];
 
   (* Exit with appropriate status *)
   If[!$UnitTestsSuccess || !$RegressionTestsSuccess,
