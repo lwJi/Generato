@@ -222,12 +222,22 @@ GetDefaultManifold::NoManifolds = "No manifolds have been defined. Use DefManifo
 Protect[GetDefaultManifold];
 
 GetDefaultChart[] :=
-  Return[ChartsOfManifold[GetDefaultManifold[]][[1]]];
+  Module[{manifold = GetDefaultManifold[]},
+    If[manifold === $Failed,
+      Return[$Failed],
+      Return[ChartsOfManifold[manifold][[1]]]
+    ]
+  ];
 
 Protect[GetDefaultChart];
 
 GetDim[] :=
-  Return[DimOfManifold[GetDefaultManifold[]]];
+  Module[{manifold = GetDefaultManifold[]},
+    If[manifold === $Failed,
+      Return[$Failed],
+      Return[DimOfManifold[manifold]]
+    ]
+  ];
 
 Protect[GetDim];
 

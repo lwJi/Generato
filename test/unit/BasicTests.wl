@@ -226,6 +226,20 @@ AppendTo[$AllTests,
   ]
 ];
 
+AppendTo[$AllTests,
+  VerificationTest[
+    (* GetDefaultChart should return $Failed when no manifolds exist *)
+    Module[{savedManifolds = $Manifolds, result},
+      Block[{$Manifolds = {}},
+        result = Quiet[GetDefaultChart[]];
+        result === $Failed
+      ]
+    ],
+    True,
+    TestID -> "GetDefaultChart-EmptyManifolds-ReturnsFailed"
+  ]
+];
+
 (* ========================================= *)
 (* Test: GetDim *)
 (* ========================================= *)
@@ -238,6 +252,20 @@ AppendTo[$AllTests,
     ],
     True,
     TestID -> "GetDim-ReturnsValidDimension"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* GetDim should return $Failed when no manifolds exist *)
+    Module[{savedManifolds = $Manifolds, result},
+      Block[{$Manifolds = {}},
+        result = Quiet[GetDim[]];
+        result === $Failed
+      ]
+    ],
+    True,
+    TestID -> "GetDim-EmptyManifolds-ReturnsFailed"
   ]
 ];
 
