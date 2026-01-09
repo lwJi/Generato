@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* testGPU.wl *)
+(* test.wl *)
 
 (* (c) Liwei Ji, 01/2024 *)
 
@@ -45,7 +45,7 @@ SetEQN[{SuffixName -> "Msqr"}, rU[i_], euclid[i, k] MDD[-k, -j] vU[j]];
 
 SetEQN[{SuffixName -> "otherwise"}, rU[i_], vU[i]];
 
-SetOutputFile[FileNameJoin[{Directory[], "testGPU.hxx"}]];
+SetOutputFile[FileNameJoin[{Directory[], "test.hxx"}]];
 
 (* SetProject["CarpetX"]; *)
 
