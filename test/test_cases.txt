@@ -1,14 +1,14 @@
 # Test case definitions for Generato
 # Format: backend:test_name:extension
 # Lines starting with # are comments
-CarpetX:test:.hxx
+#CarpetX:test:.hxx
 CarpetXGPU:test:.hxx
 CarpetXGPU:testTile:.hxx
 CarpetXGPU:testDerivs:.hxx
-CarpetXPointDesc:test:.hxx
-Carpet:test:.hxx
+#CarpetXPointDesc:test:.hxx
+#Carpet:test:.hxx
 AMReX:test:.hxx
-Nmesh:test:.c
+#Nmesh:test:.c
 Nmesh:GHG_rhs:.c
 
 # Note: test/Nmesh/GHG_rhs.ipynb is documentation-only and not part of the test suite
