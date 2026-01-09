@@ -60,27 +60,7 @@ Each backend implements `PrintComponentInitialization` and `PrintComponentEquati
 ## Running Tests
 
 ```bash
-# Run all tests (runs unit tests + regression tests)
 wolframscript -script test/AllTests.wl
-
-# Run with verbose output
-wolframscript -script test/AllTests.wl --verbose
-
-# Run unit tests only (skip regression tests)
-wolframscript -script test/AllTests.wl --unit-only
-
-# Update golden files with new outputs
-wolframscript -script test/AllTests.wl --generate
 ```
 
-The test suite includes:
-
-- **Unit tests** (`test/unit/`) - Test individual module functions
-- **Integration tests** - Generate output for each backend
-- **Golden file regression** (`test/golden/`) - Compare outputs against expected results
-
-## Test Examples
-
-- `test/CarpetX/test.wl` - Simple CarpetX example with 3 vectors
-- `test/Nmesh/GHG_rhs.wl` - GHG formulation of Einstein's equations (complex example)
-- `test/Nmesh/GHG_rhs.ipynb` - Jupyter notebook with documentation
+See [README.md](README.md) for more details on test options, directory structure, and adding new tests.
