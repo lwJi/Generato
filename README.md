@@ -4,7 +4,7 @@ Generate C/C++ Code from Tensor Expression and So On
 
 ## Pre-Requisites
 
-* Install free Wolfram Engine for Devolopers from https://www.wolfram.com/developer/.
+* Install free Wolfram Engine for Developers from https://www.wolfram.com/developer/.
 (If you are rich, you can install the totally worth-it Mathematica instead, versions that support `wolframscript`.)
 
 * Download xAct from http://www.xact.es and install it properly.
@@ -13,7 +13,7 @@ Generate C/C++ Code from Tensor Expression and So On
 
 * clone repo: `git clone https://github.com/lwJi/Generato.git`
 
-* set enviroment variable: `export GENERATO="/your/repo/path"`
+* set environment variable: `export GENERATO="/your/repo/path"`
 
 ## Example
 
@@ -35,9 +35,9 @@ cd test/Nmesh
 Generato GHG_rhs.wl
 ```
 
-## Recomendations
+## Recommendations
 
-* Use lower case to name variables (to aviod conflict with say `Pi`)
+* Use lower case to name variables (to avoid conflict with say `Pi`)
 
 ## Tips
 
