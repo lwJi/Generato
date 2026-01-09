@@ -60,3 +60,87 @@ wolframscript -script test/AllTests.wl --unit-only
 # Update golden files with new outputs
 wolframscript -script test/AllTests.wl --generate
 ```
+
+### Output Control Options
+
+- **`--verbose`** - Controls test runner output (test progress, results)
+- **`QUIET=1`** - Environment variable that suppresses xAct loading banners and Generato processing messages
+
+These operate at different levels and can be combined:
+
+```bash
+# Quiet test run (default) - minimal output
+wolframscript -script test/AllTests.wl
+
+# Verbose test run - shows test progress and results
+wolframscript -script test/AllTests.wl --verbose
+
+# Combined - verbose test results but suppressed xAct banners
+QUIET=1 wolframscript -script test/AllTests.wl --verbose
+```
+
+The test suite includes:
+
+- **Unit tests** (`test/unit/`) - Test individual module functions
+- **Integration tests** - Generate output for each backend
+- **Golden file regression** (`test/regression/golden/`) - Compare outputs against expected results
+
+### Test Directory Structure
+
+```
+test/
+├── AllTests.wl              # Master test runner
+├── TestConfig.wl            # Shared configuration module
+├── test_cases.txt           # Regression test case definitions
+├── compare_golden.wl        # Golden file comparison module
+├── unit/                    # Unit tests (one file per module)
+│   ├── BasicTests.wl
+│   ├── ComponentTests.wl
+│   ├── VarlistTests.wl
+│   └── ...
+└── regression/              # Regression tests
+    ├── golden/              # Reference outputs (.golden files)
+    │   ├── CarpetX/
+    │   ├── Nmesh/
+    │   └── ...
+    ├── CarpetX/             # Backend test directories
+    ├── Nmesh/
+    └── ...
+```
+
+### Adding New Unit Tests
+
+Create a new file in `test/unit/` following this pattern:
+
+```wolfram
+If[Environment["QUIET"] =!= "1", Print["Loading MyModuleTests.wl..."]];
+Needs["Generato`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"}]];
+SetPVerbose[False];
+SetPrintDate[False];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* test code *),
+    (* expected result *),
+    TestID -> "MyModule-DescriptiveTestName"
+  ]
+];
+
+If[Environment["QUIET"] =!= "1", Print["MyModuleTests.wl completed."]];
+```
+
+### Adding New Regression Tests
+
+1. Create test file in `test/regression/<Backend>/testname.wl`
+2. Add entry to `test/test_cases.txt`:
+   ```
+   Backend:testname:extension
+   ```
+   Format: `backend:testname:extension` (e.g., `CarpetX:mytest:.hxx`)
+3. Run `wolframscript -script test/AllTests.wl --generate` to create golden file
+
+### Test Examples
+
+- `test/regression/CarpetX/test.wl` - Simple CarpetX example with 3 vectors
+- `test/regression/Nmesh/GHG_rhs.wl` - GHG formulation of Einstein's equations (complex example)
+- `test/regression/Nmesh/GHG_rhs.ipynb` - Jupyter notebook with documentation
