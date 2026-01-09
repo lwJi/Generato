@@ -1,0 +1,1536 @@
+/* GHG_set_profile_ADM.c */
+/* Produced with Generato */
+
+#include "nmesh.h"
+#include "GHG.h"
+
+#define Power(x,y) (pow((double) (x),(double) (y)))
+#define Log(x) log((double) (x))
+#define pow2(x) ((x)*(x))
+#define pow2inv(x) (1.0/((x)*(x)))
+#define Cal(x,y,z) ((x)?(y):(z))
+#define Sqrt(x) sqrt(x)
+#define Abs(x) fabs(x)
+
+/* use globals from GHG */
+extern tGHG GHG[1];
+
+
+int GHG_set_profile_ADM(tVarList *vlu)
+{
+tMesh *mesh = vlu->mesh;
+int ialpha = Ind("ADM_alpha");
+int ibetax = Ind("ADM_betax");
+int igammaxx = Ind("ADM_gxx");
+int iexKxx = Ind("ADM_Kxx");
+int idalphax = Ind("ADM_dalphax");
+int idbetaxx = Ind("ADM_dbetaxx");
+int idgammaxxx = Ind("ADM_dgxxx");
+int idHxt = Ind("GHG_dHxt");
+
+formylnodes(mesh)
+{
+tNode *node = MyLnode;
+int ijk;
+
+/* derivatives */
+cart_partials_dU_di(node,  ialpha, idalphax);
+cart_partials_dUi_dj(node, ibetax, idbetaxx);
+cart_partials_dSij_dk(node, igammaxx, idgammaxxx);
+
+double *g00 = Vard(node, Vind(vlu,GHG->i_gtt));
+double *g01 = Vard(node, Vind(vlu,GHG->i_gtt+1));
+double *g02 = Vard(node, Vind(vlu,GHG->i_gtt+2));
+double *g03 = Vard(node, Vind(vlu,GHG->i_gtt+3));
+double *g11 = Vard(node, Vind(vlu,GHG->i_gtt+4));
+double *g12 = Vard(node, Vind(vlu,GHG->i_gtt+5));
+double *g13 = Vard(node, Vind(vlu,GHG->i_gtt+6));
+double *g22 = Vard(node, Vind(vlu,GHG->i_gtt+7));
+double *g23 = Vard(node, Vind(vlu,GHG->i_gtt+8));
+double *g33 = Vard(node, Vind(vlu,GHG->i_gtt+9));
+double *Pi00 = Vard(node, Vind(vlu,GHG->i_Pitt));
+double *Pi01 = Vard(node, Vind(vlu,GHG->i_Pitt+1));
+double *Pi02 = Vard(node, Vind(vlu,GHG->i_Pitt+2));
+double *Pi03 = Vard(node, Vind(vlu,GHG->i_Pitt+3));
+double *Pi11 = Vard(node, Vind(vlu,GHG->i_Pitt+4));
+double *Pi12 = Vard(node, Vind(vlu,GHG->i_Pitt+5));
+double *Pi13 = Vard(node, Vind(vlu,GHG->i_Pitt+6));
+double *Pi22 = Vard(node, Vind(vlu,GHG->i_Pitt+7));
+double *Pi23 = Vard(node, Vind(vlu,GHG->i_Pitt+8));
+double *Pi33 = Vard(node, Vind(vlu,GHG->i_Pitt+9));
+double *Phi100 = Vard(node, Vind(vlu,GHG->i_Phixtt));
+double *Phi101 = Vard(node, Vind(vlu,GHG->i_Phixtt+1));
+double *Phi102 = Vard(node, Vind(vlu,GHG->i_Phixtt+2));
+double *Phi103 = Vard(node, Vind(vlu,GHG->i_Phixtt+3));
+double *Phi111 = Vard(node, Vind(vlu,GHG->i_Phixtt+4));
+double *Phi112 = Vard(node, Vind(vlu,GHG->i_Phixtt+5));
+double *Phi113 = Vard(node, Vind(vlu,GHG->i_Phixtt+6));
+double *Phi122 = Vard(node, Vind(vlu,GHG->i_Phixtt+7));
+double *Phi123 = Vard(node, Vind(vlu,GHG->i_Phixtt+8));
+double *Phi133 = Vard(node, Vind(vlu,GHG->i_Phixtt+9));
+double *Phi200 = Vard(node, Vind(vlu,GHG->i_Phixtt+10));
+double *Phi201 = Vard(node, Vind(vlu,GHG->i_Phixtt+11));
+double *Phi202 = Vard(node, Vind(vlu,GHG->i_Phixtt+12));
+double *Phi203 = Vard(node, Vind(vlu,GHG->i_Phixtt+13));
+double *Phi211 = Vard(node, Vind(vlu,GHG->i_Phixtt+14));
+double *Phi212 = Vard(node, Vind(vlu,GHG->i_Phixtt+15));
+double *Phi213 = Vard(node, Vind(vlu,GHG->i_Phixtt+16));
+double *Phi222 = Vard(node, Vind(vlu,GHG->i_Phixtt+17));
+double *Phi223 = Vard(node, Vind(vlu,GHG->i_Phixtt+18));
+double *Phi233 = Vard(node, Vind(vlu,GHG->i_Phixtt+19));
+double *Phi300 = Vard(node, Vind(vlu,GHG->i_Phixtt+20));
+double *Phi301 = Vard(node, Vind(vlu,GHG->i_Phixtt+21));
+double *Phi302 = Vard(node, Vind(vlu,GHG->i_Phixtt+22));
+double *Phi303 = Vard(node, Vind(vlu,GHG->i_Phixtt+23));
+double *Phi311 = Vard(node, Vind(vlu,GHG->i_Phixtt+24));
+double *Phi312 = Vard(node, Vind(vlu,GHG->i_Phixtt+25));
+double *Phi313 = Vard(node, Vind(vlu,GHG->i_Phixtt+26));
+double *Phi322 = Vard(node, Vind(vlu,GHG->i_Phixtt+27));
+double *Phi323 = Vard(node, Vind(vlu,GHG->i_Phixtt+28));
+double *Phi333 = Vard(node, Vind(vlu,GHG->i_Phixtt+29));
+double *H0 = Vard(node, Vind(vlu,GHG->i_Ht));
+double *H1 = Vard(node, Vind(vlu,GHG->i_Ht+1));
+double *H2 = Vard(node, Vind(vlu,GHG->i_Ht+2));
+double *H3 = Vard(node, Vind(vlu,GHG->i_Ht+3));
+double *the0 = Vard(node, Vind(vlu,GHG->i_thet));
+double *the1 = Vard(node, Vind(vlu,GHG->i_thet+1));
+double *the2 = Vard(node, Vind(vlu,GHG->i_thet+2));
+double *the3 = Vard(node, Vind(vlu,GHG->i_thet+3));
+double *alpha = Vard(node, ialpha);
+double *beta1 = Vard(node, ibetax);
+double *beta2 = Vard(node, ibetax+1);
+double *beta3 = Vard(node, ibetax+2);
+double *gamma11 = Vard(node, igammaxx);
+double *gamma12 = Vard(node, igammaxx+1);
+double *gamma13 = Vard(node, igammaxx+2);
+double *gamma22 = Vard(node, igammaxx+3);
+double *gamma23 = Vard(node, igammaxx+4);
+double *gamma33 = Vard(node, igammaxx+5);
+double *exK11 = Vard(node, iexKxx);
+double *exK12 = Vard(node, iexKxx+1);
+double *exK13 = Vard(node, iexKxx+2);
+double *exK22 = Vard(node, iexKxx+3);
+double *exK23 = Vard(node, iexKxx+4);
+double *exK33 = Vard(node, iexKxx+5);
+double *dalpha1 = Vard(node, idalphax);
+double *dalpha2 = Vard(node, idalphax+1);
+double *dalpha3 = Vard(node, idalphax+2);
+double *dbeta11 = Vard(node, idbetaxx);
+double *dbeta12 = Vard(node, idbetaxx+1);
+double *dbeta13 = Vard(node, idbetaxx+2);
+double *dbeta21 = Vard(node, idbetaxx+3);
+double *dbeta22 = Vard(node, idbetaxx+4);
+double *dbeta23 = Vard(node, idbetaxx+5);
+double *dbeta31 = Vard(node, idbetaxx+6);
+double *dbeta32 = Vard(node, idbetaxx+7);
+double *dbeta33 = Vard(node, idbetaxx+8);
+double *dgamma111 = Vard(node, idgammaxxx);
+double *dgamma112 = Vard(node, idgammaxxx+1);
+double *dgamma113 = Vard(node, idgammaxxx+2);
+double *dgamma121 = Vard(node, idgammaxxx+3);
+double *dgamma122 = Vard(node, idgammaxxx+4);
+double *dgamma123 = Vard(node, idgammaxxx+5);
+double *dgamma131 = Vard(node, idgammaxxx+6);
+double *dgamma132 = Vard(node, idgammaxxx+7);
+double *dgamma133 = Vard(node, idgammaxxx+8);
+double *dgamma221 = Vard(node, idgammaxxx+9);
+double *dgamma222 = Vard(node, idgammaxxx+10);
+double *dgamma223 = Vard(node, idgammaxxx+11);
+double *dgamma231 = Vard(node, idgammaxxx+12);
+double *dgamma232 = Vard(node, idgammaxxx+13);
+double *dgamma233 = Vard(node, idgammaxxx+14);
+double *dgamma331 = Vard(node, idgammaxxx+15);
+double *dgamma332 = Vard(node, idgammaxxx+16);
+double *dgamma333 = Vard(node, idgammaxxx+17);
+double *dH10 = Vard(node, idHxt);
+double *dH11 = Vard(node, idHxt+1);
+double *dH12 = Vard(node, idHxt+2);
+double *dH13 = Vard(node, idHxt+3);
+double *dH20 = Vard(node, idHxt+4);
+double *dH21 = Vard(node, idHxt+5);
+double *dH22 = Vard(node, idHxt+6);
+double *dH23 = Vard(node, idHxt+7);
+double *dH30 = Vard(node, idHxt+8);
+double *dH31 = Vard(node, idHxt+9);
+double *dH32 = Vard(node, idHxt+10);
+double *dH33 = Vard(node, idHxt+11);
+double dtalpha;
+double dtbeta1;
+double dtbeta2;
+double dtbeta3;
+double dmetricg000;
+double dmetricg001;
+double dmetricg002;
+double dmetricg003;
+double dmetricg011;
+double dmetricg012;
+double dmetricg013;
+double dmetricg022;
+double dmetricg023;
+double dmetricg033;
+double dmetricg100;
+double dmetricg101;
+double dmetricg102;
+double dmetricg103;
+double dmetricg111;
+double dmetricg112;
+double dmetricg113;
+double dmetricg122;
+double dmetricg123;
+double dmetricg133;
+double dmetricg200;
+double dmetricg201;
+double dmetricg202;
+double dmetricg203;
+double dmetricg211;
+double dmetricg212;
+double dmetricg213;
+double dmetricg222;
+double dmetricg223;
+double dmetricg233;
+double dmetricg300;
+double dmetricg301;
+double dmetricg302;
+double dmetricg303;
+double dmetricg311;
+double dmetricg312;
+double dmetricg313;
+double dmetricg322;
+double dmetricg323;
+double dmetricg333;
+
+int idtgtt;
+if(GHG->gauge_H_dH_from_Ein) {
+  idtgtt = Ind("Ein_dtgtt");
+} else {
+  idtgtt = Ind("GHG_gtt"); /* set to dummy values */
+}
+double *dtg00 = Vard(node, idtgtt);
+double *dtg01 = Vard(node, idtgtt+1);
+double *dtg02 = Vard(node, idtgtt+2);
+double *dtg03 = Vard(node, idtgtt+3);
+double *dtg11 = Vard(node, idtgtt+4);
+double *dtg12 = Vard(node, idtgtt+5);
+double *dtg13 = Vard(node, idtgtt+6);
+double *dtg22 = Vard(node, idtgtt+7);
+double *dtg23 = Vard(node, idtgtt+8);
+double *dtg33 = Vard(node, idtgtt+9);
+
+double parnu = Getd(GHG->nu);
+double pareta = Getd(GHG->eta2);
+double parmu0 = Getd(GHG->mu0);
+
+TIMER_START;
+
+/* compute */
+forpoints(node, ijk)
+{
+
+double detgamma
+=
+-(Power(gamma13[ijk],2)*gamma22[ijk]) +
+  2*gamma12[ijk]*gamma13[ijk]*gamma23[ijk] -
+  Power(gamma12[ijk],2)*gamma33[ijk] +
+  gamma11[ijk]*(-Power(gamma23[ijk],2) + gamma22[ijk]*gamma33[ijk])
+;
+
+double invgamma11
+=
+(-Power(gamma23[ijk],2) + gamma22[ijk]*gamma33[ijk])/detgamma
+;
+
+double invgamma12
+=
+(gamma13[ijk]*gamma23[ijk] - gamma12[ijk]*gamma33[ijk])/detgamma
+;
+
+double invgamma13
+=
+(-(gamma13[ijk]*gamma22[ijk]) + gamma12[ijk]*gamma23[ijk])/detgamma
+;
+
+double invgamma22
+=
+(-Power(gamma13[ijk],2) + gamma11[ijk]*gamma33[ijk])/detgamma
+;
+
+double invgamma23
+=
+(gamma12[ijk]*gamma13[ijk] - gamma11[ijk]*gamma23[ijk])/detgamma
+;
+
+double invgamma33
+=
+(-Power(gamma12[ijk],2) + gamma11[ijk]*gamma22[ijk])/detgamma
+;
+
+double trK
+=
+invgamma11*exK11[ijk] + 2*invgamma12*exK12[ijk] + 2*invgamma13*exK13[ijk] +
+  invgamma22*exK22[ijk] + 2*invgamma23*exK23[ijk] + invgamma33*exK33[ijk]
+;
+
+double nvec0
+=
+1/alpha[ijk]
+;
+
+double nvec1
+=
+-(beta1[ijk]/alpha[ijk])
+;
+
+double nvec2
+=
+-(beta2[ijk]/alpha[ijk])
+;
+
+double nvec3
+=
+-(beta3[ijk]/alpha[ijk])
+;
+
+
+dmetricg333
+=
+dgamma333[ijk]
+;
+
+dmetricg323
+=
+dgamma233[ijk]
+;
+
+dmetricg322
+=
+dgamma223[ijk]
+;
+
+dmetricg313
+=
+dgamma133[ijk]
+;
+
+dmetricg312
+=
+dgamma123[ijk]
+;
+
+dmetricg311
+=
+dgamma113[ijk]
+;
+
+dmetricg303
+=
+beta1[ijk]*dgamma133[ijk] + beta2[ijk]*dgamma233[ijk] +
+  beta3[ijk]*dgamma333[ijk] + dbeta13[ijk]*gamma13[ijk] +
+  dbeta23[ijk]*gamma23[ijk] + dbeta33[ijk]*gamma33[ijk]
+;
+
+dmetricg302
+=
+beta1[ijk]*dgamma123[ijk] + beta2[ijk]*dgamma223[ijk] +
+  beta3[ijk]*dgamma233[ijk] + dbeta13[ijk]*gamma12[ijk] +
+  dbeta23[ijk]*gamma22[ijk] + dbeta33[ijk]*gamma23[ijk]
+;
+
+dmetricg301
+=
+beta1[ijk]*dgamma113[ijk] + beta2[ijk]*dgamma123[ijk] +
+  beta3[ijk]*dgamma133[ijk] + dbeta13[ijk]*gamma11[ijk] +
+  dbeta23[ijk]*gamma12[ijk] + dbeta33[ijk]*gamma13[ijk]
+;
+
+dmetricg300
+=
+-2*alpha[ijk]*dalpha3[ijk] + Power(beta1[ijk],2)*dgamma113[ijk] +
+  Power(beta2[ijk],2)*dgamma223[ijk] +
+  2*beta2[ijk]*beta3[ijk]*dgamma233[ijk] +
+  Power(beta3[ijk],2)*dgamma333[ijk] +
+  2*beta2[ijk]*dbeta13[ijk]*gamma12[ijk] +
+  2*beta3[ijk]*dbeta13[ijk]*gamma13[ijk] +
+  2*beta1[ijk]*(beta2[ijk]*dgamma123[ijk] + beta3[ijk]*dgamma133[ijk] +
+     dbeta13[ijk]*gamma11[ijk] + dbeta23[ijk]*gamma12[ijk] +
+     dbeta33[ijk]*gamma13[ijk]) + 2*beta2[ijk]*dbeta23[ijk]*gamma22[ijk] +
+  2*beta3[ijk]*dbeta23[ijk]*gamma23[ijk] +
+  2*beta2[ijk]*dbeta33[ijk]*gamma23[ijk] +
+  2*beta3[ijk]*dbeta33[ijk]*gamma33[ijk]
+;
+
+dmetricg233
+=
+dgamma332[ijk]
+;
+
+dmetricg223
+=
+dgamma232[ijk]
+;
+
+dmetricg222
+=
+dgamma222[ijk]
+;
+
+dmetricg213
+=
+dgamma132[ijk]
+;
+
+dmetricg212
+=
+dgamma122[ijk]
+;
+
+dmetricg211
+=
+dgamma112[ijk]
+;
+
+dmetricg203
+=
+beta1[ijk]*dgamma132[ijk] + beta2[ijk]*dgamma232[ijk] +
+  beta3[ijk]*dgamma332[ijk] + dbeta12[ijk]*gamma13[ijk] +
+  dbeta22[ijk]*gamma23[ijk] + dbeta32[ijk]*gamma33[ijk]
+;
+
+dmetricg202
+=
+beta1[ijk]*dgamma122[ijk] + beta2[ijk]*dgamma222[ijk] +
+  beta3[ijk]*dgamma232[ijk] + dbeta12[ijk]*gamma12[ijk] +
+  dbeta22[ijk]*gamma22[ijk] + dbeta32[ijk]*gamma23[ijk]
+;
+
+dmetricg201
+=
+beta1[ijk]*dgamma112[ijk] + beta2[ijk]*dgamma122[ijk] +
+  beta3[ijk]*dgamma132[ijk] + dbeta12[ijk]*gamma11[ijk] +
+  dbeta22[ijk]*gamma12[ijk] + dbeta32[ijk]*gamma13[ijk]
+;
+
+dmetricg200
+=
+-2*alpha[ijk]*dalpha2[ijk] + Power(beta1[ijk],2)*dgamma112[ijk] +
+  Power(beta2[ijk],2)*dgamma222[ijk] +
+  2*beta2[ijk]*beta3[ijk]*dgamma232[ijk] +
+  Power(beta3[ijk],2)*dgamma332[ijk] +
+  2*beta2[ijk]*dbeta12[ijk]*gamma12[ijk] +
+  2*beta3[ijk]*dbeta12[ijk]*gamma13[ijk] +
+  2*beta1[ijk]*(beta2[ijk]*dgamma122[ijk] + beta3[ijk]*dgamma132[ijk] +
+     dbeta12[ijk]*gamma11[ijk] + dbeta22[ijk]*gamma12[ijk] +
+     dbeta32[ijk]*gamma13[ijk]) + 2*beta2[ijk]*dbeta22[ijk]*gamma22[ijk] +
+  2*beta3[ijk]*dbeta22[ijk]*gamma23[ijk] +
+  2*beta2[ijk]*dbeta32[ijk]*gamma23[ijk] +
+  2*beta3[ijk]*dbeta32[ijk]*gamma33[ijk]
+;
+
+dmetricg133
+=
+dgamma331[ijk]
+;
+
+dmetricg123
+=
+dgamma231[ijk]
+;
+
+dmetricg122
+=
+dgamma221[ijk]
+;
+
+dmetricg113
+=
+dgamma131[ijk]
+;
+
+dmetricg112
+=
+dgamma121[ijk]
+;
+
+dmetricg111
+=
+dgamma111[ijk]
+;
+
+dmetricg103
+=
+beta1[ijk]*dgamma131[ijk] + beta2[ijk]*dgamma231[ijk] +
+  beta3[ijk]*dgamma331[ijk] + dbeta11[ijk]*gamma13[ijk] +
+  dbeta21[ijk]*gamma23[ijk] + dbeta31[ijk]*gamma33[ijk]
+;
+
+dmetricg102
+=
+beta1[ijk]*dgamma121[ijk] + beta2[ijk]*dgamma221[ijk] +
+  beta3[ijk]*dgamma231[ijk] + dbeta11[ijk]*gamma12[ijk] +
+  dbeta21[ijk]*gamma22[ijk] + dbeta31[ijk]*gamma23[ijk]
+;
+
+dmetricg101
+=
+beta1[ijk]*dgamma111[ijk] + beta2[ijk]*dgamma121[ijk] +
+  beta3[ijk]*dgamma131[ijk] + dbeta11[ijk]*gamma11[ijk] +
+  dbeta21[ijk]*gamma12[ijk] + dbeta31[ijk]*gamma13[ijk]
+;
+
+dmetricg100
+=
+-2*alpha[ijk]*dalpha1[ijk] + Power(beta1[ijk],2)*dgamma111[ijk] +
+  Power(beta2[ijk],2)*dgamma221[ijk] +
+  2*beta2[ijk]*beta3[ijk]*dgamma231[ijk] +
+  Power(beta3[ijk],2)*dgamma331[ijk] +
+  2*beta2[ijk]*dbeta11[ijk]*gamma12[ijk] +
+  2*beta3[ijk]*dbeta11[ijk]*gamma13[ijk] +
+  2*beta1[ijk]*(beta2[ijk]*dgamma121[ijk] + beta3[ijk]*dgamma131[ijk] +
+     dbeta11[ijk]*gamma11[ijk] + dbeta21[ijk]*gamma12[ijk] +
+     dbeta31[ijk]*gamma13[ijk]) + 2*beta2[ijk]*dbeta21[ijk]*gamma22[ijk] +
+  2*beta3[ijk]*dbeta21[ijk]*gamma23[ijk] +
+  2*beta2[ijk]*dbeta31[ijk]*gamma23[ijk] +
+  2*beta3[ijk]*dbeta31[ijk]*gamma33[ijk]
+;
+
+if(GHG->gauge_H_dH_from_Ein) {
+
+dmetricg033
+=
+dtg33[ijk]
+;
+
+dmetricg023
+=
+dtg23[ijk]
+;
+
+dmetricg022
+=
+dtg22[ijk]
+;
+
+dmetricg013
+=
+dtg13[ijk]
+;
+
+dmetricg012
+=
+dtg12[ijk]
+;
+
+dmetricg011
+=
+dtg11[ijk]
+;
+
+dmetricg003
+=
+dtg03[ijk]
+;
+
+dmetricg002
+=
+dtg02[ijk]
+;
+
+dmetricg001
+=
+dtg01[ijk]
+;
+
+dmetricg000
+=
+dtg00[ijk]
+;
+
+
+} else {
+
+if (GHG->gauge_freeze) {
+
+dtalpha
+=
+0
+;
+
+dtbeta1
+=
+0
+;
+
+dtbeta2
+=
+0
+;
+
+dtbeta3
+=
+0
+;
+
+} else if (GHG->gauge_puncture) {
+
+double tr3Gam1
+=
+(Power(detgamma,0.3333333333333333)*
+    (2*Power(invgamma11,2)*dgamma111[ijk] +
+      2*invgamma11*invgamma12*dgamma112[ijk] +
+      2*invgamma11*invgamma13*dgamma113[ijk] +
+      4*invgamma11*invgamma12*dgamma121[ijk] +
+      Power(invgamma12,2)*dgamma122[ijk] +
+      3*invgamma11*invgamma22*dgamma122[ijk] +
+      invgamma12*invgamma13*dgamma123[ijk] +
+      3*invgamma11*invgamma23*dgamma123[ijk] +
+      4*invgamma11*invgamma13*dgamma131[ijk] +
+      invgamma12*invgamma13*dgamma132[ijk] +
+      3*invgamma11*invgamma23*dgamma132[ijk] +
+      Power(invgamma13,2)*dgamma133[ijk] +
+      3*invgamma11*invgamma33*dgamma133[ijk] +
+      3*Power(invgamma12,2)*dgamma221[ijk] -
+      invgamma11*invgamma22*dgamma221[ijk] +
+      2*invgamma12*invgamma22*dgamma222[ijk] -
+      invgamma13*invgamma22*dgamma223[ijk] +
+      3*invgamma12*invgamma23*dgamma223[ijk] +
+      6*invgamma12*invgamma13*dgamma231[ijk] -
+      2*invgamma11*invgamma23*dgamma231[ijk] +
+      3*invgamma13*invgamma22*dgamma232[ijk] +
+      invgamma12*invgamma23*dgamma232[ijk] +
+      invgamma13*invgamma23*dgamma233[ijk] +
+      3*invgamma12*invgamma33*dgamma233[ijk] +
+      3*Power(invgamma13,2)*dgamma331[ijk] -
+      invgamma11*invgamma33*dgamma331[ijk] +
+      3*invgamma13*invgamma23*dgamma332[ijk] -
+      invgamma12*invgamma33*dgamma332[ijk] +
+      2*invgamma13*invgamma33*dgamma333[ijk]))/3.
+;
+
+double tr3Gam2
+=
+(Power(detgamma,0.3333333333333333)*
+    (2*invgamma11*invgamma12*dgamma111[ijk] +
+      (3*Power(invgamma12,2) - invgamma11*invgamma22)*dgamma112[ijk] +
+      3*invgamma12*invgamma13*dgamma113[ijk] -
+      invgamma11*invgamma23*dgamma113[ijk] +
+      Power(invgamma12,2)*dgamma121[ijk] +
+      3*invgamma11*invgamma22*dgamma121[ijk] +
+      4*invgamma12*invgamma22*dgamma122[ijk] +
+      3*invgamma13*invgamma22*dgamma123[ijk] +
+      invgamma12*invgamma23*dgamma123[ijk] +
+      invgamma12*invgamma13*dgamma131[ijk] +
+      3*invgamma11*invgamma23*dgamma131[ijk] -
+      2*invgamma13*invgamma22*dgamma132[ijk] +
+      6*invgamma12*invgamma23*dgamma132[ijk] +
+      invgamma13*invgamma23*dgamma133[ijk] +
+      3*invgamma12*invgamma33*dgamma133[ijk] +
+      2*invgamma12*invgamma22*dgamma221[ijk] +
+      2*Power(invgamma22,2)*dgamma222[ijk] +
+      2*invgamma22*invgamma23*dgamma223[ijk] +
+      3*invgamma13*invgamma22*dgamma231[ijk] +
+      invgamma12*invgamma23*dgamma231[ijk] +
+      4*invgamma22*invgamma23*dgamma232[ijk] +
+      Power(invgamma23,2)*dgamma233[ijk] +
+      3*invgamma22*invgamma33*dgamma233[ijk] +
+      3*invgamma13*invgamma23*dgamma331[ijk] -
+      invgamma12*invgamma33*dgamma331[ijk] +
+      3*Power(invgamma23,2)*dgamma332[ijk] -
+      invgamma22*invgamma33*dgamma332[ijk] +
+      2*invgamma23*invgamma33*dgamma333[ijk]))/3.
+;
+
+double tr3Gam3
+=
+(Power(detgamma,0.3333333333333333)*
+    (2*invgamma11*invgamma13*dgamma111[ijk] +
+      (3*invgamma12*invgamma13 - invgamma11*invgamma23)*dgamma112[ijk] +
+      3*Power(invgamma13,2)*dgamma113[ijk] -
+      invgamma11*invgamma33*dgamma113[ijk] +
+      invgamma12*invgamma13*dgamma121[ijk] +
+      3*invgamma11*invgamma23*dgamma121[ijk] +
+      3*invgamma13*invgamma22*dgamma122[ijk] +
+      invgamma12*invgamma23*dgamma122[ijk] +
+      6*invgamma13*invgamma23*dgamma123[ijk] -
+      2*invgamma12*invgamma33*dgamma123[ijk] +
+      Power(invgamma13,2)*dgamma131[ijk] +
+      3*invgamma11*invgamma33*dgamma131[ijk] +
+      invgamma13*invgamma23*dgamma132[ijk] +
+      3*invgamma12*invgamma33*dgamma132[ijk] +
+      4*invgamma13*invgamma33*dgamma133[ijk] -
+      invgamma13*invgamma22*dgamma221[ijk] +
+      3*invgamma12*invgamma23*dgamma221[ijk] +
+      2*invgamma22*invgamma23*dgamma222[ijk] +
+      3*Power(invgamma23,2)*dgamma223[ijk] -
+      invgamma22*invgamma33*dgamma223[ijk] +
+      invgamma13*invgamma23*dgamma231[ijk] +
+      3*invgamma12*invgamma33*dgamma231[ijk] +
+      Power(invgamma23,2)*dgamma232[ijk] +
+      3*invgamma22*invgamma33*dgamma232[ijk] +
+      4*invgamma23*invgamma33*dgamma233[ijk] +
+      2*invgamma13*invgamma33*dgamma331[ijk] +
+      2*invgamma23*invgamma33*dgamma332[ijk] +
+      2*Power(invgamma33,2)*dgamma333[ijk]))/3.
+;
+
+dtalpha
+=
+-2*trK*alpha[ijk] + beta1[ijk]*dalpha1[ijk] + beta2[ijk]*dalpha2[ijk] +
+  beta3[ijk]*dalpha3[ijk]
+;
+
+dtbeta1
+=
+parnu*tr3Gam1 + beta1[ijk]*(-pareta + dbeta11[ijk]) +
+  beta2[ijk]*dbeta12[ijk] + beta3[ijk]*dbeta13[ijk]
+;
+
+dtbeta2
+=
+parnu*tr3Gam2 + beta1[ijk]*dbeta21[ijk] +
+  beta2[ijk]*(-pareta + dbeta22[ijk]) + beta3[ijk]*dbeta23[ijk]
+;
+
+dtbeta3
+=
+parnu*tr3Gam3 + beta1[ijk]*dbeta31[ijk] + beta2[ijk]*dbeta32[ijk] +
+  beta3[ijk]*(-pareta + dbeta33[ijk])
+;
+
+} else if (GHG->gauge_DW) {
+
+double betaD0
+=
+Power(beta1[ijk],2)*gamma11[ijk] +
+  2*beta1[ijk]*(beta2[ijk]*gamma12[ijk] + beta3[ijk]*gamma13[ijk]) +
+  Power(beta2[ijk],2)*gamma22[ijk] + 2*beta2[ijk]*beta3[ijk]*gamma23[ijk] +
+  Power(beta3[ijk],2)*gamma33[ijk]
+;
+
+double betaD1
+=
+beta1[ijk]*gamma11[ijk] + beta2[ijk]*gamma12[ijk] + beta3[ijk]*gamma13[ijk]
+;
+
+double betaD2
+=
+beta1[ijk]*gamma12[ijk] + beta2[ijk]*gamma22[ijk] + beta3[ijk]*gamma23[ijk]
+;
+
+double betaD3
+=
+beta1[ijk]*gamma13[ijk] + beta2[ijk]*gamma23[ijk] + beta3[ijk]*gamma33[ijk]
+;
+
+double logSgOa
+=
+Log(Sqrt(detgamma)/alpha[ijk])
+;
+
+double muL
+=
+Power(logSgOa,2)*parmu0
+;
+
+double muS
+=
+muL
+;
+
+double HofGH0
+=
+-((betaD0*muS)/alpha[ijk]) - logSgOa*muL*alpha[ijk]
+;
+
+double HofGH1
+=
+-((betaD1*muS)/alpha[ijk])
+;
+
+double HofGH2
+=
+-((betaD2*muS)/alpha[ijk])
+;
+
+double HofGH3
+=
+-((betaD3*muS)/alpha[ijk])
+;
+
+dtalpha
+=
+-(trK*Power(alpha[ijk],2)) + alpha[ijk]*
+   (-HofGH0 + HofGH1*beta1[ijk] + HofGH2*beta2[ijk] + HofGH3*beta3[ijk]) +
+  beta1[ijk]*dalpha1[ijk] + beta2[ijk]*dalpha2[ijk] + beta3[ijk]*dalpha3[ijk]
+;
+
+dtbeta1
+=
+-(alpha[ijk]*(invgamma11*dalpha1[ijk] + invgamma12*dalpha2[ijk] +
+       invgamma13*dalpha3[ijk])) + beta1[ijk]*dbeta11[ijk] +
+  beta2[ijk]*dbeta12[ijk] + beta3[ijk]*dbeta13[ijk] +
+  (Power(alpha[ijk],2)*(2*HofGH1*invgamma11 + 2*HofGH2*invgamma12 +
+       2*HofGH3*invgamma13 + Power(invgamma11,2)*dgamma111[ijk] +
+       invgamma11*invgamma12*dgamma112[ijk] +
+       invgamma11*invgamma13*dgamma113[ijk] +
+       2*invgamma11*invgamma12*dgamma121[ijk] +
+       2*invgamma11*invgamma22*dgamma122[ijk] +
+       2*invgamma11*invgamma23*dgamma123[ijk] +
+       2*invgamma11*invgamma13*dgamma131[ijk] +
+       2*invgamma11*invgamma23*dgamma132[ijk] +
+       2*invgamma11*invgamma33*dgamma133[ijk] +
+       2*Power(invgamma12,2)*dgamma221[ijk] -
+       invgamma11*invgamma22*dgamma221[ijk] +
+       invgamma12*invgamma22*dgamma222[ijk] -
+       invgamma13*invgamma22*dgamma223[ijk] +
+       2*invgamma12*invgamma23*dgamma223[ijk] +
+       4*invgamma12*invgamma13*dgamma231[ijk] -
+       2*invgamma11*invgamma23*dgamma231[ijk] +
+       2*invgamma13*invgamma22*dgamma232[ijk] +
+       2*invgamma12*invgamma33*dgamma233[ijk] +
+       2*Power(invgamma13,2)*dgamma331[ijk] -
+       invgamma11*invgamma33*dgamma331[ijk] +
+       2*invgamma13*invgamma23*dgamma332[ijk] -
+       invgamma12*invgamma33*dgamma332[ijk] +
+       invgamma13*invgamma33*dgamma333[ijk]))/2.
+;
+
+dtbeta2
+=
+-(alpha[ijk]*(invgamma12*dalpha1[ijk] + invgamma22*dalpha2[ijk] +
+       invgamma23*dalpha3[ijk])) + beta1[ijk]*dbeta21[ijk] +
+  beta2[ijk]*dbeta22[ijk] + beta3[ijk]*dbeta23[ijk] +
+  (Power(alpha[ijk],2)*(2*HofGH1*invgamma12 + 2*HofGH2*invgamma22 +
+       2*HofGH3*invgamma23 + invgamma11*invgamma12*dgamma111[ijk] +
+       (2*Power(invgamma12,2) - invgamma11*invgamma22)*dgamma112[ijk] +
+       2*invgamma12*invgamma13*dgamma113[ijk] -
+       invgamma11*invgamma23*dgamma113[ijk] +
+       2*invgamma11*invgamma22*dgamma121[ijk] +
+       2*invgamma12*invgamma22*dgamma122[ijk] +
+       2*invgamma13*invgamma22*dgamma123[ijk] +
+       2*invgamma11*invgamma23*dgamma131[ijk] -
+       2*invgamma13*invgamma22*dgamma132[ijk] +
+       4*invgamma12*invgamma23*dgamma132[ijk] +
+       2*invgamma12*invgamma33*dgamma133[ijk] +
+       invgamma12*invgamma22*dgamma221[ijk] +
+       Power(invgamma22,2)*dgamma222[ijk] +
+       invgamma22*invgamma23*dgamma223[ijk] +
+       2*invgamma13*invgamma22*dgamma231[ijk] +
+       2*invgamma22*invgamma23*dgamma232[ijk] +
+       2*invgamma22*invgamma33*dgamma233[ijk] +
+       2*invgamma13*invgamma23*dgamma331[ijk] -
+       invgamma12*invgamma33*dgamma331[ijk] +
+       2*Power(invgamma23,2)*dgamma332[ijk] -
+       invgamma22*invgamma33*dgamma332[ijk] +
+       invgamma23*invgamma33*dgamma333[ijk]))/2.
+;
+
+dtbeta3
+=
+-(alpha[ijk]*(invgamma13*dalpha1[ijk] + invgamma23*dalpha2[ijk] +
+       invgamma33*dalpha3[ijk])) + beta1[ijk]*dbeta31[ijk] +
+  beta2[ijk]*dbeta32[ijk] + beta3[ijk]*dbeta33[ijk] +
+  (Power(alpha[ijk],2)*(2*HofGH1*invgamma13 + 2*HofGH2*invgamma23 +
+       2*HofGH3*invgamma33 + invgamma11*invgamma13*dgamma111[ijk] +
+       (2*invgamma12*invgamma13 - invgamma11*invgamma23)*dgamma112[ijk] +
+       2*Power(invgamma13,2)*dgamma113[ijk] -
+       invgamma11*invgamma33*dgamma113[ijk] +
+       2*invgamma11*invgamma23*dgamma121[ijk] +
+       2*invgamma13*invgamma22*dgamma122[ijk] +
+       4*invgamma13*invgamma23*dgamma123[ijk] -
+       2*invgamma12*invgamma33*dgamma123[ijk] +
+       2*invgamma11*invgamma33*dgamma131[ijk] +
+       2*invgamma12*invgamma33*dgamma132[ijk] +
+       2*invgamma13*invgamma33*dgamma133[ijk] -
+       invgamma13*invgamma22*dgamma221[ijk] +
+       2*invgamma12*invgamma23*dgamma221[ijk] +
+       invgamma22*invgamma23*dgamma222[ijk] +
+       2*Power(invgamma23,2)*dgamma223[ijk] -
+       invgamma22*invgamma33*dgamma223[ijk] +
+       2*invgamma12*invgamma33*dgamma231[ijk] +
+       2*invgamma22*invgamma33*dgamma232[ijk] +
+       2*invgamma23*invgamma33*dgamma233[ijk] +
+       invgamma13*invgamma33*dgamma331[ijk] +
+       invgamma23*invgamma33*dgamma332[ijk] +
+       Power(invgamma33,2)*dgamma333[ijk]))/2.
+;
+
+} else { errorexit("unknown ID GHG_gauge!"); }
+
+dmetricg033
+=
+2*dmetricg303 + (dmetricg133 - 2*dmetricg313)*beta1[ijk] +
+  (dmetricg233 - 2*dmetricg323)*beta2[ijk] - dmetricg333*beta3[ijk] -
+  2*alpha[ijk]*exK33[ijk]
+;
+
+dmetricg023
+=
+dmetricg203 + dmetricg302 + (dmetricg123 - dmetricg213 - dmetricg312)*
+   beta1[ijk] - dmetricg322*beta2[ijk] - dmetricg233*beta3[ijk] -
+  2*alpha[ijk]*exK23[ijk]
+;
+
+dmetricg022
+=
+2*dmetricg202 + (dmetricg122 - 2*dmetricg212)*beta1[ijk] -
+  dmetricg222*beta2[ijk] - 2*dmetricg223*beta3[ijk] +
+  dmetricg322*beta3[ijk] - 2*alpha[ijk]*exK22[ijk]
+;
+
+dmetricg013
+=
+dmetricg103 + dmetricg301 - dmetricg311*beta1[ijk] -
+  (dmetricg123 - dmetricg213 + dmetricg312)*beta2[ijk] -
+  dmetricg133*beta3[ijk] - 2*alpha[ijk]*exK13[ijk]
+;
+
+dmetricg012
+=
+dmetricg102 + dmetricg201 - dmetricg211*beta1[ijk] -
+  dmetricg122*beta2[ijk] - dmetricg123*beta3[ijk] - dmetricg213*beta3[ijk] +
+  dmetricg312*beta3[ijk] - 2*alpha[ijk]*exK12[ijk]
+;
+
+dmetricg011
+=
+2*dmetricg101 - dmetricg111*beta1[ijk] +
+  (-2*dmetricg112 + dmetricg211)*beta2[ijk] - 2*dmetricg113*beta3[ijk] +
+  dmetricg311*beta3[ijk] - 2*alpha[ijk]*exK11[ijk]
+;
+
+dmetricg003
+=
+dmetricg013*beta1[ijk] + dmetricg023*beta2[ijk] + dmetricg033*beta3[ijk] +
+  dtbeta1*gamma13[ijk] + dtbeta2*gamma23[ijk] + dtbeta3*gamma33[ijk]
+;
+
+dmetricg002
+=
+dmetricg012*beta1[ijk] + dmetricg022*beta2[ijk] + dmetricg023*beta3[ijk] +
+  dtbeta1*gamma12[ijk] + dtbeta2*gamma22[ijk] + dtbeta3*gamma23[ijk]
+;
+
+dmetricg001
+=
+dmetricg011*beta1[ijk] + dmetricg012*beta2[ijk] + dmetricg013*beta3[ijk] +
+  dtbeta1*gamma11[ijk] + dtbeta2*gamma12[ijk] + dtbeta3*gamma13[ijk]
+;
+
+dmetricg000
+=
+-2*dtalpha*alpha[ijk] + dmetricg011*Power(beta1[ijk],2) +
+  dmetricg022*Power(beta2[ijk],2) + 2*dmetricg023*beta2[ijk]*beta3[ijk] +
+  dmetricg033*Power(beta3[ijk],2) + 2*dtbeta1*beta2[ijk]*gamma12[ijk] +
+  2*dtbeta1*beta3[ijk]*gamma13[ijk] +
+  2*beta1[ijk]*(dmetricg012*beta2[ijk] + dmetricg013*beta3[ijk] +
+     dtbeta1*gamma11[ijk] + dtbeta2*gamma12[ijk] + dtbeta3*gamma13[ijk]) +
+  2*dtbeta2*beta2[ijk]*gamma22[ijk] + 2*dtbeta3*beta2[ijk]*gamma23[ijk] +
+  2*dtbeta2*beta3[ijk]*gamma23[ijk] + 2*dtbeta3*beta3[ijk]*gamma33[ijk]
+;
+
+
+}
+
+double metricgUU00
+=
+-Power(nvec0,2)
+;
+
+double metricgUU01
+=
+-(nvec0*nvec1)
+;
+
+double metricgUU02
+=
+-(nvec0*nvec2)
+;
+
+double metricgUU03
+=
+-(nvec0*nvec3)
+;
+
+double metricgUU11
+=
+invgamma11 - Power(nvec1,2)
+;
+
+double metricgUU12
+=
+invgamma12 - nvec1*nvec2
+;
+
+double metricgUU13
+=
+invgamma13 - nvec1*nvec3
+;
+
+double metricgUU22
+=
+invgamma22 - Power(nvec2,2)
+;
+
+double metricgUU23
+=
+invgamma23 - nvec2*nvec3
+;
+
+double metricgUU33
+=
+invgamma33 - Power(nvec3,2)
+;
+
+double GamDDD000
+=
+dmetricg000/2.
+;
+
+double GamDDD001
+=
+dmetricg100/2.
+;
+
+double GamDDD002
+=
+dmetricg200/2.
+;
+
+double GamDDD003
+=
+dmetricg300/2.
+;
+
+double GamDDD011
+=
+-0.5*dmetricg011 + dmetricg101
+;
+
+double GamDDD012
+=
+(-dmetricg012 + dmetricg102 + dmetricg201)/2.
+;
+
+double GamDDD013
+=
+(-dmetricg013 + dmetricg103 + dmetricg301)/2.
+;
+
+double GamDDD022
+=
+-0.5*dmetricg022 + dmetricg202
+;
+
+double GamDDD023
+=
+(-dmetricg023 + dmetricg203 + dmetricg302)/2.
+;
+
+double GamDDD033
+=
+-0.5*dmetricg033 + dmetricg303
+;
+
+double GamDDD100
+=
+dmetricg001 - dmetricg100/2.
+;
+
+double GamDDD101
+=
+dmetricg011/2.
+;
+
+double GamDDD102
+=
+(dmetricg012 - dmetricg102 + dmetricg201)/2.
+;
+
+double GamDDD103
+=
+(dmetricg013 - dmetricg103 + dmetricg301)/2.
+;
+
+double GamDDD111
+=
+dmetricg111/2.
+;
+
+double GamDDD112
+=
+dmetricg211/2.
+;
+
+double GamDDD113
+=
+dmetricg311/2.
+;
+
+double GamDDD122
+=
+-0.5*dmetricg122 + dmetricg212
+;
+
+double GamDDD123
+=
+(-dmetricg123 + dmetricg213 + dmetricg312)/2.
+;
+
+double GamDDD133
+=
+-0.5*dmetricg133 + dmetricg313
+;
+
+double GamDDD200
+=
+dmetricg002 - dmetricg200/2.
+;
+
+double GamDDD201
+=
+(dmetricg012 + dmetricg102 - dmetricg201)/2.
+;
+
+double GamDDD202
+=
+dmetricg022/2.
+;
+
+double GamDDD203
+=
+(dmetricg023 - dmetricg203 + dmetricg302)/2.
+;
+
+double GamDDD211
+=
+dmetricg112 - dmetricg211/2.
+;
+
+double GamDDD212
+=
+dmetricg122/2.
+;
+
+double GamDDD213
+=
+(dmetricg123 - dmetricg213 + dmetricg312)/2.
+;
+
+double GamDDD222
+=
+dmetricg222/2.
+;
+
+double GamDDD223
+=
+dmetricg322/2.
+;
+
+double GamDDD233
+=
+-0.5*dmetricg233 + dmetricg323
+;
+
+double GamDDD300
+=
+dmetricg003 - dmetricg300/2.
+;
+
+double GamDDD301
+=
+(dmetricg013 + dmetricg103 - dmetricg301)/2.
+;
+
+double GamDDD302
+=
+(dmetricg023 + dmetricg203 - dmetricg302)/2.
+;
+
+double GamDDD303
+=
+dmetricg033/2.
+;
+
+double GamDDD311
+=
+dmetricg113 - dmetricg311/2.
+;
+
+double GamDDD312
+=
+(dmetricg123 + dmetricg213 - dmetricg312)/2.
+;
+
+double GamDDD313
+=
+dmetricg133/2.
+;
+
+double GamDDD322
+=
+dmetricg223 - dmetricg322/2.
+;
+
+double GamDDD323
+=
+dmetricg233/2.
+;
+
+double GamDDD333
+=
+dmetricg333/2.
+;
+
+double trGam0
+=
+GamDDD000*metricgUU00 + 2*GamDDD001*metricgUU01 + 2*GamDDD002*metricgUU02 +
+  2*GamDDD003*metricgUU03 + GamDDD011*metricgUU11 +
+  2*GamDDD012*metricgUU12 + 2*GamDDD013*metricgUU13 +
+  GamDDD022*metricgUU22 + 2*GamDDD023*metricgUU23 + GamDDD033*metricgUU33
+;
+
+double trGam1
+=
+GamDDD100*metricgUU00 + 2*GamDDD101*metricgUU01 + 2*GamDDD102*metricgUU02 +
+  2*GamDDD103*metricgUU03 + GamDDD111*metricgUU11 +
+  2*GamDDD112*metricgUU12 + 2*GamDDD113*metricgUU13 +
+  GamDDD122*metricgUU22 + 2*GamDDD123*metricgUU23 + GamDDD133*metricgUU33
+;
+
+double trGam2
+=
+GamDDD200*metricgUU00 + 2*GamDDD201*metricgUU01 + 2*GamDDD202*metricgUU02 +
+  2*GamDDD203*metricgUU03 + GamDDD211*metricgUU11 +
+  2*GamDDD212*metricgUU12 + 2*GamDDD213*metricgUU13 +
+  GamDDD222*metricgUU22 + 2*GamDDD223*metricgUU23 + GamDDD233*metricgUU33
+;
+
+double trGam3
+=
+GamDDD300*metricgUU00 + 2*GamDDD301*metricgUU01 + 2*GamDDD302*metricgUU02 +
+  2*GamDDD303*metricgUU03 + GamDDD311*metricgUU11 +
+  2*GamDDD312*metricgUU12 + 2*GamDDD313*metricgUU13 +
+  GamDDD322*metricgUU22 + 2*GamDDD323*metricgUU23 + GamDDD333*metricgUU33
+;
+
+
+g00[ijk]
+=
+-Power(alpha[ijk],2) + Power(beta1[ijk],2)*gamma11[ijk] +
+  2*beta1[ijk]*(beta2[ijk]*gamma12[ijk] + beta3[ijk]*gamma13[ijk]) +
+  Power(beta2[ijk],2)*gamma22[ijk] + 2*beta2[ijk]*beta3[ijk]*gamma23[ijk] +
+  Power(beta3[ijk],2)*gamma33[ijk]
+;
+
+g01[ijk]
+=
+beta1[ijk]*gamma11[ijk] + beta2[ijk]*gamma12[ijk] + beta3[ijk]*gamma13[ijk]
+;
+
+g02[ijk]
+=
+beta1[ijk]*gamma12[ijk] + beta2[ijk]*gamma22[ijk] + beta3[ijk]*gamma23[ijk]
+;
+
+g03[ijk]
+=
+beta1[ijk]*gamma13[ijk] + beta2[ijk]*gamma23[ijk] + beta3[ijk]*gamma33[ijk]
+;
+
+g11[ijk]
+=
+gamma11[ijk]
+;
+
+g12[ijk]
+=
+gamma12[ijk]
+;
+
+g13[ijk]
+=
+gamma13[ijk]
+;
+
+g22[ijk]
+=
+gamma22[ijk]
+;
+
+g23[ijk]
+=
+gamma23[ijk]
+;
+
+g33[ijk]
+=
+gamma33[ijk]
+;
+
+Pi00[ijk]
+=
+-(dmetricg000*nvec0) - dmetricg100*nvec1 - dmetricg200*nvec2 -
+  dmetricg300*nvec3
+;
+
+Pi01[ijk]
+=
+-(dmetricg001*nvec0) - dmetricg101*nvec1 - dmetricg201*nvec2 -
+  dmetricg301*nvec3
+;
+
+Pi02[ijk]
+=
+-(dmetricg002*nvec0) - dmetricg102*nvec1 - dmetricg202*nvec2 -
+  dmetricg302*nvec3
+;
+
+Pi03[ijk]
+=
+-(dmetricg003*nvec0) - dmetricg103*nvec1 - dmetricg203*nvec2 -
+  dmetricg303*nvec3
+;
+
+Pi11[ijk]
+=
+-(dmetricg011*nvec0) - dmetricg111*nvec1 - dmetricg211*nvec2 -
+  dmetricg311*nvec3
+;
+
+Pi12[ijk]
+=
+-(dmetricg012*nvec0) - dmetricg112*nvec1 - dmetricg212*nvec2 -
+  dmetricg312*nvec3
+;
+
+Pi13[ijk]
+=
+-(dmetricg013*nvec0) - dmetricg113*nvec1 - dmetricg213*nvec2 -
+  dmetricg313*nvec3
+;
+
+Pi22[ijk]
+=
+-(dmetricg022*nvec0) - dmetricg122*nvec1 - dmetricg222*nvec2 -
+  dmetricg322*nvec3
+;
+
+Pi23[ijk]
+=
+-(dmetricg023*nvec0) - dmetricg123*nvec1 - dmetricg223*nvec2 -
+  dmetricg323*nvec3
+;
+
+Pi33[ijk]
+=
+-(dmetricg033*nvec0) - dmetricg133*nvec1 - dmetricg233*nvec2 -
+  dmetricg333*nvec3
+;
+
+Phi100[ijk]
+=
+dmetricg100
+;
+
+Phi101[ijk]
+=
+dmetricg101
+;
+
+Phi102[ijk]
+=
+dmetricg102
+;
+
+Phi103[ijk]
+=
+dmetricg103
+;
+
+Phi111[ijk]
+=
+dmetricg111
+;
+
+Phi112[ijk]
+=
+dmetricg112
+;
+
+Phi113[ijk]
+=
+dmetricg113
+;
+
+Phi122[ijk]
+=
+dmetricg122
+;
+
+Phi123[ijk]
+=
+dmetricg123
+;
+
+Phi133[ijk]
+=
+dmetricg133
+;
+
+Phi200[ijk]
+=
+dmetricg200
+;
+
+Phi201[ijk]
+=
+dmetricg201
+;
+
+Phi202[ijk]
+=
+dmetricg202
+;
+
+Phi203[ijk]
+=
+dmetricg203
+;
+
+Phi211[ijk]
+=
+dmetricg211
+;
+
+Phi212[ijk]
+=
+dmetricg212
+;
+
+Phi213[ijk]
+=
+dmetricg213
+;
+
+Phi222[ijk]
+=
+dmetricg222
+;
+
+Phi223[ijk]
+=
+dmetricg223
+;
+
+Phi233[ijk]
+=
+dmetricg233
+;
+
+Phi300[ijk]
+=
+dmetricg300
+;
+
+Phi301[ijk]
+=
+dmetricg301
+;
+
+Phi302[ijk]
+=
+dmetricg302
+;
+
+Phi303[ijk]
+=
+dmetricg303
+;
+
+Phi311[ijk]
+=
+dmetricg311
+;
+
+Phi312[ijk]
+=
+dmetricg312
+;
+
+Phi313[ijk]
+=
+dmetricg313
+;
+
+Phi322[ijk]
+=
+dmetricg322
+;
+
+Phi323[ijk]
+=
+dmetricg323
+;
+
+Phi333[ijk]
+=
+dmetricg333
+;
+
+H0[ijk]
+=
+-trGam0
+;
+
+H1[ijk]
+=
+-trGam1
+;
+
+H2[ijk]
+=
+-trGam2
+;
+
+H3[ijk]
+=
+-trGam3
+;
+
+
+} /* end of points */
+
+/* derivatives */
+cart_partials_diUa(node, Vind(GHG->vlu,GHG->i_Ht), idHxt);
+
+forpoints(node, ijk)
+{
+the0[ijk]
+=
+-(beta1[ijk]*dH10[ijk]) - beta2[ijk]*dH20[ijk] - beta3[ijk]*dH30[ijk]
+;
+
+the1[ijk]
+=
+-(beta1[ijk]*dH11[ijk]) - beta2[ijk]*dH21[ijk] - beta3[ijk]*dH31[ijk]
+;
+
+the2[ijk]
+=
+-(beta1[ijk]*dH12[ijk]) - beta2[ijk]*dH22[ijk] - beta3[ijk]*dH32[ijk]
+;
+
+the3[ijk]
+=
+-(beta1[ijk]*dH13[ijk]) - beta2[ijk]*dH23[ijk] - beta3[ijk]*dH33[ijk]
+;
+
+} /* end of points */
+
+TIMER_STOP;
+
+} /* end of nodes */
+
+return 0;
+} /* end of function */
+
+/* GHG_set_profile_ADM.c */
