@@ -148,7 +148,7 @@ TempTensors[vars__] :=
 Protect[TempTensors];
 
 (*
-    Baisc functions
+    Basic functions
 *)
 
 Options[SetComponents] :=
