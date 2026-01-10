@@ -165,7 +165,7 @@ PrintFDExpressionMix2nd[accuracyOrd_?IntegerQ, strIdx_?StringQ] :=
 (*                               Misc functions                               *)
 (******************************************************************************)
 
-(* Function to get varialbe name in interface.ccl *)
+(* Function to get variable name in interface.ccl *)
 
 GetInterfaceName[compname_] :=
   Module[{intfname = ToString[compname[[0]]], colist = {"t", "x", "y", "z"}},

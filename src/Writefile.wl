@@ -51,7 +51,7 @@ WriteToFile[outputfile_] :=
     ];
     If[FileExistsQ[outputfile],
       If[Environment["QUIET"] =!= "1",
-        System`Print["\"", outputfile, "\" already exist, replacing it ...\n"]
+        System`Print["\"", outputfile, "\" already exists, replacing it ...\n"]
       ];
       DeleteFile[outputfile]
     ];

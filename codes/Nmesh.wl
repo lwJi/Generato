@@ -129,7 +129,7 @@ PrintComponentEquation::EMode = "PrintEquationMode unrecognized!";
 Module[{outputfile = GetOutputFile[], filepointer},
   If[Environment["QUIET"] =!= "1", System`Print["Writing to \"", outputfile, "\"...\n"]];
   If[FileExistsQ[outputfile],
-    If[Environment["QUIET"] =!= "1", System`Print["\"", outputfile, "\" already exist, replacing it ...\n"]];
+    If[Environment["QUIET"] =!= "1", System`Print["\"", outputfile, "\" already exists, replacing it ...\n"]];
     DeleteFile[outputfile]
   ];
   (* define pr *)
