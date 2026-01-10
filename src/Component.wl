@@ -170,10 +170,10 @@ ParseComponent[varinfo_, compindexlist_?ListQ, coordinate_, extrareplacerules_?L
       Continue[]
     ];
     Which[
-      GetParseMode[SetComp],
+      InSetCompPhase[],
         SetComponent[compname, SetExprName[varname, compindexlist, coordinate]]
       ,
-      GetParseMode[PrintComp],
+      InPrintCompPhase[],
         PrintComponent[coordinate, varinfo, compname, extrareplacerules]
       ,
       True,
@@ -188,11 +188,11 @@ Protect[ParseComponent];
 PrintComponent[coordinate_, varinfo_, compname_, extrareplacerules_] :=
   Module[{},
     Which[
-      GetParsePrintCompMode[Initializations],
+      InInitMode[],
         PrintVerbose["    PrintComponentInitialization ", compname, "..."];
         Global`PrintComponentInitialization[varinfo, compname]
       ,
-      GetParsePrintCompMode[Equations],
+      InEqnMode[],
         PrintVerbose["    PrintComponentEquation ", compname, "..."];
         Global`PrintComponentEquation[coordinate, compname, extrareplacerules]
       ,
@@ -217,7 +217,7 @@ PrintComponent::EMode = "PrintMode unrecognized!";
 SetComponent[compname_, exprname_] :=
   Module[{varlistindex, mapCtoV = GetMapComponentToVarlist[]},
     PrintVerbose["    SetComponent ", compname, "..."];
-    If[Length[mapCtoV] == 0 || GetProcessNewVarlist[] || (GetParseSetCompMode[IndependentVarlistIndex] && (compname[[0]] =!= Last[Keys[mapCtoV]][[0]])),
+    If[Length[mapCtoV] == 0 || GetProcessNewVarlist[] || (GetIndependentVarlistIndex[] && (compname[[0]] =!= Last[Keys[mapCtoV]][[0]])),
       varlistindex = 0(*C convention*)
       ,
       varlistindex = Last[mapCtoV] + 1
@@ -283,10 +283,10 @@ SetExprName[varname_, compindexlist_, coordinate_] :=
       ]
     ];
     exprname =
-      If[GetParseSetCompMode[WithoutGridPointIndex] || (GetInterfaceWithNonCoordBasis[] && coordinate === GetDefaultChart[]),
+      If[GetWithoutGridPointIndex[] || (GetInterfaceWithNonCoordBasis[] && coordinate === GetDefaultChart[]),
         ToExpression[exprname]
         ,
-        If[GetParseSetCompMode[UseTilePointIndex],
+        If[GetUseTilePointIndex[],
           ToExpression[exprname <> GetTilePointIndex[]]
           ,
           ToExpression[exprname <> GetGridPointIndex[]]

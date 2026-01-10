@@ -10,297 +10,206 @@ If[Environment["QUIET"] =!= "1",
   System`Print["------------------------------------------------------------"];
 ];
 
-GetParseMode::usage = "GetParseMode[key] returns True if the specified parsing mode is active, False otherwise.";
+(* Core Functions *)
+GetMode::usage = "GetMode[path...] returns the mode value at the specified path.";
+SetMode::usage = "SetMode[path... -> value] sets the mode value at the specified path.";
+ResetMode::usage = "ResetMode[path...] resets mode(s) to default values.";
 
-SetParseMode::usage = "SetParseMode[key->value] sets the specified parsing mode.";
+(* Phase Helpers *)
+InSetCompPhase::usage = "InSetCompPhase[] returns True if in SetComp phase.";
+InPrintCompPhase::usage = "InPrintCompPhase[] returns True if in PrintComp phase.";
 
-SetParseModeAllToFalse::usage = "SetParseModeAllToFalse[] deactivates all parsing modes.";
+(* PrintComp Type Helpers *)
+InInitMode::usage = "InInitMode[] returns True if in Initializations mode.";
+InEqnMode::usage = "InEqnMode[] returns True if in Equations mode.";
 
-CleanParseMode::usage = "CleanParseMode[] clears the parsing mode association.";
+(* Init Mode Helpers *)
+GetInitMode::usage = "GetInitMode[] returns current initialization mode.";
+GetTensorType::usage = "GetTensorType[] returns current tensor type.";
+GetStorageType::usage = "GetStorageType[] returns current storage type.";
+GetDerivsOrder::usage = "GetDerivsOrder[] returns derivative order.";
+GetDerivsAccuracy::usage = "GetDerivsAccuracy[] returns derivative accuracy.";
 
-SetComp::usage = "SetComp is a ParseMode option that indicates component-setting phase, where tensor components are assigned to expressions.";
+(* Eqn Mode Helper *)
+GetEqnMode::usage = "GetEqnMode[] returns current equation mode.";
 
-PrintComp::usage = "PrintComp is a ParseMode option that indicates component-printing phase, where tensor components are written to output.";
-
-Protect[SetComp];
-
-Protect[PrintComp];
-
-GetParseSetCompMode::usage = "GetParseSetCompMode[key] returns True if the specified SetComp mode is active, False otherwise.";
-
-SetParseSetCompMode::usage = "SetParseSetCompMode[key->value] sets the specified SetComp mode.";
-
-SetParseSetCompModeAllToFalse::usage = "SetParseSetCompModeAllToFalse[] deactivates all SetComp modes.";
-
-CleanParseSetCompMode::usage = "CleanParseSetCompMode[] clears the SetComp mode association.";
-
-IndependentVarlistIndex::usage = "IndependentVarlistIndex is a SetComp mode option that resets component indices for each new variable in the varlist.";
-
-WithoutGridPointIndex::usage = "WithoutGridPointIndex is a SetComp mode option that omits the grid point index suffix from variable names.";
-
-UseTilePointIndex::usage = "UseTilePointIndex is a SetComp mode option that uses tile point index instead of grid point index.";
-
-Protect[IndependentVarlistIndex];
-
-Protect[WithoutGridPointIndex];
-
-Protect[UseTilePointIndex];
-
-GetParsePrintCompMode::usage = "GetParsePrintCompMode[key] returns True if the specified PrintComp mode is active, False otherwise.";
-
-SetParsePrintCompMode::usage = "SetParsePrintCompMode[key->value] sets the specified PrintComp mode.";
-
-SetParsePrintCompModeAllToFalse::usage = "SetParsePrintCompModeAllToFalse[] deactivates all PrintComp modes.";
-
-CleanParsePrintCompMode::usage = "CleanParsePrintCompMode[] clears the PrintComp mode association.";
-
-Initializations::usage = "Initializations is a PrintComp mode option that indicates initialization code generation phase.";
-
-Equations::usage = "Equations is a PrintComp mode option that indicates equation code generation phase.";
-
-Protect[Initializations];
-
-Protect[Equations];
-
-GetParsePrintCompInitMode::usage = "GetParsePrintCompInitMode[key] returns the value for the specified initialization mode key.";
-
-SetParsePrintCompInitMode::usage = "SetParsePrintCompInitMode[key->value] sets the specified initialization mode.";
-
-CleanParsePrintCompInitMode::usage = "CleanParsePrintCompInitMode[] clears the initialization mode association.";
-
-GetParsePrintCompEQNMode::usage = "GetParsePrintCompEQNMode[key] returns True if the specified equation mode is active, False otherwise.";
-
-SetParsePrintCompEQNMode::usage = "SetParsePrintCompEQNMode[key->value] sets the specified equation mode.";
-
-CleanParsePrintCompEQNMode::usage = "CleanParsePrintCompEQNMode[] clears the equation mode association.";
-
-GetParsePrintCompInitTensorType::usage = "GetParsePrintCompInitTensorType[key] returns True if the specified tensor type is active, False otherwise.";
-
-SetParsePrintCompInitTensorType::usage = "SetParsePrintCompInitTensorType[key->value] sets the specified tensor type mode.";
-
-CleanParsePrintCompInitTensorType::usage = "CleanParsePrintCompInitTensorType[] clears the tensor type association.";
-
-GetParsePrintCompInitStorageType::usage = "GetParsePrintCompInitStorageType[key] returns True if the specified storage type is active, False otherwise.";
-
-SetParsePrintCompInitStorageType::usage = "SetParsePrintCompInitStorageType[key->value] sets the specified storage type mode.";
-
-CleanParsePrintCompInitStorageType::usage = "CleanParsePrintCompInitStorageType[] clears the storage type association.";
+(* SetComp Helpers *)
+GetIndependentVarlistIndex::usage = "GetIndependentVarlistIndex[] returns IndependentVarlistIndex setting.";
+GetWithoutGridPointIndex::usage = "GetWithoutGridPointIndex[] returns WithoutGridPointIndex setting.";
+GetUseTilePointIndex::usage = "GetUseTilePointIndex[] returns UseTilePointIndex setting.";
 
 Begin["`Private`"];
 
-(* Data *)
+(* Valid values for each path *)
+$ModeValidValues = <|
+  {"Phase"} -> {None, "SetComp", "PrintComp"},
+  {"SetComp", "IndependentVarlistIndex"} -> {True, False},
+  {"SetComp", "WithoutGridPointIndex"} -> {True, False},
+  {"SetComp", "UseTilePointIndex"} -> {True, False},
+  {"PrintComp", "Type"} -> {None, "Initializations", "Equations"},
+  {"PrintComp", "Init", "Mode"} -> {None, "MainOut", "MainIn", "Derivs", "Derivs1st", "Derivs2nd", "MoreInOut", "Temp"},
+  {"PrintComp", "Init", "TensorType"} -> {None, "Scal", "Vect", "Smat"},
+  {"PrintComp", "Init", "StorageType"} -> {None, "GF", "Tile"},
+  {"PrintComp", "Init", "DerivsOrder"} -> _Integer,
+  {"PrintComp", "Init", "DerivsAccuracy"} -> _Integer,
+  {"PrintComp", "Eqn", "Mode"} -> {None, "NewVar", "Main", "AddToMain"}
+|>;
 
-$ParseModeAssociation = <||>;
+(* Default mode structure *)
+$ModeDefaults = <|
+  "Phase" -> None,
+  "SetComp" -> <|
+    "IndependentVarlistIndex" -> False,
+    "WithoutGridPointIndex" -> False,
+    "UseTilePointIndex" -> False
+  |>,
+  "PrintComp" -> <|
+    "Type" -> None,
+    "Init" -> <|
+      "Mode" -> None,
+      "TensorType" -> None,
+      "StorageType" -> None,
+      "DerivsOrder" -> 0,
+      "DerivsAccuracy" -> 0
+    |>,
+    "Eqn" -> <|
+      "Mode" -> None
+    |>
+  |>
+|>;
 
-$ParseSetCompModeAssociation = <||>;
+(* The single mode state *)
+$Mode = $ModeDefaults;
 
-$ParsePrintCompModeAssociation = <||>;
+(* ========================================= *)
+(* Core Functions *)
+(* ========================================= *)
 
-$ParsePrintCompInitModeAssociation = <||>;
+(* Get value at nested path *)
+GetMode[] := $Mode;
 
-$ParsePrintCompEQNModeAssociation = <||>;
+GetMode[key_String] :=
+  If[KeyExistsQ[$Mode, key], $Mode[key], None];
 
-$ParsePrintCompInitTensorTypeAssociation = <||>;
-
-$ParsePrintCompInitStorageTypeAssociation = <||>;
-
-(* Function *)
-
-GetParseMode[key_] :=
-  Return[
-    If[KeyExistsQ[$ParseModeAssociation, key],
-      $ParseModeAssociation[key]
+GetMode[keys__String] :=
+  Module[{path = {keys}, result = $Mode},
+    Do[
+      If[AssociationQ[result] && KeyExistsQ[result, path[[i]]],
+        result = result[[path[[i]]]]
+        ,
+        Return[None]
+      ]
       ,
-      False
+      {i, Length[path]}
+    ];
+    result
+  ];
+
+Protect[GetMode];
+
+(* Validate value for path *)
+ValidateModeValue[path_List, value_] :=
+  Module[{validValues},
+    If[!KeyExistsQ[$ModeValidValues, path],
+      (* No validation for this path - allow any value *)
+      True
+      ,
+      validValues = $ModeValidValues[path];
+      If[ListQ[validValues],
+        MemberQ[validValues, value]
+        ,
+        (* It's a pattern (e.g., _Integer) - use pattern matching *)
+        MatchQ[value, validValues]
+      ]
     ]
   ];
 
-Protect[GetParseMode];
-
-SetParseMode[assoc_] :=
+(* Set value at nested path with validation *)
+SetMode[key_String -> value_] :=
   Module[{},
-    AppendTo[$ParseModeAssociation, assoc]
+    If[!ValidateModeValue[{key}, value],
+      Throw @ Message[SetMode::EInvalidValue, key, value]
+    ];
+    $Mode[key] = value
   ];
 
-Protect[SetParseMode];
-
-SetParseModeAllToFalse[] :=
-  Module[{},
-    $ParseModeAssociation = <|SetComp -> False, PrintComp -> False|>
+SetMode[keys__String, lastKey_String -> value_] :=
+  Module[{path = {keys, lastKey}},
+    If[!ValidateModeValue[path, value],
+      Throw @ Message[SetMode::EInvalidValue, StringRiffle[path, "."], value]
+    ];
+    $Mode[[Sequence @@ Most[path], Last[path]]] = value
   ];
 
-Protect[SetParseModeAllToFalse];
+SetMode::EInvalidValue = "Invalid mode value for '`1`': `2`";
 
-CleanParseMode[] :=
+Protect[SetMode];
+
+(* Reset mode to defaults *)
+ResetMode[] :=
   Module[{},
-    $ParseModeAssociation = <||>
+    $Mode = $ModeDefaults
   ];
 
-Protect[CleanParseMode];
-
-GetParseSetCompMode[key_] :=
-  Return[
-    If[KeyExistsQ[$ParseSetCompModeAssociation, key],
-      $ParseSetCompModeAssociation[key]
-      ,
-      False
+ResetMode[key_String] :=
+  Module[{},
+    If[KeyExistsQ[$ModeDefaults, key],
+      $Mode[key] = $ModeDefaults[key]
     ]
   ];
 
-Protect[GetParseSetCompMode];
-
-SetParseSetCompMode[assoc_] :=
-  Module[{},
-    AppendTo[$ParseSetCompModeAssociation, assoc]
+ResetMode[keys__String] :=
+  Module[{path = {keys}},
+    $Mode[[Sequence @@ Most[path], Last[path]]] =
+      $ModeDefaults[[Sequence @@ Most[path], Last[path]]]
   ];
 
-Protect[SetParseSetCompMode];
+Protect[ResetMode];
 
-SetParseSetCompModeAllToFalse[] :=
-  Module[{},
-    $ParseSetCompModeAssociation = <|IndependentVarlistIndex -> False, WithoutGridPointIndex -> False, UseTilePointIndex -> False|>
-  ];
+(* ========================================= *)
+(* Convenience Helpers *)
+(* ========================================= *)
 
-Protect[SetParseSetCompModeAllToFalse];
+(* Phase helpers *)
+InSetCompPhase[] := GetMode["Phase"] === "SetComp";
+InPrintCompPhase[] := GetMode["Phase"] === "PrintComp";
 
-CleanParseSetCompMode[] :=
-  Module[{},
-    $ParseSetCompModeAssociation = <||>
-  ];
+Protect[InSetCompPhase];
+Protect[InPrintCompPhase];
 
-Protect[CleanParseSetCompMode];
+(* PrintComp type helpers *)
+InInitMode[] := GetMode["PrintComp", "Type"] === "Initializations";
+InEqnMode[] := GetMode["PrintComp", "Type"] === "Equations";
 
-GetParsePrintCompMode[key_] :=
-  Return[
-    If[KeyExistsQ[$ParsePrintCompModeAssociation, key],
-      $ParsePrintCompModeAssociation[key]
-      ,
-      False
-    ]
-  ];
+Protect[InInitMode];
+Protect[InEqnMode];
 
-Protect[GetParsePrintCompMode];
+(* Init mode helpers *)
+GetInitMode[] := GetMode["PrintComp", "Init", "Mode"];
+GetTensorType[] := GetMode["PrintComp", "Init", "TensorType"];
+GetStorageType[] := GetMode["PrintComp", "Init", "StorageType"];
+GetDerivsOrder[] := GetMode["PrintComp", "Init", "DerivsOrder"];
+GetDerivsAccuracy[] := GetMode["PrintComp", "Init", "DerivsAccuracy"];
 
-SetParsePrintCompMode[assoc_] :=
-  Module[{},
-    AppendTo[$ParsePrintCompModeAssociation, assoc]
-  ];
+Protect[GetInitMode];
+Protect[GetTensorType];
+Protect[GetStorageType];
+Protect[GetDerivsOrder];
+Protect[GetDerivsAccuracy];
 
-Protect[SetParsePrintCompMode];
+(* Eqn mode helper *)
+GetEqnMode[] := GetMode["PrintComp", "Eqn", "Mode"];
 
-SetParsePrintCompModeAllToFalse[] :=
-  Module[{},
-    $ParsePrintCompModeAssociation = <|Initializations -> False, Equations -> False|>
-  ];
+Protect[GetEqnMode];
 
-Protect[SetParsePrintCompModeAllToFalse];
+(* SetComp helpers *)
+GetIndependentVarlistIndex[] := GetMode["SetComp", "IndependentVarlistIndex"];
+GetWithoutGridPointIndex[] := GetMode["SetComp", "WithoutGridPointIndex"];
+GetUseTilePointIndex[] := GetMode["SetComp", "UseTilePointIndex"];
 
-CleanParsePrintCompMode[] :=
-  Module[{},
-    $ParsePrintCompModeAssociation = <||>
-  ];
-
-Protect[CleanParsePrintCompMode];
-
-GetParsePrintCompInitMode[key_] :=
-  Return[
-    If[KeyExistsQ[$ParsePrintCompInitModeAssociation, key],
-      $ParsePrintCompInitModeAssociation[key]
-      ,
-      False
-    ]
-  ];
-
-Protect[GetParsePrintCompInitMode];
-
-SetParsePrintCompInitMode[assoc_] :=
-  Module[{},
-    AppendTo[$ParsePrintCompInitModeAssociation, assoc]
-  ];
-
-Protect[SetParsePrintCompInitMode];
-
-CleanParsePrintCompInitMode[] :=
-  Module[{},
-    $ParsePrintCompInitModeAssociation = <||>
-  ];
-
-Protect[CleanParsePrintCompInitMode];
-
-GetParsePrintCompEQNMode[key_] :=
-  Return[
-    If[KeyExistsQ[$ParsePrintCompEQNModeAssociation, key],
-      $ParsePrintCompEQNModeAssociation[key]
-      ,
-      False
-    ]
-  ];
-
-Protect[GetParsePrintCompEQNMode];
-
-SetParsePrintCompEQNMode[assoc_] :=
-  Module[{},
-    AppendTo[$ParsePrintCompEQNModeAssociation, assoc]
-  ];
-
-Protect[SetParsePrintCompEQNMode];
-
-CleanParsePrintCompEQNMode[] :=
-  Module[{},
-    $ParsePrintCompEQNModeAssociation = <||>
-  ];
-
-Protect[CleanParsePrintCompEQNMode];
-
-GetParsePrintCompInitTensorType[key_] :=
-  Return[
-    If[KeyExistsQ[$ParsePrintCompInitTensorTypeAssociation, key],
-      $ParsePrintCompInitTensorTypeAssociation[key]
-      ,
-      False
-    ]
-  ];
-
-Protect[GetParsePrintCompInitTensorType];
-
-SetParsePrintCompInitTensorType[assoc_] :=
-  Module[{},
-    AppendTo[$ParsePrintCompInitTensorTypeAssociation, assoc]
-  ];
-
-Protect[SetParsePrintCompInitTensorType];
-
-CleanParsePrintCompInitTensorType[] :=
-  Module[{},
-    $ParsePrintCompInitTensorTypeAssociation = <||>
-  ];
-
-Protect[CleanParsePrintCompInitTensorType];
-
-GetParsePrintCompInitStorageType[key_] :=
-  Return[
-    If[KeyExistsQ[$ParsePrintCompInitStorageTypeAssociation, key],
-      $ParsePrintCompInitStorageTypeAssociation[key]
-      ,
-      False
-    ]
-  ];
-
-Protect[GetParsePrintCompInitStorageType];
-
-SetParsePrintCompInitStorageType[assoc_] :=
-  Module[{},
-    AppendTo[$ParsePrintCompInitStorageTypeAssociation, assoc]
-  ];
-
-Protect[SetParsePrintCompInitStorageType];
-
-CleanParsePrintCompInitStorageType[] :=
-  Module[{},
-    $ParsePrintCompInitStorageTypeAssociation = <||>
-  ];
-
-Protect[CleanParsePrintCompInitStorageType];
+Protect[GetIndependentVarlistIndex];
+Protect[GetWithoutGridPointIndex];
+Protect[GetUseTilePointIndex];
 
 End[];
 

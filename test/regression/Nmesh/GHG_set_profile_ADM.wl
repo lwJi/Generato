@@ -342,9 +342,11 @@ $MainPrint[] :=
       (* set d_k g_{ab} *)
       printdg[cc_, aa_, bb_] :=
         Module[{},
-          SetParsePrintCompEQNMode[Main -> True];
+          SetMode["Phase" -> "PrintComp"];
+          SetMode["PrintComp", "Type" -> "Equations"];
+          SetMode["PrintComp", "Eqn", "Mode" -> "Main"];
           PrintComponentEquation[GetDefaultChart[], dmetricg[{cc, -GetDefaultChart[]}, {aa, -GetDefaultChart[]}, {bb, -GetDefaultChart[]}], {}];
-          CleanParsePrintCompEQNMode[];
+          ResetMode["PrintComp", "Eqn"];
         ];
       Do[printdg[cc, aa, bb], {cc, 3, 1, -1}, {aa, 3, 0, -1}, {bb, 3, aa, -1}];
       (* set d_t g_{ab} *)
@@ -354,9 +356,11 @@ $MainPrint[] :=
         printdtgEin[cc_, aa_, bb_] :=
           Module[{},
             SetSuffixName["Ein"];
-            SetParsePrintCompEQNMode[Main -> True];
+            SetMode["Phase" -> "PrintComp"];
+            SetMode["PrintComp", "Type" -> "Equations"];
+            SetMode["PrintComp", "Eqn", "Mode" -> "Main"];
             PrintComponentEquation[GetDefaultChart[], dmetricg[{cc, -GetDefaultChart[]}, {aa, -GetDefaultChart[]}, {bb, -GetDefaultChart[]}], {}];
-            CleanParsePrintCompEQNMode[];
+            ResetMode["PrintComp", "Eqn"];
             SetSuffixName[""];
           ];
         Do[printdtgEin[0, aa, bb], {aa, 3, 0, -1}, {bb, 3, aa, -1}];

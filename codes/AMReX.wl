@@ -87,10 +87,10 @@ PrintComponentInitialization[varinfo_, compname_] :=
 
     (* set subbuf *)
     Which[
-      GetParsePrintCompInitTensorType[Scal],
+      GetTensorType[] === "Scal",
         subbuf = If[len == 0, "", "[" <> ToString[varlistindex] <> "]"]
       ,
-      GetParsePrintCompInitTensorType[Vect],
+      GetTensorType[] === "Vect",
         Which[
           len == 1,
             subbuf = "[" <> ToString[varlistindex] <> "]"
@@ -107,7 +107,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
             Throw @ Message[PrintComponentInitialization::EVarLength]
         ]
       ,
-      GetParsePrintCompInitTensorType[Smat],
+      GetTensorType[] === "Smat",
         Which[
           len == 2,
             subbuf = "[" <> ToString[varlistindex] <> "]"
@@ -127,19 +127,19 @@ PrintComponentInitialization[varinfo_, compname_] :=
       True,
         Throw @ Message[PrintComponentInitialization::EMode]
     ];
-    fdorder = GetParsePrintCompInitMode[DerivsOrder];
-    fdaccuracy = GetParsePrintCompInitMode[DerivsAccuracy];
+    fdorder = GetDerivsOrder[];
+    fdaccuracy = GetDerivsAccuracy[];
 
     (* set buf *)
     buf =
       Which[
-        GetParsePrintCompInitMode[MainIn] || GetParsePrintCompInitMode[MainOut],
+        GetInitMode[] === "MainIn" || GetInitMode[] === "MainOut",
           "auto &" <> ToString[compToValue]
           <> " = " <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
         ,
-        GetParsePrintCompInitMode[Derivs],
+        GetInitMode[] === "Derivs",
           offset = fdorder - 1;
-          If[GetParsePrintCompInitStorageType[Tile],
+          If[GetStorageType[] === "Tile",
             "const auto " <> StringTrim[ToString[compToValue], GetTilePointIndex[]]
             <> " = tl_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ".ptr;"
             ,
@@ -159,7 +159,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
             <> ", p.i, p.j, p.k);"
           ]
         ,
-        GetParsePrintCompInitMode[Temp],
+        GetInitMode[] === "Temp",
           "const auto &" <> ToString[compToValue]
           <> " = " <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
         ,
@@ -199,7 +199,7 @@ PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
       rhssToValue = (rhssToValue // ToValues) /. extrareplacerules
     ];
     Which[
-      GetParsePrintCompEQNMode[NewVar],
+      GetEqnMode[] === "NewVar",
         Module[{},
           Global`pr["const " <> GetTempVariableType[] <> " "];
           Global`pr[StringTrim[ToString[compToValue], GetGridPointIndex[]]];
@@ -208,7 +208,7 @@ PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
           Global`pr[";\n"]
         ]
       ,
-      GetParsePrintCompEQNMode[Main],
+      GetEqnMode[] === "Main",
         Module[{},
           PutAppend[CForm[compToValue], outputfile];
           Global`pr["="];
@@ -216,7 +216,7 @@ PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
           Global`pr[";\n"]
         ]
       ,
-      GetParsePrintCompEQNMode[AddToMain],
+      GetEqnMode[] === "AddToMain",
         Module[{},
           PutAppend[CForm[compToValue], outputfile];
           Global`pr["+="];

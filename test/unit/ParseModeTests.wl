@@ -1,7 +1,7 @@
 (* ::Package:: *)
 
 (* ParseModeTests.wl *)
-(* Unit tests for Generato`ParseMode module *)
+(* Unit tests for Generato`ParseMode module - New Nested Mode System *)
 
 If[Environment["QUIET"] =!= "1", Print["Loading ParseModeTests.wl..."]];
 
@@ -12,236 +12,242 @@ SetPVerbose[False];
 SetPrintDate[False];
 
 (* ========================================= *)
-(* Test: ParseMode (Level 1) *)
+(* Test: GetMode / SetMode / ResetMode *)
 (* ========================================= *)
 
 AppendTo[$AllTests,
   VerificationTest[
-    CleanParseMode[];
-    SetParseMode[<|SetComp -> True|>];
-    GetParseMode[SetComp],
+    ResetMode[];
+    SetMode["Phase" -> "SetComp"];
+    GetMode["Phase"],
+    "SetComp",
+    TestID -> "Mode-Phase-SetComp"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    ResetMode[];
+    SetMode["Phase" -> "PrintComp"];
+    GetMode["Phase"],
+    "PrintComp",
+    TestID -> "Mode-Phase-PrintComp"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    ResetMode[];
+    GetMode["Phase"],
+    None,
+    TestID -> "Mode-Phase-Default-None"
+  ]
+];
+
+(* ========================================= *)
+(* Test: SetComp Options *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    ResetMode[];
+    SetMode["SetComp", "IndependentVarlistIndex" -> True];
+    GetMode["SetComp", "IndependentVarlistIndex"],
     True,
-    TestID -> "ParseMode-SetComp-True"
+    TestID -> "Mode-SetComp-IndependentVarlistIndex"
   ]
 ];
 
 AppendTo[$AllTests,
   VerificationTest[
-    CleanParseMode[];
-    SetParseMode[<|PrintComp -> True|>];
-    GetParseMode[PrintComp],
+    ResetMode[];
+    SetMode["SetComp", "WithoutGridPointIndex" -> True];
+    GetMode["SetComp", "WithoutGridPointIndex"],
     True,
-    TestID -> "ParseMode-PrintComp-True"
+    TestID -> "Mode-SetComp-WithoutGridPointIndex"
   ]
 ];
 
 AppendTo[$AllTests,
   VerificationTest[
-    CleanParseMode[];
-    GetParseMode[NonExistentKey],
-    False,
-    TestID -> "ParseMode-NonExistentKey-ReturnsFalse"
-  ]
-];
-
-AppendTo[$AllTests,
-  VerificationTest[
-    CleanParseMode[];
-    SetParseMode[<|SetComp -> True, PrintComp -> True|>];
-    SetParseModeAllToFalse[];
-    {GetParseMode[SetComp], GetParseMode[PrintComp]},
-    {False, False},
-    TestID -> "ParseMode-SetAllToFalse"
-  ]
-];
-
-(* ========================================= *)
-(* Test: ParseSetCompMode (Level 2) *)
-(* ========================================= *)
-
-AppendTo[$AllTests,
-  VerificationTest[
-    CleanParseSetCompMode[];
-    SetParseSetCompMode[<|IndependentVarlistIndex -> True|>];
-    GetParseSetCompMode[IndependentVarlistIndex],
+    ResetMode[];
+    SetMode["SetComp", "UseTilePointIndex" -> True];
+    GetMode["SetComp", "UseTilePointIndex"],
     True,
-    TestID -> "ParseSetCompMode-IndependentVarlistIndex-True"
+    TestID -> "Mode-SetComp-UseTilePointIndex"
+  ]
+];
+
+(* ========================================= *)
+(* Test: PrintComp Init Modes *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    ResetMode[];
+    SetMode["PrintComp", "Type" -> "Initializations"];
+    SetMode["PrintComp", "Init", "Mode" -> "MainIn"];
+    GetMode["PrintComp", "Init", "Mode"],
+    "MainIn",
+    TestID -> "Mode-PrintComp-Init-MainIn"
   ]
 ];
 
 AppendTo[$AllTests,
   VerificationTest[
-    CleanParseSetCompMode[];
-    SetParseSetCompMode[<|WithoutGridPointIndex -> True|>];
-    GetParseSetCompMode[WithoutGridPointIndex],
+    ResetMode[];
+    SetMode["PrintComp", "Init", "TensorType" -> "Vect"];
+    GetMode["PrintComp", "Init", "TensorType"],
+    "Vect",
+    TestID -> "Mode-PrintComp-Init-TensorType-Vect"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    ResetMode[];
+    SetMode["PrintComp", "Init", "StorageType" -> "Tile"];
+    GetMode["PrintComp", "Init", "StorageType"],
+    "Tile",
+    TestID -> "Mode-PrintComp-Init-StorageType-Tile"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    ResetMode[];
+    SetMode["PrintComp", "Init", "DerivsOrder" -> 2];
+    SetMode["PrintComp", "Init", "DerivsAccuracy" -> 6];
+    {GetMode["PrintComp", "Init", "DerivsOrder"], GetMode["PrintComp", "Init", "DerivsAccuracy"]},
+    {2, 6},
+    TestID -> "Mode-PrintComp-Init-Derivs"
+  ]
+];
+
+(* ========================================= *)
+(* Test: PrintComp Eqn Modes *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    ResetMode[];
+    SetMode["PrintComp", "Eqn", "Mode" -> "NewVar"];
+    GetMode["PrintComp", "Eqn", "Mode"],
+    "NewVar",
+    TestID -> "Mode-PrintComp-Eqn-NewVar"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    ResetMode[];
+    SetMode["PrintComp", "Eqn", "Mode" -> "Main"];
+    GetMode["PrintComp", "Eqn", "Mode"],
+    "Main",
+    TestID -> "Mode-PrintComp-Eqn-Main"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    ResetMode[];
+    SetMode["PrintComp", "Eqn", "Mode" -> "AddToMain"];
+    GetMode["PrintComp", "Eqn", "Mode"],
+    "AddToMain",
+    TestID -> "Mode-PrintComp-Eqn-AddToMain"
+  ]
+];
+
+(* ========================================= *)
+(* Test: Convenience Helpers *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    ResetMode[];
+    SetMode["Phase" -> "SetComp"];
+    InSetCompPhase[],
     True,
-    TestID -> "ParseSetCompMode-WithoutGridPointIndex-True"
+    TestID -> "Mode-Helper-InSetCompPhase"
   ]
 ];
 
 AppendTo[$AllTests,
   VerificationTest[
-    CleanParseSetCompMode[];
-    SetParseSetCompMode[<|UseTilePointIndex -> True|>];
-    GetParseSetCompMode[UseTilePointIndex],
+    ResetMode[];
+    SetMode["Phase" -> "PrintComp"];
+    InPrintCompPhase[],
     True,
-    TestID -> "ParseSetCompMode-UseTilePointIndex-True"
+    TestID -> "Mode-Helper-InPrintCompPhase"
   ]
 ];
 
 AppendTo[$AllTests,
   VerificationTest[
-    CleanParseSetCompMode[];
-    GetParseSetCompMode[NonExistentKey],
-    False,
-    TestID -> "ParseSetCompMode-NonExistentKey-ReturnsFalse"
-  ]
-];
-
-AppendTo[$AllTests,
-  VerificationTest[
-    CleanParseSetCompMode[];
-    SetParseSetCompMode[<|IndependentVarlistIndex -> True, WithoutGridPointIndex -> True, UseTilePointIndex -> True|>];
-    SetParseSetCompModeAllToFalse[];
-    {GetParseSetCompMode[IndependentVarlistIndex], GetParseSetCompMode[WithoutGridPointIndex], GetParseSetCompMode[UseTilePointIndex]},
-    {False, False, False},
-    TestID -> "ParseSetCompMode-SetAllToFalse"
-  ]
-];
-
-(* ========================================= *)
-(* Test: ParsePrintCompMode (Level 3) *)
-(* ========================================= *)
-
-AppendTo[$AllTests,
-  VerificationTest[
-    CleanParsePrintCompMode[];
-    SetParsePrintCompMode[<|Initializations -> True|>];
-    GetParsePrintCompMode[Initializations],
+    ResetMode[];
+    SetMode["PrintComp", "Type" -> "Initializations"];
+    InInitMode[],
     True,
-    TestID -> "ParsePrintCompMode-Initializations-True"
+    TestID -> "Mode-Helper-InInitMode"
   ]
 ];
 
 AppendTo[$AllTests,
   VerificationTest[
-    CleanParsePrintCompMode[];
-    SetParsePrintCompMode[<|Equations -> True|>];
-    GetParsePrintCompMode[Equations],
+    ResetMode[];
+    SetMode["PrintComp", "Type" -> "Equations"];
+    InEqnMode[],
     True,
-    TestID -> "ParsePrintCompMode-Equations-True"
+    TestID -> "Mode-Helper-InEqnMode"
   ]
 ];
 
 AppendTo[$AllTests,
   VerificationTest[
-    CleanParsePrintCompMode[];
-    GetParsePrintCompMode[NonExistentKey],
-    False,
-    TestID -> "ParsePrintCompMode-NonExistentKey-ReturnsFalse"
+    ResetMode[];
+    SetMode["PrintComp", "Init", "Mode" -> "MainOut"];
+    GetInitMode[],
+    "MainOut",
+    TestID -> "Mode-Helper-GetInitMode"
   ]
 ];
 
 AppendTo[$AllTests,
   VerificationTest[
-    CleanParsePrintCompMode[];
-    SetParsePrintCompMode[<|Initializations -> True, Equations -> True|>];
-    SetParsePrintCompModeAllToFalse[];
-    {GetParsePrintCompMode[Initializations], GetParsePrintCompMode[Equations]},
-    {False, False},
-    TestID -> "ParsePrintCompMode-SetAllToFalse"
-  ]
-];
-
-(* ========================================= *)
-(* Test: ParsePrintCompInitMode (Level 4) *)
-(* ========================================= *)
-
-AppendTo[$AllTests,
-  VerificationTest[
-    CleanParsePrintCompInitMode[];
-    SetParsePrintCompInitMode[<|"TestKey" -> "TestValue"|>];
-    GetParsePrintCompInitMode["TestKey"],
-    "TestValue",
-    TestID -> "ParsePrintCompInitMode-SetGet"
-  ]
-];
-
-AppendTo[$AllTests,
-  VerificationTest[
-    CleanParsePrintCompInitMode[];
-    GetParsePrintCompInitMode["NonExistentKey"],
-    False,
-    TestID -> "ParsePrintCompInitMode-NonExistentKey-ReturnsFalse"
+    ResetMode[];
+    SetMode["PrintComp", "Eqn", "Mode" -> "Main"];
+    GetEqnMode[],
+    "Main",
+    TestID -> "Mode-Helper-GetEqnMode"
   ]
 ];
 
 (* ========================================= *)
-(* Test: ParsePrintCompEQNMode (Level 5) *)
+(* Test: ResetMode Subtree *)
 (* ========================================= *)
 
 AppendTo[$AllTests,
   VerificationTest[
-    CleanParsePrintCompEQNMode[];
-    SetParsePrintCompEQNMode[<|"TestKey" -> "TestValue"|>];
-    GetParsePrintCompEQNMode["TestKey"],
-    "TestValue",
-    TestID -> "ParsePrintCompEQNMode-SetGet"
-  ]
-];
-
-AppendTo[$AllTests,
-  VerificationTest[
-    CleanParsePrintCompEQNMode[];
-    GetParsePrintCompEQNMode["NonExistentKey"],
-    False,
-    TestID -> "ParsePrintCompEQNMode-NonExistentKey-ReturnsFalse"
+    ResetMode[];
+    SetMode["PrintComp", "Init", "Mode" -> "MainIn"];
+    SetMode["PrintComp", "Init", "TensorType" -> "Vect"];
+    ResetMode["PrintComp", "Init"];
+    {GetMode["PrintComp", "Init", "Mode"], GetMode["PrintComp", "Init", "TensorType"]},
+    {None, None},
+    TestID -> "Mode-ResetMode-Subtree"
   ]
 ];
 
 (* ========================================= *)
-(* Test: ParsePrintCompInitTensorType (Level 6) *)
+(* Test: Validation *)
 (* ========================================= *)
 
 AppendTo[$AllTests,
   VerificationTest[
-    CleanParsePrintCompInitTensorType[];
-    SetParsePrintCompInitTensorType[<|"TestKey" -> "TestValue"|>];
-    GetParsePrintCompInitTensorType["TestKey"],
-    "TestValue",
-    TestID -> "ParsePrintCompInitTensorType-SetGet"
-  ]
-];
-
-AppendTo[$AllTests,
-  VerificationTest[
-    CleanParsePrintCompInitTensorType[];
-    GetParsePrintCompInitTensorType["NonExistentKey"],
-    False,
-    TestID -> "ParsePrintCompInitTensorType-NonExistentKey-ReturnsFalse"
-  ]
-];
-
-(* ========================================= *)
-(* Test: ParsePrintCompInitStorageType (Level 7) *)
-(* ========================================= *)
-
-AppendTo[$AllTests,
-  VerificationTest[
-    CleanParsePrintCompInitStorageType[];
-    SetParsePrintCompInitStorageType[<|"TestKey" -> "TestValue"|>];
-    GetParsePrintCompInitStorageType["TestKey"],
-    "TestValue",
-    TestID -> "ParsePrintCompInitStorageType-SetGet"
-  ]
-];
-
-AppendTo[$AllTests,
-  VerificationTest[
-    CleanParsePrintCompInitStorageType[];
-    GetParsePrintCompInitStorageType["NonExistentKey"],
-    False,
-    TestID -> "ParsePrintCompInitStorageType-NonExistentKey-ReturnsFalse"
+    ResetMode[];
+    Quiet[Catch[SetMode["Phase" -> "InvalidPhase"]], SetMode::EInvalidValue],
+    Null,
+    TestID -> "Mode-Validation-InvalidPhase"
   ]
 ];
 
@@ -249,12 +255,6 @@ AppendTo[$AllTests,
 (* Cleanup *)
 (* ========================================= *)
 
-CleanParseMode[];
-CleanParseSetCompMode[];
-CleanParsePrintCompMode[];
-CleanParsePrintCompInitMode[];
-CleanParsePrintCompEQNMode[];
-CleanParsePrintCompInitTensorType[];
-CleanParsePrintCompInitStorageType[];
+ResetMode[];
 
 If[Environment["QUIET"] =!= "1", Print["ParseModeTests.wl completed."]];
