@@ -135,25 +135,13 @@ PrintComponentInitialization[varinfo_, compname_] :=
     subbuf = If[len == 0, "", "[" <> ToString[varlistindex] <> "]"];
 
     (* set buf *)
+    (* Note: Derivs1st/Derivs2nd modes removed - use Derivs mode with DerivsOrder parameter *)
     buf =
       Which[
         GetParsePrintCompInitMode[MainIn] || GetParsePrintCompInitMode[MainOut],
           "const auto &"
           <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
           <> " = gf_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
-        ,
-        GetParsePrintCompInitMode[Derivs1st],
-          "const auto " <> ToString[compToValue]
-          <> " = fd_1st<" <> ToString[compname[[1]][[1]]] <> ">("
-          <> StringDrop[StringDrop[ToString[compToValue], 1], {-len, -len + 0}]
-          <> ", p);"
-        ,
-        GetParsePrintCompInitMode[Derivs2nd],
-          "const auto " <> ToString[compToValue]
-          <> " = fd_2nd<" <> ToString[compname[[1]][[1]]] <> ", "
-          <> ToString[compname[[2]][[1]]] <> ">("
-          <> StringDrop[StringDrop[ToString[compToValue], 2], {-len, -len + 1}]
-          <> ", p);"
         ,
         GetParsePrintCompInitMode[Temp],
           buf = "auto " <> ToString[compToValue] <> ";"
