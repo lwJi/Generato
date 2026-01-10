@@ -30,7 +30,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
     {varname, symmetry} = varinfo;
     (* set subbuf *)
     Which[
-      GetParsePrintCompInitTensorType[Scal],
+      GetTensorType[] === "Scal",
         Which[
           Length[varname] == 0,
             subbuf = ""
@@ -52,7 +52,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
             Throw @ Message[PrintComponentInitialization::EVarLength]
         ]
       ,
-      GetParsePrintCompInitTensorType[Vect],
+      GetTensorType[] === "Vect",
         Which[
           Length[varname] == 1,
             subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> ")"
@@ -74,7 +74,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
             Throw @ Message[PrintComponentInitialization::EVarLength]
         ]
       ,
-      GetParsePrintCompInitTensorType[Smat],
+      GetTensorType[] === "Smat",
         Which[
           Length[varname] == 2,
             subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> "," <> ToString[compname[[2]][[1]] - 1] <> ")"
@@ -93,20 +93,20 @@ PrintComponentInitialization[varinfo_, compname_] :=
         Throw @ Message[PrintComponentInitialization::EMode]
     ];
     (* combine buf *)
-    isGF3D2 = GetParsePrintCompInitStorageType[GF];
-    isGF3D5 = GetParsePrintCompInitStorageType[Tile];
+    isGF3D2 = GetStorageType[] === "GF";
+    isGF3D5 = GetStorageType[] === "Tile";
     buf =
       Which[
-        GetParsePrintCompInitMode[MainOut] && isGF3D2,
+        GetInitMode[] === "MainOut" && isGF3D2,
           "const GF3D2<CCTK_REAL> &local_" <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]] <> subbuf <> ";"
         ,
-        GetParsePrintCompInitMode[MainIn] && isGF3D2,
+        GetInitMode[] === "MainIn" && isGF3D2,
           "const vreal " <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = tmp_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]] <> subbuf <> ";"
         ,
-        GetParsePrintCompInitMode[MainIn] && isGF3D5,
+        GetInitMode[] === "MainIn" && isGF3D5,
           "const vreal " <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = tmp_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]] <> subbuf <> ";"
         ,
-        GetParsePrintCompInitMode[Temp],
+        GetInitMode[] === "Temp",
           buf = "vreal " <> ToString[compToValue] <> ";"
         ,
         True,
@@ -143,7 +143,7 @@ PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
       rhssToValue = (rhssToValue // ToValues) /. extrareplacerules
     ];
     Which[
-      GetParsePrintCompEQNMode[NewVar],
+      GetEqnMode[] === "NewVar",
         Module[{},
           Global`pr[GetTempVariableType[] <> " "];
           PutAppend[CForm[compToValue], outputfile];
@@ -152,14 +152,14 @@ PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
           Global`pr[";\n"]
         ]
       ,
-      GetParsePrintCompEQNMode[Main],
+      GetEqnMode[] === "Main",
         Module[{},
           Global`pr["local_" <> ToString[CForm[compToValue]] <> ".store(mask, index2, "];
           PutAppend[CForm[rhssToValue], outputfile];
           Global`pr[");\n"]
         ]
       ,
-      GetParsePrintCompEQNMode[AddToMain],
+      GetEqnMode[] === "AddToMain",
         Module[{},
           PutAppend[CForm[compToValue], outputfile];
           Global`pr["+="];

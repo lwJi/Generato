@@ -137,25 +137,25 @@ PrintComponentInitialization[varinfo_, compname_] :=
     (* set buf *)
     buf =
       Which[
-        GetParsePrintCompInitMode[MainIn] || GetParsePrintCompInitMode[MainOut],
+        GetInitMode[] === "MainIn" || GetInitMode[] === "MainOut",
           "const auto &"
           <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
           <> " = gf_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
         ,
-        GetParsePrintCompInitMode[Derivs1st],
+        GetInitMode[] === "Derivs1st",
           "const auto " <> ToString[compToValue]
           <> " = fd_1st<" <> ToString[compname[[1]][[1]]] <> ">("
           <> StringDrop[StringDrop[ToString[compToValue], 1], {-len, -len + 0}]
           <> ", p);"
         ,
-        GetParsePrintCompInitMode[Derivs2nd],
+        GetInitMode[] === "Derivs2nd",
           "const auto " <> ToString[compToValue]
           <> " = fd_2nd<" <> ToString[compname[[1]][[1]]] <> ", "
           <> ToString[compname[[2]][[1]]] <> ">("
           <> StringDrop[StringDrop[ToString[compToValue], 2], {-len, -len + 1}]
           <> ", p);"
         ,
-        GetParsePrintCompInitMode[Temp],
+        GetInitMode[] === "Temp",
           buf = "auto " <> ToString[compToValue] <> ";"
         ,
         True,
@@ -194,7 +194,7 @@ PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
       rhssToValue = (rhssToValue // ToValues) /. extrareplacerules
     ];
     Which[
-      GetParsePrintCompEQNMode[NewVar],
+      GetEqnMode[] === "NewVar",
         Module[{},
           Global`pr["const " <> GetTempVariableType[] <> " "];
           PutAppend[CForm[compToValue], outputfile];
@@ -203,7 +203,7 @@ PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
           Global`pr[";\n"]
         ]
       ,
-      GetParsePrintCompEQNMode[Main],
+      GetEqnMode[] === "Main",
         Module[{},
           PutAppend[CForm[compToValue], outputfile];
           Global`pr["="];
@@ -211,7 +211,7 @@ PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
           Global`pr[";\n"]
         ]
       ,
-      GetParsePrintCompEQNMode[AddToMain],
+      GetEqnMode[] === "AddToMain",
         Module[{},
           PutAppend[CForm[compToValue], outputfile];
           Global`pr["+="];

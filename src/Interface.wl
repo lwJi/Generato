@@ -30,67 +30,7 @@ SetComponents::usage = "SetComponents[varlist] sets tensor components for the gi
 
 PrintEquations::usage = "PrintEquations[varlist] prints equations for tensor components in the varlist.\nPrintEquations[{opts}, varlist] prints with options ChartName, SuffixName, Mode, ExtraReplaceRules.";
 
-NewVar::usage = "NewVar is a PrintEquations Mode option that declares new temporary variables before assignment.";
-
-Protect[NewVar];
-
-Main::usage = "Main is a PrintEquations Mode option that generates the main equation assignments.";
-
-Protect[Main];
-
-AddToMain::usage = "AddToMain is a PrintEquations Mode option that adds terms to existing equation assignments.";
-
-Protect[AddToMain];
-
 PrintInitializations::usage = "PrintInitializations[varlist] prints initialization code for tensor components.\nPrintInitializations[{opts}, varlist] prints with options ChartName, Mode, TensorType, StorageType, DerivsOrder, DerivsAccuracy.";
-
-MainOut::usage = "MainOut is a PrintInitializations Mode option that generates output variable declarations."
-
-Protect[MainOut];
-
-MainIn::usage = "MainIn is a PrintInitializations Mode option that generates input variable declarations."
-
-Protect[MainIn];
-
-Derivs::usage = "Derivs is a PrintInitializations Mode option that generates derivative variable declarations."
-
-Protect[Derivs];
-
-DerivsOrder::usage = "DerivsOrder is a PrintInitializations option that specifies the derivative order (default 1)."
-
-Protect[DerivsOrder];
-
-DerivsAccuracy::usage = "DerivsAccuracy is a PrintInitializations option that specifies the finite difference accuracy order (default 4)."
-
-Protect[DerivsAccuracy];
-
-MoreInOut::usage = "MoreInOut is a PrintInitializations Mode option that generates additional input/output declarations."
-
-Protect[MoreInOut];
-
-Temp::usage = "Temp is a PrintInitializations Mode option that generates temporary variable declarations."
-
-Protect[Temp];
-
-Scal::usage = "Scal is a PrintInitializations TensorType option indicating a scalar quantity."
-
-Protect[Scal];
-
-Vect::usage = "Vect is a PrintInitializations TensorType option indicating a vector quantity."
-
-Protect[Vect];
-
-Smat::usage = "Smat is a PrintInitializations TensorType option indicating a symmetric matrix quantity."
-
-Protect[Smat];
-
-GF::usage = "GF is a PrintInitializations StorageType option indicating grid function storage."
-
-Protect[GF];
-
-Tile::usage = "Tile is a PrintInitializations StorageType option indicating tile-based storage."
-
-Protect[Tile];
 
 Begin["`Private`"];
 
@@ -157,10 +97,10 @@ Options[SetComponents] :=
 SetComponents[OptionsPattern[], varlist_?ListQ] :=
   Module[{chartname, indepidx, nogpidx, tlidx},
     {chartname, indepidx, nogpidx, tlidx} = OptionValue[{ChartName, IndependentIndexForEachVar, WithoutGridPointIndex, UseTilePointIndex}];
-    SetParseMode[{SetComp -> True, PrintComp -> False}];
-    SetParseSetCompMode[IndependentVarlistIndex -> indepidx];
-    SetParseSetCompMode[WithoutGridPointIndex -> nogpidx];
-    SetParseSetCompMode[UseTilePointIndex -> tlidx];
+    SetMode["Phase" -> "SetComp"];
+    SetMode["SetComp", "IndependentVarlistIndex" -> indepidx];
+    SetMode["SetComp", "WithoutGridPointIndex" -> nogpidx];
+    SetMode["SetComp", "UseTilePointIndex" -> tlidx];
     ParseVarlist[varlist, chartname];
   ];
 
@@ -176,28 +116,23 @@ Options[PrintEquations] :=
   {ChartName -> GetDefaultChart[], SuffixName -> Null, Mode -> "Main", ExtraReplaceRules -> {}};
 
 PrintEquations[OptionsPattern[], varlist_?ListQ] :=
-  Module[{chartname, suffixname, mode, extrareplacerules},
+  Module[{chartname, suffixname, mode, extrareplacerules, eqnMode},
     {chartname, suffixname, mode, extrareplacerules} = OptionValue[{ChartName, SuffixName, Mode, ExtraReplaceRules}];
     If[suffixname =!= Null,
       SetSuffixName[suffixname]
     ];
-    SetParseMode[{PrintComp -> True, SetComp -> False}];
-    SetParsePrintCompMode[{Equations -> True, Initializations -> False}];
-    Which[
-      StringMatchQ[mode, "Temp"],
-        SetParsePrintCompEQNMode[NewVar -> True]
-      ,
-      StringMatchQ[mode, "Main"],
-        SetParsePrintCompEQNMode[Main -> True]
-      ,
-      StringMatchQ[mode, "AddToMain"],
-        SetParsePrintCompEQNMode[AddToMain -> True]
-      ,
-      True,
-        Throw @ Message[PrintEquations::EMode, mode]
+    (* Map string mode to internal mode *)
+    eqnMode = Which[
+      StringMatchQ[mode, "Temp"], "NewVar",
+      StringMatchQ[mode, "Main"], "Main",
+      StringMatchQ[mode, "AddToMain"], "AddToMain",
+      True, Throw @ Message[PrintEquations::EMode, mode]
     ];
+    SetMode["Phase" -> "PrintComp"];
+    SetMode["PrintComp", "Type" -> "Equations"];
+    SetMode["PrintComp", "Eqn", "Mode" -> eqnMode];
     ParseVarlist[{ExtraReplaceRules -> extrareplacerules}, varlist, chartname];
-    CleanParsePrintCompEQNMode[];
+    ResetMode["PrintComp", "Eqn"];
     SetSuffixName[""];
   ];
 
@@ -216,56 +151,52 @@ PrintInitializations[OptionsPattern[], varlist_?ListQ] :=
   Module[{chartname, mode, tensortype, storagetype, derivsorder, accuracyorder},
     {chartname, mode, tensortype, storagetype, derivsorder, accuracyorder} =
       OptionValue[{ChartName, Mode, TensorType, StorageType, DerivsOrder, DerivsAccuracy}];
-    SetParseMode[{PrintComp -> True, SetComp -> False}];
-    SetParsePrintCompMode[{Initializations -> True, Equations -> False}];
+
+    SetMode["Phase" -> "PrintComp"];
+    SetMode["PrintComp", "Type" -> "Initializations"];
+
+    (* Set initialization mode *)
     Which[
       StringMatchQ[mode, "MainOut"],
-        SetParsePrintCompInitMode[MainOut -> True]
-      ,
+        SetMode["PrintComp", "Init", "Mode" -> "MainOut"],
       StringMatchQ[mode, "MainIn"],
-        SetParsePrintCompInitMode[MainIn -> True]
-      ,
+        SetMode["PrintComp", "Init", "Mode" -> "MainIn"],
       StringMatchQ[mode, "Derivs"],
-        SetParsePrintCompInitMode[Derivs -> True];
-        SetParsePrintCompInitMode[DerivsOrder -> derivsorder];
-        SetParsePrintCompInitMode[DerivsAccuracy -> accuracyorder]
-      ,
+        SetMode["PrintComp", "Init", "Mode" -> "Derivs"];
+        SetMode["PrintComp", "Init", "DerivsOrder" -> derivsorder];
+        SetMode["PrintComp", "Init", "DerivsAccuracy" -> accuracyorder],
       StringMatchQ[mode, "MoreInOut"],
-        SetParsePrintCompInitMode[MoreInOut -> True]
-      ,
+        SetMode["PrintComp", "Init", "Mode" -> "MoreInOut"],
       StringMatchQ[mode, "Temp"],
-        SetParsePrintCompInitMode[Temp -> True]
-      ,
+        SetMode["PrintComp", "Init", "Mode" -> "Temp"],
       True,
         Throw @ Message[PrintInitializations::EMode, mode]
     ];
+
+    (* Set tensor type *)
     Which[
       StringMatchQ[tensortype, "Scal"],
-        SetParsePrintCompInitTensorType[Scal -> True]
-      ,
+        SetMode["PrintComp", "Init", "TensorType" -> "Scal"],
       StringMatchQ[tensortype, "Vect"],
-        SetParsePrintCompInitTensorType[Vect -> True]
-      ,
+        SetMode["PrintComp", "Init", "TensorType" -> "Vect"],
       StringMatchQ[tensortype, "Smat"],
-        SetParsePrintCompInitTensorType[Smat -> True]
-      ,
+        SetMode["PrintComp", "Init", "TensorType" -> "Smat"],
       True,
         Throw @ Message[PrintInitializations::ETensorType, tensortype]
     ];
+
+    (* Set storage type *)
     Which[
       StringMatchQ[storagetype, "GF"],
-        SetParsePrintCompInitStorageType[GF -> True]
-      ,
+        SetMode["PrintComp", "Init", "StorageType" -> "GF"],
       StringMatchQ[storagetype, "Tile"],
-        SetParsePrintCompInitStorageType[Tile -> True]
-      ,
+        SetMode["PrintComp", "Init", "StorageType" -> "Tile"],
       True,
         Throw @ Message[PrintInitializations::EStorageType, storagetype]
     ];
+
     ParseVarlist[varlist, chartname];
-    CleanParsePrintCompInitMode[];
-    CleanParsePrintCompInitTensorType[];
-    CleanParsePrintCompInitStorageType[];
+    ResetMode["PrintComp", "Init"];
   ];
 
 PrintInitializations::EMode = "PrintInitializations mode '`1`' unsupported yet!";

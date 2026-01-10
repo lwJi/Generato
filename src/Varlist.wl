@@ -52,7 +52,7 @@ ParseVarlist[OptionsPattern[], varlist_?ListQ, chartname_] :=
         symindex = symmetry[[1]]
       ];
       If[!xTensorQ[varname[[0]]],
-        If[GetParseMode[SetComp],
+        If[InSetCompPhase[],
           DefineTensor[varname, symmetry, printname]
           ,
           Throw @ Message[ParseVarlist::ETensorNonExist, ivar, varname]
