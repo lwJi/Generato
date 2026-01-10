@@ -201,7 +201,7 @@ ParseVarlist[OptionsPattern[], varlist_?ListQ, chartname_] :=
 
 ParseVarlist::ETensorNonExist = "Tensor of the `1`-th var, `2`, in varlist not exist and can't be defined since SetComp is false. Please check that this type of tensor can be handled by Generato!";
 
-ParseVarlist::ETensorExistOutside = "Tensor of the `1`-th var, `2`, in varlist already exsit outside the global varlist, Please try a different name!";
+ParseVarlist::ETensorExistOutside = "Tensor of the `1`-th var, `2`, in varlist already exists outside the global varlist, please try a different name!";
 
 ParseVarlist::ETensorType = "Tensor type of the `1`-th var, `2`, in varlist unsupported yet!";
 
