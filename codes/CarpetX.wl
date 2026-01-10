@@ -19,7 +19,7 @@ PrintListInitializations[varlist_?ListQ, storagetype_?StringQ, indextype_?String
     ];
   ];
 
-(*Protect[PrintListInitializations];*)
+Protect[PrintListInitializations];
 
 (*
     Print initialization of each component of a tensor
@@ -119,7 +119,7 @@ PrintComponentInitialization::EMode = "PrintComponentInitialization mode unrecog
 
 PrintComponentInitialization::EVarLength = "PrintComponentInitialization variable's tensor type unsupported!";
 
-(*Protect[PrintComponentInitialization];*)
+Protect[PrintComponentInitialization];
 
 
 (******************************************************************************)
@@ -174,7 +174,7 @@ PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
 
 PrintComponentEquation::EMode = "PrintEquationMode unrecognized!";
 
-(*Protect[PrintComponentEquation];*)
+Protect[PrintComponentEquation];
 
 (******************************************************************************)
 

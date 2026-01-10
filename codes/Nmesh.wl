@@ -64,7 +64,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
 
 PrintComponentInitialization::EMode = "PrintComponentInitialization mode unrecognized!";
 
-(*Protect[PrintComponentInitialization];*)
+Protect[PrintComponentInitialization];
 
 
 (******************************************************************************)
@@ -120,7 +120,7 @@ PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
 
 PrintComponentEquation::EMode = "PrintEquationMode unrecognized!";
 
-(*Protect[PrintComponentEquation];*)
+Protect[PrintComponentEquation];
 
 (*
     Write to files
