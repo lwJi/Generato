@@ -41,8 +41,8 @@ SetMainPrint[
   pr[];
   PrintInitializations[{Mode -> "MainIn"}, EvolVarlist];
   pr[];
-  (* Test Mode->Derivs with DerivsOrder and AccuracyOrder *)
-  PrintInitializations[{Mode -> "Derivs", TensorType -> "Vect", DerivsOrder -> 1, AccuracyOrder -> 4}, DerivVarlist];
+  (* Test Mode->Derivs with DerivsOrder and DerivsAccuracy *)
+  PrintInitializations[{Mode -> "Derivs", TensorType -> "Vect", DerivsOrder -> 1, DerivsAccuracy -> 4}, DerivVarlist];
   pr[];
   PrintEquations[{Mode -> "Temp"}, TempVarlist];
 ];
