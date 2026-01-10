@@ -45,7 +45,7 @@ SetMainPrint[content_] :=
 Protect[SetMainPrint];
 
 WriteToFile[outputfile_] :=
-  Module[{},
+  Module[{filepointer},
     If[Environment["QUIET"] =!= "1",
       System`Print["Writing to \"", outputfile, "\"...\n"]
     ];
@@ -57,37 +57,39 @@ WriteToFile[outputfile_] :=
     ];
     (* define pr *)
     filepointer = OpenAppend[outputfile];
-    Global`pr[x_:""] :=
-      Module[{},
-        If[x == GetTempVariableType[],
-          WriteString[filepointer, x]
-          ,
-          WriteLine[filepointer, x]
-        ]
+    Block[{Global`pr},
+      Global`pr[x_:""] :=
+        Module[{},
+          If[x == GetTempVariableType[],
+            WriteString[filepointer, x]
+            ,
+            WriteLine[filepointer, x]
+          ]
+        ];
+      (* print first few lines *)
+      Global`pr["/* " <> FileNameTake[outputfile] <> " */"];
+      Global`pr[
+        "/* Produced with Generato" <>
+          If[GetPrintDate[],
+            " on " <> DateString[{"Month", "/", "Day", "/", "Year"}]
+            ,
+            ""
+          ] <> " */"
       ];
-    (* print first few lines *)
-    Global`pr["/* " <> FileNameTake[outputfile] <> " */"];
-    Global`pr[
-      "/* Produced with Generato" <>
-        If[GetPrintDate[],
-          " on " <> DateString[{"Month", "/", "Day", "/", "Year"}]
-          ,
-          ""
-        ] <> " */"
+      Global`pr[];
+      If[GetPrintHeaderMacro[],
+        Global`pr["#ifndef " <> StringReplace[ToUpperCase[FileNameTake[outputfile]], "." -> "_"]];
+        Global`pr["#define " <> StringReplace[ToUpperCase[FileNameTake[outputfile]], "." -> "_"]];
+        Global`pr[]
+      ];
+      GetMainPrint[];
+      Global`pr[];
+      If[GetPrintHeaderMacro[],
+        Global`pr["#endif // #ifndef " <> StringReplace[ToUpperCase[FileNameTake[outputfile]], "." -> "_"]];
+        Global`pr[]
+      ];
+      Global`pr["/* " <> FileNameTake[outputfile] <> " */"];
     ];
-    Global`pr[];
-    If[GetPrintHeaderMacro[],
-      Global`pr["#ifndef " <> StringReplace[ToUpperCase[FileNameTake[outputfile]], "." -> "_"]];
-      Global`pr["#define " <> StringReplace[ToUpperCase[FileNameTake[outputfile]], "." -> "_"]];
-      Global`pr[]
-    ];
-    GetMainPrint[];
-    Global`pr[];
-    If[GetPrintHeaderMacro[],
-      Global`pr["#endif // #ifndef " <> StringReplace[ToUpperCase[FileNameTake[outputfile]], "." -> "_"]];
-      Global`pr[]
-    ];
-    Global`pr["/* " <> FileNameTake[outputfile] <> " */"];
     If[Environment["QUIET"] =!= "1",
       System`Print["Done generating \"", outputfile, "\"\n"]
     ];
