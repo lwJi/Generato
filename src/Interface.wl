@@ -42,7 +42,7 @@ AddToMain::usage = "AddToMain is a PrintEquations Mode option that adds terms to
 
 Protect[AddToMain];
 
-PrintInitializations::usage = "PrintInitializations[varlist] prints initialization code for tensor components.\nPrintInitializations[{opts}, varlist] prints with options ChartName, Mode, TensorType, StorageType, DerivsOrder, AccuracyOrder.";
+PrintInitializations::usage = "PrintInitializations[varlist] prints initialization code for tensor components.\nPrintInitializations[{opts}, varlist] prints with options ChartName, Mode, TensorType, StorageType, DerivsOrder, DerivsAccuracy.";
 
 MainOut::usage = "MainOut is a PrintInitializations Mode option that generates output variable declarations."
 
@@ -210,11 +210,12 @@ Protect[PrintEquations];
  *)
 
 Options[PrintInitializations] :=
-  {ChartName -> GetDefaultChart[], Mode -> "Temp", TensorType -> "Scal", StorageType -> "GF", DerivsOrder -> 1, AccuracyOrder -> 4};
+  {ChartName -> GetDefaultChart[], Mode -> "Temp", TensorType -> "Scal", StorageType -> "GF", DerivsOrder -> 1, DerivsAccuracy -> 4};
 
 PrintInitializations[OptionsPattern[], varlist_?ListQ] :=
   Module[{chartname, mode, tensortype, storagetype, derivsorder, accuracyorder},
-    {chartname, mode, tensortype, storagetype, derivsorder, accuracyorder} = OptionValue[{ChartName, Mode, TensorType, StorageType, DerivsOrder, AccuracyOrder}];
+    {chartname, mode, tensortype, storagetype, derivsorder, accuracyorder} =
+      OptionValue[{ChartName, Mode, TensorType, StorageType, DerivsOrder, DerivsAccuracy}];
     SetParseMode[{PrintComp -> True, SetComp -> False}];
     SetParsePrintCompMode[{Initializations -> True, Equations -> False}];
     Which[
