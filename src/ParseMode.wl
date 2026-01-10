@@ -136,6 +136,8 @@ CleanParseMode[] :=
     $ParseModeAssociation = <||>
   ];
 
+Protect[CleanParseMode];
+
 GetParseSetCompMode[key_] :=
   Return[
     If[KeyExistsQ[$ParseSetCompModeAssociation, key],
@@ -165,6 +167,8 @@ CleanParseSetCompMode[] :=
   Module[{},
     $ParseSetCompModeAssociation = <||>
   ];
+
+Protect[CleanParseSetCompMode];
 
 GetParsePrintCompMode[key_] :=
   Return[
@@ -196,6 +200,8 @@ CleanParsePrintCompMode[] :=
     $ParsePrintCompModeAssociation = <||>
   ];
 
+Protect[CleanParsePrintCompMode];
+
 GetParsePrintCompInitMode[key_] :=
   Return[
     If[KeyExistsQ[$ParsePrintCompInitModeAssociation, key],
@@ -218,6 +224,8 @@ CleanParsePrintCompInitMode[] :=
   Module[{},
     $ParsePrintCompInitModeAssociation = <||>
   ];
+
+Protect[CleanParsePrintCompInitMode];
 
 GetParsePrintCompEQNMode[key_] :=
   Return[
@@ -242,6 +250,8 @@ CleanParsePrintCompEQNMode[] :=
     $ParsePrintCompEQNModeAssociation = <||>
   ];
 
+Protect[CleanParsePrintCompEQNMode];
+
 GetParsePrintCompInitTensorType[key_] :=
   Return[
     If[KeyExistsQ[$ParsePrintCompInitTensorTypeAssociation, key],
@@ -265,6 +275,8 @@ CleanParsePrintCompInitTensorType[] :=
     $ParsePrintCompInitTensorTypeAssociation = <||>
   ];
 
+Protect[CleanParsePrintCompInitTensorType];
+
 GetParsePrintCompInitStorageType[key_] :=
   Return[
     If[KeyExistsQ[$ParsePrintCompInitStorageTypeAssociation, key],
@@ -287,6 +299,8 @@ CleanParsePrintCompInitStorageType[] :=
   Module[{},
     $ParsePrintCompInitStorageTypeAssociation = <||>
   ];
+
+Protect[CleanParsePrintCompInitStorageType];
 
 End[];
 
