@@ -121,6 +121,8 @@ Protect[SetCheckInputEquations];
 GetPVerbose[] :=
   Return[$PVerbose];
 
+Protect[GetPVerbose];
+
 SetPVerbose[verbose_] :=
   Module[{},
     $PVerbose = verbose
