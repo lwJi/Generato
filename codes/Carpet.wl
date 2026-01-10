@@ -247,7 +247,7 @@ PrintComponentInitialization::EMode =
 PrintComponentInitialization::EVarLength =
   "PrintComponentInitialization variable's tensor type unsupported!";
 
-(*Protect[PrintComponentInitialization];*)
+Protect[PrintComponentInitialization];
 
 
 (******************************************************************************)
@@ -303,7 +303,7 @@ PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
 
 PrintComponentEquation::EMode = "PrintEquationMode unrecognized!";
 
-(*Protect[PrintComponentEquation];*)
+Protect[PrintComponentEquation];
 
 
 (******************************************************************************)
