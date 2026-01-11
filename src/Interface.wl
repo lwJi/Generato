@@ -97,11 +97,14 @@ Options[SetComponents] :=
 SetComponents[OptionsPattern[], varlist_?ListQ] :=
   Module[{chartname, indepidx, nogpidx, tlidx},
     {chartname, indepidx, nogpidx, tlidx} = OptionValue[{ChartName, IndependentIndexForEachVar, WithoutGridPointIndex, UseTilePointIndex}];
-    SetMode["Phase" -> "SetComp"];
-    SetMode["SetComp", "IndependentVarlistIndex" -> indepidx];
-    SetMode["SetComp", "WithoutGridPointIndex" -> nogpidx];
-    SetMode["SetComp", "UseTilePointIndex" -> tlidx];
-    ParseVarlist[varlist, chartname];
+    WithMode[{
+      {"Phase"} -> "SetComp",
+      {"SetComp", "IndependentVarlistIndex"} -> indepidx,
+      {"SetComp", "WithoutGridPointIndex"} -> nogpidx,
+      {"SetComp", "UseTilePointIndex"} -> tlidx
+    },
+      ParseVarlist[varlist, chartname]
+    ]
   ];
 
 Protect[SetComponents];
@@ -128,11 +131,13 @@ PrintEquations[OptionsPattern[], varlist_?ListQ] :=
       StringMatchQ[mode, "AddToMain"], "AddToMain",
       True, Throw @ Message[PrintEquations::EMode, mode]
     ];
-    SetMode["Phase" -> "PrintComp"];
-    SetMode["PrintComp", "Type" -> "Equations"];
-    SetMode["PrintComp", "Eqn", "Mode" -> eqnMode];
-    ParseVarlist[{ExtraReplaceRules -> extrareplacerules}, varlist, chartname];
-    ResetMode["PrintComp", "Eqn"];
+    WithMode[{
+      {"Phase"} -> "PrintComp",
+      {"PrintComp", "Type"} -> "Equations",
+      {"PrintComp", "Eqn", "Mode"} -> eqnMode
+    },
+      ParseVarlist[{ExtraReplaceRules -> extrareplacerules}, varlist, chartname]
+    ];
     SetSuffixName[""];
   ];
 
@@ -152,58 +157,18 @@ PrintInitializations[OptionsPattern[], varlist_?ListQ] :=
     {chartname, mode, tensortype, storagetype, derivsorder, accuracyorder} =
       OptionValue[{ChartName, Mode, TensorType, StorageType, DerivsOrder, DerivsAccuracy}];
 
-    SetMode["Phase" -> "PrintComp"];
-    SetMode["PrintComp", "Type" -> "Initializations"];
-
-    (* Set initialization mode *)
-    Which[
-      StringMatchQ[mode, "MainOut"],
-        SetMode["PrintComp", "Init", "Mode" -> "MainOut"],
-      StringMatchQ[mode, "MainIn"],
-        SetMode["PrintComp", "Init", "Mode" -> "MainIn"],
-      StringMatchQ[mode, "Derivs"],
-        SetMode["PrintComp", "Init", "Mode" -> "Derivs"];
-        SetMode["PrintComp", "Init", "DerivsOrder" -> derivsorder];
-        SetMode["PrintComp", "Init", "DerivsAccuracy" -> accuracyorder],
-      StringMatchQ[mode, "MoreInOut"],
-        SetMode["PrintComp", "Init", "Mode" -> "MoreInOut"],
-      StringMatchQ[mode, "Temp"],
-        SetMode["PrintComp", "Init", "Mode" -> "Temp"],
-      True,
-        Throw @ Message[PrintInitializations::EMode, mode]
-    ];
-
-    (* Set tensor type *)
-    Which[
-      StringMatchQ[tensortype, "Scal"],
-        SetMode["PrintComp", "Init", "TensorType" -> "Scal"],
-      StringMatchQ[tensortype, "Vect"],
-        SetMode["PrintComp", "Init", "TensorType" -> "Vect"],
-      StringMatchQ[tensortype, "Smat"],
-        SetMode["PrintComp", "Init", "TensorType" -> "Smat"],
-      True,
-        Throw @ Message[PrintInitializations::ETensorType, tensortype]
-    ];
-
-    (* Set storage type *)
-    Which[
-      StringMatchQ[storagetype, "GF"],
-        SetMode["PrintComp", "Init", "StorageType" -> "GF"],
-      StringMatchQ[storagetype, "Tile"],
-        SetMode["PrintComp", "Init", "StorageType" -> "Tile"],
-      True,
-        Throw @ Message[PrintInitializations::EStorageType, storagetype]
-    ];
-
-    ParseVarlist[varlist, chartname];
-    ResetMode["PrintComp", "Init"];
+    WithMode[{
+      {"Phase"} -> "PrintComp",
+      {"PrintComp", "Type"} -> "Initializations",
+      {"PrintComp", "Init", "Mode"} -> mode,
+      {"PrintComp", "Init", "TensorType"} -> tensortype,
+      {"PrintComp", "Init", "StorageType"} -> storagetype,
+      {"PrintComp", "Init", "DerivsOrder"} -> derivsorder,
+      {"PrintComp", "Init", "DerivsAccuracy"} -> accuracyorder
+    },
+      ParseVarlist[varlist, chartname]
+    ]
   ];
-
-PrintInitializations::EMode = "PrintInitializations mode '`1`' unsupported yet!";
-
-PrintInitializations::ETensorType = "PrintInitializations tensor type '`1`' unsupported yet!";
-
-PrintInitializations::EStorageType = "PrintInitializations storage type '`1`' unsupported yet!";
 
 Protect[PrintInitializations];
 
