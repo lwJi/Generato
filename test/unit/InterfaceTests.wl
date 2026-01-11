@@ -141,6 +141,153 @@ AppendTo[$AllTests,
   ]
 ];
 
+(* ========================================= *)
+(* Test: Context-aware DefTensors *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* DefTensors[ctx, varlist] should return the varlist *)
+    ctx = CreateContext[];
+    defList = DefTensors[ctx, {{intDefCtx[i], PrintAs -> "idc"}}];
+    ListQ[defList] && Length[defList] >= 1,
+    True,
+    TestID -> "DefTensors-ContextAware-ReturnsList"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* DefTensors[ctx, varlist] with symmetric tensor *)
+    ctx = CreateContext[];
+    defList = DefTensors[ctx, {{intDefCtxSym[-i, -j], Symmetric[{-i, -j}], PrintAs -> "idcs"}}];
+    Length[defList] >= 1,
+    True,
+    TestID -> "DefTensors-ContextAware-SymmetricTensor"
+  ]
+];
+
+(* ========================================= *)
+(* Test: Context-aware GridTensors *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* GridTensors[ctx, varlist] should return varlist *)
+    ctx = CreateContext[];
+    varlist = GridTensors[ctx, {{intCtxGridVec[i], PrintAs -> "icgv"}}];
+    ListQ[varlist] && Length[varlist] >= 1,
+    True,
+    TestID -> "GridTensors-ContextAware-ReturnsList"
+  ]
+];
+
+(* ========================================= *)
+(* Test: Context-aware TileTensors *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* TileTensors[ctx, varlist] should return varlist *)
+    ctx = CreateContext[];
+    tileList = TileTensors[ctx, {{intCtxTileVec[i], PrintAs -> "ictv"}}];
+    ListQ[tileList] && Length[tileList] >= 1,
+    True,
+    TestID -> "TileTensors-ContextAware-ReturnsList"
+  ]
+];
+
+(* ========================================= *)
+(* Test: Context-aware TempTensors *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* TempTensors[ctx, varlist] should return varlist *)
+    ctx = CreateContext[];
+    tempList = TempTensors[ctx, {{intCtxTempVec[i], PrintAs -> "ictp"}}];
+    ListQ[tempList] && Length[tempList] >= 1,
+    True,
+    TestID -> "TempTensors-ContextAware-ReturnsList"
+  ]
+];
+
+(* ========================================= *)
+(* Test: WithSetCompPhase *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* WithSetCompPhase should set phase to SetComp in context *)
+    ctx = CreateContext[];
+    result = WithSetCompPhase[ctx, GetPhase[$CurrentContext]];
+    result === "SetComp",
+    True,
+    TestID -> "WithSetCompPhase-SetsPhase"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* WithSetCompPhase should restore phase after body *)
+    ctx = CreateContext[];
+    (* Phase should be None after WithSetCompPhase completes *)
+    WithSetCompPhase[ctx, "dummy"];
+    GetPhase[] === None,
+    True,
+    TestID -> "WithSetCompPhase-RestoresPhase"
+  ]
+];
+
+(* ========================================= *)
+(* Test: WithPrintCompPhase *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* WithPrintCompPhase should set phase to PrintComp in context *)
+    ctx = CreateContext[];
+    result = WithPrintCompPhase[ctx, GetPhase[$CurrentContext]];
+    result === "PrintComp",
+    True,
+    TestID -> "WithPrintCompPhase-SetsPhase"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* WithPrintCompPhase should restore phase after body *)
+    ctx = CreateContext[];
+    (* Phase should be None after WithPrintCompPhase completes *)
+    WithPrintCompPhase[ctx, "dummy"];
+    GetPhase[] === None,
+    True,
+    TestID -> "WithPrintCompPhase-RestoresPhase"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* InSetCompPhase should return True inside WithSetCompPhase *)
+    ctx = CreateContext[];
+    result = WithSetCompPhase[ctx, InSetCompPhase[$CurrentContext]];
+    result === True,
+    True,
+    TestID -> "WithSetCompPhase-InSetCompPhase"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* InPrintCompPhase should return True inside WithPrintCompPhase *)
+    ctx = CreateContext[];
+    result = WithPrintCompPhase[ctx, InPrintCompPhase[$CurrentContext]];
+    result === True,
+    True,
+    TestID -> "WithPrintCompPhase-InPrintCompPhase"
+  ]
+];
+
 (* Reset state *)
 SetPVerbose[False];
 SetPrintDate[False];

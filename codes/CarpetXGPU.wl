@@ -9,14 +9,7 @@
 (*                    Finite difference stencil function                      *)
 (******************************************************************************)
 
-(* Function to get GF index name - GetGFIndexName is now in BackendCommon.wl *)
-
-GetGFIndexNameMix2nd[index1_?IntegerQ, index2_?IntegerQ] :=
-  Module[{gfindex},
-    gfindex = ToString[GetGFIndexName[index1]]
-           <> ToString[GetGFIndexName[index2]];
-    ToExpression[gfindex]
-  ];
+(* GetGFIndexName and GetGFIndexNameMix2nd are now in BackendCommon.wl *)
 
 (* Function to print 3D indexes *)
 
@@ -150,43 +143,27 @@ PrintFDExpressionMix2nd[accuracyOrd_?IntegerQ, strIdx_?StringQ] :=
   ];
 
 
-(******************************************************************************)
-(*                               Misc functions                               *)
-(******************************************************************************)
-
-(* Function to get variable name in interface.ccl *)
-
-GetInterfaceName[compname_] :=
-  Module[{intfname = ToString[compname[[0]]], colist = {"t", "x", "y", "z"}},
-    Do[
-      coindex = compname[[icomp]][[1]];
-      intfname = intfname <> colist[[coindex + 1]]
-      ,
-      {icomp, 1, Length[compname]}
-    ];
-    intfname = ToString[CForm[ToExpression[intfname <> GetGridPointIndex[]]]];
-    Return[intfname];
-  ];
+(* GetInterfaceName is now in BackendCommon.wl *)
 
 
 (******************************************************************************)
 (*            Print initialization of each component of a tensor              *)
 (******************************************************************************)
 
-PrintComponentInitialization[varinfo_, compname_] :=
+PrintComponentInitialization[ctx_Association, varinfo_, compname_] :=
   Module[{varlistindex, compToValue, varname, symmetry, buf, subbuf, len,
           fdorder, fdaccuracy},
-    varlistindex = GetMapComponentToVarlist[][compname];
+    varlistindex = GetMapComponentToVarlist[ctx][compname];
     compToValue = compname // ToValues;
     {varname, symmetry} = varinfo;
     len = Length[varname];
 
     (* set subbuf *)
     Which[
-      GetTensorType[] === "Scal",
+      GetTensorType[ctx] === "Scal",
         subbuf = If[len == 0, "", "[" <> ToString[varlistindex] <> "]"]
       ,
-      GetTensorType[] === "Vect",
+      GetTensorType[ctx] === "Vect",
         Which[
           len == 1,
             subbuf = "[" <> ToString[varlistindex] <> "]"
@@ -203,7 +180,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
             Throw @ Message[PrintComponentInitialization::EVarLength]
         ]
       ,
-      GetTensorType[] === "Smat",
+      GetTensorType[ctx] === "Smat",
         Which[
           len == 2,
             subbuf = "[" <> ToString[varlistindex] <> "]"
@@ -223,26 +200,26 @@ PrintComponentInitialization[varinfo_, compname_] :=
       True,
         Throw @ Message[PrintComponentInitialization::EMode]
     ];
-    fdorder = GetDerivsOrder[];
-    fdaccuracy = GetDerivsAccuracy[];
+    fdorder = GetDerivsOrder[ctx];
+    fdaccuracy = GetDerivsAccuracy[ctx];
 
     (* set buf *)
     buf =
       Which[
-        GetInitializationsMode[] === "MainIn" || GetInitializationsMode[] === "MainOut",
-          If[GetStorageType[] === "Tile",
-            "const auto " <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
+        GetInitializationsMode[ctx] === "MainIn" || GetInitializationsMode[ctx] === "MainOut",
+          If[GetStorageType[ctx] === "Tile",
+            "const auto " <> StringTrim[ToString[compToValue], GetGridPointIndex[ctx]]
             <> " = tl_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ".ptr;"
             ,
             "const auto "
-            <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
+            <> StringTrim[ToString[compToValue], GetGridPointIndex[ctx]]
             <> " = gf_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
           ]
         ,
-        GetInitializationsMode[] === "Derivs",
+        GetInitializationsMode[ctx] === "Derivs",
           offset = fdorder - 1;
-          If[GetStorageType[] === "Tile",
-            "const auto " <> StringTrim[ToString[compToValue], GetTilePointIndex[]]
+          If[GetStorageType[ctx] === "Tile",
+            "const auto " <> StringTrim[ToString[compToValue], GetTilePointIndex[ctx]]
             <> " = tl_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ".ptr;"
             ,
             tensorname = StringDrop[ToString[compToValue], {-len, -len + offset}];
@@ -262,7 +239,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
           ]
         ,
         (*
-        GetInitializationsMode[] === "Derivs",
+        GetInitializationsMode[ctx] === "Derivs",
           offset = fdorder - 1;
           "const auto " <> ToString[compToValue]
           <> " = fd_" <> ToString[fdorder] <> "_o" <> ToString[fdaccuracy]
@@ -275,7 +252,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
           <> ", p.i, p.j, p.k, invDxyz);"
         ,
         *)
-        GetInitializationsMode[] === "Temp",
+        GetInitializationsMode[ctx] === "Temp",
           "auto " <> ToString[compToValue] <> ";"
         ,
         True,
@@ -284,11 +261,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
     pr[buf];
   ];
 
-PrintComponentInitialization::EMode =
-  "PrintComponentInitialization mode unrecognized!";
-
-PrintComponentInitialization::EVarLength =
-  "PrintComponentInitialization variable's tensor type unsupported!";
+(* Error messages PrintComponentInitialization::EMode and ::EVarLength are in BackendCommon.wl *)
 
 Protect[PrintComponentInitialization];
 
@@ -301,50 +274,35 @@ Protect[PrintComponentInitialization];
  *        introduced to replace say coordinates representation of metric.
  *)
 
-PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
-  Module[{outputfile = GetOutputFile[], compToValue, rhssToValue},
+PrintComponentEquation[ctx_Association, coordinate_, compname_, extrareplacerules_] :=
+  Module[{outputfile = GetOutputFile[ctx], compToValue, rhssToValue},
     compToValue = (compname // ToValues) /. extrareplacerules;
-    rhssToValue =
-      (compname /. {compname[[0]] -> RHSOf[compname[[0]], GetSuffixName[]]}) //
-      DummyToBasis[coordinate] // TraceBasisDummy // ToValues;
-    If[GetSimplifyEquation[],
-      rhssToValue = rhssToValue // Simplify
-    ];
-    If[Length[extrareplacerules] > 0,
-      rhssToValue = (rhssToValue // ToValues) /. extrareplacerules
-    ];
-    Which[
-      GetEquationsMode[] === "Temp",
-        Module[{},
-          Global`pr["const " <> GetTempVariableType[] <> " "];
-          Global`pr[StringTrim[ToString[compToValue], GetGridPointIndex[]]];
-          Global`pr["="];
-          PutAppend[CForm[rhssToValue], outputfile];
-          Global`pr[";\n"]
-        ]
-      ,
-      GetEquationsMode[] === "MainOut",
-        Module[{},
-          PutAppend[CForm[compToValue], outputfile];
-          Global`pr["="];
-          PutAppend[CForm[rhssToValue], outputfile];
-          Global`pr[";\n"]
-        ]
-      ,
-      GetEquationsMode[] === "AddToMainOut",
-        Module[{},
-          PutAppend[CForm[compToValue], outputfile];
-          Global`pr["+="];
-          PutAppend[CForm[rhssToValue], outputfile];
-          Global`pr[";\n"]
-        ]
-      ,
-      True,
-        Throw @ Message[PrintComponentEquation::EMode]
+    rhssToValue = ComputeRHSValue[ctx, coordinate, compname, extrareplacerules];
+    PrintEquationByMode[ctx, compToValue, rhssToValue,
+      (* MainOut formatter - standard assignment *)
+      Function[{comp, rhs},
+        PutAppend[CForm[comp], outputfile];
+        Global`pr["="];
+        PutAppend[CForm[rhs], outputfile];
+        Global`pr[";\n"]
+      ],
+      (* Temp formatter - CarpetXGPU specific: const prefix, trimmed name *)
+      Function[{comp, rhs},
+        Global`pr["const " <> GetTempVariableType[ctx] <> " "];
+        Global`pr[StringTrim[ToString[comp], GetGridPointIndex[ctx]]];
+        Global`pr["="];
+        PutAppend[CForm[rhs], outputfile];
+        Global`pr[";\n"]
+      ]
     ]
   ];
 
-PrintComponentEquation::EMode = "PrintEquationMode unrecognized!";
+(* Backwards compat: old 3-argument signature *)
+PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
+  Module[{},
+    SyncModeToContext[];
+    PrintComponentEquation[$CurrentContext, coordinate, compname, extrareplacerules]
+  ];
 
 Protect[PrintComponentEquation];
 

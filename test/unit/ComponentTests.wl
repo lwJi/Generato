@@ -171,6 +171,140 @@ AppendTo[$AllTests,
   ]
 ];
 
+(* ========================================= *)
+(* Test: Context-Aware Getters *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* Context-aware GetMapComponentToVarlist should return default value *)
+    Module[{ctx = CreateContext[]},
+      GetMapComponentToVarlist[ctx]
+    ],
+    <||>,
+    TestID -> "GetMapComponentToVarlist-Context-ReturnsDefault"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* Context-aware GetProcessNewVarlist should return default value *)
+    Module[{ctx = CreateContext[]},
+      GetProcessNewVarlist[ctx]
+    ],
+    True,
+    TestID -> "GetProcessNewVarlist-Context-ReturnsDefault"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* Context-aware GetSimplifyEquation should return default value *)
+    Module[{ctx = CreateContext[]},
+      GetSimplifyEquation[ctx]
+    ],
+    True,
+    TestID -> "GetSimplifyEquation-Context-ReturnsDefault"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* Context-aware GetTempVariableType should return default value *)
+    Module[{ctx = CreateContext[]},
+      GetTempVariableType[ctx]
+    ],
+    "double",
+    TestID -> "GetTempVariableType-Context-ReturnsDefault"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* Context-aware GetSuffixName should return default value *)
+    Module[{ctx = CreateContext[]},
+      GetSuffixName[ctx]
+    ],
+    "",
+    TestID -> "GetSuffixName-Context-ReturnsDefault"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* Context-aware GetPrefixDt should return default value *)
+    Module[{ctx = CreateContext[]},
+      GetPrefixDt[ctx]
+    ],
+    "dt",
+    TestID -> "GetPrefixDt-Context-ReturnsDefault"
+  ]
+];
+
+(* ========================================= *)
+(* Test: Context-Aware Setters Return New Context *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* Context-aware SetSimplifyEquation should return new context *)
+    Module[{ctx = CreateContext[], ctx2},
+      ctx2 = SetSimplifyEquation[ctx, False];
+      {GetSimplifyEquation[ctx], GetSimplifyEquation[ctx2]}
+    ],
+    {True, False},
+    TestID -> "SetSimplifyEquation-Context-ReturnsNewContext"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* Context-aware SetTempVariableType should return new context *)
+    Module[{ctx = CreateContext[], ctx2},
+      ctx2 = SetTempVariableType[ctx, "CCTK_REAL"];
+      {GetTempVariableType[ctx], GetTempVariableType[ctx2]}
+    ],
+    {"double", "CCTK_REAL"},
+    TestID -> "SetTempVariableType-Context-ReturnsNewContext"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* Context-aware SetSuffixName should return new context *)
+    Module[{ctx = CreateContext[], ctx2},
+      ctx2 = SetSuffixName[ctx, "_rhs"];
+      {GetSuffixName[ctx], GetSuffixName[ctx2]}
+    ],
+    {"", "_rhs"},
+    TestID -> "SetSuffixName-Context-ReturnsNewContext"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* Context-aware SetProcessNewVarlist should return new context *)
+    Module[{ctx = CreateContext[], ctx2},
+      ctx2 = SetProcessNewVarlist[ctx, False];
+      {GetProcessNewVarlist[ctx], GetProcessNewVarlist[ctx2]}
+    ],
+    {True, False},
+    TestID -> "SetProcessNewVarlist-Context-ReturnsNewContext"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* Context-aware SetMapComponentToVarlist should return new context *)
+    Module[{ctx = CreateContext[], ctx2, testMap = <|"test" -> 0|>},
+      ctx2 = SetMapComponentToVarlist[ctx, testMap];
+      {GetMapComponentToVarlist[ctx], GetMapComponentToVarlist[ctx2]}
+    ],
+    {<||>, <|"test" -> 0|>},
+    TestID -> "SetMapComponentToVarlist-Context-ReturnsNewContext"
+  ]
+];
+
 (* Reset state *)
 SetSimplifyEquation[True];
 SetUseLetterForTensorComponent[False];

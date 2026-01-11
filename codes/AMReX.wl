@@ -66,70 +66,30 @@ PrintFDExpression[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strIdx_?StringQ] :=
 (*            Print initialization of each component of a tensor              *)
 (******************************************************************************)
 
-PrintComponentInitialization[varinfo_, compname_] :=
+PrintComponentInitialization[ctx_Association, varinfo_, compname_] :=
   Module[{varlistindex, compToValue, varname, symmetry, buf, subbuf, len,
           fdorder, fdaccuracy},
-    varlistindex = GetMapComponentToVarlist[][compname];
+    varlistindex = GetMapComponentToVarlist[ctx][compname];
     compToValue = compname // ToValues;
     {varname, symmetry} = varinfo;
     len = Length[varname];
 
-    (* set subbuf *)
-    Which[
-      GetTensorType[] === "Scal",
-        subbuf = If[len == 0, "", "[" <> ToString[varlistindex] <> "]"]
-      ,
-      GetTensorType[] === "Vect",
-        Which[
-          len == 1,
-            subbuf = "[" <> ToString[varlistindex] <> "]"
-          ,
-          len == 2,
-            subbuf = "[" <> ToString[Quotient[varlistindex, 3]] <> "]["
-                         <> ToString[Mod[varlistindex, 3]] <> "]"
-          ,
-          len == 3,
-            subbuf = "[" <> ToString[Quotient[varlistindex, 3]] <> "]["
-                         <> ToString[Mod[varlistindex, 3]] <> "]"
-          ,
-          True,
-            Throw @ Message[PrintComponentInitialization::EVarLength]
-        ]
-      ,
-      GetTensorType[] === "Smat",
-        Which[
-          len == 2,
-            subbuf = "[" <> ToString[varlistindex] <> "]"
-          ,
-          len == 3,
-            subbuf = "[" <> ToString[Quotient[varlistindex, 6]] <> "]["
-                         <> ToString[Mod[varlistindex, 6]] <> "]"
-          ,
-          len == 4,
-            subbuf = "[" <> ToString[Quotient[varlistindex, 6]] <> "]["
-                         <> ToString[Mod[varlistindex, 6]] <> "]"
-          ,
-          True,
-            Throw @ Message[PrintComponentInitialization::EVarLength]
-        ]
-      ,
-      True,
-        Throw @ Message[PrintComponentInitialization::EMode]
-    ];
-    fdorder = GetDerivsOrder[];
-    fdaccuracy = GetDerivsAccuracy[];
+    (* set subbuf using shared function from BackendCommon *)
+    subbuf = GetTensorIndexSubbuf[ctx, len, varlistindex];
+    fdorder = GetDerivsOrder[ctx];
+    fdaccuracy = GetDerivsAccuracy[ctx];
 
     (* set buf *)
     buf =
       Which[
-        GetInitializationsMode[] === "MainIn" || GetInitializationsMode[] === "MainOut",
+        GetInitializationsMode[ctx] === "MainIn" || GetInitializationsMode[ctx] === "MainOut",
           "auto &" <> ToString[compToValue]
           <> " = " <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
         ,
-        GetInitializationsMode[] === "Derivs",
+        GetInitializationsMode[ctx] === "Derivs",
           offset = fdorder - 1;
-          If[GetStorageType[] === "Tile",
-            "const auto " <> StringTrim[ToString[compToValue], GetTilePointIndex[]]
+          If[GetStorageType[ctx] === "Tile",
+            "const auto " <> StringTrim[ToString[compToValue], GetTilePointIndex[ctx]]
             <> " = tl_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ".ptr;"
             ,
             tensorname = StringDrop[ToString[compToValue], {-len, -len + offset}];
@@ -148,7 +108,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
             <> ", p.i, p.j, p.k);"
           ]
         ,
-        GetInitializationsMode[] === "Temp",
+        GetInitializationsMode[ctx] === "Temp",
           "const auto &" <> ToString[compToValue]
           <> " = " <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
         ,
@@ -158,11 +118,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
     pr[buf];
   ];
 
-PrintComponentInitialization::EMode =
-  "PrintComponentInitialization mode unrecognized!";
-
-PrintComponentInitialization::EVarLength =
-  "PrintComponentInitialization variable's tensor type unsupported!";
+(* Error messages PrintComponentInitialization::EMode and ::EVarLength are in BackendCommon.wl *)
 
 Protect[PrintComponentInitialization];
 
@@ -175,50 +131,35 @@ Protect[PrintComponentInitialization];
  *        introduced to replace say coordinates representation of metric.
  *)
 
-PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
-  Module[{outputfile = GetOutputFile[], compToValue, rhssToValue},
+PrintComponentEquation[ctx_Association, coordinate_, compname_, extrareplacerules_] :=
+  Module[{outputfile = GetOutputFile[ctx], compToValue, rhssToValue},
     compToValue = (compname // ToValues) /. extrareplacerules;
-    rhssToValue =
-      (compname /. {compname[[0]] -> RHSOf[compname[[0]], GetSuffixName[]]}) //
-      DummyToBasis[coordinate] // TraceBasisDummy // ToValues;
-    If[GetSimplifyEquation[],
-      rhssToValue = rhssToValue // Simplify
-    ];
-    If[Length[extrareplacerules] > 0,
-      rhssToValue = (rhssToValue // ToValues) /. extrareplacerules
-    ];
-    Which[
-      GetEquationsMode[] === "Temp",
-        Module[{},
-          Global`pr["const " <> GetTempVariableType[] <> " "];
-          Global`pr[StringTrim[ToString[compToValue], GetGridPointIndex[]]];
-          Global`pr["="];
-          PutAppend[CForm[rhssToValue], outputfile];
-          Global`pr[";\n"]
-        ]
-      ,
-      GetEquationsMode[] === "MainOut",
-        Module[{},
-          PutAppend[CForm[compToValue], outputfile];
-          Global`pr["="];
-          PutAppend[CForm[rhssToValue], outputfile];
-          Global`pr[";\n"]
-        ]
-      ,
-      GetEquationsMode[] === "AddToMainOut",
-        Module[{},
-          PutAppend[CForm[compToValue], outputfile];
-          Global`pr["+="];
-          PutAppend[CForm[rhssToValue], outputfile];
-          Global`pr[";\n"]
-        ]
-      ,
-      True,
-        Throw @ Message[PrintComponentEquation::EMode]
+    rhssToValue = ComputeRHSValue[ctx, coordinate, compname, extrareplacerules];
+    PrintEquationByMode[ctx, compToValue, rhssToValue,
+      (* MainOut formatter - standard assignment *)
+      Function[{comp, rhs},
+        PutAppend[CForm[comp], outputfile];
+        Global`pr["="];
+        PutAppend[CForm[rhs], outputfile];
+        Global`pr[";\n"]
+      ],
+      (* Temp formatter - AMReX specific: const prefix, trimmed name *)
+      Function[{comp, rhs},
+        Global`pr["const " <> GetTempVariableType[ctx] <> " "];
+        Global`pr[StringTrim[ToString[comp], GetGridPointIndex[ctx]]];
+        Global`pr["="];
+        PutAppend[CForm[rhs], outputfile];
+        Global`pr[";\n"]
+      ]
     ]
   ];
 
-PrintComponentEquation::EMode = "PrintEquationMode unrecognized!";
+(* Backwards compat: old 3-argument signature *)
+PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
+  Module[{},
+    SyncModeToContext[];
+    PrintComponentEquation[$CurrentContext, coordinate, compname, extrareplacerules]
+  ];
 
 Protect[PrintComponentEquation];
 

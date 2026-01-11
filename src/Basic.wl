@@ -8,10 +8,10 @@
 
 If[Environment["QUIET"] === "1",
   Block[{Print},
-    BeginPackage["Generato`Basic`", {"xAct`xTensor`", "xAct`xCoba`"}]
+    BeginPackage["Generato`Basic`", {"xAct`xTensor`", "xAct`xCoba`", "Generato`Context`"}]
   ]
   ,
-  BeginPackage["Generato`Basic`", {"xAct`xTensor`", "xAct`xCoba`"}]
+  BeginPackage["Generato`Basic`", {"xAct`xTensor`", "xAct`xCoba`", "Generato`Context`"}]
 ];
 
 If[Environment["QUIET"] =!= "1",
@@ -106,11 +106,19 @@ $Project = "TEST";
 
 (* Function *)
 
-GetCheckInputEquations[] :=
-  Return[$CheckInputEquations];
+(* Context-aware getter *)
+GetCheckInputEquations[ctx_Association] := GetCtx[ctx, "CheckInputEquations"];
+
+(* Global getter - uses current context *)
+GetCheckInputEquations[] := $CheckInputEquations;
 
 Protect[GetCheckInputEquations];
 
+(* Context-aware setter - returns new context *)
+SetCheckInputEquations[ctx_Association, checkinput_] :=
+  SetCtx[ctx, "CheckInputEquations", checkinput];
+
+(* Global setter - mutates global variable *)
 SetCheckInputEquations[checkinput_] :=
   Module[{},
     $CheckInputEquations = checkinput
@@ -118,11 +126,19 @@ SetCheckInputEquations[checkinput_] :=
 
 Protect[SetCheckInputEquations];
 
-GetPVerbose[] :=
-  Return[$PVerbose];
+(* Context-aware getter *)
+GetPVerbose[ctx_Association] := GetCtx[ctx, "PVerbose"];
+
+(* Global getter - uses current context *)
+GetPVerbose[] := $PVerbose;
 
 Protect[GetPVerbose];
 
+(* Context-aware setter - returns new context *)
+SetPVerbose[ctx_Association, verbose_] :=
+  SetCtx[ctx, "PVerbose", verbose];
+
+(* Global setter - mutates global variable *)
 SetPVerbose[verbose_] :=
   Module[{},
     $PVerbose = verbose
@@ -130,11 +146,19 @@ SetPVerbose[verbose_] :=
 
 Protect[SetPVerbose];
 
-GetPrintDate[] :=
-  Return[$PrintDate];
+(* Context-aware getter *)
+GetPrintDate[ctx_Association] := GetCtx[ctx, "PrintDate"];
+
+(* Global getter - uses current context *)
+GetPrintDate[] := $PrintDate;
 
 Protect[GetPrintDate];
 
+(* Context-aware setter - returns new context *)
+SetPrintDate[ctx_Association, print_] :=
+  SetCtx[ctx, "PrintDate", print];
+
+(* Global setter - mutates global variable *)
 SetPrintDate[print_] :=
   Module[{},
     $PrintDate = print
@@ -142,11 +166,19 @@ SetPrintDate[print_] :=
 
 Protect[SetPrintDate];
 
-GetPrintHeaderMacro[] :=
-  Return[$PrintHeaderMacro];
+(* Context-aware getter *)
+GetPrintHeaderMacro[ctx_Association] := GetCtx[ctx, "PrintHeaderMacro"];
+
+(* Global getter - uses current context *)
+GetPrintHeaderMacro[] := $PrintHeaderMacro;
 
 Protect[GetPrintHeaderMacro];
 
+(* Context-aware setter - returns new context *)
+SetPrintHeaderMacro[ctx_Association, print_] :=
+  SetCtx[ctx, "PrintHeaderMacro", print];
+
+(* Global setter - mutates global variable *)
 SetPrintHeaderMacro[print_] :=
   Module[{},
     $PrintHeaderMacro = print
@@ -154,11 +186,19 @@ SetPrintHeaderMacro[print_] :=
 
 Protect[SetPrintHeaderMacro];
 
-GetGridPointIndex[] :=
-  Return[$GridPointIndex];
+(* Context-aware getter *)
+GetGridPointIndex[ctx_Association] := GetCtx[ctx, "GridPointIndex"];
+
+(* Global getter - uses current context *)
+GetGridPointIndex[] := $GridPointIndex;
 
 Protect[GetGridPointIndex];
 
+(* Context-aware setter - returns new context *)
+SetGridPointIndex[ctx_Association, gridindex_] :=
+  SetCtx[ctx, "GridPointIndex", gridindex];
+
+(* Global setter - mutates global variable *)
 SetGridPointIndex[gridindex_] :=
   Module[{},
     $GridPointIndex = gridindex
@@ -166,11 +206,19 @@ SetGridPointIndex[gridindex_] :=
 
 Protect[SetGridPointIndex];
 
-GetTilePointIndex[] :=
-  Return[$TilePointIndex];
+(* Context-aware getter *)
+GetTilePointIndex[ctx_Association] := GetCtx[ctx, "TilePointIndex"];
+
+(* Global getter - uses current context *)
+GetTilePointIndex[] := $TilePointIndex;
 
 Protect[GetTilePointIndex];
 
+(* Context-aware setter - returns new context *)
+SetTilePointIndex[ctx_Association, tileindex_] :=
+  SetCtx[ctx, "TilePointIndex", tileindex];
+
+(* Global setter - mutates global variable *)
 SetTilePointIndex[tileindex_] :=
   Module[{},
     $TilePointIndex = tileindex
@@ -178,11 +226,19 @@ SetTilePointIndex[tileindex_] :=
 
 Protect[SetTilePointIndex];
 
-GetSuffixUnprotected[] :=
-  Return[$SuffixUnprotected];
+(* Context-aware getter *)
+GetSuffixUnprotected[ctx_Association] := GetCtx[ctx, "SuffixUnprotected"];
+
+(* Global getter - uses current context *)
+GetSuffixUnprotected[] := $SuffixUnprotected;
 
 Protect[GetSuffixUnprotected];
 
+(* Context-aware setter - returns new context *)
+SetSuffixUnprotected[ctx_Association, suffix_] :=
+  SetCtx[ctx, "SuffixUnprotected", suffix];
+
+(* Global setter - mutates global variable *)
 SetSuffixUnprotected[suffix_] :=
   Module[{},
     $SuffixUnprotected = suffix
@@ -190,11 +246,19 @@ SetSuffixUnprotected[suffix_] :=
 
 Protect[SetSuffixUnprotected];
 
-GetOutputFile[] :=
-  Return[$OutputFile];
+(* Context-aware getter *)
+GetOutputFile[ctx_Association] := GetCtx[ctx, "OutputFile"];
+
+(* Global getter - uses current context *)
+GetOutputFile[] := $OutputFile;
 
 Protect[GetOutputFile];
 
+(* Context-aware setter - returns new context *)
+SetOutputFile[ctx_Association, filename_] :=
+  SetCtx[ctx, "OutputFile", filename];
+
+(* Global setter - mutates global variable *)
 SetOutputFile[filename_] :=
   Module[{},
     $OutputFile = filename
@@ -202,11 +266,19 @@ SetOutputFile[filename_] :=
 
 Protect[SetOutputFile];
 
-GetProject[] :=
-  Return[$Project];
+(* Context-aware getter *)
+GetProject[ctx_Association] := GetCtx[ctx, "Project"];
+
+(* Global getter - uses current context *)
+GetProject[] := $Project;
 
 Protect[GetProject];
 
+(* Context-aware setter - returns new context *)
+SetProject[ctx_Association, name_] :=
+  SetCtx[ctx, "Project", name];
+
+(* Global setter - mutates global variable *)
 SetProject[name_] :=
   Module[{},
     $Project = name
