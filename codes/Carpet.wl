@@ -243,13 +243,6 @@ PrintComponentEquation[ctx_Association, coordinate_, compname_, extrareplacerule
     ]
   ];
 
-(* Backwards compat: old 3-argument signature *)
-PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
-  Module[{},
-    SyncModeToContext[];
-    PrintComponentEquation[$CurrentContext, coordinate, compname, extrareplacerules]
-  ];
-
 Protect[PrintComponentEquation];
 
 

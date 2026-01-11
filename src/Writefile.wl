@@ -28,17 +28,21 @@ ReplaceGFIndexName::usage = "ReplaceGFIndexName[filename, rule] applies string r
 
 Begin["`Private`"];
 
-(* Data *)
-
-$MainPrint = Null;
-
 (* Function *)
 
 (* Context-aware getter *)
 GetMainPrint[ctx_Association] := GetCtx[ctx, "MainPrint"];
 
-(* Global getter - uses global variable *)
-GetMainPrint[] := $MainPrint;
+(* Global getter - reads from $CurrentContext and evaluates held content *)
+GetMainPrint[] :=
+  Module[{mainPrint},
+    mainPrint = $CurrentContext["MainPrint"];
+    If[Head[mainPrint] === Hold,
+      ReleaseHold[mainPrint]
+      ,
+      mainPrint
+    ]
+  ];
 
 Protect[GetMainPrint];
 
@@ -56,10 +60,10 @@ SetMainPrint[ctx_, content_] /; AssociationQ[ctx] :=
     SetCtx[evalCtx, "MainPrint", Hold[content]]
   ];
 
-(* Global setter - mutates global variable using SetDelayed *)
+(* Global setter - writes to $CurrentContext with Hold *)
 SetMainPrint[content_] :=
   Module[{},
-    $MainPrint := content
+    $CurrentContext = SetCtx[$CurrentContext, "MainPrint", Hold[content]]
   ];
 
 Protect[SetMainPrint];
@@ -128,7 +132,7 @@ WriteToFile[ctx_Association, outputfile_String] :=
     Close[filepointer]
   ];
 
-(* Global WriteToFile - uses global variables *)
+(* Global WriteToFile - uses global getters *)
 WriteToFile[outputfile_String] :=
   Module[{filepointer},
     If[Environment["QUIET"] =!= "1",
@@ -167,6 +171,7 @@ WriteToFile[outputfile_String] :=
         Global`pr["#define " <> StringReplace[ToUpperCase[FileNameTake[outputfile]], "." -> "_"]];
         Global`pr[]
       ];
+      (* GetMainPrint[] evaluates the held main print content *)
       GetMainPrint[];
       Global`pr[];
       If[GetPrintHeaderMacro[],

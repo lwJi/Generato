@@ -176,8 +176,9 @@ AppendTo[$AllTests,
     (* ParseVarlist should process a list of variable definitions *)
     (* This is a basic smoke test - full functionality tested via GridTensors *)
     varlist = {{parseVarlistTest[i], PrintAs -> "pvt"}};
-    SetMode["Phase" -> "SetComp"];
-    ParseVarlist[varlist, testCart];
+    WithMode[{{"Phase"} -> "SetComp"},
+      ParseVarlist[varlist, testCart]
+    ];
     True,
     True,
     TestID -> "ParseVarlist-BasicSmoke"

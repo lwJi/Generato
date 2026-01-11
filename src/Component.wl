@@ -52,31 +52,13 @@ Is3DAbstractIndex::usage = "Is3DAbstractIndex[index] returns True if the abstrac
 
 Begin["`Private`"];
 
-(* Data *)
-
-$MapComponentToVarlist = <||>;(*store all varlist's map*)
-
-$ProcessNewVarlist = True;
-
-$SimplifyEquation = True;
-
-$UseLetterForTensorComponent = False;
-
-$TempVariableType = "double";
-
-$InterfaceWithNonCoordBasis = False;
-
-$SuffixName = "";
-
-$PrefixDt = "dt";
-
 (* Function *)
 
 (* Context-aware getter *)
 GetMapComponentToVarlist[ctx_Association] := GetCtx[ctx, "MapComponentToVarlist"];
 
-(* Global getter - uses global variable *)
-GetMapComponentToVarlist[] := $MapComponentToVarlist;
+(* Global getter - reads from $CurrentContext *)
+GetMapComponentToVarlist[] := $CurrentContext["MapComponentToVarlist"];
 
 Protect[GetMapComponentToVarlist];
 
@@ -84,10 +66,10 @@ Protect[GetMapComponentToVarlist];
 SetMapComponentToVarlist[ctx_Association, map_] :=
   SetCtx[ctx, "MapComponentToVarlist", map];
 
-(* Global setter - mutates global variable *)
+(* Global setter - writes to $CurrentContext *)
 SetMapComponentToVarlist[map_] :=
   Module[{},
-    $MapComponentToVarlist = map
+    $CurrentContext = SetCtx[$CurrentContext, "MapComponentToVarlist", map]
   ];
 
 Protect[SetMapComponentToVarlist];
@@ -95,8 +77,8 @@ Protect[SetMapComponentToVarlist];
 (* Context-aware getter *)
 GetProcessNewVarlist[ctx_Association] := GetCtx[ctx, "ProcessNewVarlist"];
 
-(* Global getter - uses global variable *)
-GetProcessNewVarlist[] := $ProcessNewVarlist;
+(* Global getter - reads from $CurrentContext *)
+GetProcessNewVarlist[] := $CurrentContext["ProcessNewVarlist"];
 
 Protect[GetProcessNewVarlist];
 
@@ -104,10 +86,10 @@ Protect[GetProcessNewVarlist];
 SetProcessNewVarlist[ctx_Association, isnew_] :=
   SetCtx[ctx, "ProcessNewVarlist", isnew];
 
-(* Global setter - mutates global variable *)
+(* Global setter - writes to $CurrentContext *)
 SetProcessNewVarlist[isnew_] :=
   Module[{},
-    $ProcessNewVarlist = isnew
+    $CurrentContext = SetCtx[$CurrentContext, "ProcessNewVarlist", isnew]
   ];
 
 Protect[SetProcessNewVarlist];
@@ -115,8 +97,8 @@ Protect[SetProcessNewVarlist];
 (* Context-aware getter *)
 GetSimplifyEquation[ctx_Association] := GetCtx[ctx, "SimplifyEquation"];
 
-(* Global getter - uses global variable *)
-GetSimplifyEquation[] := $SimplifyEquation;
+(* Global getter - reads from $CurrentContext *)
+GetSimplifyEquation[] := $CurrentContext["SimplifyEquation"];
 
 Protect[GetSimplifyEquation];
 
@@ -124,10 +106,10 @@ Protect[GetSimplifyEquation];
 SetSimplifyEquation[ctx_Association, simplify_] :=
   SetCtx[ctx, "SimplifyEquation", simplify];
 
-(* Global setter - mutates global variable *)
+(* Global setter - writes to $CurrentContext *)
 SetSimplifyEquation[simplify_] :=
   Module[{},
-    $SimplifyEquation = simplify
+    $CurrentContext = SetCtx[$CurrentContext, "SimplifyEquation", simplify]
   ];
 
 Protect[SetSimplifyEquation];
@@ -135,8 +117,8 @@ Protect[SetSimplifyEquation];
 (* Context-aware getter *)
 GetUseLetterForTensorComponent[ctx_Association] := GetCtx[ctx, "UseLetterForTensorComponent"];
 
-(* Global getter - uses global variable *)
-GetUseLetterForTensorComponent[] := $UseLetterForTensorComponent;
+(* Global getter - reads from $CurrentContext *)
+GetUseLetterForTensorComponent[] := $CurrentContext["UseLetterForTensorComponent"];
 
 Protect[GetUseLetterForTensorComponent];
 
@@ -144,10 +126,10 @@ Protect[GetUseLetterForTensorComponent];
 SetUseLetterForTensorComponent[ctx_Association, useletter_] :=
   SetCtx[ctx, "UseLetterForTensorComponent", useletter];
 
-(* Global setter - mutates global variable *)
+(* Global setter - writes to $CurrentContext *)
 SetUseLetterForTensorComponent[useletter_] :=
   Module[{},
-    $UseLetterForTensorComponent = useletter
+    $CurrentContext = SetCtx[$CurrentContext, "UseLetterForTensorComponent", useletter]
   ];
 
 Protect[SetUseLetterForTensorComponent];
@@ -155,8 +137,8 @@ Protect[SetUseLetterForTensorComponent];
 (* Context-aware getter *)
 GetTempVariableType[ctx_Association] := GetCtx[ctx, "TempVariableType"];
 
-(* Global getter - uses global variable *)
-GetTempVariableType[] := $TempVariableType;
+(* Global getter - reads from $CurrentContext *)
+GetTempVariableType[] := $CurrentContext["TempVariableType"];
 
 Protect[GetTempVariableType];
 
@@ -164,10 +146,10 @@ Protect[GetTempVariableType];
 SetTempVariableType[ctx_Association, type_] :=
   SetCtx[ctx, "TempVariableType", type];
 
-(* Global setter - mutates global variable *)
+(* Global setter - writes to $CurrentContext *)
 SetTempVariableType[type_] :=
   Module[{},
-    $TempVariableType = type
+    $CurrentContext = SetCtx[$CurrentContext, "TempVariableType", type]
   ];
 
 Protect[SetTempVariableType];
@@ -175,8 +157,8 @@ Protect[SetTempVariableType];
 (* Context-aware getter *)
 GetInterfaceWithNonCoordBasis[ctx_Association] := GetCtx[ctx, "InterfaceWithNonCoordBasis"];
 
-(* Global getter - uses global variable *)
-GetInterfaceWithNonCoordBasis[] := $InterfaceWithNonCoordBasis;
+(* Global getter - reads from $CurrentContext *)
+GetInterfaceWithNonCoordBasis[] := $CurrentContext["InterfaceWithNonCoordBasis"];
 
 Protect[GetInterfaceWithNonCoordBasis];
 
@@ -184,10 +166,10 @@ Protect[GetInterfaceWithNonCoordBasis];
 SetInterfaceWithNonCoordBasis[ctx_Association, noncoordbasis_] :=
   SetCtx[ctx, "InterfaceWithNonCoordBasis", noncoordbasis];
 
-(* Global setter - mutates global variable *)
+(* Global setter - writes to $CurrentContext *)
 SetInterfaceWithNonCoordBasis[noncoordbasis_] :=
   Module[{},
-    $InterfaceWithNonCoordBasis = noncoordbasis
+    $CurrentContext = SetCtx[$CurrentContext, "InterfaceWithNonCoordBasis", noncoordbasis]
   ];
 
 Protect[SetInterfaceWithNonCoordBasis];
@@ -195,8 +177,8 @@ Protect[SetInterfaceWithNonCoordBasis];
 (* Context-aware getter *)
 GetSuffixName[ctx_Association] := GetCtx[ctx, "SuffixName"];
 
-(* Global getter - uses global variable *)
-GetSuffixName[] := $SuffixName;
+(* Global getter - reads from $CurrentContext *)
+GetSuffixName[] := $CurrentContext["SuffixName"];
 
 Protect[GetSuffixName];
 
@@ -204,10 +186,10 @@ Protect[GetSuffixName];
 SetSuffixName[ctx_Association, suffix_] :=
   SetCtx[ctx, "SuffixName", suffix];
 
-(* Global setter - mutates global variable *)
+(* Global setter - writes to $CurrentContext *)
 SetSuffixName[suffix_] :=
   Module[{},
-    $SuffixName = suffix
+    $CurrentContext = SetCtx[$CurrentContext, "SuffixName", suffix]
   ];
 
 Protect[SetSuffixName];
@@ -215,8 +197,8 @@ Protect[SetSuffixName];
 (* Context-aware getter *)
 GetPrefixDt[ctx_Association] := GetCtx[ctx, "PrefixDt"];
 
-(* Global getter - uses global variable *)
-GetPrefixDt[] := $PrefixDt;
+(* Global getter - reads from $CurrentContext *)
+GetPrefixDt[] := $CurrentContext["PrefixDt"];
 
 Protect[GetPrefixDt];
 
@@ -224,10 +206,10 @@ Protect[GetPrefixDt];
 SetPrefixDt[ctx_Association, prefix_] :=
   SetCtx[ctx, "PrefixDt", prefix];
 
-(* Global setter - mutates global variable *)
+(* Global setter - writes to $CurrentContext *)
 SetPrefixDt[prefix_] :=
   Module[{},
-    $PrefixDt = prefix
+    $CurrentContext = SetCtx[$CurrentContext, "PrefixDt", prefix]
   ];
 
 Protect[SetPrefixDt];
@@ -261,8 +243,6 @@ Protect[ParseComponent];
 
 PrintComponent[coordinate_, varinfo_, compname_, extrareplacerules_] :=
   Module[{},
-    (* Sync global state to $CurrentContext before calling backend *)
-    SyncModeToContext[];
     Which[
       InInitializationsMode[],
         PrintVerbose["    PrintComponentInitialization ", compname, "..."];
