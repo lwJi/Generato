@@ -42,6 +42,44 @@ AppendTo[$AllTests,
 ];
 
 (* ========================================= *)
+(* Test: Context-aware SetMainPrint / GetMainPrint *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* Context-aware SetMainPrint should store content in context *)
+    ctx = CreateContext[];
+    ctx2 = SetMainPrint[ctx, Print["context test"]];
+    GetMainPrint[ctx2] =!= Null,
+    True,
+    TestID -> "SetMainPrint-Context-StoresContent"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* Context-aware SetMainPrint returns new context, original unchanged *)
+    ctx = CreateContext[];
+    ctx2 = SetMainPrint[ctx, Print["new content"]];
+    {GetMainPrint[ctx], GetMainPrint[ctx2] =!= Null},
+    {Null, True},
+    TestID -> "SetMainPrint-Context-ImmutableOriginal"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* Context-aware SetMainPrint holds content *)
+    ctx = CreateContext[];
+    ctx2 = SetMainPrint[ctx, testContextVar = 99];
+    (* Content should be wrapped in Hold *)
+    Head[GetMainPrint[ctx2]],
+    Hold,
+    TestID -> "SetMainPrint-Context-HoldsContent"
+  ]
+];
+
+(* ========================================= *)
 (* Test: ReplaceGFIndexName *)
 (* ========================================= *)
 
@@ -109,6 +147,67 @@ AppendTo[$AllTests,
     !StringContainsQ[result, "#ifndef"],
     True,
     TestID -> "WriteToFile-NoHeaderMacro"
+  ]
+];
+
+(* ========================================= *)
+(* Test: Context-aware WriteToFile *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* Context-aware WriteToFile should create a file with header and footer *)
+    tempFile = FileNameJoin[{$TemporaryDirectory, "test_ctx_write.hxx"}];
+    ctx = CreateContext[];
+    ctx = SetCtx[ctx, "PrintHeaderMacro", True];
+    ctx = SetCtx[ctx, "PrintDate", False];
+    ctx = SetMainPrint[ctx, Global`pr["// context test content"]];
+    WriteToFile[ctx, tempFile];
+    result = Import[tempFile, "Text"];
+    DeleteFile[tempFile];
+    (* Check for header comment and macro guards *)
+    StringContainsQ[result, "/* test_ctx_write.hxx */"] &&
+    StringContainsQ[result, "#ifndef TEST_CTX_WRITE_HXX"] &&
+    StringContainsQ[result, "// context test content"],
+    True,
+    TestID -> "WriteToFile-Context-CreatesFileWithHeader"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* Context-aware WriteToFile without header macro *)
+    tempFile = FileNameJoin[{$TemporaryDirectory, "test_ctx_nomacro.hxx"}];
+    ctx = CreateContext[];
+    ctx = SetCtx[ctx, "PrintHeaderMacro", False];
+    ctx = SetCtx[ctx, "PrintDate", False];
+    ctx = SetMainPrint[ctx, Global`pr["// context only"]];
+    WriteToFile[ctx, tempFile];
+    result = Import[tempFile, "Text"];
+    DeleteFile[tempFile];
+    (* Should have comment but no macro guards *)
+    StringContainsQ[result, "/* test_ctx_nomacro.hxx */"] &&
+    !StringContainsQ[result, "#ifndef"],
+    True,
+    TestID -> "WriteToFile-Context-NoHeaderMacro"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* Context-aware WriteToFile evaluates held content *)
+    tempFile = FileNameJoin[{$TemporaryDirectory, "test_ctx_held.hxx"}];
+    ctx = CreateContext[];
+    ctx = SetCtx[ctx, "PrintHeaderMacro", False];
+    ctx = SetCtx[ctx, "PrintDate", False];
+    (* Use SetMainPrint which wraps in Hold *)
+    ctx = SetMainPrint[ctx, Global`pr["// held content evaluated"]];
+    WriteToFile[ctx, tempFile];
+    result = Import[tempFile, "Text"];
+    DeleteFile[tempFile];
+    StringContainsQ[result, "// held content evaluated"],
+    True,
+    TestID -> "WriteToFile-Context-EvaluatesHeldContent"
   ]
 ];
 

@@ -25,12 +25,12 @@ Protect[PrintListInitializations];
     Print initialization of each component of a tensor
 *)
 
-PrintComponentInitialization[varinfo_, compname_] :=
-  Module[{varlistindex = GetMapComponentToVarlist[][compname], compToValue = compname // ToValues, varname, symmetry, buf, subbuf, isGF3D2, isGF3D5},
+PrintComponentInitialization[ctx_Association, varinfo_, compname_] :=
+  Module[{varlistindex = GetMapComponentToVarlist[ctx][compname], compToValue = compname // ToValues, varname, symmetry, buf, subbuf, isGF3D2, isGF3D5},
     {varname, symmetry} = varinfo;
     (* set subbuf *)
     Which[
-      GetTensorType[] === "Scal",
+      GetTensorType[ctx] === "Scal",
         Which[
           Length[varname] == 0,
             subbuf = ""
@@ -52,7 +52,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
             Throw @ Message[PrintComponentInitialization::EVarLength]
         ]
       ,
-      GetTensorType[] === "Vect",
+      GetTensorType[ctx] === "Vect",
         Which[
           Length[varname] == 1,
             subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> ")"
@@ -74,7 +74,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
             Throw @ Message[PrintComponentInitialization::EVarLength]
         ]
       ,
-      GetTensorType[] === "Smat",
+      GetTensorType[ctx] === "Smat",
         Which[
           Length[varname] == 2,
             subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> "," <> ToString[compname[[2]][[1]] - 1] <> ")"
@@ -93,20 +93,20 @@ PrintComponentInitialization[varinfo_, compname_] :=
         Throw @ Message[PrintComponentInitialization::EMode]
     ];
     (* combine buf *)
-    isGF3D2 = GetStorageType[] === "GF";
-    isGF3D5 = GetStorageType[] === "Tile";
+    isGF3D2 = GetStorageType[ctx] === "GF";
+    isGF3D5 = GetStorageType[ctx] === "Tile";
     buf =
       Which[
-        GetInitializationsMode[] === "MainOut" && isGF3D2,
-          "const GF3D2<CCTK_REAL> &local_" <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]] <> subbuf <> ";"
+        GetInitializationsMode[ctx] === "MainOut" && isGF3D2,
+          "const GF3D2<CCTK_REAL> &local_" <> StringTrim[ToString[compToValue], GetGridPointIndex[ctx]] <> " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[ctx]] <> subbuf <> ";"
         ,
-        GetInitializationsMode[] === "MainIn" && isGF3D2,
-          "const vreal " <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = tmp_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]] <> subbuf <> ";"
+        GetInitializationsMode[ctx] === "MainIn" && isGF3D2,
+          "const vreal " <> StringTrim[ToString[compToValue], GetGridPointIndex[ctx]] <> " = tmp_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[ctx]] <> subbuf <> ";"
         ,
-        GetInitializationsMode[] === "MainIn" && isGF3D5,
-          "const vreal " <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = tmp_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]] <> subbuf <> ";"
+        GetInitializationsMode[ctx] === "MainIn" && isGF3D5,
+          "const vreal " <> StringTrim[ToString[compToValue], GetGridPointIndex[ctx]] <> " = tmp_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[ctx]] <> subbuf <> ";"
         ,
-        GetInitializationsMode[] === "Temp",
+        GetInitializationsMode[ctx] === "Temp",
           buf = "vreal " <> ToString[compToValue] <> ";"
         ,
         True,
@@ -115,9 +115,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
     pr[buf];
   ];
 
-PrintComponentInitialization::EMode = "PrintComponentInitialization mode unrecognized!";
-
-PrintComponentInitialization::EVarLength = "PrintComponentInitialization variable's tensor type unsupported!";
+(* Error messages PrintComponentInitialization::EMode and ::EVarLength are in BackendCommon.wl *)
 
 Protect[PrintComponentInitialization];
 
@@ -130,49 +128,26 @@ Protect[PrintComponentInitialization];
  *        introduced to replace say coordinates representation of metric.
  *)
 
-PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
-  Module[{outputfile = GetOutputFile[], compToValue, rhssToValue},
+PrintComponentEquation[ctx_Association, coordinate_, compname_, extrareplacerules_] :=
+  Module[{outputfile = GetOutputFile[ctx], compToValue, rhssToValue},
     compToValue = compname // ToValues;
-    rhssToValue =
-      (compname /. {compname[[0]] -> RHSOf[compname[[0]], GetSuffixName[]]}) //
-      DummyToBasis[coordinate] // TraceBasisDummy // ToValues;
-    If[GetSimplifyEquation[],
-      rhssToValue = rhssToValue // Simplify
-    ];
-    If[Length[extrareplacerules] > 0,
-      rhssToValue = (rhssToValue // ToValues) /. extrareplacerules
-    ];
-    Which[
-      GetEquationsMode[] === "Temp",
-        Module[{},
-          Global`pr[GetTempVariableType[] <> " "];
-          PutAppend[CForm[compToValue], outputfile];
-          Global`pr["="];
-          PutAppend[CForm[rhssToValue], outputfile];
-          Global`pr[";\n"]
-        ]
-      ,
-      GetEquationsMode[] === "MainOut",
-        Module[{},
-          Global`pr["local_" <> ToString[CForm[compToValue]] <> ".store(mask, index2, "];
-          PutAppend[CForm[rhssToValue], outputfile];
-          Global`pr[");\n"]
-        ]
-      ,
-      GetEquationsMode[] === "AddToMainOut",
-        Module[{},
-          PutAppend[CForm[compToValue], outputfile];
-          Global`pr["+="];
-          PutAppend[CForm[rhssToValue], outputfile];
-          Global`pr[";\n"]
-        ]
-      ,
-      True,
-        Throw @ Message[PrintComponentEquation::EMode]
+    rhssToValue = ComputeRHSValue[ctx, coordinate, compname, extrareplacerules];
+    PrintEquationByMode[ctx, compToValue, rhssToValue,
+      (* MainOut formatter - CarpetX specific *)
+      Function[{comp, rhs},
+        Global`pr["local_" <> ToString[CForm[comp]] <> ".store(mask, index2, "];
+        PutAppend[CForm[rhs], outputfile];
+        Global`pr[");\n"]
+      ]
     ]
   ];
 
-PrintComponentEquation::EMode = "PrintEquationMode unrecognized!";
+(* Backwards compat: old 3-argument signature *)
+PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
+  Module[{},
+    SyncModeToContext[];
+    PrintComponentEquation[$CurrentContext, coordinate, compname, extrareplacerules]
+  ];
 
 Protect[PrintComponentEquation];
 

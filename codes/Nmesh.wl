@@ -22,38 +22,38 @@ GetInitialComp[varname_] :=
     Print initialization of each component of a tensor
 *)
 
-PrintComponentInitialization[varinfo_, compname_] :=
-  Module[{varlistindex = GetMapComponentToVarlist[][compname], compToValue = compname // ToValues, varname, buf},
+PrintComponentInitialization[ctx_Association, varinfo_, compname_] :=
+  Module[{varlistindex = GetMapComponentToVarlist[ctx][compname], compToValue = compname // ToValues, varname, buf},
     varname = varinfo[[1]];
     Which[
-      GetInitializationsMode[] === "MainOut",
+      GetInitializationsMode[ctx] === "MainOut",
         buf =
-          "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = Vard(node, Vind(vlr," <> ToString[GetProject[]] <> "->i_" <> StringTrim[ToString[varname[[0]]], (GetPrefixDt[] | GetSuffixUnprotected[])] <> GetInitialComp[varname] <>
+          "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[ctx]] <> " = Vard(node, Vind(vlr," <> ToString[GetProject[ctx]] <> "->i_" <> StringTrim[ToString[varname[[0]]], (GetPrefixDt[ctx] | GetSuffixUnprotected[ctx])] <> GetInitialComp[varname] <>
             If[varlistindex == 0,
               ""
               ,
               "+" <> ToString[varlistindex]
             ] <> "));"
       ,
-      GetInitializationsMode[] === "MainIn",
+      GetInitializationsMode[ctx] === "MainIn",
         buf =
-          "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = Vard(node, Vind(vlu," <> ToString[GetProject[]] <> "->i_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]] <> GetInitialComp[varname] <>
+          "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[ctx]] <> " = Vard(node, Vind(vlu," <> ToString[GetProject[ctx]] <> "->i_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[ctx]] <> GetInitialComp[varname] <>
             If[varlistindex == 0,
               ""
               ,
               "+" <> ToString[varlistindex]
             ] <> "));"
       ,
-      GetInitializationsMode[] === "MoreInOut",
+      GetInitializationsMode[ctx] === "MoreInOut",
         buf =
-          "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = Vard(node, i" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]] <> GetInitialComp[varname] <>
+          "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[ctx]] <> " = Vard(node, i" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[ctx]] <> GetInitialComp[varname] <>
             If[varlistindex == 0,
               ""
               ,
               "+" <> ToString[varlistindex]
             ] <> ");"
       ,
-      GetInitializationsMode[] === "Temp",
+      GetInitializationsMode[ctx] === "Temp",
         buf = "double " <> ToString[compToValue] <> ";"
       ,
       True,
@@ -62,7 +62,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
     pr[buf];
   ];
 
-PrintComponentInitialization::EMode = "PrintComponentInitialization mode unrecognized!";
+(* Error message PrintComponentInitialization::EMode is in BackendCommon.wl *)
 
 Protect[PrintComponentInitialization];
 
@@ -75,50 +75,28 @@ Protect[PrintComponentInitialization];
  *        introduced to replace say coordinates representation of metric.
  *)
 
-PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
-  Module[{outputfile = GetOutputFile[], compToValue, rhssToValue},
+PrintComponentEquation[ctx_Association, coordinate_, compname_, extrareplacerules_] :=
+  Module[{outputfile = GetOutputFile[ctx], compToValue, rhssToValue},
     compToValue = compname // ToValues;
-    rhssToValue =
-      (compname /. {compname[[0]] -> RHSOf[compname[[0]], GetSuffixName[]]}) //
-      DummyToBasis[coordinate] // TraceBasisDummy // ToValues;
-    If[GetSimplifyEquation[],
-      rhssToValue = rhssToValue // Simplify
-    ];
-    If[Length[extrareplacerules] > 0,
-      rhssToValue = (rhssToValue // ToValues) /. extrareplacerules
-    ];
-    Which[
-      GetEquationsMode[] === "Temp",
-        Module[{},
-          Global`pr[GetTempVariableType[] <> " "];
-          PutAppend[CForm[compToValue], outputfile];
-          Global`pr["="];
-          PutAppend[CForm[rhssToValue], outputfile];
-          Global`pr[";\n"]
-        ]
-      ,
-      GetEquationsMode[] === "MainOut",
-        Module[{},
-          PutAppend[CForm[compToValue], outputfile];
-          Global`pr["="];
-          PutAppend[CForm[rhssToValue], outputfile];
-          Global`pr[";\n"]
-        ]
-      ,
-      GetEquationsMode[] === "AddToMainOut",
-        Module[{},
-          PutAppend[CForm[compToValue], outputfile];
-          Global`pr["+="];
-          PutAppend[CForm[rhssToValue], outputfile];
-          Global`pr[";\n"]
-        ]
-      ,
-      True,
-        Throw @ Message[PrintComponentEquation::EMode]
+    rhssToValue = ComputeRHSValue[ctx, coordinate, compname, extrareplacerules];
+    PrintEquationByMode[ctx, compToValue, rhssToValue,
+      (* MainOut formatter - standard assignment *)
+      Function[{comp, rhs},
+        PutAppend[CForm[comp], outputfile];
+        Global`pr["="];
+        PutAppend[CForm[rhs], outputfile];
+        Global`pr[";\n"]
+      ]
+      (* Temp uses default: no const prefix, CForm[compToValue] *)
     ]
   ];
 
-PrintComponentEquation::EMode = "PrintEquationMode unrecognized!";
+(* Backwards compat: old 3-argument signature *)
+PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
+  Module[{},
+    SyncModeToContext[];
+    PrintComponentEquation[$CurrentContext, coordinate, compname, extrareplacerules]
+  ];
 
 Protect[PrintComponentEquation];
 
