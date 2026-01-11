@@ -39,12 +39,12 @@ SetOutputFile[FileNameJoin[{Directory[], "testDerivs.hxx"}]];
 
 SetMainPrint[
   pr[];
-  PrintInitializations[{Mode -> "MainIn"}, EvolVarlist];
+  PrintInitializations[{InitializationsMode -> "MainIn"}, EvolVarlist];
   pr[];
-  (* Test Mode->Derivs with DerivsOrder and DerivsAccuracy *)
-  PrintInitializations[{Mode -> "Derivs", TensorType -> "Vect", DerivsOrder -> 1, DerivsAccuracy -> 4}, DerivVarlist];
+  (* Test InitializationsMode->Derivs with DerivsOrder and DerivsAccuracy *)
+  PrintInitializations[{InitializationsMode -> "Derivs", TensorType -> "Vect", DerivsOrder -> 1, DerivsAccuracy -> 4}, DerivVarlist];
   pr[];
-  PrintEquations[{Mode -> "Temp"}, TempVarlist];
+  PrintEquations[{EquationsMode -> "Temp"}, TempVarlist];
 ];
 
 Import[FileNameJoin[{Environment["GENERATO"], "codes/CarpetXGPU.wl"}]];

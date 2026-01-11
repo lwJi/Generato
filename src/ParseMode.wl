@@ -22,20 +22,20 @@ InSetCompPhase::usage = "InSetCompPhase[] returns True if in SetComp phase.";
 InPrintCompPhase::usage = "InPrintCompPhase[] returns True if in PrintComp phase.";
 
 (* PrintComp Type Helpers *)
-InInitMode::usage = "InInitMode[] returns True if in Initializations mode.";
-InEqnMode::usage = "InEqnMode[] returns True if in Equations mode.";
+InInitializationsMode::usage = "InInitializationsMode[] returns True if in Initializations mode.";
+InEquationsMode::usage = "InEquationsMode[] returns True if in Equations mode.";
 
-(* Init Mode Helpers *)
-GetInitMode::usage = "GetInitMode[] returns current initialization mode.";
+(* Initializations Mode Helpers *)
+GetInitializationsMode::usage = "GetInitializationsMode[] returns current initialization mode.";
 GetTensorType::usage = "GetTensorType[] returns current tensor type.";
 GetStorageType::usage = "GetStorageType[] returns current storage type.";
 GetDerivsOrder::usage = "GetDerivsOrder[] returns derivative order.";
 GetDerivsAccuracy::usage = "GetDerivsAccuracy[] returns derivative accuracy.";
 
-(* Eqn Mode Helper *)
-GetEqnMode::usage = "GetEqnMode[] returns current equation mode.";
+(* Equations Mode Helper *)
+GetEquationsMode::usage = "GetEquationsMode[] returns current equation mode.";
 
-(* SetComp Helpers *)
+(* IndexOptions Helpers *)
 GetIndependentVarlistIndex::usage = "GetIndependentVarlistIndex[] returns IndependentVarlistIndex setting.";
 GetWithoutGridPointIndex::usage = "GetWithoutGridPointIndex[] returns WithoutGridPointIndex setting.";
 GetUseTilePointIndex::usage = "GetUseTilePointIndex[] returns UseTilePointIndex setting.";
@@ -45,36 +45,36 @@ Begin["`Private`"];
 (* Valid values for each path *)
 $ModeValidValues = <|
   {"Phase"} -> {None, "SetComp", "PrintComp"},
-  {"SetComp", "IndependentVarlistIndex"} -> {True, False},
-  {"SetComp", "WithoutGridPointIndex"} -> {True, False},
-  {"SetComp", "UseTilePointIndex"} -> {True, False},
+  {"IndexOptions", "IndependentVarlistIndex"} -> {True, False},
+  {"IndexOptions", "WithoutGridPointIndex"} -> {True, False},
+  {"IndexOptions", "UseTilePointIndex"} -> {True, False},
   {"PrintComp", "Type"} -> {None, "Initializations", "Equations"},
-  {"PrintComp", "Init", "Mode"} -> {None, "MainOut", "MainIn", "Derivs", "Derivs1st", "Derivs2nd", "MoreInOut", "Temp"},
-  {"PrintComp", "Init", "TensorType"} -> {None, "Scal", "Vect", "Smat"},
-  {"PrintComp", "Init", "StorageType"} -> {None, "GF", "Tile"},
-  {"PrintComp", "Init", "DerivsOrder"} -> _Integer,
-  {"PrintComp", "Init", "DerivsAccuracy"} -> _Integer,
-  {"PrintComp", "Eqn", "Mode"} -> {None, "Temp", "Main", "AddToMain"}
+  {"PrintComp", "Initializations", "Mode"} -> {None, "MainOut", "MainIn", "Derivs", "Derivs1st", "Derivs2nd", "MoreInOut", "Temp"},
+  {"PrintComp", "Initializations", "TensorType"} -> {None, "Scal", "Vect", "Smat"},
+  {"PrintComp", "Initializations", "StorageType"} -> {None, "GF", "Tile"},
+  {"PrintComp", "Initializations", "DerivsOrder"} -> _Integer,
+  {"PrintComp", "Initializations", "DerivsAccuracy"} -> _Integer,
+  {"PrintComp", "Equations", "Mode"} -> {None, "Temp", "MainOut", "AddToMainOut"}
 |>;
 
 (* Default mode structure *)
 $ModeDefaults = <|
   "Phase" -> None,
-  "SetComp" -> <|
+  "IndexOptions" -> <|
     "IndependentVarlistIndex" -> False,
     "WithoutGridPointIndex" -> False,
     "UseTilePointIndex" -> False
   |>,
   "PrintComp" -> <|
     "Type" -> None,
-    "Init" -> <|
+    "Initializations" -> <|
       "Mode" -> None,
       "TensorType" -> None,
       "StorageType" -> None,
       "DerivsOrder" -> 0,
       "DerivsAccuracy" -> 0
     |>,
-    "Eqn" -> <|
+    "Equations" -> <|
       "Mode" -> None
     |>
   |>
@@ -210,34 +210,34 @@ Protect[InSetCompPhase];
 Protect[InPrintCompPhase];
 
 (* PrintComp type helpers *)
-InInitMode[] := GetMode["PrintComp", "Type"] === "Initializations";
-InEqnMode[] := GetMode["PrintComp", "Type"] === "Equations";
+InInitializationsMode[] := GetMode["PrintComp", "Type"] === "Initializations";
+InEquationsMode[] := GetMode["PrintComp", "Type"] === "Equations";
 
-Protect[InInitMode];
-Protect[InEqnMode];
+Protect[InInitializationsMode];
+Protect[InEquationsMode];
 
-(* Init mode helpers *)
-GetInitMode[] := GetMode["PrintComp", "Init", "Mode"];
-GetTensorType[] := GetMode["PrintComp", "Init", "TensorType"];
-GetStorageType[] := GetMode["PrintComp", "Init", "StorageType"];
-GetDerivsOrder[] := GetMode["PrintComp", "Init", "DerivsOrder"];
-GetDerivsAccuracy[] := GetMode["PrintComp", "Init", "DerivsAccuracy"];
+(* Initializations mode helpers *)
+GetInitializationsMode[] := GetMode["PrintComp", "Initializations", "Mode"];
+GetTensorType[] := GetMode["PrintComp", "Initializations", "TensorType"];
+GetStorageType[] := GetMode["PrintComp", "Initializations", "StorageType"];
+GetDerivsOrder[] := GetMode["PrintComp", "Initializations", "DerivsOrder"];
+GetDerivsAccuracy[] := GetMode["PrintComp", "Initializations", "DerivsAccuracy"];
 
-Protect[GetInitMode];
+Protect[GetInitializationsMode];
 Protect[GetTensorType];
 Protect[GetStorageType];
 Protect[GetDerivsOrder];
 Protect[GetDerivsAccuracy];
 
-(* Eqn mode helper *)
-GetEqnMode[] := GetMode["PrintComp", "Eqn", "Mode"];
+(* Equations mode helper *)
+GetEquationsMode[] := GetMode["PrintComp", "Equations", "Mode"];
 
-Protect[GetEqnMode];
+Protect[GetEquationsMode];
 
-(* SetComp helpers *)
-GetIndependentVarlistIndex[] := GetMode["SetComp", "IndependentVarlistIndex"];
-GetWithoutGridPointIndex[] := GetMode["SetComp", "WithoutGridPointIndex"];
-GetUseTilePointIndex[] := GetMode["SetComp", "UseTilePointIndex"];
+(* IndexOptions helpers *)
+GetIndependentVarlistIndex[] := GetMode["IndexOptions", "IndependentVarlistIndex"];
+GetWithoutGridPointIndex[] := GetMode["IndexOptions", "WithoutGridPointIndex"];
+GetUseTilePointIndex[] := GetMode["IndexOptions", "UseTilePointIndex"];
 
 Protect[GetIndependentVarlistIndex];
 Protect[GetWithoutGridPointIndex];

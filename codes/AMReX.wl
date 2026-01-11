@@ -9,18 +9,7 @@
 (*                    Finite difference stencil function                      *)
 (******************************************************************************)
 
-(* Function to get GF index name *)
-
-GetGFIndexName[index_?IntegerQ] :=
-  Module[{gfindex},
-    gfindex =
-      Which[
-        index > 0, "p" <> ToString[index],
-        index < 0, "m" <> ToString[Abs[index]],
-        True, "c0"
-      ];
-    ToExpression[gfindex]
-  ];
+(* Function to get GF index name - GetGFIndexName is now in BackendCommon.wl *)
 
 PrintIndexes3D[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strDir_?StringQ] :=
   Module[{stencils, solution},
@@ -133,11 +122,11 @@ PrintComponentInitialization[varinfo_, compname_] :=
     (* set buf *)
     buf =
       Which[
-        GetInitMode[] === "MainIn" || GetInitMode[] === "MainOut",
+        GetInitializationsMode[] === "MainIn" || GetInitializationsMode[] === "MainOut",
           "auto &" <> ToString[compToValue]
           <> " = " <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
         ,
-        GetInitMode[] === "Derivs",
+        GetInitializationsMode[] === "Derivs",
           offset = fdorder - 1;
           If[GetStorageType[] === "Tile",
             "const auto " <> StringTrim[ToString[compToValue], GetTilePointIndex[]]
@@ -159,7 +148,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
             <> ", p.i, p.j, p.k);"
           ]
         ,
-        GetInitMode[] === "Temp",
+        GetInitializationsMode[] === "Temp",
           "const auto &" <> ToString[compToValue]
           <> " = " <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
         ,
@@ -199,7 +188,7 @@ PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
       rhssToValue = (rhssToValue // ToValues) /. extrareplacerules
     ];
     Which[
-      GetEqnMode[] === "Temp",
+      GetEquationsMode[] === "Temp",
         Module[{},
           Global`pr["const " <> GetTempVariableType[] <> " "];
           Global`pr[StringTrim[ToString[compToValue], GetGridPointIndex[]]];
@@ -208,7 +197,7 @@ PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
           Global`pr[";\n"]
         ]
       ,
-      GetEqnMode[] === "Main",
+      GetEquationsMode[] === "MainOut",
         Module[{},
           PutAppend[CForm[compToValue], outputfile];
           Global`pr["="];
@@ -216,7 +205,7 @@ PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
           Global`pr[";\n"]
         ]
       ,
-      GetEqnMode[] === "AddToMain",
+      GetEquationsMode[] === "AddToMainOut",
         Module[{},
           PutAppend[CForm[compToValue], outputfile];
           Global`pr["+="];
