@@ -14,6 +14,8 @@ If[Environment["QUIET"] =!= "1",
 GetMode::usage = "GetMode[path...] returns the mode value at the specified path.";
 SetMode::usage = "SetMode[path... -> value] sets the mode value at the specified path.";
 ResetMode::usage = "ResetMode[path...] resets mode(s) to default values.";
+SetModes::usage = "SetModes[{path1 -> val1, path2 -> val2, ...}] sets multiple mode values at once.";
+WithMode::usage = "WithMode[settings, body] sets modes, evaluates body, then restores previous mode state.";
 
 (* Phase Helpers *)
 InSetCompPhase::usage = "InSetCompPhase[] returns True if in SetComp phase.";
@@ -165,6 +167,36 @@ ResetMode[keys__String] :=
   ];
 
 Protect[ResetMode];
+
+(* Batch set multiple modes *)
+SetModes[rules_List] :=
+  Scan[
+    Function[rule,
+      With[{path = First[rule], value = Last[rule]},
+        If[Length[path] === 1,
+          SetMode[First[path] -> value],
+          SetMode[Sequence @@ Most[path], Last[path] -> value]
+        ]
+      ]
+    ],
+    rules
+  ];
+
+Protect[SetModes];
+
+(* Scoped mode context with automatic restore *)
+SetAttributes[WithMode, HoldRest];
+
+WithMode[settings_List, body_] :=
+  Module[{savedMode = $Mode},
+    SetModes[settings];
+    WithCleanup[
+      body,
+      $Mode = savedMode
+    ]
+  ];
+
+Protect[WithMode];
 
 (* ========================================= *)
 (* Convenience Helpers *)
