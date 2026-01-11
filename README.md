@@ -35,6 +35,29 @@ cd test/Nmesh
 Generato GHG_rhs.wl
 ```
 
+## Architecture
+
+### Core Modules (src/)
+- **Generato.wl** - Package loader, imports modules in dependency order
+- **Basic.wl** - Global config state, tensor utilities, equation setting (SetEQN/SetEQNDelayed)
+- **ParseMode.wl** - Mode management system tracking execution state (SetComp/PrintComp phases)
+- **Component.wl** - Maps tensor components to varlist indices, handles symmetries
+- **Varlist.wl** - Processes tensor definitions via ParseVarlist
+- **Interface.wl** - Public API: DefTensors, GridTensors, TileTensors, TempTensors, SetComponents, PrintEquations, PrintInitializations
+- **BackendCommon.wl** - Shared backend utilities
+- **Derivation.wl** - Testing utilities
+- **Writefile.wl** - Output buffering (SetMainPrint/GetMainPrint)
+- **stencils/FiniteDifferenceStencils.wl** - Finite difference stencil generation
+
+### Backends (codes/)
+Each backend implements `PrintComponentInitialization` and `PrintComponentEquation`:
+- **CarpetX.wl** - CarpetX AMR with GF3D2 storage
+- **CarpetXGPU.wl** - GPU-enabled CarpetX
+- **CarpetXPointDesc.wl** - Point description variant
+- **Carpet.wl** - Original Carpet framework
+- **AMReX.wl** - AMReX AMR library
+- **Nmesh.wl** - Structured mesh framework (C output)
+
 ## Recommendations
 
 * Use lower case to name variables (to avoid conflict with say `Pi`)
