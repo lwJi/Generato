@@ -54,7 +54,7 @@ $ModeValidValues = <|
   {"PrintComp", "Init", "StorageType"} -> {None, "GF", "Tile"},
   {"PrintComp", "Init", "DerivsOrder"} -> _Integer,
   {"PrintComp", "Init", "DerivsAccuracy"} -> _Integer,
-  {"PrintComp", "Eqn", "Mode"} -> {None, "NewVar", "Main", "AddToMain"}
+  {"PrintComp", "Eqn", "Mode"} -> {None, "Temp", "Main", "AddToMain"}
 |>;
 
 (* Default mode structure *)

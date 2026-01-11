@@ -119,29 +119,20 @@ Options[PrintEquations] :=
   {ChartName -> GetDefaultChart[], SuffixName -> Null, Mode -> "Main", ExtraReplaceRules -> {}};
 
 PrintEquations[OptionsPattern[], varlist_?ListQ] :=
-  Module[{chartname, suffixname, mode, extrareplacerules, eqnMode},
+  Module[{chartname, suffixname, mode, extrareplacerules},
     {chartname, suffixname, mode, extrareplacerules} = OptionValue[{ChartName, SuffixName, Mode, ExtraReplaceRules}];
     If[suffixname =!= Null,
       SetSuffixName[suffixname]
     ];
-    (* Map string mode to internal mode *)
-    eqnMode = Which[
-      StringMatchQ[mode, "Temp"], "NewVar",
-      StringMatchQ[mode, "Main"], "Main",
-      StringMatchQ[mode, "AddToMain"], "AddToMain",
-      True, Throw @ Message[PrintEquations::EMode, mode]
-    ];
     WithMode[{
       {"Phase"} -> "PrintComp",
       {"PrintComp", "Type"} -> "Equations",
-      {"PrintComp", "Eqn", "Mode"} -> eqnMode
+      {"PrintComp", "Eqn", "Mode"} -> mode
     },
       ParseVarlist[{ExtraReplaceRules -> extrareplacerules}, varlist, chartname]
     ];
     SetSuffixName[""];
   ];
-
-PrintEquations::EMode = "PrintEquations mode '`1`' unsupported yet!";
 
 Protect[PrintEquations];
 

@@ -131,10 +131,10 @@ AppendTo[$AllTests,
 AppendTo[$AllTests,
   VerificationTest[
     ResetMode[];
-    SetMode["PrintComp", "Eqn", "Mode" -> "NewVar"];
+    SetMode["PrintComp", "Eqn", "Mode" -> "Temp"];
     GetMode["PrintComp", "Eqn", "Mode"],
-    "NewVar",
-    TestID -> "Mode-PrintComp-Eqn-NewVar"
+    "Temp",
+    TestID -> "Mode-PrintComp-Eqn-Temp"
   ]
 ];
 

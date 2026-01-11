@@ -325,7 +325,7 @@ PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
       rhssToValue = (rhssToValue // ToValues) /. extrareplacerules
     ];
     Which[
-      GetEqnMode[] === "NewVar",
+      GetEqnMode[] === "Temp",
         Module[{},
           Global`pr["const " <> GetTempVariableType[] <> " "];
           Global`pr[StringTrim[ToString[compToValue], GetGridPointIndex[]]];
