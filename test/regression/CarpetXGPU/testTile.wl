@@ -43,12 +43,12 @@ SetOutputFile[FileNameJoin[{Directory[], "testTile.hxx"}]];
 
 SetMainPrint[
   pr[];
-  PrintInitializations[{InitializationsMode -> "MainOut"}, TileVarlist];
-  PrintInitializations[{InitializationsMode -> "MainIn", StorageType -> "Tile"}, GridVarlist];
+  PrintInitializations[{Mode -> "MainOut"}, TileVarlist];
+  PrintInitializations[{Mode -> "MainIn", StorageType -> "Tile"}, GridVarlist];
   pr[];
-  PrintEquations[{EquationsMode -> "Temp"}, TempVarlist];
+  PrintEquations[{Mode -> "Temp"}, TempVarlist];
   pr[];
-  PrintEquations[{EquationsMode -> "MainOut"}, TileVarlist];
+  PrintEquations[{Mode -> "MainOut"}, TileVarlist];
 ];
 
 Import[FileNameJoin[{Environment["GENERATO"], "codes/CarpetXGPU.wl"}]];

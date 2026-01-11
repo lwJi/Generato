@@ -51,19 +51,19 @@ SetOutputFile[FileNameJoin[{Directory[], "test.hxx"}]];
 
 SetMainPrint[
   pr[];
-  PrintInitializations[{InitializationsMode -> "MainOut"}, dtEvolVarlist];
-  PrintInitializations[{InitializationsMode -> "MainIn"}, EvolVarlist];
-  PrintInitializations[{InitializationsMode -> "MainIn"}, MoreInVarlist];
+  PrintInitializations[{Mode -> "MainOut"}, dtEvolVarlist];
+  PrintInitializations[{Mode -> "MainIn"}, EvolVarlist];
+  PrintInitializations[{Mode -> "MainIn"}, MoreInVarlist];
   pr[];
-  PrintEquations[{EquationsMode -> "Temp"}, TempVarlist];
+  PrintEquations[{Mode -> "Temp"}, TempVarlist];
   pr[];
   pr["if(Msqr)"];
   pr["{"];
-  PrintEquations[{EquationsMode -> "MainOut", SuffixName -> "Msqr", ChartName -> cart}, dtEvolVarlist];
+  PrintEquations[{Mode -> "MainOut", SuffixName -> "Msqr", ChartName -> cart}, dtEvolVarlist];
   pr["}"];
   pr["else"];
   pr["{"];
-  PrintEquations[{EquationsMode -> "MainOut", SuffixName -> "otherwise"}, dtEvolVarlist];
+  PrintEquations[{Mode -> "MainOut", SuffixName -> "otherwise"}, dtEvolVarlist];
   pr["}"];
 ];
 
