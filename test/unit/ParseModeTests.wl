@@ -45,116 +45,116 @@ AppendTo[$AllTests,
 ];
 
 (* ========================================= *)
-(* Test: SetComp Options *)
+(* Test: IndexOptions *)
 (* ========================================= *)
 
 AppendTo[$AllTests,
   VerificationTest[
     ResetMode[];
-    SetMode["SetComp", "IndependentVarlistIndex" -> True];
-    GetMode["SetComp", "IndependentVarlistIndex"],
+    SetMode["IndexOptions", "IndependentVarlistIndex" -> True];
+    GetMode["IndexOptions", "IndependentVarlistIndex"],
     True,
-    TestID -> "Mode-SetComp-IndependentVarlistIndex"
+    TestID -> "Mode-IndexOptions-IndependentVarlistIndex"
   ]
 ];
 
 AppendTo[$AllTests,
   VerificationTest[
     ResetMode[];
-    SetMode["SetComp", "WithoutGridPointIndex" -> True];
-    GetMode["SetComp", "WithoutGridPointIndex"],
+    SetMode["IndexOptions", "WithoutGridPointIndex" -> True];
+    GetMode["IndexOptions", "WithoutGridPointIndex"],
     True,
-    TestID -> "Mode-SetComp-WithoutGridPointIndex"
+    TestID -> "Mode-IndexOptions-WithoutGridPointIndex"
   ]
 ];
 
 AppendTo[$AllTests,
   VerificationTest[
     ResetMode[];
-    SetMode["SetComp", "UseTilePointIndex" -> True];
-    GetMode["SetComp", "UseTilePointIndex"],
+    SetMode["IndexOptions", "UseTilePointIndex" -> True];
+    GetMode["IndexOptions", "UseTilePointIndex"],
     True,
-    TestID -> "Mode-SetComp-UseTilePointIndex"
+    TestID -> "Mode-IndexOptions-UseTilePointIndex"
   ]
 ];
 
 (* ========================================= *)
-(* Test: PrintComp Init Modes *)
+(* Test: PrintComp Initializations Modes *)
 (* ========================================= *)
 
 AppendTo[$AllTests,
   VerificationTest[
     ResetMode[];
     SetMode["PrintComp", "Type" -> "Initializations"];
-    SetMode["PrintComp", "Init", "Mode" -> "MainIn"];
-    GetMode["PrintComp", "Init", "Mode"],
+    SetMode["PrintComp", "Initializations", "Mode" -> "MainIn"];
+    GetMode["PrintComp", "Initializations", "Mode"],
     "MainIn",
-    TestID -> "Mode-PrintComp-Init-MainIn"
+    TestID -> "Mode-PrintComp-Initializations-MainIn"
   ]
 ];
 
 AppendTo[$AllTests,
   VerificationTest[
     ResetMode[];
-    SetMode["PrintComp", "Init", "TensorType" -> "Vect"];
-    GetMode["PrintComp", "Init", "TensorType"],
+    SetMode["PrintComp", "Initializations", "TensorType" -> "Vect"];
+    GetMode["PrintComp", "Initializations", "TensorType"],
     "Vect",
-    TestID -> "Mode-PrintComp-Init-TensorType-Vect"
+    TestID -> "Mode-PrintComp-Initializations-TensorType-Vect"
   ]
 ];
 
 AppendTo[$AllTests,
   VerificationTest[
     ResetMode[];
-    SetMode["PrintComp", "Init", "StorageType" -> "Tile"];
-    GetMode["PrintComp", "Init", "StorageType"],
+    SetMode["PrintComp", "Initializations", "StorageType" -> "Tile"];
+    GetMode["PrintComp", "Initializations", "StorageType"],
     "Tile",
-    TestID -> "Mode-PrintComp-Init-StorageType-Tile"
+    TestID -> "Mode-PrintComp-Initializations-StorageType-Tile"
   ]
 ];
 
 AppendTo[$AllTests,
   VerificationTest[
     ResetMode[];
-    SetMode["PrintComp", "Init", "DerivsOrder" -> 2];
-    SetMode["PrintComp", "Init", "DerivsAccuracy" -> 6];
-    {GetMode["PrintComp", "Init", "DerivsOrder"], GetMode["PrintComp", "Init", "DerivsAccuracy"]},
+    SetMode["PrintComp", "Initializations", "DerivsOrder" -> 2];
+    SetMode["PrintComp", "Initializations", "DerivsAccuracy" -> 6];
+    {GetMode["PrintComp", "Initializations", "DerivsOrder"], GetMode["PrintComp", "Initializations", "DerivsAccuracy"]},
     {2, 6},
-    TestID -> "Mode-PrintComp-Init-Derivs"
+    TestID -> "Mode-PrintComp-Initializations-Derivs"
   ]
 ];
 
 (* ========================================= *)
-(* Test: PrintComp Eqn Modes *)
+(* Test: PrintComp Equations Modes *)
 (* ========================================= *)
 
 AppendTo[$AllTests,
   VerificationTest[
     ResetMode[];
-    SetMode["PrintComp", "Eqn", "Mode" -> "Temp"];
-    GetMode["PrintComp", "Eqn", "Mode"],
+    SetMode["PrintComp", "Equations", "Mode" -> "Temp"];
+    GetMode["PrintComp", "Equations", "Mode"],
     "Temp",
-    TestID -> "Mode-PrintComp-Eqn-Temp"
+    TestID -> "Mode-PrintComp-Equations-Temp"
   ]
 ];
 
 AppendTo[$AllTests,
   VerificationTest[
     ResetMode[];
-    SetMode["PrintComp", "Eqn", "Mode" -> "Main"];
-    GetMode["PrintComp", "Eqn", "Mode"],
-    "Main",
-    TestID -> "Mode-PrintComp-Eqn-Main"
+    SetMode["PrintComp", "Equations", "Mode" -> "MainOut"];
+    GetMode["PrintComp", "Equations", "Mode"],
+    "MainOut",
+    TestID -> "Mode-PrintComp-Equations-MainOut"
   ]
 ];
 
 AppendTo[$AllTests,
   VerificationTest[
     ResetMode[];
-    SetMode["PrintComp", "Eqn", "Mode" -> "AddToMain"];
-    GetMode["PrintComp", "Eqn", "Mode"],
-    "AddToMain",
-    TestID -> "Mode-PrintComp-Eqn-AddToMain"
+    SetMode["PrintComp", "Equations", "Mode" -> "AddToMainOut"];
+    GetMode["PrintComp", "Equations", "Mode"],
+    "AddToMainOut",
+    TestID -> "Mode-PrintComp-Equations-AddToMainOut"
   ]
 ];
 
@@ -186,9 +186,9 @@ AppendTo[$AllTests,
   VerificationTest[
     ResetMode[];
     SetMode["PrintComp", "Type" -> "Initializations"];
-    InInitMode[],
+    InInitializationsMode[],
     True,
-    TestID -> "Mode-Helper-InInitMode"
+    TestID -> "Mode-Helper-InInitializationsMode"
   ]
 ];
 
@@ -196,29 +196,29 @@ AppendTo[$AllTests,
   VerificationTest[
     ResetMode[];
     SetMode["PrintComp", "Type" -> "Equations"];
-    InEqnMode[],
+    InEquationsMode[],
     True,
-    TestID -> "Mode-Helper-InEqnMode"
+    TestID -> "Mode-Helper-InEquationsMode"
   ]
 ];
 
 AppendTo[$AllTests,
   VerificationTest[
     ResetMode[];
-    SetMode["PrintComp", "Init", "Mode" -> "MainOut"];
-    GetInitMode[],
+    SetMode["PrintComp", "Initializations", "Mode" -> "MainOut"];
+    GetInitializationsMode[],
     "MainOut",
-    TestID -> "Mode-Helper-GetInitMode"
+    TestID -> "Mode-Helper-GetInitializationsMode"
   ]
 ];
 
 AppendTo[$AllTests,
   VerificationTest[
     ResetMode[];
-    SetMode["PrintComp", "Eqn", "Mode" -> "Main"];
-    GetEqnMode[],
-    "Main",
-    TestID -> "Mode-Helper-GetEqnMode"
+    SetMode["PrintComp", "Equations", "Mode" -> "MainOut"];
+    GetEquationsMode[],
+    "MainOut",
+    TestID -> "Mode-Helper-GetEquationsMode"
   ]
 ];
 
@@ -229,10 +229,10 @@ AppendTo[$AllTests,
 AppendTo[$AllTests,
   VerificationTest[
     ResetMode[];
-    SetMode["PrintComp", "Init", "Mode" -> "MainIn"];
-    SetMode["PrintComp", "Init", "TensorType" -> "Vect"];
-    ResetMode["PrintComp", "Init"];
-    {GetMode["PrintComp", "Init", "Mode"], GetMode["PrintComp", "Init", "TensorType"]},
+    SetMode["PrintComp", "Initializations", "Mode" -> "MainIn"];
+    SetMode["PrintComp", "Initializations", "TensorType" -> "Vect"];
+    ResetMode["PrintComp", "Initializations"];
+    {GetMode["PrintComp", "Initializations", "Mode"], GetMode["PrintComp", "Initializations", "TensorType"]},
     {None, None},
     TestID -> "Mode-ResetMode-Subtree"
   ]

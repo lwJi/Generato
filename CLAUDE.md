@@ -64,3 +64,18 @@ wolframscript -script test/AllTests.wl
 ```
 
 See [README.md](README.md) for more details on test options, directory structure, and adding new tests.
+
+## Wolframscript Tips
+
+When running wolframscript with `-e` and backticks in the code, shell escaping issues can cause misleading "license error" messages. Use a pipe instead:
+
+```bash
+# Don't use -e with backticks (causes shell escaping issues)
+# wolframscript -e 'Needs["Generato`ParseMode`"]'  # May fail with "license error"
+
+# Use pipe instead
+echo 'Needs["Generato`ParseMode`"]; Print["success"]' | wolframscript
+
+# Or load files directly with Get
+echo 'Get["/path/to/file.wl"]; Print["success"]' | QUIET=1 wolframscript
+```

@@ -26,11 +26,11 @@ TileTensors::usage = "TileTensors[var1, var2, ...] defines tensors with tile poi
 
 TempTensors::usage = "TempTensors[var1, var2, ...] defines temporary tensors without grid point indices, sets their components, and returns the varlist.";
 
-SetComponents::usage = "SetComponents[varlist] sets tensor components for the given varlist.\nSetComponents[{opts}, varlist] sets components with options ChartName, IndependentIndexForEachVar, WithoutGridPointIndex, UseTilePointIndex.";
+SetComponents::usage = "SetComponents[varlist] sets tensor components for the given varlist.\nSetComponents[{opts}, varlist] sets components with options ChartName, IndependentVarlistIndex, WithoutGridPointIndex, UseTilePointIndex.";
 
-PrintEquations::usage = "PrintEquations[varlist] prints equations for tensor components in the varlist.\nPrintEquations[{opts}, varlist] prints with options ChartName, SuffixName, Mode, ExtraReplaceRules.";
+PrintEquations::usage = "PrintEquations[varlist] prints equations for tensor components in the varlist.\nPrintEquations[{opts}, varlist] prints with options ChartName, SuffixName, EquationsMode, ExtraReplaceRules.";
 
-PrintInitializations::usage = "PrintInitializations[varlist] prints initialization code for tensor components.\nPrintInitializations[{opts}, varlist] prints with options ChartName, Mode, TensorType, StorageType, DerivsOrder, DerivsAccuracy.";
+PrintInitializations::usage = "PrintInitializations[varlist] prints initialization code for tensor components.\nPrintInitializations[{opts}, varlist] prints with options ChartName, InitializationsMode, TensorType, StorageType, DerivsOrder, DerivsAccuracy.";
 
 Begin["`Private`"];
 
@@ -92,16 +92,16 @@ Protect[TempTensors];
 *)
 
 Options[SetComponents] :=
-  {ChartName -> GetDefaultChart[], IndependentIndexForEachVar -> True, WithoutGridPointIndex -> False, UseTilePointIndex -> False};
+  {ChartName -> GetDefaultChart[], IndependentVarlistIndex -> True, WithoutGridPointIndex -> False, UseTilePointIndex -> False};
 
 SetComponents[OptionsPattern[], varlist_?ListQ] :=
   Module[{chartname, indepidx, nogpidx, tlidx},
-    {chartname, indepidx, nogpidx, tlidx} = OptionValue[{ChartName, IndependentIndexForEachVar, WithoutGridPointIndex, UseTilePointIndex}];
+    {chartname, indepidx, nogpidx, tlidx} = OptionValue[{ChartName, IndependentVarlistIndex, WithoutGridPointIndex, UseTilePointIndex}];
     WithMode[{
       {"Phase"} -> "SetComp",
-      {"SetComp", "IndependentVarlistIndex"} -> indepidx,
-      {"SetComp", "WithoutGridPointIndex"} -> nogpidx,
-      {"SetComp", "UseTilePointIndex"} -> tlidx
+      {"IndexOptions", "IndependentVarlistIndex"} -> indepidx,
+      {"IndexOptions", "WithoutGridPointIndex"} -> nogpidx,
+      {"IndexOptions", "UseTilePointIndex"} -> tlidx
     },
       ParseVarlist[varlist, chartname]
     ]
@@ -116,18 +116,18 @@ Protect[SetComponents];
  *)
 
 Options[PrintEquations] :=
-  {ChartName -> GetDefaultChart[], SuffixName -> Null, Mode -> "Main", ExtraReplaceRules -> {}};
+  {ChartName -> GetDefaultChart[], SuffixName -> Null, EquationsMode -> "MainOut", ExtraReplaceRules -> {}};
 
 PrintEquations[OptionsPattern[], varlist_?ListQ] :=
   Module[{chartname, suffixname, mode, extrareplacerules},
-    {chartname, suffixname, mode, extrareplacerules} = OptionValue[{ChartName, SuffixName, Mode, ExtraReplaceRules}];
+    {chartname, suffixname, mode, extrareplacerules} = OptionValue[{ChartName, SuffixName, EquationsMode, ExtraReplaceRules}];
     If[suffixname =!= Null,
       SetSuffixName[suffixname]
     ];
     WithMode[{
       {"Phase"} -> "PrintComp",
       {"PrintComp", "Type"} -> "Equations",
-      {"PrintComp", "Eqn", "Mode"} -> mode
+      {"PrintComp", "Equations", "Mode"} -> mode
     },
       ParseVarlist[{ExtraReplaceRules -> extrareplacerules}, varlist, chartname]
     ];
@@ -141,21 +141,21 @@ Protect[PrintEquations];
  *)
 
 Options[PrintInitializations] :=
-  {ChartName -> GetDefaultChart[], Mode -> "Temp", TensorType -> "Scal", StorageType -> "GF", DerivsOrder -> 1, DerivsAccuracy -> 4};
+  {ChartName -> GetDefaultChart[], InitializationsMode -> "Temp", TensorType -> "Scal", StorageType -> "GF", DerivsOrder -> 1, DerivsAccuracy -> 4};
 
 PrintInitializations[OptionsPattern[], varlist_?ListQ] :=
   Module[{chartname, mode, tensortype, storagetype, derivsorder, accuracyorder},
     {chartname, mode, tensortype, storagetype, derivsorder, accuracyorder} =
-      OptionValue[{ChartName, Mode, TensorType, StorageType, DerivsOrder, DerivsAccuracy}];
+      OptionValue[{ChartName, InitializationsMode, TensorType, StorageType, DerivsOrder, DerivsAccuracy}];
 
     WithMode[{
       {"Phase"} -> "PrintComp",
       {"PrintComp", "Type"} -> "Initializations",
-      {"PrintComp", "Init", "Mode"} -> mode,
-      {"PrintComp", "Init", "TensorType"} -> tensortype,
-      {"PrintComp", "Init", "StorageType"} -> storagetype,
-      {"PrintComp", "Init", "DerivsOrder"} -> derivsorder,
-      {"PrintComp", "Init", "DerivsAccuracy"} -> accuracyorder
+      {"PrintComp", "Initializations", "Mode"} -> mode,
+      {"PrintComp", "Initializations", "TensorType"} -> tensortype,
+      {"PrintComp", "Initializations", "StorageType"} -> storagetype,
+      {"PrintComp", "Initializations", "DerivsOrder"} -> derivsorder,
+      {"PrintComp", "Initializations", "DerivsAccuracy"} -> accuracyorder
     },
       ParseVarlist[varlist, chartname]
     ]

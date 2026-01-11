@@ -188,11 +188,11 @@ Protect[ParseComponent];
 PrintComponent[coordinate_, varinfo_, compname_, extrareplacerules_] :=
   Module[{},
     Which[
-      InInitMode[],
+      InInitializationsMode[],
         PrintVerbose["    PrintComponentInitialization ", compname, "..."];
         Global`PrintComponentInitialization[varinfo, compname]
       ,
-      InEqnMode[],
+      InEquationsMode[],
         PrintVerbose["    PrintComponentEquation ", compname, "..."];
         Global`PrintComponentEquation[coordinate, compname, extrareplacerules]
       ,

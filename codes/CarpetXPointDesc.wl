@@ -9,18 +9,7 @@
 (*                    Finite difference stencil function                      *)
 (******************************************************************************)
 
-(* Function to get GF index name *)
-
-GetGFIndexName[index_?IntegerQ] :=
-  Module[{gfindex},
-    gfindex =
-      Which[
-        index > 0, "p" <> ToString[index],
-        index < 0, "m" <> ToString[Abs[index]],
-        True, "c0"
-      ];
-    ToExpression[gfindex]
-  ];
+(* Function to get GF index name - GetGFIndexName is now in BackendCommon.wl *)
 
 GetGFIndexNameMix2nd[index1_?IntegerQ, index2_?IntegerQ] :=
   Module[{gfindex},
@@ -137,25 +126,25 @@ PrintComponentInitialization[varinfo_, compname_] :=
     (* set buf *)
     buf =
       Which[
-        GetInitMode[] === "MainIn" || GetInitMode[] === "MainOut",
+        GetInitializationsMode[] === "MainIn" || GetInitializationsMode[] === "MainOut",
           "const auto &"
           <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
           <> " = gf_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
         ,
-        GetInitMode[] === "Derivs1st",
+        GetInitializationsMode[] === "Derivs1st",
           "const auto " <> ToString[compToValue]
           <> " = fd_1st<" <> ToString[compname[[1]][[1]]] <> ">("
           <> StringDrop[StringDrop[ToString[compToValue], 1], {-len, -len + 0}]
           <> ", p);"
         ,
-        GetInitMode[] === "Derivs2nd",
+        GetInitializationsMode[] === "Derivs2nd",
           "const auto " <> ToString[compToValue]
           <> " = fd_2nd<" <> ToString[compname[[1]][[1]]] <> ", "
           <> ToString[compname[[2]][[1]]] <> ">("
           <> StringDrop[StringDrop[ToString[compToValue], 2], {-len, -len + 1}]
           <> ", p);"
         ,
-        GetInitMode[] === "Temp",
+        GetInitializationsMode[] === "Temp",
           buf = "auto " <> ToString[compToValue] <> ";"
         ,
         True,
@@ -194,7 +183,7 @@ PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
       rhssToValue = (rhssToValue // ToValues) /. extrareplacerules
     ];
     Which[
-      GetEqnMode[] === "Temp",
+      GetEquationsMode[] === "Temp",
         Module[{},
           Global`pr["const " <> GetTempVariableType[] <> " "];
           PutAppend[CForm[compToValue], outputfile];
@@ -203,7 +192,7 @@ PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
           Global`pr[";\n"]
         ]
       ,
-      GetEqnMode[] === "Main",
+      GetEquationsMode[] === "MainOut",
         Module[{},
           PutAppend[CForm[compToValue], outputfile];
           Global`pr["="];
@@ -211,7 +200,7 @@ PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
           Global`pr[";\n"]
         ]
       ,
-      GetEqnMode[] === "AddToMain",
+      GetEquationsMode[] === "AddToMainOut",
         Module[{},
           PutAppend[CForm[compToValue], outputfile];
           Global`pr["+="];

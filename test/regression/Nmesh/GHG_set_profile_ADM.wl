@@ -305,13 +305,13 @@ $MainPrint[] :=
     pr["cart_partials_dSij_dk(node, igammaxx, idgammaxxx);"];
     pr[];
     (* print initializations *)
-    PrintInitializations[{Mode -> "MainIn"}, GHGVarlist];
-    PrintInitializations[{Mode -> "MainIn"}, MoreOutputVarlist];
-    PrintInitializations[{Mode -> "MoreInOut"}, ADMVarlist];
-    PrintInitializations[{Mode -> "MoreInOut"}, dADMVarlist];
-    PrintInitializations[{Mode -> "MoreInOut"}, dHVarlist];
-    PrintInitializations[{Mode -> "Temp"}, GaugeVarlist];
-    PrintInitializations[{Mode -> "Temp"}, dgVarlist];
+    PrintInitializations[{InitializationsMode -> "MainIn"}, GHGVarlist];
+    PrintInitializations[{InitializationsMode -> "MainIn"}, MoreOutputVarlist];
+    PrintInitializations[{InitializationsMode -> "MoreInOut"}, ADMVarlist];
+    PrintInitializations[{InitializationsMode -> "MoreInOut"}, dADMVarlist];
+    PrintInitializations[{InitializationsMode -> "MoreInOut"}, dHVarlist];
+    PrintInitializations[{InitializationsMode -> "Temp"}, GaugeVarlist];
+    PrintInitializations[{InitializationsMode -> "Temp"}, dgVarlist];
     pr[];
     (* from Ein case *)
     pr["int idtgtt;"];
@@ -320,7 +320,7 @@ $MainPrint[] :=
     pr["} else {"];
     pr["  idtgtt = Ind(\"GHG_gtt\"); /* set to dummy values */"];
     pr["}"];
-    PrintInitializations[{Mode -> "MoreInOut"}, EinVarlist];
+    PrintInitializations[{InitializationsMode -> "MoreInOut"}, EinVarlist];
     pr[];
     (* parameters *)
     pr["double parnu = Getd(GHG->nu);"];
@@ -334,7 +334,7 @@ $MainPrint[] :=
     pr["{"];
     pr[];
     (* declare temporary vars *)
-    PrintEquations[{Mode -> "Temp"}, TempVarlist];
+    PrintEquations[{EquationsMode -> "Temp"}, TempVarlist];
     pr[];
     Module[
       {printdg}
@@ -344,9 +344,9 @@ $MainPrint[] :=
         Module[{},
           SetMode["Phase" -> "PrintComp"];
           SetMode["PrintComp", "Type" -> "Equations"];
-          SetMode["PrintComp", "Eqn", "Mode" -> "Main"];
+          SetMode["PrintComp", "Equations", "Mode" -> "MainOut"];
           PrintComponentEquation[GetDefaultChart[], dmetricg[{cc, -GetDefaultChart[]}, {aa, -GetDefaultChart[]}, {bb, -GetDefaultChart[]}], {}];
-          ResetMode["PrintComp", "Eqn"];
+          ResetMode["PrintComp", "Equations"];
         ];
       Do[printdg[cc, aa, bb], {cc, 3, 1, -1}, {aa, 3, 0, -1}, {bb, 3, aa, -1}];
       (* set d_t g_{ab} *)
@@ -358,9 +358,9 @@ $MainPrint[] :=
             SetSuffixName["Ein"];
             SetMode["Phase" -> "PrintComp"];
             SetMode["PrintComp", "Type" -> "Equations"];
-            SetMode["PrintComp", "Eqn", "Mode" -> "Main"];
+            SetMode["PrintComp", "Equations", "Mode" -> "MainOut"];
             PrintComponentEquation[GetDefaultChart[], dmetricg[{cc, -GetDefaultChart[]}, {aa, -GetDefaultChart[]}, {bb, -GetDefaultChart[]}], {}];
-            ResetMode["PrintComp", "Eqn"];
+            ResetMode["PrintComp", "Equations"];
             SetSuffixName[""];
           ];
         Do[printdtgEin[0, aa, bb], {aa, 3, 0, -1}, {bb, 3, aa, -1}];
@@ -369,16 +369,16 @@ $MainPrint[] :=
       pr["} else {"] pr[];
       pr["if (GHG->gauge_freeze) {"];
       pr[];
-      PrintEquations[{Mode -> "Main", SuffixName -> "Freeze"}, GaugeVarlist];
+      PrintEquations[{EquationsMode -> "MainOut", SuffixName -> "Freeze"}, GaugeVarlist];
       pr["} else if (GHG->gauge_puncture) {"];
       pr[];
-      PrintEquations[{Mode -> "Temp"}, GaugePunctureVarlist];
-      PrintEquations[{Mode -> "Main", SuffixName -> "Puncture"}, GaugeVarlist];
+      PrintEquations[{EquationsMode -> "Temp"}, GaugePunctureVarlist];
+      PrintEquations[{EquationsMode -> "MainOut", SuffixName -> "Puncture"}, GaugeVarlist];
       pr["} else if (GHG->gauge_DW) {"];
       pr[];
-      PrintEquations[{Mode -> "Temp"}, GaugeDWVarlist];
-      PrintEquations[{Mode -> "Temp", SuffixName -> "DW"}, GaugeGHVarlist];
-      PrintEquations[{Mode -> "Main", SuffixName -> "GH"}, GaugeVarlist];
+      PrintEquations[{EquationsMode -> "Temp"}, GaugeDWVarlist];
+      PrintEquations[{EquationsMode -> "Temp", SuffixName -> "DW"}, GaugeGHVarlist];
+      PrintEquations[{EquationsMode -> "MainOut", SuffixName -> "GH"}, GaugeVarlist];
       pr["} else { errorexit(\"unknown ID GHG_gauge!\"); }"];
       pr[];
       Do[printdg[0, aa, bb], {aa, 3, 0, -1}, {bb, 3, aa, -1}];
@@ -387,7 +387,7 @@ $MainPrint[] :=
       pr[];
     ];
     (* set g^{ab}, Gam_{cab}, Gam_{c} *)
-    PrintEquations[{Mode -> "Temp"}, MoreTempVarlist];
+    PrintEquations[{EquationsMode -> "Temp"}, MoreTempVarlist];
     pr[];
     (* set GHG vars *)
     PrintEquations[GHGVarlist];

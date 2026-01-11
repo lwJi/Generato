@@ -97,16 +97,16 @@ PrintComponentInitialization[varinfo_, compname_] :=
     isGF3D5 = GetStorageType[] === "Tile";
     buf =
       Which[
-        GetInitMode[] === "MainOut" && isGF3D2,
+        GetInitializationsMode[] === "MainOut" && isGF3D2,
           "const GF3D2<CCTK_REAL> &local_" <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]] <> subbuf <> ";"
         ,
-        GetInitMode[] === "MainIn" && isGF3D2,
+        GetInitializationsMode[] === "MainIn" && isGF3D2,
           "const vreal " <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = tmp_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]] <> subbuf <> ";"
         ,
-        GetInitMode[] === "MainIn" && isGF3D5,
+        GetInitializationsMode[] === "MainIn" && isGF3D5,
           "const vreal " <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = tmp_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]] <> subbuf <> ";"
         ,
-        GetInitMode[] === "Temp",
+        GetInitializationsMode[] === "Temp",
           buf = "vreal " <> ToString[compToValue] <> ";"
         ,
         True,
@@ -143,7 +143,7 @@ PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
       rhssToValue = (rhssToValue // ToValues) /. extrareplacerules
     ];
     Which[
-      GetEqnMode[] === "Temp",
+      GetEquationsMode[] === "Temp",
         Module[{},
           Global`pr[GetTempVariableType[] <> " "];
           PutAppend[CForm[compToValue], outputfile];
@@ -152,14 +152,14 @@ PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
           Global`pr[";\n"]
         ]
       ,
-      GetEqnMode[] === "Main",
+      GetEquationsMode[] === "MainOut",
         Module[{},
           Global`pr["local_" <> ToString[CForm[compToValue]] <> ".store(mask, index2, "];
           PutAppend[CForm[rhssToValue], outputfile];
           Global`pr[");\n"]
         ]
       ,
-      GetEqnMode[] === "AddToMain",
+      GetEquationsMode[] === "AddToMainOut",
         Module[{},
           PutAppend[CForm[compToValue], outputfile];
           Global`pr["+="];

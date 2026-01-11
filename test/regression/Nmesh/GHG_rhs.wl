@@ -124,9 +124,9 @@ $MainPrint[] :=
     pr["int fc[6];"];
     pr["int ijk;"];
     pr[];
-    PrintInitializations[{Mode -> "MainOut"}, dtEvolVarlist];
-    PrintInitializations[{Mode -> "MainIn"}, EvolVarlist];
-    PrintInitializations[{Mode -> "MoreInOut"}, MoreInVarlist];
+    PrintInitializations[{InitializationsMode -> "MainOut"}, dtEvolVarlist];
+    PrintInitializations[{InitializationsMode -> "MainIn"}, EvolVarlist];
+    PrintInitializations[{InitializationsMode -> "MoreInOut"}, MoreInVarlist];
     pr[];
     pr["TIMER_START;"];
     pr[];
@@ -141,9 +141,9 @@ $MainPrint[] :=
     pr["gamma1 = gammas[1];"];
     pr["gamma2 = gammas[2];"];
     pr[];
-    PrintEquations[{Mode -> "Temp"}, TempVarlist];
+    PrintEquations[{EquationsMode -> "Temp"}, TempVarlist];
     pr[];
-    PrintEquations[{Mode -> "Main"}, dtEvolVarlist];
+    PrintEquations[{EquationsMode -> "MainOut"}, dtEvolVarlist];
     pr["} /* end of points */"];
     pr[];
     pr["TIMER_STOP;"];
