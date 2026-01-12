@@ -26,8 +26,10 @@ Protect[PrintListInitializations];
 *)
 
 PrintComponentInitialization[ctx_Association, varinfo_, compname_] :=
-  Module[{varlistindex = GetMapComponentToVarlist[ctx][compname], compToValue = compname // ToValues, varname, symmetry, buf, subbuf, isGF3D2, isGF3D5},
-    {varname, symmetry} = varinfo;
+  Module[{varlistindex, compToValue, varname, symmetry, buf, subbuf, len, isGF3D2, isGF3D5},
+    (* Extract common component info using shared function *)
+    {varlistindex, compToValue, varname, symmetry, len} =
+      ExtractComponentInfo[ctx, varinfo, compname];
     (* set subbuf *)
     Which[
       GetTensorType[ctx] === "Scal",

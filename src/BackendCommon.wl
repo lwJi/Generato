@@ -21,6 +21,7 @@ GetInterfaceName::usage = "GetInterfaceName[compname] returns the interface name
 ComputeRHSValue::usage = "ComputeRHSValue[coordinate, compname, extrareplacerules] computes the RHS value for an equation.";
 PrintEquationByMode::usage = "PrintEquationByMode[compToValue, rhssToValue, mainFormatter, tempFormatter] prints equation based on current EquationsMode. tempFormatter is optional (defaults to Automatic for standard Temp output).";
 GetTensorIndexSubbuf::usage = "GetTensorIndexSubbuf[len, varlistindex] computes subbuf string for tensor component indexing.";
+ExtractComponentInfo::usage = "ExtractComponentInfo[ctx, varinfo, compname] extracts {varlistindex, compToValue, varname, symmetry, len} for component initialization.";
 
 Begin["`Private`"];
 
@@ -207,6 +208,27 @@ GetTensorIndexSubbuf::ELength = "GetTensorIndexSubbuf: Unsupported tensor rank f
 GetTensorIndexSubbuf::ETensorType = "GetTensorIndexSubbuf: Unknown tensor type.";
 
 Protect[GetTensorIndexSubbuf];
+
+(*
+  ExtractComponentInfo - Extracts common component information for initialization
+  Returns: {varlistindex, compToValue, varname, symmetry, len}
+
+  Previously duplicated pattern in all 6 backends:
+    varlistindex = GetMapComponentToVarlist[ctx][compname];
+    compToValue = compname // ToValues;
+    {varname, symmetry} = varinfo;
+    len = Length[varname];
+*)
+ExtractComponentInfo[ctx_Association, varinfo_, compname_] :=
+  Module[{varlistindex, compToValue, varname, symmetry, len},
+    varlistindex = GetMapComponentToVarlist[ctx][compname];
+    compToValue = compname // ToValues;
+    {varname, symmetry} = varinfo;
+    len = Length[varname];
+    {varlistindex, compToValue, varname, symmetry, len}
+  ];
+
+Protect[ExtractComponentInfo];
 
 (*
   Standard backend error messages - shared by all backends

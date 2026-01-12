@@ -153,12 +153,11 @@ PrintFDExpressionMix2nd[accuracyOrd_?IntegerQ, strIdx_?StringQ] :=
 PrintComponentInitialization[ctx_Association, varinfo_, compname_] :=
   Module[{varlistindex, compToValue, varname, symmetry, buf, subbuf, len,
           fdorder, fdaccuracy},
-    varlistindex = GetMapComponentToVarlist[ctx][compname];
-    compToValue = compname // ToValues;
-    {varname, symmetry} = varinfo;
-    len = Length[varname];
+    (* Extract common component info using shared function *)
+    {varlistindex, compToValue, varname, symmetry, len} =
+      ExtractComponentInfo[ctx, varinfo, compname];
 
-    (* set subbuf *)
+    (* set subbuf - CarpetXGPU uses [Mod][Quotient] ordering *)
     Which[
       GetTensorType[ctx] === "Scal",
         subbuf = If[len == 0, "", "[" <> ToString[varlistindex] <> "]"]
