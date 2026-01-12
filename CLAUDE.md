@@ -16,7 +16,7 @@ Generato file1.wl file2.wl          # Multiple files
 - **Generato.wl** - Package loader
 - **Context.wl** - Context-based state management (CreateContext, GetCtx, SetCtx, UpdateCtx, WithContext)
 - **Basic.wl** - Config state, tensor utilities, SetEQN/SetEQNDelayed
-- **ParseMode.wl** - Mode management (SetComp/PrintComp phases)
+- **ParseMode.wl** - Phase management (SetComp/PrintComp phases), WithMode for scoped settings
 - **Component.wl** - Tensor component to varlist index mapping
 - **Varlist.wl** - Tensor definitions via ParseVarlist
 - **Interface.wl** - Public API: DefTensors, GridTensors, TileTensors, TempTensors, SetComponents, PrintEquations, PrintInitializations
@@ -34,13 +34,28 @@ Each implements `PrintComponentInitialization[ctx, varinfo, compname]` and `Prin
 
 Common backend code is in `BackendCommon.wl`.
 
-### Context-Based State Management
+### State Management
 
-All state is encapsulated in a `GeneratoContext` association. Functions take context as first parameter.
+All state is stored in `$CurrentContext`, a flat association that serves as the single source of truth. Global getters/setters read/write `$CurrentContext` directly, and context-aware functions take `ctx` as the first parameter.
 
 ```wolfram
+(* Global API - reads/writes $CurrentContext *)
+SetGridPointIndex["[[ijk]]"];
+GetGridPointIndex[];
+
+(* Context-aware API - functional, returns new context *)
 ctx = CreateContext[];
 ctx = SetGridPointIndex[ctx, "[[ijk]]"];
+```
+
+Use `WithMode` for scoped settings that auto-restore:
+```wolfram
+WithMode[{
+  {"Phase"} -> "PrintComp",
+  {"PrintComp", "Type"} -> "Equations"
+},
+  (* body - settings restored after *)
+];
 ```
 
 ### Two-Phase Processing

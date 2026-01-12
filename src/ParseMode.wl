@@ -11,10 +11,6 @@ If[Environment["QUIET"] =!= "1",
 ];
 
 (* Core Functions *)
-GetMode::usage = "GetMode[path...] returns the mode value at the specified path.";
-SetMode::usage = "SetMode[path... -> value] sets the mode value at the specified path.";
-ResetMode::usage = "ResetMode[path...] resets mode(s) to default values.";
-SetModes::usage = "SetModes[{path1 -> val1, path2 -> val2, ...}] sets multiple mode values at once.";
 WithMode::usage = "WithMode[settings, body] sets modes, evaluates body, then restores previous mode state.";
 
 (* Phase Helpers *)
@@ -45,9 +41,6 @@ SetDerivsAccuracy::usage = "SetDerivsAccuracy[ctx, accuracy] returns new context
 GetEquationsMode::usage = "GetEquationsMode[ctx] returns equation mode from context.\nGetEquationsMode[] returns current equation mode.";
 SetEquationsMode::usage = "SetEquationsMode[ctx, mode] returns new context with updated equation mode.";
 
-(* Context Sync *)
-SyncModeToContext::usage = "SyncModeToContext[] synchronizes global mode and state to $CurrentContext.";
-
 (* IndexOptions Helpers *)
 GetIndependentVarlistIndex::usage = "GetIndependentVarlistIndex[ctx] returns IndependentVarlistIndex from context.\nGetIndependentVarlistIndex[] returns IndependentVarlistIndex setting.";
 SetIndependentVarlistIndex::usage = "SetIndependentVarlistIndex[ctx, val] returns new context with updated IndependentVarlistIndex.";
@@ -57,21 +50,6 @@ GetUseTilePointIndex::usage = "GetUseTilePointIndex[ctx] returns UseTilePointInd
 SetUseTilePointIndex::usage = "SetUseTilePointIndex[ctx, val] returns new context with updated UseTilePointIndex.";
 
 Begin["`Private`"];
-
-(* Valid values for each path - nested structure *)
-$ModeValidValues = <|
-  {"Phase"} -> {None, "SetComp", "PrintComp"},
-  {"IndexOptions", "IndependentVarlistIndex"} -> {True, False},
-  {"IndexOptions", "WithoutGridPointIndex"} -> {True, False},
-  {"IndexOptions", "UseTilePointIndex"} -> {True, False},
-  {"PrintComp", "Type"} -> {None, "Initializations", "Equations"},
-  {"PrintComp", "Initializations", "Mode"} -> {None, "MainOut", "MainIn", "Derivs", "Derivs1st", "Derivs2nd", "MoreInOut", "Temp"},
-  {"PrintComp", "Initializations", "TensorType"} -> {None, "Scal", "Vect", "Smat"},
-  {"PrintComp", "Initializations", "StorageType"} -> {None, "GF", "Tile"},
-  {"PrintComp", "Initializations", "DerivsOrder"} -> _Integer,
-  {"PrintComp", "Initializations", "DerivsAccuracy"} -> _Integer,
-  {"PrintComp", "Equations", "Mode"} -> {None, "Temp", "MainOut", "AddToMainOut"}
-|>;
 
 (* Valid values for flat context keys *)
 $ContextModeValidValues = <|
@@ -88,74 +66,10 @@ $ContextModeValidValues = <|
   "EquationsMode" -> {None, "Temp", "MainOut", "AddToMainOut"}
 |>;
 
-(* Default mode structure *)
-$ModeDefaults = <|
-  "Phase" -> None,
-  "IndexOptions" -> <|
-    "IndependentVarlistIndex" -> False,
-    "WithoutGridPointIndex" -> False,
-    "UseTilePointIndex" -> False
-  |>,
-  "PrintComp" -> <|
-    "Type" -> None,
-    "Initializations" -> <|
-      "Mode" -> None,
-      "TensorType" -> None,
-      "StorageType" -> None,
-      "DerivsOrder" -> 0,
-      "DerivsAccuracy" -> 0
-    |>,
-    "Equations" -> <|
-      "Mode" -> None
-    |>
-  |>
-|>;
-
-(* The single mode state *)
-$Mode = $ModeDefaults;
 
 (* ========================================= *)
 (* Core Functions *)
 (* ========================================= *)
-
-(* Get value at nested path *)
-GetMode[] := $Mode;
-
-GetMode[key_String] :=
-  If[KeyExistsQ[$Mode, key], $Mode[key], None];
-
-GetMode[keys__String] :=
-  Module[{path = {keys}, result = $Mode},
-    Do[
-      If[AssociationQ[result] && KeyExistsQ[result, path[[i]]],
-        result = result[[path[[i]]]]
-        ,
-        Return[None]
-      ]
-      ,
-      {i, Length[path]}
-    ];
-    result
-  ];
-
-Protect[GetMode];
-
-(* Validate value for path - nested mode structure *)
-ValidateModeValue[path_List, value_] :=
-  Module[{validValues},
-    If[!KeyExistsQ[$ModeValidValues, path],
-      (* No validation for this path - allow any value *)
-      True
-      ,
-      validValues = $ModeValidValues[path];
-      If[ListQ[validValues],
-        MemberQ[validValues, value]
-        ,
-        (* It's a pattern (e.g., _Integer) - use pattern matching *)
-        MatchQ[value, validValues]
-      ]
-    ]
-  ];
 
 (* Validate value for flat context key *)
 ValidateContextModeValue[key_String, value_] :=
@@ -174,113 +88,51 @@ ValidateContextModeValue[key_String, value_] :=
     ]
   ];
 
-(* Set value at nested path with validation *)
-SetMode[key_String -> value_] :=
-  Module[{},
-    If[!ValidateModeValue[{key}, value],
-      Throw @ Message[SetMode::EInvalidValue, key, value]
-    ];
-    $Mode[key] = value
-  ];
+(* Map nested paths to flat context keys *)
+PathToFlatKey[path_List] := Switch[path,
+  {"Phase"}, "Phase",
+  {"IndexOptions", "IndependentVarlistIndex"}, "IndependentVarlistIndex",
+  {"IndexOptions", "WithoutGridPointIndex"}, "WithoutGridPointIndex",
+  {"IndexOptions", "UseTilePointIndex"}, "UseTilePointIndex",
+  {"PrintComp", "Type"}, "PrintCompType",
+  {"PrintComp", "Initializations", "Mode"}, "InitializationsMode",
+  {"PrintComp", "Initializations", "TensorType"}, "TensorType",
+  {"PrintComp", "Initializations", "StorageType"}, "StorageType",
+  {"PrintComp", "Initializations", "DerivsOrder"}, "DerivsOrder",
+  {"PrintComp", "Initializations", "DerivsAccuracy"}, "DerivsAccuracy",
+  {"PrintComp", "Equations", "Mode"}, "EquationsMode",
+  _, Throw @ Message[PathToFlatKey::EUnknownPath, path]
+];
 
-SetMode[keys__String, lastKey_String -> value_] :=
-  Module[{path = {keys, lastKey}},
-    If[!ValidateModeValue[path, value],
-      Throw @ Message[SetMode::EInvalidValue, StringRiffle[path, "."], value]
-    ];
-    $Mode[[Sequence @@ Most[path], Last[path]]] = value
-  ];
-
-SetMode::EInvalidValue = "Invalid mode value for '`1`': `2`";
-
-Protect[SetMode];
-
-(* Reset mode to defaults *)
-ResetMode[] :=
-  Module[{},
-    $Mode = $ModeDefaults
-  ];
-
-ResetMode[key_String] :=
-  Module[{},
-    If[KeyExistsQ[$ModeDefaults, key],
-      $Mode[key] = $ModeDefaults[key]
-    ]
-  ];
-
-ResetMode[keys__String] :=
-  Module[{path = {keys}},
-    $Mode[[Sequence @@ Most[path], Last[path]]] =
-      $ModeDefaults[[Sequence @@ Most[path], Last[path]]]
-  ];
-
-Protect[ResetMode];
-
-(* Batch set multiple modes *)
-SetModes[rules_List] :=
-  Scan[
-    Function[rule,
-      With[{path = First[rule], value = Last[rule]},
-        If[Length[path] === 1,
-          SetMode[First[path] -> value],
-          SetMode[Sequence @@ Most[path], Last[path] -> value]
-        ]
-      ]
-    ],
-    rules
-  ];
-
-Protect[SetModes];
-
-(* Helper to sync $Mode to $CurrentContext *)
-(* Maps nested $Mode paths to flat context keys *)
-(* Also syncs Component.wl state: $MapComponentToVarlist, etc. *)
-SyncModeToContext[] :=
-  Module[{},
-    $CurrentContext = UpdateCtx[$CurrentContext, <|
-      (* Mode state *)
-      "Phase" -> GetMode["Phase"],
-      "IndependentVarlistIndex" -> GetMode["IndexOptions", "IndependentVarlistIndex"],
-      "WithoutGridPointIndex" -> GetMode["IndexOptions", "WithoutGridPointIndex"],
-      "UseTilePointIndex" -> GetMode["IndexOptions", "UseTilePointIndex"],
-      "PrintCompType" -> GetMode["PrintComp", "Type"],
-      "InitializationsMode" -> GetMode["PrintComp", "Initializations", "Mode"],
-      "TensorType" -> GetMode["PrintComp", "Initializations", "TensorType"],
-      "StorageType" -> GetMode["PrintComp", "Initializations", "StorageType"],
-      "DerivsOrder" -> GetMode["PrintComp", "Initializations", "DerivsOrder"],
-      "DerivsAccuracy" -> GetMode["PrintComp", "Initializations", "DerivsAccuracy"],
-      "EquationsMode" -> GetMode["PrintComp", "Equations", "Mode"],
-      (* Component state - sync from global variables *)
-      "MapComponentToVarlist" -> Generato`Component`Private`$MapComponentToVarlist,
-      "ProcessNewVarlist" -> Generato`Component`Private`$ProcessNewVarlist,
-      "SimplifyEquation" -> Generato`Component`Private`$SimplifyEquation,
-      "UseLetterForTensorComponent" -> Generato`Component`Private`$UseLetterForTensorComponent,
-      "TempVariableType" -> Generato`Component`Private`$TempVariableType,
-      "InterfaceWithNonCoordBasis" -> Generato`Component`Private`$InterfaceWithNonCoordBasis,
-      "SuffixName" -> Generato`Component`Private`$SuffixName,
-      "PrefixDt" -> Generato`Component`Private`$PrefixDt,
-      (* Basic state *)
-      "GridPointIndex" -> Generato`Basic`Private`$GridPointIndex,
-      "TilePointIndex" -> Generato`Basic`Private`$TilePointIndex,
-      "SuffixUnprotected" -> Generato`Basic`Private`$SuffixUnprotected,
-      "OutputFile" -> Generato`Basic`Private`$OutputFile,
-      "Project" -> Generato`Basic`Private`$Project
-    |>];
-  ];
-
-Protect[SyncModeToContext];
+PathToFlatKey::EUnknownPath = "Unknown nested path: `1`";
 
 (* Scoped mode context with automatic restore - global mode version *)
+(* Converts nested path settings to flat keys and applies to $CurrentContext *)
+(* Only saves/restores the specific keys that are modified, preserving other state changes *)
 SetAttributes[WithMode, HoldRest];
 
 WithMode[settings_List, body_] :=
-  Module[{savedMode = $Mode, savedContext = $CurrentContext},
-    SetModes[settings];
-    SyncModeToContext[];
+  Module[{flatKeys, savedValues},
+    (* Convert nested paths to flat keys *)
+    flatKeys = PathToFlatKey[First[#]] & /@ settings;
+    (* Save only the values for keys we're about to modify *)
+    savedValues = $CurrentContext[#] & /@ flatKeys;
+    (* Apply the new settings *)
+    Scan[
+      Function[setting,
+        With[{flatKey = PathToFlatKey[First[setting]], value = Last[setting]},
+          $CurrentContext = SetCtx[$CurrentContext, flatKey, value]
+        ]
+      ],
+      settings
+    ];
+    (* Restore only the specific keys that were modified *)
     WithCleanup[
       body,
-      $Mode = savedMode;
-      $CurrentContext = savedContext
+      Do[
+        $CurrentContext = SetCtx[$CurrentContext, flatKeys[[i]], savedValues[[i]]],
+        {i, Length[flatKeys]}
+      ]
     ]
   ];
 
@@ -307,13 +159,13 @@ Protect[WithMode];
 
 (* Phase helpers - context-aware versions *)
 GetPhase[ctx_Association] := GetCtx[ctx, "Phase"];
-GetPhase[] := GetMode["Phase"];
+GetPhase[] := $CurrentContext["Phase"];
 
 InSetCompPhase[ctx_Association] := GetPhase[ctx] === "SetComp";
-InSetCompPhase[] := GetMode["Phase"] === "SetComp";
+InSetCompPhase[] := $CurrentContext["Phase"] === "SetComp";
 
 InPrintCompPhase[ctx_Association] := GetPhase[ctx] === "PrintComp";
-InPrintCompPhase[] := GetMode["Phase"] === "PrintComp";
+InPrintCompPhase[] := $CurrentContext["Phase"] === "PrintComp";
 
 (* Phase setters - context-aware versions return new context *)
 SetPhase[ctx_Association, phase_] :=
@@ -333,13 +185,13 @@ Protect[SetPhase];
 
 (* PrintComp type helpers - context-aware versions *)
 GetPrintCompType[ctx_Association] := GetCtx[ctx, "PrintCompType"];
-GetPrintCompType[] := GetMode["PrintComp", "Type"];
+GetPrintCompType[] := $CurrentContext["PrintCompType"];
 
 InInitializationsMode[ctx_Association] := GetPrintCompType[ctx] === "Initializations";
-InInitializationsMode[] := GetMode["PrintComp", "Type"] === "Initializations";
+InInitializationsMode[] := $CurrentContext["PrintCompType"] === "Initializations";
 
 InEquationsMode[ctx_Association] := GetPrintCompType[ctx] === "Equations";
-InEquationsMode[] := GetMode["PrintComp", "Type"] === "Equations";
+InEquationsMode[] := $CurrentContext["PrintCompType"] === "Equations";
 
 (* PrintCompType setter - context-aware version *)
 SetPrintCompType[ctx_Association, ptype_] :=
@@ -359,19 +211,19 @@ Protect[SetPrintCompType];
 
 (* Initializations mode helpers - context-aware versions *)
 GetInitializationsMode[ctx_Association] := GetCtx[ctx, "InitializationsMode"];
-GetInitializationsMode[] := GetMode["PrintComp", "Initializations", "Mode"];
+GetInitializationsMode[] := $CurrentContext["InitializationsMode"];
 
 GetTensorType[ctx_Association] := GetCtx[ctx, "TensorType"];
-GetTensorType[] := GetMode["PrintComp", "Initializations", "TensorType"];
+GetTensorType[] := $CurrentContext["TensorType"];
 
 GetStorageType[ctx_Association] := GetCtx[ctx, "StorageType"];
-GetStorageType[] := GetMode["PrintComp", "Initializations", "StorageType"];
+GetStorageType[] := $CurrentContext["StorageType"];
 
 GetDerivsOrder[ctx_Association] := GetCtx[ctx, "DerivsOrder"];
-GetDerivsOrder[] := GetMode["PrintComp", "Initializations", "DerivsOrder"];
+GetDerivsOrder[] := $CurrentContext["DerivsOrder"];
 
 GetDerivsAccuracy[ctx_Association] := GetCtx[ctx, "DerivsAccuracy"];
-GetDerivsAccuracy[] := GetMode["PrintComp", "Initializations", "DerivsAccuracy"];
+GetDerivsAccuracy[] := $CurrentContext["DerivsAccuracy"];
 
 (* Initializations mode setters - context-aware versions *)
 SetInitializationsMode[ctx_Association, mode_] :=
@@ -437,7 +289,7 @@ Protect[SetDerivsAccuracy];
 
 (* Equations mode helper - context-aware versions *)
 GetEquationsMode[ctx_Association] := GetCtx[ctx, "EquationsMode"];
-GetEquationsMode[] := GetMode["PrintComp", "Equations", "Mode"];
+GetEquationsMode[] := $CurrentContext["EquationsMode"];
 
 SetEquationsMode[ctx_Association, mode_] :=
   Module[{},
@@ -454,13 +306,13 @@ Protect[SetEquationsMode];
 
 (* IndexOptions helpers - context-aware versions *)
 GetIndependentVarlistIndex[ctx_Association] := GetCtx[ctx, "IndependentVarlistIndex"];
-GetIndependentVarlistIndex[] := GetMode["IndexOptions", "IndependentVarlistIndex"];
+GetIndependentVarlistIndex[] := $CurrentContext["IndependentVarlistIndex"];
 
 GetWithoutGridPointIndex[ctx_Association] := GetCtx[ctx, "WithoutGridPointIndex"];
-GetWithoutGridPointIndex[] := GetMode["IndexOptions", "WithoutGridPointIndex"];
+GetWithoutGridPointIndex[] := $CurrentContext["WithoutGridPointIndex"];
 
 GetUseTilePointIndex[ctx_Association] := GetCtx[ctx, "UseTilePointIndex"];
-GetUseTilePointIndex[] := GetMode["IndexOptions", "UseTilePointIndex"];
+GetUseTilePointIndex[] := $CurrentContext["UseTilePointIndex"];
 
 (* IndexOptions setters - context-aware versions *)
 SetIndependentVarlistIndex[ctx_Association, val_] :=

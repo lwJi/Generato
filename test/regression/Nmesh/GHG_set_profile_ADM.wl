@@ -341,12 +341,12 @@ $MainPrint[] :=
       ,
       (* set d_k g_{ab} *)
       printdg[cc_, aa_, bb_] :=
-        Module[{},
-          SetMode["Phase" -> "PrintComp"];
-          SetMode["PrintComp", "Type" -> "Equations"];
-          SetMode["PrintComp", "Equations", "Mode" -> "MainOut"];
-          PrintComponentEquation[GetDefaultChart[], dmetricg[{cc, -GetDefaultChart[]}, {aa, -GetDefaultChart[]}, {bb, -GetDefaultChart[]}], {}];
-          ResetMode["PrintComp", "Equations"];
+        WithMode[{
+          {"Phase"} -> "PrintComp",
+          {"PrintComp", "Type"} -> "Equations",
+          {"PrintComp", "Equations", "Mode"} -> "MainOut"
+        },
+          PrintComponentEquation[$CurrentContext, GetDefaultChart[], dmetricg[{cc, -GetDefaultChart[]}, {aa, -GetDefaultChart[]}, {bb, -GetDefaultChart[]}], {}]
         ];
       Do[printdg[cc, aa, bb], {cc, 3, 1, -1}, {aa, 3, 0, -1}, {bb, 3, aa, -1}];
       (* set d_t g_{ab} *)
@@ -354,14 +354,16 @@ $MainPrint[] :=
       pr[];
       Module[{printdtgEin},
         printdtgEin[cc_, aa_, bb_] :=
-          Module[{},
+          Module[{savedSuffix = GetSuffixName[]},
             SetSuffixName["Ein"];
-            SetMode["Phase" -> "PrintComp"];
-            SetMode["PrintComp", "Type" -> "Equations"];
-            SetMode["PrintComp", "Equations", "Mode" -> "MainOut"];
-            PrintComponentEquation[GetDefaultChart[], dmetricg[{cc, -GetDefaultChart[]}, {aa, -GetDefaultChart[]}, {bb, -GetDefaultChart[]}], {}];
-            ResetMode["PrintComp", "Equations"];
-            SetSuffixName[""];
+            WithMode[{
+              {"Phase"} -> "PrintComp",
+              {"PrintComp", "Type"} -> "Equations",
+              {"PrintComp", "Equations", "Mode"} -> "MainOut"
+            },
+              PrintComponentEquation[$CurrentContext, GetDefaultChart[], dmetricg[{cc, -GetDefaultChart[]}, {aa, -GetDefaultChart[]}, {bb, -GetDefaultChart[]}], {}]
+            ];
+            SetSuffixName[savedSuffix]
           ];
         Do[printdtgEin[0, aa, bb], {aa, 3, 0, -1}, {bb, 3, aa, -1}];
         pr[];
