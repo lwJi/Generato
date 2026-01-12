@@ -23,8 +23,10 @@ GetInitialComp[varname_] :=
 *)
 
 PrintComponentInitialization[ctx_Association, varinfo_, compname_] :=
-  Module[{varlistindex = GetMapComponentToVarlist[ctx][compname], compToValue = compname // ToValues, varname, buf},
-    varname = varinfo[[1]];
+  Module[{varlistindex, compToValue, varname, symmetry, len, buf},
+    (* Extract common component info using shared function *)
+    {varlistindex, compToValue, varname, symmetry, len} =
+      ExtractComponentInfo[ctx, varinfo, compname];
     Which[
       GetInitializationsMode[ctx] === "MainOut",
         buf =
