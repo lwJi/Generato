@@ -20,17 +20,17 @@ Generate C/C++ Code from Tensor Expression and So On
 * Small toy
 
 ```bash
-cd test/CarpetX
+cd test/regression/CarpetX
 
 Generato test.wl
 ```
 
 * GHG formulation of Einstein's equations
 
-Please take a look at the example script for GHG system: [test/Nmesh/GHG_rhs.ipynb](https://github.com/lwJi/Generato/blob/main/test/Nmesh/GHG_rhs.ipynb). Or
+Please take a look at the example script for GHG system: [test/regression/Nmesh/GHG_rhs.ipynb](https://github.com/lwJi/Generato/blob/main/test/regression/Nmesh/GHG_rhs.ipynb). Or
 
 ```bash
-cd test/Nmesh
+cd test/regression/Nmesh
 
 Generato GHG_rhs.wl
 ```
@@ -51,12 +51,27 @@ Generato GHG_rhs.wl
 
 ### Backends (codes/)
 Each backend implements `PrintComponentInitialization[varinfo, compname]` and `PrintComponentEquation[coordinate, compname, extrareplacerules]`:
-- **CarpetX.wl** - CarpetX AMR with GF3D2 storage
-- **CarpetXGPU.wl** - GPU-enabled CarpetX
-- **CarpetXPointDesc.wl** - Point description variant
-- **Carpet.wl** - Original Carpet framework
-- **AMReX.wl** - AMReX AMR library
-- **Nmesh.wl** - Structured mesh framework (C output)
+
+| Backend | Output | Description |
+|---------|--------|-------------|
+| CarpetX.wl | `.hxx` | CarpetX AMR with GF3D2 storage |
+| CarpetXGPU.wl | `.hxx` | GPU-enabled CarpetX |
+| CarpetXPointDesc.wl | `.hxx` | Point descriptor variant |
+| Carpet.wl | `.hxx` | Original Carpet framework |
+| AMReX.wl | `.hxx` | AMReX AMR library |
+| Nmesh.wl | `.c` | Structured mesh (C output) |
+
+### Public API (Interface.wl)
+
+| Function | Description |
+|----------|-------------|
+| `DefTensors[var1, ...]` | Define tensors without setting components |
+| `GridTensors[var1, ...]` | Define tensors with grid point indices |
+| `TileTensors[var1, ...]` | Define tensors with tile point indices |
+| `TempTensors[var1, ...]` | Define temporary tensors (no grid index) |
+| `SetComponents[varlist]` | Map tensor components to varlist indices |
+| `PrintEquations[{opts}, varlist]` | Generate C/C++ equations |
+| `PrintInitializations[{opts}, varlist]` | Generate initialization code |
 
 ## Recommendations
 
