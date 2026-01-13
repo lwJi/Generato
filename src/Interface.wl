@@ -126,17 +126,14 @@ Options[PrintEquations] :=
 PrintEquations[OptionsPattern[], varlist_?ListQ] :=
   Module[{chartname, suffixname, mode, extrareplacerules},
     {chartname, suffixname, mode, extrareplacerules} = OptionValue[{ChartName, SuffixName, Mode, ExtraReplaceRules}];
-    If[suffixname =!= Null,
-      SetSuffixName[suffixname]
-    ];
     WithMode[{
       "Phase" -> "PrintComp",
       "PrintCompType" -> "Equations",
-      "EquationsMode" -> mode
+      "EquationsMode" -> mode,
+      "SuffixName" -> If[suffixname === Null, "", suffixname]
     },
       ParseVarlist[{ExtraReplaceRules -> extrareplacerules}, varlist, chartname]
-    ];
-    SetSuffixName[""];
+    ]
   ];
 
 Protect[PrintEquations];
