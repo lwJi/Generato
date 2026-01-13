@@ -25,8 +25,8 @@ Protect[PrintListInitializations];
     Print initialization of each component of a tensor
 *)
 
-PrintComponentInitialization[ctx_Association, varinfo_, compname_] :=
-  Module[{varlistindex, compToValue, varname, symmetry, buf, subbuf, len, isGF3D2, isGF3D5},
+PrintComponentInitialization[varinfo_, compname_] :=
+  Module[{ctx = $CurrentContext, varlistindex, compToValue, varname, symmetry, buf, subbuf, len, isGF3D2, isGF3D5},
     (* Extract common component info using shared function *)
     {varlistindex, compToValue, varname, symmetry, len} =
       ExtractComponentInfo[ctx, varinfo, compname];
@@ -130,8 +130,9 @@ Protect[PrintComponentInitialization];
  *        introduced to replace say coordinates representation of metric.
  *)
 
-PrintComponentEquation[ctx_Association, coordinate_, compname_, extrareplacerules_] :=
-  Module[{outputfile = GetOutputFile[ctx], compToValue, rhssToValue},
+PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
+  Module[{ctx = $CurrentContext, outputfile, compToValue, rhssToValue},
+    outputfile = GetOutputFile[ctx];
     compToValue = compname // ToValues;
     rhssToValue = ComputeRHSValue[ctx, coordinate, compname, extrareplacerules];
     PrintEquationByMode[ctx, compToValue, rhssToValue,
@@ -152,4 +153,4 @@ Protect[PrintComponentEquation];
 
 (******************************************************************************)
 
-WriteToFile[GetOutputFile[]];
+WriteToFile[$CurrentContext, GetOutputFile[$CurrentContext]];

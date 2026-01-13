@@ -9,8 +9,8 @@ If[Environment["QUIET"] =!= "1", Print["Loading BasicTests.wl..."]];
 Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"}]];
 
 (* Suppress verbose output during tests *)
-SetPVerbose[False];
-SetPrintDate[False];
+$CurrentContext = SetPVerbose[$CurrentContext, False];
+$CurrentContext = SetPrintDate[$CurrentContext, False];
 
 (* ========================================= *)
 (* Test: Global Configuration Functions *)
@@ -18,7 +18,7 @@ SetPrintDate[False];
 
 AppendTo[$AllTests,
   VerificationTest[
-    SetPVerbose[True];
+    $CurrentContext = SetPVerbose[$CurrentContext, True];
     (* PVerbose should be settable without error *)
     True,
     True,
@@ -28,8 +28,8 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    SetPrintDate[False];
-    GetPrintDate[],
+    $CurrentContext = SetPrintDate[$CurrentContext, False];
+    GetPrintDate[$CurrentContext],
     False,
     TestID -> "GetSetPrintDate-ReturnsFalse"
   ]
@@ -37,8 +37,8 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    SetGridPointIndex["[[ijk]]"];
-    GetGridPointIndex[],
+    $CurrentContext = SetGridPointIndex[$CurrentContext, "[[ijk]]"];
+    GetGridPointIndex[$CurrentContext],
     "[[ijk]]",
     TestID -> "GetSetGridPointIndex-ReturnsValue"
   ]
@@ -46,8 +46,8 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    SetTilePointIndex["(ti,tj,tk)"];
-    GetTilePointIndex[],
+    $CurrentContext = SetTilePointIndex[$CurrentContext, "(ti,tj,tk)"];
+    GetTilePointIndex[$CurrentContext],
     "(ti,tj,tk)",
     TestID -> "GetSetTilePointIndex-ReturnsValue"
   ]
@@ -55,8 +55,8 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    SetOutputFile["/tmp/test_output.c"];
-    GetOutputFile[],
+    $CurrentContext = SetOutputFile[$CurrentContext, "/tmp/test_output.c"];
+    GetOutputFile[$CurrentContext],
     "/tmp/test_output.c",
     TestID -> "GetSetOutputFile-ReturnsPath"
   ]
@@ -64,8 +64,8 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    SetProject["TestProject"];
-    GetProject[],
+    $CurrentContext = SetProject[$CurrentContext, "TestProject"];
+    GetProject[$CurrentContext],
     "TestProject",
     TestID -> "GetSetProject-ReturnsValue"
   ]
@@ -124,8 +124,8 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    SetCheckInputEquations[True];
-    GetCheckInputEquations[],
+    $CurrentContext = SetCheckInputEquations[$CurrentContext, True];
+    GetCheckInputEquations[$CurrentContext],
     True,
     TestID -> "GetSetCheckInputEquations-True"
   ]
@@ -133,8 +133,8 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    SetCheckInputEquations[False];
-    GetCheckInputEquations[],
+    $CurrentContext = SetCheckInputEquations[$CurrentContext, False];
+    GetCheckInputEquations[$CurrentContext],
     False,
     TestID -> "GetSetCheckInputEquations-False"
   ]
@@ -146,8 +146,8 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    SetPrintHeaderMacro[True];
-    GetPrintHeaderMacro[],
+    $CurrentContext = SetPrintHeaderMacro[$CurrentContext, True];
+    GetPrintHeaderMacro[$CurrentContext],
     True,
     TestID -> "GetSetPrintHeaderMacro-True"
   ]
@@ -155,8 +155,8 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    SetPrintHeaderMacro[False];
-    GetPrintHeaderMacro[],
+    $CurrentContext = SetPrintHeaderMacro[$CurrentContext, False];
+    GetPrintHeaderMacro[$CurrentContext],
     False,
     TestID -> "GetSetPrintHeaderMacro-False"
   ]
@@ -168,8 +168,8 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    SetSuffixUnprotected["_test"];
-    GetSuffixUnprotected[],
+    $CurrentContext = SetSuffixUnprotected[$CurrentContext, "_test"];
+    GetSuffixUnprotected[$CurrentContext],
     "_test",
     TestID -> "GetSetSuffixUnprotected-String"
   ]
@@ -270,14 +270,14 @@ AppendTo[$AllTests,
 ];
 
 (* Reset to clean state - all modified variables *)
-SetPVerbose[False];
-SetPrintDate[False];
-SetGridPointIndex[""];
-SetTilePointIndex[""];
-SetOutputFile[""];
-SetProject[""];
-SetCheckInputEquations[True];
-SetPrintHeaderMacro[True];
-SetSuffixUnprotected[""];
+$CurrentContext = SetPVerbose[$CurrentContext, False];
+$CurrentContext = SetPrintDate[$CurrentContext, False];
+$CurrentContext = SetGridPointIndex[$CurrentContext, ""];
+$CurrentContext = SetTilePointIndex[$CurrentContext, ""];
+$CurrentContext = SetOutputFile[$CurrentContext, ""];
+$CurrentContext = SetProject[$CurrentContext, ""];
+$CurrentContext = SetCheckInputEquations[$CurrentContext, True];
+$CurrentContext = SetPrintHeaderMacro[$CurrentContext, True];
+$CurrentContext = SetSuffixUnprotected[$CurrentContext, ""];
 
 If[Environment["QUIET"] =!= "1", Print["BasicTests.wl completed."]];

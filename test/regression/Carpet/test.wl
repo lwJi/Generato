@@ -6,13 +6,13 @@
 
 Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"}]]
 
-SetPVerbose[False];
+$CurrentContext = SetPVerbose[$CurrentContext, False];
 
-SetPrintDate[False];
+$CurrentContext = SetPrintDate[$CurrentContext, False];
 
-SetGridPointIndex[""];
+$CurrentContext = SetGridPointIndex[$CurrentContext, ""];
 
-SetTempVariableType["CCTK_REAL"];
+$CurrentContext = SetTempVariableType[$CurrentContext, "CCTK_REAL"];
 
 DefManifold[M3, 3, IndexRange[a, z]];
 
@@ -43,11 +43,11 @@ SetEQN[{SuffixName -> "Msqr"}, rU[i_], euclid[i, k] MDD[-k, -j] vU[j]];
 
 SetEQN[{SuffixName -> "otherwise"}, rU[i_], vU[i]];
 
-SetOutputFile[FileNameJoin[{Directory[], "test.hxx"}]];
+$CurrentContext = SetOutputFile[$CurrentContext, FileNameJoin[{Directory[], "test.hxx"}]];
 
 (* SetProject["Carpet"]; *)
 
-SetMainPrint[
+$MainPrint[] := (
   pr[];
   PrintInitializations[{Mode -> "MainOut"}, dtEvolVarlist];
   PrintInitializations[{Mode -> "MainIn"}, EvolVarlist];
@@ -63,6 +63,6 @@ SetMainPrint[
   pr["{"];
   PrintEquations[{Mode -> "MainOut", SuffixName -> "otherwise"}, dtEvolVarlist];
   pr["}"];
-];
+);
 
 Import[FileNameJoin[{Environment["GENERATO"], "codes/Carpet.wl"}]];

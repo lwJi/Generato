@@ -11,8 +11,8 @@ If[!MemberQ[$Packages, "Generato`Interface`"],
   Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"}]]
 ];
 
-SetPVerbose[False];
-SetPrintDate[False];
+$CurrentContext = SetPVerbose[$CurrentContext, False];
+$CurrentContext = SetPrintDate[$CurrentContext, False];
 
 (* ========================================= *)
 (* Setup: Use existing test manifold from BasicTests *)
@@ -233,7 +233,7 @@ AppendTo[$AllTests,
     ctx = CreateContext[];
     (* Phase should be None after WithSetCompPhase completes *)
     WithSetCompPhase[ctx, "dummy"];
-    GetPhase[] === None,
+    GetPhase[$CurrentContext] === None,
     True,
     TestID -> "WithSetCompPhase-RestoresPhase"
   ]
@@ -260,7 +260,7 @@ AppendTo[$AllTests,
     ctx = CreateContext[];
     (* Phase should be None after WithPrintCompPhase completes *)
     WithPrintCompPhase[ctx, "dummy"];
-    GetPhase[] === None,
+    GetPhase[$CurrentContext] === None,
     True,
     TestID -> "WithPrintCompPhase-RestoresPhase"
   ]
@@ -289,7 +289,7 @@ AppendTo[$AllTests,
 ];
 
 (* Reset state *)
-SetPVerbose[False];
-SetPrintDate[False];
+$CurrentContext = SetPVerbose[$CurrentContext, False];
+$CurrentContext = SetPrintDate[$CurrentContext, False];
 
 If[Environment["QUIET"] =!= "1", Print["InterfaceTests.wl completed."]];

@@ -33,22 +33,10 @@ Begin["`Private`"];
 (* Context-aware getter *)
 GetMainPrint[ctx_Association] := GetCtx[ctx, "MainPrint"];
 
-(* Global getter - reads from $CurrentContext and evaluates held content *)
-GetMainPrint[] :=
-  Module[{mainPrint},
-    mainPrint = $CurrentContext["MainPrint"];
-    If[Head[mainPrint] === Hold,
-      ReleaseHold[mainPrint]
-      ,
-      mainPrint
-    ]
-  ];
-
 Protect[GetMainPrint];
 
 (* SetMainPrint needs special handling:
    - Context version (2 args): evaluate ctx, hold content
-   - Global version (1 arg): hold content for deferred evaluation
 
    Use HoldAll and manually evaluate the ctx argument for 2-arg version *)
 
@@ -58,12 +46,6 @@ SetAttributes[SetMainPrint, HoldAll];
 SetMainPrint[ctx_, content_] /; AssociationQ[ctx] :=
   With[{evalCtx = ctx},
     SetCtx[evalCtx, "MainPrint", Hold[content]]
-  ];
-
-(* Global setter - writes to $CurrentContext with Hold *)
-SetMainPrint[content_] :=
-  Module[{},
-    $CurrentContext = SetCtx[$CurrentContext, "MainPrint", Hold[content]]
   ];
 
 Protect[SetMainPrint];
@@ -113,68 +95,20 @@ WriteToFile[ctx_Association, outputfile_String] :=
         Global`pr["#define " <> StringReplace[ToUpperCase[FileNameTake[outputfile]], "." -> "_"]];
         Global`pr[]
       ];
-      (* Evaluate the held main print content *)
-      If[Head[mainPrint] === Hold,
-        ReleaseHold[mainPrint]
-        ,
-        mainPrint
+      (* Evaluate the main print content *)
+      (* Priority: context-stored Hold, then global $MainPrint[] *)
+      Which[
+        Head[mainPrint] === Hold,
+          ReleaseHold[mainPrint],
+        mainPrint =!= Null,
+          mainPrint,
+        Length[DownValues[Global`$MainPrint]] > 0,
+          Global`$MainPrint[],
+        True,
+          Null  (* No main print defined *)
       ];
       Global`pr[];
       If[printHeaderMacro,
-        Global`pr["#endif // #ifndef " <> StringReplace[ToUpperCase[FileNameTake[outputfile]], "." -> "_"]];
-        Global`pr[]
-      ];
-      Global`pr["/* " <> FileNameTake[outputfile] <> " */"];
-    ];
-    If[Environment["QUIET"] =!= "1",
-      System`Print["Done generating \"", outputfile, "\"\n"]
-    ];
-    Close[filepointer]
-  ];
-
-(* Global WriteToFile - uses global getters *)
-WriteToFile[outputfile_String] :=
-  Module[{filepointer},
-    If[Environment["QUIET"] =!= "1",
-      System`Print["Writing to \"", outputfile, "\"...\n"]
-    ];
-    If[FileExistsQ[outputfile],
-      If[Environment["QUIET"] =!= "1",
-        System`Print["\"", outputfile, "\" already exists, replacing it ...\n"]
-      ];
-      DeleteFile[outputfile]
-    ];
-    (* define pr *)
-    filepointer = OpenAppend[outputfile];
-    Block[{Global`pr},
-      Global`pr[x_:""] :=
-        Module[{},
-          If[x == GetTempVariableType[],
-            WriteString[filepointer, x]
-            ,
-            WriteLine[filepointer, x]
-          ]
-        ];
-      (* print first few lines *)
-      Global`pr["/* " <> FileNameTake[outputfile] <> " */"];
-      Global`pr[
-        "/* Produced with Generato" <>
-          If[GetPrintDate[],
-            " on " <> DateString[{"Month", "/", "Day", "/", "Year"}]
-            ,
-            ""
-          ] <> " */"
-      ];
-      Global`pr[];
-      If[GetPrintHeaderMacro[],
-        Global`pr["#ifndef " <> StringReplace[ToUpperCase[FileNameTake[outputfile]], "." -> "_"]];
-        Global`pr["#define " <> StringReplace[ToUpperCase[FileNameTake[outputfile]], "." -> "_"]];
-        Global`pr[]
-      ];
-      (* GetMainPrint[] evaluates the held main print content *)
-      GetMainPrint[];
-      Global`pr[];
-      If[GetPrintHeaderMacro[],
         Global`pr["#endif // #ifndef " <> StringReplace[ToUpperCase[FileNameTake[outputfile]], "." -> "_"]];
         Global`pr[]
       ];

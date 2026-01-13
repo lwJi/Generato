@@ -90,8 +90,8 @@ PrintFDExpressionMix2nd[accuracyOrd_?IntegerQ,
 (*            Print initialization of each component of a tensor              *)
 (******************************************************************************)
 
-PrintComponentInitialization[ctx_Association, varinfo_, compname_] :=
-  Module[{varlistindex, compToValue, varname, symmetry, buf, subbuf, len},
+PrintComponentInitialization[varinfo_, compname_] :=
+  Module[{ctx = $CurrentContext, varlistindex, compToValue, varname, symmetry, buf, subbuf, len},
     (* Extract common component info using shared function *)
     {varlistindex, compToValue, varname, symmetry, len} =
       ExtractComponentInfo[ctx, varinfo, compname];
@@ -142,8 +142,9 @@ Protect[PrintComponentInitialization];
  *        introduced to replace say coordinates representation of metric.
  *)
 
-PrintComponentEquation[ctx_Association, coordinate_, compname_, extrareplacerules_] :=
-  Module[{outputfile = GetOutputFile[ctx], compToValue, rhssToValue},
+PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
+  Module[{ctx = $CurrentContext, outputfile, compToValue, rhssToValue},
+    outputfile = GetOutputFile[ctx];
     compToValue = compname // ToValues;
     rhssToValue = ComputeRHSValue[ctx, coordinate, compname, extrareplacerules];
     PrintEquationByMode[ctx, compToValue, rhssToValue,
@@ -172,11 +173,11 @@ Protect[PrintComponentEquation];
 (*                                Write to files                              *)
 (******************************************************************************)
 
-WriteToFile[GetOutputFile[]];
+WriteToFile[$CurrentContext, GetOutputFile[$CurrentContext]];
 ReplaceGFIndexName[
-  GetOutputFile[],
+  GetOutputFile[$CurrentContext],
   StringDrop[
-    ToString[CForm[ToExpression["gf" <> GetGridPointIndex[]]]]
+    ToString[CForm[ToExpression["gf" <> GetGridPointIndex[$CurrentContext]]]]
     ,
     2
   ] -> "(p.I)"

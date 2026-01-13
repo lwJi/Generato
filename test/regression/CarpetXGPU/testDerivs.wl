@@ -7,13 +7,13 @@
 
 Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"}]]
 
-SetPVerbose[False];
+$CurrentContext = SetPVerbose[$CurrentContext, False];
 
-SetPrintDate[False];
+$CurrentContext = SetPrintDate[$CurrentContext, False];
 
-SetGridPointIndex[""];
+$CurrentContext = SetGridPointIndex[$CurrentContext, ""];
 
-SetTempVariableType["vreal"];
+$CurrentContext = SetTempVariableType[$CurrentContext, "vreal"];
 
 DefManifold[M3, 3, IndexRange[a, z]];
 
@@ -35,9 +35,9 @@ TempVarlist = TempTensors[{psi[], PrintAs -> "psi"}];
 (* Simple equation using the derivative *)
 SetEQN[psi[], euclid[i, j] dphi[-i] dphi[-j]];
 
-SetOutputFile[FileNameJoin[{Directory[], "testDerivs.hxx"}]];
+$CurrentContext = SetOutputFile[$CurrentContext, FileNameJoin[{Directory[], "testDerivs.hxx"}]];
 
-SetMainPrint[
+$MainPrint[] := (
   pr[];
   PrintInitializations[{Mode -> "MainIn"}, EvolVarlist];
   pr[];
@@ -45,6 +45,6 @@ SetMainPrint[
   PrintInitializations[{Mode -> "Derivs", TensorType -> "Vect", DerivsOrder -> 1, DerivsAccuracy -> 4}, DerivVarlist];
   pr[];
   PrintEquations[{Mode -> "Temp"}, TempVarlist];
-];
+);
 
 Import[FileNameJoin[{Environment["GENERATO"], "codes/CarpetXGPU.wl"}]];

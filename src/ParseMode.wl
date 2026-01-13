@@ -88,43 +88,24 @@ ValidateContextModeValue[key_String, value_] :=
     ]
   ];
 
-(* Map nested paths to flat context keys *)
-PathToFlatKey[path_List] := Switch[path,
-  {"Phase"}, "Phase",
-  {"IndexOptions", "IndependentVarlistIndex"}, "IndependentVarlistIndex",
-  {"IndexOptions", "WithoutGridPointIndex"}, "WithoutGridPointIndex",
-  {"IndexOptions", "UseTilePointIndex"}, "UseTilePointIndex",
-  {"PrintComp", "Type"}, "PrintCompType",
-  {"PrintComp", "Initializations", "Mode"}, "InitializationsMode",
-  {"PrintComp", "Initializations", "TensorType"}, "TensorType",
-  {"PrintComp", "Initializations", "StorageType"}, "StorageType",
-  {"PrintComp", "Initializations", "DerivsOrder"}, "DerivsOrder",
-  {"PrintComp", "Initializations", "DerivsAccuracy"}, "DerivsAccuracy",
-  {"PrintComp", "Equations", "Mode"}, "EquationsMode",
-  _, Throw @ Message[PathToFlatKey::EUnknownPath, path]
-];
-
-PathToFlatKey::EUnknownPath = "Unknown nested path: `1`";
-
-(* Scoped mode context with automatic restore - global mode version *)
-(* Converts nested path settings to flat keys and applies to $CurrentContext *)
-(* Only saves/restores the specific keys that are modified, preserving other state changes *)
+(* Context-aware WithMode - applies flat key-value settings to context *)
+(* Note: ctx is used to set $CurrentContext, then settings are applied on top *)
+(* Only the keys in settings are saved/restored; other $CurrentContext changes persist *)
 SetAttributes[WithMode, HoldRest];
 
-WithMode[settings_List, body_] :=
+WithMode[ctx_Association, settings_List, body_] :=
   Module[{flatKeys, savedValues},
-    (* Convert nested paths to flat keys *)
-    flatKeys = PathToFlatKey[First[#]] & /@ settings;
-    (* Save only the values for keys we're about to modify *)
+    (* First set $CurrentContext to the provided context *)
+    $CurrentContext = ctx;
+    (* Then apply settings on top, saving original values for restoration *)
+    flatKeys = First /@ settings;
     savedValues = $CurrentContext[#] & /@ flatKeys;
     (* Apply the new settings *)
-    Scan[
-      Function[setting,
-        With[{flatKey = PathToFlatKey[First[setting]], value = Last[setting]},
-          $CurrentContext = SetCtx[$CurrentContext, flatKey, value]
-        ]
+    Do[
+      With[{flatKey = First[settings[[i]]], value = Last[settings[[i]]]},
+        $CurrentContext = SetCtx[$CurrentContext, flatKey, value]
       ],
-      settings
+      {i, Length[settings]}
     ];
     (* Restore only the specific keys that were modified *)
     WithCleanup[
@@ -136,21 +117,6 @@ WithMode[settings_List, body_] :=
     ]
   ];
 
-(* Context-aware WithMode - applies flat key-value settings to context *)
-(* settings is a list of {key, value} pairs or key -> value rules *)
-WithMode[ctx_Association, settings_List, body_] :=
-  Module[{newCtx},
-    newCtx = Fold[
-      If[Head[#2] === Rule,
-        SetCtx[#1, First[#2], Last[#2]],
-        SetCtx[#1, #2[[1]], #2[[2]]]
-      ] &,
-      ctx,
-      settings
-    ];
-    WithContext[newCtx, body]
-  ];
-
 Protect[WithMode];
 
 (* ========================================= *)
@@ -159,13 +125,10 @@ Protect[WithMode];
 
 (* Phase helpers - context-aware versions *)
 GetPhase[ctx_Association] := GetCtx[ctx, "Phase"];
-GetPhase[] := $CurrentContext["Phase"];
 
 InSetCompPhase[ctx_Association] := GetPhase[ctx] === "SetComp";
-InSetCompPhase[] := $CurrentContext["Phase"] === "SetComp";
 
 InPrintCompPhase[ctx_Association] := GetPhase[ctx] === "PrintComp";
-InPrintCompPhase[] := $CurrentContext["Phase"] === "PrintComp";
 
 (* Phase setters - context-aware versions return new context *)
 SetPhase[ctx_Association, phase_] :=
@@ -185,13 +148,10 @@ Protect[SetPhase];
 
 (* PrintComp type helpers - context-aware versions *)
 GetPrintCompType[ctx_Association] := GetCtx[ctx, "PrintCompType"];
-GetPrintCompType[] := $CurrentContext["PrintCompType"];
 
 InInitializationsMode[ctx_Association] := GetPrintCompType[ctx] === "Initializations";
-InInitializationsMode[] := $CurrentContext["PrintCompType"] === "Initializations";
 
 InEquationsMode[ctx_Association] := GetPrintCompType[ctx] === "Equations";
-InEquationsMode[] := $CurrentContext["PrintCompType"] === "Equations";
 
 (* PrintCompType setter - context-aware version *)
 SetPrintCompType[ctx_Association, ptype_] :=
@@ -211,19 +171,14 @@ Protect[SetPrintCompType];
 
 (* Initializations mode helpers - context-aware versions *)
 GetInitializationsMode[ctx_Association] := GetCtx[ctx, "InitializationsMode"];
-GetInitializationsMode[] := $CurrentContext["InitializationsMode"];
 
 GetTensorType[ctx_Association] := GetCtx[ctx, "TensorType"];
-GetTensorType[] := $CurrentContext["TensorType"];
 
 GetStorageType[ctx_Association] := GetCtx[ctx, "StorageType"];
-GetStorageType[] := $CurrentContext["StorageType"];
 
 GetDerivsOrder[ctx_Association] := GetCtx[ctx, "DerivsOrder"];
-GetDerivsOrder[] := $CurrentContext["DerivsOrder"];
 
 GetDerivsAccuracy[ctx_Association] := GetCtx[ctx, "DerivsAccuracy"];
-GetDerivsAccuracy[] := $CurrentContext["DerivsAccuracy"];
 
 (* Initializations mode setters - context-aware versions *)
 SetInitializationsMode[ctx_Association, mode_] :=
@@ -289,7 +244,6 @@ Protect[SetDerivsAccuracy];
 
 (* Equations mode helper - context-aware versions *)
 GetEquationsMode[ctx_Association] := GetCtx[ctx, "EquationsMode"];
-GetEquationsMode[] := $CurrentContext["EquationsMode"];
 
 SetEquationsMode[ctx_Association, mode_] :=
   Module[{},
@@ -306,13 +260,10 @@ Protect[SetEquationsMode];
 
 (* IndexOptions helpers - context-aware versions *)
 GetIndependentVarlistIndex[ctx_Association] := GetCtx[ctx, "IndependentVarlistIndex"];
-GetIndependentVarlistIndex[] := $CurrentContext["IndependentVarlistIndex"];
 
 GetWithoutGridPointIndex[ctx_Association] := GetCtx[ctx, "WithoutGridPointIndex"];
-GetWithoutGridPointIndex[] := $CurrentContext["WithoutGridPointIndex"];
 
 GetUseTilePointIndex[ctx_Association] := GetCtx[ctx, "UseTilePointIndex"];
-GetUseTilePointIndex[] := $CurrentContext["UseTilePointIndex"];
 
 (* IndexOptions setters - context-aware versions *)
 SetIndependentVarlistIndex[ctx_Association, val_] :=

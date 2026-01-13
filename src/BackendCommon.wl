@@ -71,9 +71,6 @@ GetInterfaceName[ctx_Association, compname_] :=
     Return[intfname];
   ];
 
-(* Backwards compat *)
-GetInterfaceName[compname_] := GetInterfaceName[$CurrentContext, compname];
-
 Protect[GetInterfaceName];
 
 (*
@@ -93,10 +90,6 @@ ComputeRHSValue[ctx_Association, coordinate_, compname_, extrareplacerules_] :=
     ];
     rhssToValue
   ];
-
-(* Backwards compat *)
-ComputeRHSValue[coordinate_, compname_, extrareplacerules_] :=
-  ComputeRHSValue[$CurrentContext, coordinate, compname, extrareplacerules];
 
 Protect[ComputeRHSValue];
 
@@ -146,13 +139,6 @@ PrintEquationByMode[ctx_Association, compToValue_, rhssToValue_, mainFormatter_,
     ]
   ];
 
-(* Backwards compat *)
-PrintEquationByMode[compToValue_, rhssToValue_, mainFormatter_] :=
-  PrintEquationByMode[$CurrentContext, compToValue, rhssToValue, mainFormatter, Automatic];
-
-PrintEquationByMode[compToValue_, rhssToValue_, mainFormatter_, tempFormatter_] :=
-  PrintEquationByMode[$CurrentContext, compToValue, rhssToValue, mainFormatter, tempFormatter];
-
 PrintEquationByMode::EMode = "PrintEquationByMode: EquationsMode unrecognized!";
 
 Protect[PrintEquationByMode];
@@ -199,10 +185,6 @@ GetTensorIndexSubbuf[ctx_Association, len_Integer, varlistindex_Integer] :=
         Message[GetTensorIndexSubbuf::ETensorType]; ""
     ]
   ];
-
-(* Backwards compat *)
-GetTensorIndexSubbuf[len_Integer, varlistindex_Integer] :=
-  GetTensorIndexSubbuf[$CurrentContext, len, varlistindex];
 
 GetTensorIndexSubbuf::ELength = "GetTensorIndexSubbuf: Unsupported tensor rank for tensor type.";
 GetTensorIndexSubbuf::ETensorType = "GetTensorIndexSubbuf: Unknown tensor type.";

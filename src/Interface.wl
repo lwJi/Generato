@@ -82,7 +82,7 @@ GridTensors[ctx_Association, varlist_?ListQ] :=
 (* Original API: GridTensors[var1, var2, ...] *)
 GridTensors[vars__] :=
   Module[{arglist = List[vars]},
-    If[GetCheckInputEquations[],
+    If[GetCheckInputEquations[$CurrentContext],
       DefTensors[vars]
       ,
       SetComponents[arglist]
@@ -106,7 +106,7 @@ TileTensors[ctx_Association, varlist_?ListQ] :=
 (* Original API: TileTensors[var1, var2, ...] *)
 TileTensors[vars__] :=
   Module[{arglist = List[vars]},
-    If[GetCheckInputEquations[],
+    If[GetCheckInputEquations[$CurrentContext],
       DefTensors[vars]
       ,
       SetComponents[{UseTilePointIndex -> True}, arglist]
@@ -130,7 +130,7 @@ TempTensors[ctx_Association, varlist_?ListQ] :=
 (* Original API: TempTensors[var1, var2, ...] *)
 TempTensors[vars__] :=
   Module[{arglist = List[vars]},
-    If[GetCheckInputEquations[],
+    If[GetCheckInputEquations[$CurrentContext],
       DefTensors[vars]
       ,
       SetComponents[{WithoutGridPointIndex -> True}, arglist]
@@ -150,11 +150,11 @@ Options[SetComponents] :=
 SetComponents[OptionsPattern[], varlist_?ListQ] :=
   Module[{chartname, indepidx, nogpidx, tlidx},
     {chartname, indepidx, nogpidx, tlidx} = OptionValue[{ChartName, IndependentVarlistIndex, WithoutGridPointIndex, UseTilePointIndex}];
-    WithMode[{
-      {"Phase"} -> "SetComp",
-      {"IndexOptions", "IndependentVarlistIndex"} -> indepidx,
-      {"IndexOptions", "WithoutGridPointIndex"} -> nogpidx,
-      {"IndexOptions", "UseTilePointIndex"} -> tlidx
+    WithMode[$CurrentContext, {
+      "Phase" -> "SetComp",
+      "IndependentVarlistIndex" -> indepidx,
+      "WithoutGridPointIndex" -> nogpidx,
+      "UseTilePointIndex" -> tlidx
     },
       ParseVarlist[varlist, chartname]
     ]
@@ -180,16 +180,16 @@ PrintEquations[ctx_Association, options_?ListQ, varlist_?ListQ] :=
     mode = Lookup[optAssoc, Mode, "MainOut"];
     extrareplacerules = Lookup[optAssoc, ExtraReplaceRules, {}];
     If[suffixname =!= Null,
-      SetSuffixName[suffixname]
+      $CurrentContext = SetSuffixName[$CurrentContext, suffixname]
     ];
-    WithMode[{
-      {"Phase"} -> "PrintComp",
-      {"PrintComp", "Type"} -> "Equations",
-      {"PrintComp", "Equations", "Mode"} -> mode
+    WithMode[ctx, {
+      "Phase" -> "PrintComp",
+      "PrintCompType" -> "Equations",
+      "EquationsMode" -> mode
     },
       ParseVarlist[{ExtraReplaceRules -> extrareplacerules}, varlist, chartname]
     ];
-    SetSuffixName[""];
+    $CurrentContext = SetSuffixName[$CurrentContext, ""]
   ];
 
 (* Original API: PrintEquations[{opts}, varlist] *)
@@ -197,16 +197,16 @@ PrintEquations[OptionsPattern[], varlist_?ListQ] :=
   Module[{chartname, suffixname, mode, extrareplacerules},
     {chartname, suffixname, mode, extrareplacerules} = OptionValue[{ChartName, SuffixName, Mode, ExtraReplaceRules}];
     If[suffixname =!= Null,
-      SetSuffixName[suffixname]
+      $CurrentContext = SetSuffixName[$CurrentContext, suffixname]
     ];
-    WithMode[{
-      {"Phase"} -> "PrintComp",
-      {"PrintComp", "Type"} -> "Equations",
-      {"PrintComp", "Equations", "Mode"} -> mode
+    WithMode[$CurrentContext, {
+      "Phase" -> "PrintComp",
+      "PrintCompType" -> "Equations",
+      "EquationsMode" -> mode
     },
       ParseVarlist[{ExtraReplaceRules -> extrareplacerules}, varlist, chartname]
     ];
-    SetSuffixName[""];
+    $CurrentContext = SetSuffixName[$CurrentContext, ""]
   ];
 
 Protect[PrintEquations];
@@ -229,14 +229,14 @@ PrintInitializations[ctx_Association, options_?ListQ, varlist_?ListQ] :=
     derivsorder = Lookup[optAssoc, DerivsOrder, 1];
     accuracyorder = Lookup[optAssoc, DerivsAccuracy, 4];
 
-    WithMode[{
-      {"Phase"} -> "PrintComp",
-      {"PrintComp", "Type"} -> "Initializations",
-      {"PrintComp", "Initializations", "Mode"} -> mode,
-      {"PrintComp", "Initializations", "TensorType"} -> tensortype,
-      {"PrintComp", "Initializations", "StorageType"} -> storagetype,
-      {"PrintComp", "Initializations", "DerivsOrder"} -> derivsorder,
-      {"PrintComp", "Initializations", "DerivsAccuracy"} -> accuracyorder
+    WithMode[ctx, {
+      "Phase" -> "PrintComp",
+      "PrintCompType" -> "Initializations",
+      "InitializationsMode" -> mode,
+      "TensorType" -> tensortype,
+      "StorageType" -> storagetype,
+      "DerivsOrder" -> derivsorder,
+      "DerivsAccuracy" -> accuracyorder
     },
       ParseVarlist[varlist, chartname]
     ]
@@ -248,14 +248,14 @@ PrintInitializations[OptionsPattern[], varlist_?ListQ] :=
     {chartname, mode, tensortype, storagetype, derivsorder, accuracyorder} =
       OptionValue[{ChartName, Mode, TensorType, StorageType, DerivsOrder, DerivsAccuracy}];
 
-    WithMode[{
-      {"Phase"} -> "PrintComp",
-      {"PrintComp", "Type"} -> "Initializations",
-      {"PrintComp", "Initializations", "Mode"} -> mode,
-      {"PrintComp", "Initializations", "TensorType"} -> tensortype,
-      {"PrintComp", "Initializations", "StorageType"} -> storagetype,
-      {"PrintComp", "Initializations", "DerivsOrder"} -> derivsorder,
-      {"PrintComp", "Initializations", "DerivsAccuracy"} -> accuracyorder
+    WithMode[$CurrentContext, {
+      "Phase" -> "PrintComp",
+      "PrintCompType" -> "Initializations",
+      "InitializationsMode" -> mode,
+      "TensorType" -> tensortype,
+      "StorageType" -> storagetype,
+      "DerivsOrder" -> derivsorder,
+      "DerivsAccuracy" -> accuracyorder
     },
       ParseVarlist[varlist, chartname]
     ]

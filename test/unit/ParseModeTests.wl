@@ -8,20 +8,18 @@ If[Environment["QUIET"] =!= "1", Print["Loading ParseModeTests.wl..."]];
 (* Load Generato *)
 Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"}]];
 
-SetPVerbose[False];
-SetPrintDate[False];
-
-(* Helper to reset context to defaults *)
-ResetContext[] := ($CurrentContext = CreateContext[]);
+$CurrentContext = SetPVerbose[$CurrentContext, False];
+$CurrentContext = SetPrintDate[$CurrentContext, False];
 
 (* ========================================= *)
-(* Test: WithMode with nested path syntax *)
+(* Test: WithMode with flat key syntax *)
 (* ========================================= *)
 
 AppendTo[$AllTests,
   VerificationTest[
-    ResetContext[];
-    WithMode[{{"Phase"} -> "SetComp"}, GetPhase[]],
+    Module[{ctx = CreateContext[]},
+      WithMode[ctx, {"Phase" -> "SetComp"}, GetPhase[$CurrentContext]]
+    ],
     "SetComp",
     TestID -> "Mode-Phase-SetComp"
   ]
@@ -29,8 +27,9 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    ResetContext[];
-    WithMode[{{"Phase"} -> "PrintComp"}, GetPhase[]],
+    Module[{ctx = CreateContext[]},
+      WithMode[ctx, {"Phase" -> "PrintComp"}, GetPhase[$CurrentContext]]
+    ],
     "PrintComp",
     TestID -> "Mode-Phase-PrintComp"
   ]
@@ -38,8 +37,9 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    ResetContext[];
-    GetPhase[],
+    Module[{ctx = CreateContext[]},
+      GetPhase[ctx]
+    ],
     None,
     TestID -> "Mode-Phase-Default-None"
   ]
@@ -51,8 +51,9 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    ResetContext[];
-    WithMode[{{"IndexOptions", "IndependentVarlistIndex"} -> True}, GetIndependentVarlistIndex[]],
+    Module[{ctx = CreateContext[]},
+      WithMode[ctx, {"IndependentVarlistIndex" -> True}, GetIndependentVarlistIndex[$CurrentContext]]
+    ],
     True,
     TestID -> "Mode-IndexOptions-IndependentVarlistIndex"
   ]
@@ -60,8 +61,9 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    ResetContext[];
-    WithMode[{{"IndexOptions", "WithoutGridPointIndex"} -> True}, GetWithoutGridPointIndex[]],
+    Module[{ctx = CreateContext[]},
+      WithMode[ctx, {"WithoutGridPointIndex" -> True}, GetWithoutGridPointIndex[$CurrentContext]]
+    ],
     True,
     TestID -> "Mode-IndexOptions-WithoutGridPointIndex"
   ]
@@ -69,8 +71,9 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    ResetContext[];
-    WithMode[{{"IndexOptions", "UseTilePointIndex"} -> True}, GetUseTilePointIndex[]],
+    Module[{ctx = CreateContext[]},
+      WithMode[ctx, {"UseTilePointIndex" -> True}, GetUseTilePointIndex[$CurrentContext]]
+    ],
     True,
     TestID -> "Mode-IndexOptions-UseTilePointIndex"
   ]
@@ -82,11 +85,12 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    ResetContext[];
-    WithMode[{
-      {"PrintComp", "Type"} -> "Initializations",
-      {"PrintComp", "Initializations", "Mode"} -> "MainIn"
-    }, GetInitializationsMode[]],
+    Module[{ctx = CreateContext[]},
+      WithMode[ctx, {
+        "PrintCompType" -> "Initializations",
+        "InitializationsMode" -> "MainIn"
+      }, GetInitializationsMode[$CurrentContext]]
+    ],
     "MainIn",
     TestID -> "Mode-PrintComp-Initializations-MainIn"
   ]
@@ -94,8 +98,9 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    ResetContext[];
-    WithMode[{{"PrintComp", "Initializations", "TensorType"} -> "Vect"}, GetTensorType[]],
+    Module[{ctx = CreateContext[]},
+      WithMode[ctx, {"TensorType" -> "Vect"}, GetTensorType[$CurrentContext]]
+    ],
     "Vect",
     TestID -> "Mode-PrintComp-Initializations-TensorType-Vect"
   ]
@@ -103,8 +108,9 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    ResetContext[];
-    WithMode[{{"PrintComp", "Initializations", "StorageType"} -> "Tile"}, GetStorageType[]],
+    Module[{ctx = CreateContext[]},
+      WithMode[ctx, {"StorageType" -> "Tile"}, GetStorageType[$CurrentContext]]
+    ],
     "Tile",
     TestID -> "Mode-PrintComp-Initializations-StorageType-Tile"
   ]
@@ -112,11 +118,12 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    ResetContext[];
-    WithMode[{
-      {"PrintComp", "Initializations", "DerivsOrder"} -> 2,
-      {"PrintComp", "Initializations", "DerivsAccuracy"} -> 6
-    }, {GetDerivsOrder[], GetDerivsAccuracy[]}],
+    Module[{ctx = CreateContext[]},
+      WithMode[ctx, {
+        "DerivsOrder" -> 2,
+        "DerivsAccuracy" -> 6
+      }, {GetDerivsOrder[$CurrentContext], GetDerivsAccuracy[$CurrentContext]}]
+    ],
     {2, 6},
     TestID -> "Mode-PrintComp-Initializations-Derivs"
   ]
@@ -128,8 +135,9 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    ResetContext[];
-    WithMode[{{"PrintComp", "Equations", "Mode"} -> "Temp"}, GetEquationsMode[]],
+    Module[{ctx = CreateContext[]},
+      WithMode[ctx, {"EquationsMode" -> "Temp"}, GetEquationsMode[$CurrentContext]]
+    ],
     "Temp",
     TestID -> "Mode-PrintComp-Equations-Temp"
   ]
@@ -137,8 +145,9 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    ResetContext[];
-    WithMode[{{"PrintComp", "Equations", "Mode"} -> "MainOut"}, GetEquationsMode[]],
+    Module[{ctx = CreateContext[]},
+      WithMode[ctx, {"EquationsMode" -> "MainOut"}, GetEquationsMode[$CurrentContext]]
+    ],
     "MainOut",
     TestID -> "Mode-PrintComp-Equations-MainOut"
   ]
@@ -146,8 +155,9 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    ResetContext[];
-    WithMode[{{"PrintComp", "Equations", "Mode"} -> "AddToMainOut"}, GetEquationsMode[]],
+    Module[{ctx = CreateContext[]},
+      WithMode[ctx, {"EquationsMode" -> "AddToMainOut"}, GetEquationsMode[$CurrentContext]]
+    ],
     "AddToMainOut",
     TestID -> "Mode-PrintComp-Equations-AddToMainOut"
   ]
@@ -159,8 +169,9 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    ResetContext[];
-    WithMode[{{"Phase"} -> "SetComp"}, InSetCompPhase[]],
+    Module[{ctx = CreateContext[]},
+      WithMode[ctx, {"Phase" -> "SetComp"}, InSetCompPhase[$CurrentContext]]
+    ],
     True,
     TestID -> "Mode-Helper-InSetCompPhase"
   ]
@@ -168,8 +179,9 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    ResetContext[];
-    WithMode[{{"Phase"} -> "PrintComp"}, InPrintCompPhase[]],
+    Module[{ctx = CreateContext[]},
+      WithMode[ctx, {"Phase" -> "PrintComp"}, InPrintCompPhase[$CurrentContext]]
+    ],
     True,
     TestID -> "Mode-Helper-InPrintCompPhase"
   ]
@@ -177,8 +189,9 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    ResetContext[];
-    WithMode[{{"PrintComp", "Type"} -> "Initializations"}, InInitializationsMode[]],
+    Module[{ctx = CreateContext[]},
+      WithMode[ctx, {"PrintCompType" -> "Initializations"}, InInitializationsMode[$CurrentContext]]
+    ],
     True,
     TestID -> "Mode-Helper-InInitializationsMode"
   ]
@@ -186,8 +199,9 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    ResetContext[];
-    WithMode[{{"PrintComp", "Type"} -> "Equations"}, InEquationsMode[]],
+    Module[{ctx = CreateContext[]},
+      WithMode[ctx, {"PrintCompType" -> "Equations"}, InEquationsMode[$CurrentContext]]
+    ],
     True,
     TestID -> "Mode-Helper-InEquationsMode"
   ]
@@ -195,8 +209,9 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    ResetContext[];
-    WithMode[{{"PrintComp", "Initializations", "Mode"} -> "MainOut"}, GetInitializationsMode[]],
+    Module[{ctx = CreateContext[]},
+      WithMode[ctx, {"InitializationsMode" -> "MainOut"}, GetInitializationsMode[$CurrentContext]]
+    ],
     "MainOut",
     TestID -> "Mode-Helper-GetInitializationsMode"
   ]
@@ -204,8 +219,9 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    ResetContext[];
-    WithMode[{{"PrintComp", "Equations", "Mode"} -> "MainOut"}, GetEquationsMode[]],
+    Module[{ctx = CreateContext[]},
+      WithMode[ctx, {"EquationsMode" -> "MainOut"}, GetEquationsMode[$CurrentContext]]
+    ],
     "MainOut",
     TestID -> "Mode-Helper-GetEquationsMode"
   ]
@@ -217,20 +233,22 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    ResetContext[];
-    (* Set initial values, then verify WithMode restores them *)
-    $CurrentContext = SetCtx[$CurrentContext, "InitializationsMode", "MainIn"];
-    $CurrentContext = SetCtx[$CurrentContext, "TensorType", "Vect"];
-    (* WithMode should temporarily change, then restore *)
-    WithMode[{
-      {"PrintComp", "Initializations", "Mode"} -> "Temp",
-      {"PrintComp", "Initializations", "TensorType"} -> "Scal"
-    },
-      (* Inside WithMode, check the temp values *)
-      GetInitializationsMode[] === "Temp" && GetTensorType[] === "Scal"
-    ] &&
-    (* After WithMode, check restored values *)
-    GetInitializationsMode[] === "MainIn" && GetTensorType[] === "Vect",
+    Module[{ctx, result},
+      (* Create context with specific values *)
+      ctx = CreateContext[];
+      ctx = SetCtx[ctx, "InitializationsMode", "MainIn"];
+      ctx = SetCtx[ctx, "TensorType", "Vect"];
+      (* WithMode should provide modified context inside body via $CurrentContext *)
+      result = WithMode[ctx, {
+        "InitializationsMode" -> "Temp",
+        "TensorType" -> "Scal"
+      },
+        (* Inside WithMode, check the temp values via context-aware getters (reads $CurrentContext) *)
+        GetInitializationsMode[$CurrentContext] === "Temp" && GetTensorType[$CurrentContext] === "Scal"
+      ];
+      (* Original ctx is unchanged (functional style) *)
+      result && GetInitializationsMode[ctx] === "MainIn" && GetTensorType[ctx] === "Vect"
+    ],
     True,
     TestID -> "Mode-Context-Isolation"
   ]
@@ -242,18 +260,12 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    ResetContext[];
-    ctx = CreateContext[];
-    Quiet[Catch[SetPhase[ctx, "InvalidPhase"]], SetPhase::EInvalidValue],
+    Module[{ctx = CreateContext[]},
+      Quiet[Catch[SetPhase[ctx, "InvalidPhase"]], SetPhase::EInvalidValue]
+    ],
     Null,
     TestID -> "Mode-Validation-InvalidPhase"
   ]
 ];
-
-(* ========================================= *)
-(* Cleanup *)
-(* ========================================= *)
-
-ResetContext[];
 
 If[Environment["QUIET"] =!= "1", Print["ParseModeTests.wl completed."]];

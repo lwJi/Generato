@@ -51,8 +51,8 @@ ctx = SetGridPointIndex[ctx, "[[ijk]]"];
 Use `WithMode` for scoped settings that auto-restore:
 ```wolfram
 WithMode[{
-  {"Phase"} -> "PrintComp",
-  {"PrintComp", "Type"} -> "Equations"
+  "Phase" -> "PrintComp",
+  "PrintCompType" -> "Equations"
 },
   (* body - settings restored after *)
 ];

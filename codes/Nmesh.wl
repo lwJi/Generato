@@ -22,8 +22,8 @@ GetInitialComp[varname_] :=
     Print initialization of each component of a tensor
 *)
 
-PrintComponentInitialization[ctx_Association, varinfo_, compname_] :=
-  Module[{varlistindex, compToValue, varname, symmetry, len, buf},
+PrintComponentInitialization[varinfo_, compname_] :=
+  Module[{ctx = $CurrentContext, varlistindex, compToValue, varname, symmetry, len, buf},
     (* Extract common component info using shared function *)
     {varlistindex, compToValue, varname, symmetry, len} =
       ExtractComponentInfo[ctx, varinfo, compname];
@@ -77,8 +77,9 @@ Protect[PrintComponentInitialization];
  *        introduced to replace say coordinates representation of metric.
  *)
 
-PrintComponentEquation[ctx_Association, coordinate_, compname_, extrareplacerules_] :=
-  Module[{outputfile = GetOutputFile[ctx], compToValue, rhssToValue},
+PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
+  Module[{ctx = $CurrentContext, outputfile, compToValue, rhssToValue},
+    outputfile = GetOutputFile[ctx];
     compToValue = compname // ToValues;
     rhssToValue = ComputeRHSValue[ctx, coordinate, compname, extrareplacerules];
     PrintEquationByMode[ctx, compToValue, rhssToValue,
@@ -99,7 +100,7 @@ Protect[PrintComponentEquation];
     Write to files
 *)
 
-Module[{outputfile = GetOutputFile[], filepointer},
+Module[{outputfile = GetOutputFile[$CurrentContext], filepointer},
   If[Environment["QUIET"] =!= "1", System`Print["Writing to \"", outputfile, "\"...\n"]];
   If[FileExistsQ[outputfile],
     If[Environment["QUIET"] =!= "1", System`Print["\"", outputfile, "\" already exists, replacing it ...\n"]];
@@ -119,7 +120,7 @@ Module[{outputfile = GetOutputFile[], filepointer},
   pr["/* " <> FileNameTake[outputfile] <> " */"];
   pr[
     "/* Produced with Generato" <>
-      If[GetPrintDate[],
+      If[GetPrintDate[$CurrentContext],
         " on " <> DateString[{"Month", "/", "Day", "/", "Year"}]
         ,
         ""

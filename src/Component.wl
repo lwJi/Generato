@@ -57,28 +57,16 @@ Begin["`Private`"];
 (* Context-aware getter *)
 GetMapComponentToVarlist[ctx_Association] := GetCtx[ctx, "MapComponentToVarlist"];
 
-(* Global getter - reads from $CurrentContext *)
-GetMapComponentToVarlist[] := $CurrentContext["MapComponentToVarlist"];
-
 Protect[GetMapComponentToVarlist];
 
 (* Context-aware setter - returns new context *)
 SetMapComponentToVarlist[ctx_Association, map_] :=
   SetCtx[ctx, "MapComponentToVarlist", map];
 
-(* Global setter - writes to $CurrentContext *)
-SetMapComponentToVarlist[map_] :=
-  Module[{},
-    $CurrentContext = SetCtx[$CurrentContext, "MapComponentToVarlist", map]
-  ];
-
 Protect[SetMapComponentToVarlist];
 
 (* Context-aware getter *)
 GetProcessNewVarlist[ctx_Association] := GetCtx[ctx, "ProcessNewVarlist"];
-
-(* Global getter - reads from $CurrentContext *)
-GetProcessNewVarlist[] := $CurrentContext["ProcessNewVarlist"];
 
 Protect[GetProcessNewVarlist];
 
@@ -86,19 +74,10 @@ Protect[GetProcessNewVarlist];
 SetProcessNewVarlist[ctx_Association, isnew_] :=
   SetCtx[ctx, "ProcessNewVarlist", isnew];
 
-(* Global setter - writes to $CurrentContext *)
-SetProcessNewVarlist[isnew_] :=
-  Module[{},
-    $CurrentContext = SetCtx[$CurrentContext, "ProcessNewVarlist", isnew]
-  ];
-
 Protect[SetProcessNewVarlist];
 
 (* Context-aware getter *)
 GetSimplifyEquation[ctx_Association] := GetCtx[ctx, "SimplifyEquation"];
-
-(* Global getter - reads from $CurrentContext *)
-GetSimplifyEquation[] := $CurrentContext["SimplifyEquation"];
 
 Protect[GetSimplifyEquation];
 
@@ -106,19 +85,10 @@ Protect[GetSimplifyEquation];
 SetSimplifyEquation[ctx_Association, simplify_] :=
   SetCtx[ctx, "SimplifyEquation", simplify];
 
-(* Global setter - writes to $CurrentContext *)
-SetSimplifyEquation[simplify_] :=
-  Module[{},
-    $CurrentContext = SetCtx[$CurrentContext, "SimplifyEquation", simplify]
-  ];
-
 Protect[SetSimplifyEquation];
 
 (* Context-aware getter *)
 GetUseLetterForTensorComponent[ctx_Association] := GetCtx[ctx, "UseLetterForTensorComponent"];
-
-(* Global getter - reads from $CurrentContext *)
-GetUseLetterForTensorComponent[] := $CurrentContext["UseLetterForTensorComponent"];
 
 Protect[GetUseLetterForTensorComponent];
 
@@ -126,19 +96,10 @@ Protect[GetUseLetterForTensorComponent];
 SetUseLetterForTensorComponent[ctx_Association, useletter_] :=
   SetCtx[ctx, "UseLetterForTensorComponent", useletter];
 
-(* Global setter - writes to $CurrentContext *)
-SetUseLetterForTensorComponent[useletter_] :=
-  Module[{},
-    $CurrentContext = SetCtx[$CurrentContext, "UseLetterForTensorComponent", useletter]
-  ];
-
 Protect[SetUseLetterForTensorComponent];
 
 (* Context-aware getter *)
 GetTempVariableType[ctx_Association] := GetCtx[ctx, "TempVariableType"];
-
-(* Global getter - reads from $CurrentContext *)
-GetTempVariableType[] := $CurrentContext["TempVariableType"];
 
 Protect[GetTempVariableType];
 
@@ -146,19 +107,10 @@ Protect[GetTempVariableType];
 SetTempVariableType[ctx_Association, type_] :=
   SetCtx[ctx, "TempVariableType", type];
 
-(* Global setter - writes to $CurrentContext *)
-SetTempVariableType[type_] :=
-  Module[{},
-    $CurrentContext = SetCtx[$CurrentContext, "TempVariableType", type]
-  ];
-
 Protect[SetTempVariableType];
 
 (* Context-aware getter *)
 GetInterfaceWithNonCoordBasis[ctx_Association] := GetCtx[ctx, "InterfaceWithNonCoordBasis"];
-
-(* Global getter - reads from $CurrentContext *)
-GetInterfaceWithNonCoordBasis[] := $CurrentContext["InterfaceWithNonCoordBasis"];
 
 Protect[GetInterfaceWithNonCoordBasis];
 
@@ -166,19 +118,10 @@ Protect[GetInterfaceWithNonCoordBasis];
 SetInterfaceWithNonCoordBasis[ctx_Association, noncoordbasis_] :=
   SetCtx[ctx, "InterfaceWithNonCoordBasis", noncoordbasis];
 
-(* Global setter - writes to $CurrentContext *)
-SetInterfaceWithNonCoordBasis[noncoordbasis_] :=
-  Module[{},
-    $CurrentContext = SetCtx[$CurrentContext, "InterfaceWithNonCoordBasis", noncoordbasis]
-  ];
-
 Protect[SetInterfaceWithNonCoordBasis];
 
 (* Context-aware getter *)
 GetSuffixName[ctx_Association] := GetCtx[ctx, "SuffixName"];
-
-(* Global getter - reads from $CurrentContext *)
-GetSuffixName[] := $CurrentContext["SuffixName"];
 
 Protect[GetSuffixName];
 
@@ -186,31 +129,16 @@ Protect[GetSuffixName];
 SetSuffixName[ctx_Association, suffix_] :=
   SetCtx[ctx, "SuffixName", suffix];
 
-(* Global setter - writes to $CurrentContext *)
-SetSuffixName[suffix_] :=
-  Module[{},
-    $CurrentContext = SetCtx[$CurrentContext, "SuffixName", suffix]
-  ];
-
 Protect[SetSuffixName];
 
 (* Context-aware getter *)
 GetPrefixDt[ctx_Association] := GetCtx[ctx, "PrefixDt"];
-
-(* Global getter - reads from $CurrentContext *)
-GetPrefixDt[] := $CurrentContext["PrefixDt"];
 
 Protect[GetPrefixDt];
 
 (* Context-aware setter - returns new context *)
 SetPrefixDt[ctx_Association, prefix_] :=
   SetCtx[ctx, "PrefixDt", prefix];
-
-(* Global setter - writes to $CurrentContext *)
-SetPrefixDt[prefix_] :=
-  Module[{},
-    $CurrentContext = SetCtx[$CurrentContext, "PrefixDt", prefix]
-  ];
 
 Protect[SetPrefixDt];
 
@@ -226,10 +154,10 @@ ParseComponent[varinfo_, compindexlist_?ListQ, coordinate_, extrareplacerules_?L
       Continue[]
     ];
     Which[
-      InSetCompPhase[],
+      InSetCompPhase[$CurrentContext],
         SetComponent[compname, SetExprName[varname, compindexlist, coordinate]]
       ,
-      InPrintCompPhase[],
+      InPrintCompPhase[$CurrentContext],
         PrintComponent[coordinate, varinfo, compname, extrareplacerules]
       ,
       True,
@@ -244,13 +172,13 @@ Protect[ParseComponent];
 PrintComponent[coordinate_, varinfo_, compname_, extrareplacerules_] :=
   Module[{},
     Which[
-      InInitializationsMode[],
+      InInitializationsMode[$CurrentContext],
         PrintVerbose["    PrintComponentInitialization ", compname, "..."];
-        Global`PrintComponentInitialization[$CurrentContext, varinfo, compname]
+        Global`PrintComponentInitialization[varinfo, compname]
       ,
-      InEquationsMode[],
+      InEquationsMode[$CurrentContext],
         PrintVerbose["    PrintComponentEquation ", compname, "..."];
-        Global`PrintComponentEquation[$CurrentContext, coordinate, compname, extrareplacerules]
+        Global`PrintComponentEquation[coordinate, compname, extrareplacerules]
       ,
       True,
         Throw @ Message[PrintComponent::EMode]
@@ -271,9 +199,9 @@ PrintComponent::EMode = "PrintMode unrecognized!";
 *)
 
 SetComponent[compname_, exprname_] :=
-  Module[{varlistindex, mapCtoV = GetMapComponentToVarlist[]},
+  Module[{varlistindex, mapCtoV = GetMapComponentToVarlist[$CurrentContext]},
     PrintVerbose["    SetComponent ", compname, "..."];
-    If[Length[mapCtoV] == 0 || GetProcessNewVarlist[] || (GetIndependentVarlistIndex[] && (compname[[0]] =!= Last[Keys[mapCtoV]][[0]])),
+    If[Length[mapCtoV] == 0 || GetProcessNewVarlist[$CurrentContext] || (GetIndependentVarlistIndex[$CurrentContext] && (compname[[0]] =!= Last[Keys[mapCtoV]][[0]])),
       varlistindex = 0(*C convention*)
       ,
       varlistindex = Last[mapCtoV] + 1
@@ -281,9 +209,9 @@ SetComponent[compname_, exprname_] :=
     ComponentValue[compname, exprname];
     If[!MemberQ[Keys[mapCtoV], compname],
       AppendTo[mapCtoV, compname -> varlistindex];
-      SetMapComponentToVarlist[mapCtoV]
+      $CurrentContext = SetMapComponentToVarlist[$CurrentContext, mapCtoV]
     ];
-    SetProcessNewVarlist[False]
+    $CurrentContext = SetProcessNewVarlist[$CurrentContext, False]
   ];
 
 (*
@@ -321,7 +249,7 @@ SetCompName[varname_, compindexlist_, coordinate_] :=
 
 SetExprName[varname_, compindexlist_, coordinate_] :=
   Module[{exprname, colist = {"t", "x", "y", "z"}},
-    exprname = StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]];
+    exprname = StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[$CurrentContext]];
     If[Length[compindexlist] > 0, (*not scalar, ignore up/down*)
       If[coordinate =!= GetDefaultChart[],
         exprname = exprname <> ToString[coordinate]
@@ -329,7 +257,7 @@ SetExprName[varname_, compindexlist_, coordinate_] :=
       Do[
         exprname =
           exprname <>
-            If[GetUseLetterForTensorComponent[],
+            If[GetUseLetterForTensorComponent[$CurrentContext],
               colist[[compindexlist[[icomp]] + 1]]
               ,
               ToString @ compindexlist[[icomp]]
@@ -339,13 +267,13 @@ SetExprName[varname_, compindexlist_, coordinate_] :=
       ]
     ];
     exprname =
-      If[GetWithoutGridPointIndex[] || (GetInterfaceWithNonCoordBasis[] && coordinate === GetDefaultChart[]),
+      If[GetWithoutGridPointIndex[$CurrentContext] || (GetInterfaceWithNonCoordBasis[$CurrentContext] && coordinate === GetDefaultChart[]),
         ToExpression[exprname]
         ,
-        If[GetUseTilePointIndex[],
-          ToExpression[exprname <> GetTilePointIndex[]]
+        If[GetUseTilePointIndex[$CurrentContext],
+          ToExpression[exprname <> GetTilePointIndex[$CurrentContext]]
           ,
-          ToExpression[exprname <> GetGridPointIndex[]]
+          ToExpression[exprname <> GetGridPointIndex[$CurrentContext]]
         ]
       ];
     Return[exprname]

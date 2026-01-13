@@ -7,15 +7,15 @@
 
 Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"}]]
 
-SetPVerbose[False];
+$CurrentContext = SetPVerbose[$CurrentContext, False];
 
-SetPrintDate[False];
+$CurrentContext = SetPrintDate[$CurrentContext, False];
 
-SetGridPointIndex[""];
+$CurrentContext = SetGridPointIndex[$CurrentContext, ""];
 
-SetTilePointIndex["[[tI]]"];
+$CurrentContext = SetTilePointIndex[$CurrentContext, "[[tI]]"];
 
-SetTempVariableType["vreal"];
+$CurrentContext = SetTempVariableType[$CurrentContext, "vreal"];
 
 DefManifold[M3, 3, IndexRange[a, z]];
 
@@ -39,9 +39,9 @@ SetEQN[tempU[i_], gridU[i]];
 
 SetEQN[tileU[i_], tempU[i]];
 
-SetOutputFile[FileNameJoin[{Directory[], "testTile.hxx"}]];
+$CurrentContext = SetOutputFile[$CurrentContext, FileNameJoin[{Directory[], "testTile.hxx"}]];
 
-SetMainPrint[
+$MainPrint[] := (
   pr[];
   PrintInitializations[{Mode -> "MainOut"}, TileVarlist];
   PrintInitializations[{Mode -> "MainIn", StorageType -> "Tile"}, GridVarlist];
@@ -49,6 +49,6 @@ SetMainPrint[
   PrintEquations[{Mode -> "Temp"}, TempVarlist];
   pr[];
   PrintEquations[{Mode -> "MainOut"}, TileVarlist];
-];
+);
 
 Import[FileNameJoin[{Environment["GENERATO"], "codes/CarpetXGPU.wl"}]];

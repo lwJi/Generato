@@ -42,7 +42,7 @@ ParseVarlist[OptionsPattern[], varlist_?ListQ, chartname_] :=
       ,
       iMin = 0
     ];
-    SetProcessNewVarlist[True];
+    $CurrentContext = SetProcessNewVarlist[$CurrentContext, True];
     Do[
       var = varlist[[ivar]];
       {varname, symmetry, printname} = ParseVar[var];
@@ -52,13 +52,13 @@ ParseVarlist[OptionsPattern[], varlist_?ListQ, chartname_] :=
         symindex = symmetry[[1]]
       ];
       If[!xTensorQ[varname[[0]]],
-        If[InSetCompPhase[],
+        If[InSetCompPhase[$CurrentContext],
           DefineTensor[varname, symmetry, printname]
           ,
           Throw @ Message[ParseVarlist::ETensorNonExist, ivar, varname]
         ]
         ,
-        If[!MemberQ[Keys[GetMapComponentToVarlist[]][[All, 0]], varname[[0]]],
+        If[!MemberQ[Keys[GetMapComponentToVarlist[$CurrentContext]][[All, 0]], varname[[0]]],
           Throw @ Message[ParseVarlist::ETensorExistOutside, ivar, varname]
         ]
       ];

@@ -8,8 +8,8 @@ If[Environment["QUIET"] =!= "1", Print["Loading ComponentTests.wl..."]];
 (* Load Generato *)
 Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"}]];
 
-SetPVerbose[False];
-SetPrintDate[False];
+$CurrentContext = SetPVerbose[$CurrentContext, False];
+$CurrentContext = SetPrintDate[$CurrentContext, False];
 
 (* ========================================= *)
 (* Test: Getter/Setter Functions *)
@@ -17,8 +17,8 @@ SetPrintDate[False];
 
 AppendTo[$AllTests,
   VerificationTest[
-    SetSimplifyEquation[True];
-    GetSimplifyEquation[],
+    $CurrentContext = SetSimplifyEquation[$CurrentContext, True];
+    GetSimplifyEquation[$CurrentContext],
     True,
     TestID -> "GetSetSimplifyEquation-True"
   ]
@@ -26,8 +26,8 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    SetSimplifyEquation[False];
-    GetSimplifyEquation[],
+    $CurrentContext = SetSimplifyEquation[$CurrentContext, False];
+    GetSimplifyEquation[$CurrentContext],
     False,
     TestID -> "GetSetSimplifyEquation-False"
   ]
@@ -35,8 +35,8 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    SetUseLetterForTensorComponent[True];
-    GetUseLetterForTensorComponent[],
+    $CurrentContext = SetUseLetterForTensorComponent[$CurrentContext, True];
+    GetUseLetterForTensorComponent[$CurrentContext],
     True,
     TestID -> "GetSetUseLetterForTensorComponent-True"
   ]
@@ -44,8 +44,8 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    SetUseLetterForTensorComponent[False];
-    GetUseLetterForTensorComponent[],
+    $CurrentContext = SetUseLetterForTensorComponent[$CurrentContext, False];
+    GetUseLetterForTensorComponent[$CurrentContext],
     False,
     TestID -> "GetSetUseLetterForTensorComponent-False"
   ]
@@ -53,8 +53,8 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    SetTempVariableType["CCTK_REAL"];
-    GetTempVariableType[],
+    $CurrentContext = SetTempVariableType[$CurrentContext, "CCTK_REAL"];
+    GetTempVariableType[$CurrentContext],
     "CCTK_REAL",
     TestID -> "GetSetTempVariableType-ReturnsValue"
   ]
@@ -62,8 +62,8 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    SetInterfaceWithNonCoordBasis[True];
-    GetInterfaceWithNonCoordBasis[],
+    $CurrentContext = SetInterfaceWithNonCoordBasis[$CurrentContext, True];
+    GetInterfaceWithNonCoordBasis[$CurrentContext],
     True,
     TestID -> "GetSetInterfaceWithNonCoordBasis-ReturnsTrue"
   ]
@@ -71,8 +71,8 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    SetSuffixName["_rhs"];
-    GetSuffixName[],
+    $CurrentContext = SetSuffixName[$CurrentContext, "_rhs"];
+    GetSuffixName[$CurrentContext],
     "_rhs",
     TestID -> "GetSetSuffixName-ReturnsValue"
   ]
@@ -80,8 +80,8 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    SetSuffixName[""];
-    GetSuffixName[],
+    $CurrentContext = SetSuffixName[$CurrentContext, ""];
+    GetSuffixName[$CurrentContext],
     "",
     TestID -> "GetSetSuffixName-ReturnsEmpty"
   ]
@@ -152,7 +152,7 @@ AppendTo[$AllTests,
 AppendTo[$AllTests,
   VerificationTest[
     (* GetMapComponentToVarlist should return an Association *)
-    AssociationQ[GetMapComponentToVarlist[]],
+    AssociationQ[GetMapComponentToVarlist[$CurrentContext]],
     True,
     TestID -> "GetMapComponentToVarlist-ReturnsAssociation"
   ]
@@ -165,7 +165,7 @@ AppendTo[$AllTests,
 AppendTo[$AllTests,
   VerificationTest[
     (* GetPrefixDt should return a string *)
-    StringQ[GetPrefixDt[]],
+    StringQ[GetPrefixDt[$CurrentContext]],
     True,
     TestID -> "GetPrefixDt-ReturnsString"
   ]
@@ -306,10 +306,10 @@ AppendTo[$AllTests,
 ];
 
 (* Reset state *)
-SetSimplifyEquation[True];
-SetUseLetterForTensorComponent[False];
-SetTempVariableType["double"];
-SetInterfaceWithNonCoordBasis[False];
-SetSuffixName[""];
+$CurrentContext = SetSimplifyEquation[$CurrentContext, True];
+$CurrentContext = SetUseLetterForTensorComponent[$CurrentContext, False];
+$CurrentContext = SetTempVariableType[$CurrentContext, "double"];
+$CurrentContext = SetInterfaceWithNonCoordBasis[$CurrentContext, False];
+$CurrentContext = SetSuffixName[$CurrentContext, ""];
 
 If[Environment["QUIET"] =!= "1", Print["ComponentTests.wl completed."]];

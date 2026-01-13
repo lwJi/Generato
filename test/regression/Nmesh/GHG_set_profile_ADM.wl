@@ -6,11 +6,11 @@
 
 Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"}]]
 
-SetPVerbose[False];
+$CurrentContext = SetPVerbose[$CurrentContext, False];
 
-SetPrintDate[False];
+$CurrentContext = SetPrintDate[$CurrentContext, False];
 
-SetGridPointIndex["[[ijk]]"];
+$CurrentContext = SetGridPointIndex[$CurrentContext, "[[ijk]]"];
 
 DefManifold[M4, 4, Union[Complement[IndexRange[a, z], {g}], Table[ToExpression["h" <> ToString[i]], {i, 1, 9}], Table[ToExpression["z" <> ToString[i]], {i, 1, 9}]]];
 
@@ -261,12 +261,12 @@ SetEQN[the[a_], -beta[k] dH[-k, a]];
 
 (* ============== *)
 
-SetOutputFile[FileNameJoin[{Directory[], "GHG_set_profile_ADM.c"}]];
+$CurrentContext = SetOutputFile[$CurrentContext, FileNameJoin[{Directory[], "GHG_set_profile_ADM.c"}]];
 
-SetProject["GHG"];
+$CurrentContext = SetProject[$CurrentContext, "GHG"];
 
 $MainPrint[] :=
-  Module[{project = GetProject[]},
+  Module[{project = GetProject[$CurrentContext]},
     pr["#include \"nmesh.h\""];
     pr["#include \"" <> project <> ".h\""];
     pr[];
@@ -341,12 +341,12 @@ $MainPrint[] :=
       ,
       (* set d_k g_{ab} *)
       printdg[cc_, aa_, bb_] :=
-        WithMode[{
-          {"Phase"} -> "PrintComp",
-          {"PrintComp", "Type"} -> "Equations",
-          {"PrintComp", "Equations", "Mode"} -> "MainOut"
+        WithMode[$CurrentContext, {
+          "Phase" -> "PrintComp",
+          "PrintCompType" -> "Equations",
+          "EquationsMode" -> "MainOut"
         },
-          PrintComponentEquation[$CurrentContext, GetDefaultChart[], dmetricg[{cc, -GetDefaultChart[]}, {aa, -GetDefaultChart[]}, {bb, -GetDefaultChart[]}], {}]
+          PrintComponentEquation[GetDefaultChart[], dmetricg[{cc, -GetDefaultChart[]}, {aa, -GetDefaultChart[]}, {bb, -GetDefaultChart[]}], {}]
         ];
       Do[printdg[cc, aa, bb], {cc, 3, 1, -1}, {aa, 3, 0, -1}, {bb, 3, aa, -1}];
       (* set d_t g_{ab} *)
@@ -354,16 +354,16 @@ $MainPrint[] :=
       pr[];
       Module[{printdtgEin},
         printdtgEin[cc_, aa_, bb_] :=
-          Module[{savedSuffix = GetSuffixName[]},
-            SetSuffixName["Ein"];
-            WithMode[{
-              {"Phase"} -> "PrintComp",
-              {"PrintComp", "Type"} -> "Equations",
-              {"PrintComp", "Equations", "Mode"} -> "MainOut"
+          Module[{savedSuffix = GetSuffixName[$CurrentContext]},
+            $CurrentContext = SetSuffixName[$CurrentContext, "Ein"];
+            WithMode[$CurrentContext, {
+              "Phase" -> "PrintComp",
+              "PrintCompType" -> "Equations",
+              "EquationsMode" -> "MainOut"
             },
-              PrintComponentEquation[$CurrentContext, GetDefaultChart[], dmetricg[{cc, -GetDefaultChart[]}, {aa, -GetDefaultChart[]}, {bb, -GetDefaultChart[]}], {}]
+              PrintComponentEquation[GetDefaultChart[], dmetricg[{cc, -GetDefaultChart[]}, {aa, -GetDefaultChart[]}, {bb, -GetDefaultChart[]}], {}]
             ];
-            SetSuffixName[savedSuffix]
+            $CurrentContext = SetSuffixName[$CurrentContext, savedSuffix]
           ];
         Do[printdtgEin[0, aa, bb], {aa, 3, 0, -1}, {bb, 3, aa, -1}];
         pr[];

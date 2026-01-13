@@ -9,8 +9,8 @@ If[Environment["QUIET"] =!= "1", Print["Loading VarlistTests.wl..."]];
 (* Load Generato *)
 Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"}]];
 
-SetPVerbose[False];
-SetPrintDate[False];
+$CurrentContext = SetPVerbose[$CurrentContext, False];
+$CurrentContext = SetPrintDate[$CurrentContext, False];
 
 (* ========================================= *)
 (* Setup: Use existing test manifold from BasicTests *)
@@ -175,11 +175,13 @@ AppendTo[$AllTests,
   VerificationTest[
     (* ParseVarlist should process a list of variable definitions *)
     (* This is a basic smoke test - full functionality tested via GridTensors *)
-    varlist = {{parseVarlistTest[i], PrintAs -> "pvt"}};
-    WithMode[{{"Phase"} -> "SetComp"},
-      ParseVarlist[varlist, testCart]
-    ];
-    True,
+    Module[{ctx = CreateContext[], varlist},
+      varlist = {{parseVarlistTest[i], PrintAs -> "pvt"}};
+      WithMode[ctx, {"Phase" -> "SetComp"},
+        ParseVarlist[varlist, testCart]
+      ];
+      True
+    ],
     True,
     TestID -> "ParseVarlist-BasicSmoke"
   ]

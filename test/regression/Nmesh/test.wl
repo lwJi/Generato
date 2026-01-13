@@ -6,11 +6,11 @@
 
 Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"}]]
 
-SetPVerbose[False];
+$CurrentContext = SetPVerbose[$CurrentContext, False];
 
-SetPrintDate[False];
+$CurrentContext = SetPrintDate[$CurrentContext, False];
 
-SetGridPointIndex["[[ijk]]"];
+$CurrentContext = SetGridPointIndex[$CurrentContext, "[[ijk]]"];
 
 DefManifold[M3, 3, IndexRange[a, z]];
 
@@ -43,12 +43,12 @@ SetEQN[{SuffixName -> "Msqr"}, rU[i_], euclid[i, k] MDD[-k, -j] vU[j]];
 
 SetEQN[{SuffixName -> "otherwise"}, rU[i_], vU[i]];
 
-SetOutputFile[FileNameJoin[{Directory[], "test.c"}]];
+$CurrentContext = SetOutputFile[$CurrentContext, FileNameJoin[{Directory[], "test.c"}]];
 
-SetProject["C3GH"];
+$CurrentContext = SetProject[$CurrentContext, "C3GH"];
 
 $MainPrint[] :=
-  Module[{project = GetProject[]},
+  Module[{project = GetProject[$CurrentContext]},
     pr["#include \"nmesh.h\""];
     pr["#include \"" <> project <> ".h\""];
     pr[];

@@ -6,13 +6,13 @@
 
 Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"}]]
 
-SetPVerbose[False];
+$CurrentContext = SetPVerbose[$CurrentContext, False];
 
-SetPrintDate[False];
+$CurrentContext = SetPrintDate[$CurrentContext, False];
 
-SetGridPointIndex[""];
+$CurrentContext = SetGridPointIndex[$CurrentContext, ""];
 
-SetTempVariableType["Real"];
+$CurrentContext = SetTempVariableType[$CurrentContext, "Real"];
 
 DefManifold[M3, 3, IndexRange[a, z]];
 
@@ -43,11 +43,11 @@ SetEQN[{SuffixName -> "Msqr"}, rU[i_], euclid[i, k] MDD[-k, -j] vU[j]];
 
 SetEQN[{SuffixName -> "otherwise"}, rU[i_], vU[i]];
 
-SetOutputFile[FileNameJoin[{Directory[], "test.hxx"}]];
+$CurrentContext = SetOutputFile[$CurrentContext, FileNameJoin[{Directory[], "test.hxx"}]];
 
 (* SetProject["AMReX"]; *)
 
-SetMainPrint[
+$MainPrint[] := (
   pr[];
   PrintInitializations[{Mode -> "MainOut"}, dtEvolVarlist];
   PrintInitializations[{Mode -> "MainIn"}, EvolVarlist];
@@ -63,6 +63,6 @@ SetMainPrint[
   pr["{"];
   PrintEquations[{Mode -> "MainOut", SuffixName -> "otherwise"}, dtEvolVarlist];
   pr["}"];
-];
+);
 
 Import[FileNameJoin[{Environment["GENERATO"], "codes/AMReX.wl"}]];

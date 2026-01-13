@@ -66,8 +66,8 @@ PrintFDExpression[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strIdx_?StringQ] :=
 (*            Print initialization of each component of a tensor              *)
 (******************************************************************************)
 
-PrintComponentInitialization[ctx_Association, varinfo_, compname_] :=
-  Module[{varlistindex, compToValue, varname, symmetry, buf, subbuf, len,
+PrintComponentInitialization[varinfo_, compname_] :=
+  Module[{ctx = $CurrentContext, varlistindex, compToValue, varname, symmetry, buf, subbuf, len,
           fdorder, fdaccuracy},
     (* Extract common component info using shared function *)
     {varlistindex, compToValue, varname, symmetry, len} =
@@ -130,8 +130,9 @@ Protect[PrintComponentInitialization];
  *        introduced to replace say coordinates representation of metric.
  *)
 
-PrintComponentEquation[ctx_Association, coordinate_, compname_, extrareplacerules_] :=
-  Module[{outputfile = GetOutputFile[ctx], compToValue, rhssToValue},
+PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
+  Module[{ctx = $CurrentContext, outputfile, compToValue, rhssToValue},
+    outputfile = GetOutputFile[ctx];
     compToValue = (compname // ToValues) /. extrareplacerules;
     rhssToValue = ComputeRHSValue[ctx, coordinate, compname, extrareplacerules];
     PrintEquationByMode[ctx, compToValue, rhssToValue,
@@ -160,4 +161,4 @@ Protect[PrintComponentEquation];
 (*                                Write to files                              *)
 (******************************************************************************)
 
-WriteToFile[GetOutputFile[]];
+WriteToFile[$CurrentContext, GetOutputFile[$CurrentContext]];

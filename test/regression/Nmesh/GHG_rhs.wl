@@ -6,11 +6,11 @@
 
 Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"}]]
 
-SetPVerbose[False];
+$CurrentContext = SetPVerbose[$CurrentContext, False];
 
-SetPrintDate[False];
+$CurrentContext = SetPrintDate[$CurrentContext, False];
 
-SetGridPointIndex["[[ijk]]"];
+$CurrentContext = SetGridPointIndex[$CurrentContext, "[[ijk]]"];
 
 DefManifold[M4, 4, Union[Complement[IndexRange[a, z], {g}], Table[ToExpression["h" <> ToString[i]], {i, 1, 9}], Table[ToExpression["z" <> ToString[i]], {i, 1, 9}]]];
 
@@ -91,12 +91,12 @@ SetEQN[dtPhi[i_, a_, b_], -AdPhi[i, a, b] interior + 1/2 alpha[] nvec[c] nvec[d]
 
 (* Write to files *)
 
-SetOutputFile[FileNameJoin[{Directory[], "GHG_rhs.c"}]];
+$CurrentContext = SetOutputFile[$CurrentContext, FileNameJoin[{Directory[], "GHG_rhs.c"}]];
 
-SetProject["GHG"];
+$CurrentContext = SetProject[$CurrentContext, "GHG"];
 
 $MainPrint[] :=
-  Module[{project = GetProject[]},
+  Module[{project = GetProject[$CurrentContext]},
     pr["#include \"nmesh.h\""];
     pr["#include \"" <> project <> ".h\""];
     pr[];
