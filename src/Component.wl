@@ -14,37 +14,37 @@ If[Environment["QUIET"] =!= "1",
   System`Print["------------------------------------------------------------"];
 ];
 
-GetMapComponentToVarlist::usage = "GetMapComponentToVarlist[ctx] returns the Association mapping tensor components to varlist indices from context.\nGetMapComponentToVarlist[] returns the mapping from global state.";
+GetMapComponentToVarlist::usage = "GetMapComponentToVarlist[] returns the Association mapping tensor components to varlist indices.";
 
-SetMapComponentToVarlist::usage = "SetMapComponentToVarlist[ctx, map] returns new context with updated mapping.\nSetMapComponentToVarlist[map] sets the mapping in global state.";
+SetMapComponentToVarlist::usage = "SetMapComponentToVarlist[map] sets the mapping in global state.";
 
-GetProcessNewVarlist::usage = "GetProcessNewVarlist[ctx] returns ProcessNewVarlist flag from context.\nGetProcessNewVarlist[] returns the flag from global state.";
+GetProcessNewVarlist::usage = "GetProcessNewVarlist[] returns the ProcessNewVarlist flag.";
 
-SetProcessNewVarlist::usage = "SetProcessNewVarlist[ctx, bool] returns new context with updated flag.\nSetProcessNewVarlist[bool] sets whether the next varlist is treated as a new varlist for index numbering.";
+SetProcessNewVarlist::usage = "SetProcessNewVarlist[bool] sets whether the next varlist is treated as a new varlist for index numbering.";
 
-GetSimplifyEquation::usage = "GetSimplifyEquation[ctx] returns SimplifyEquation flag from context.\nGetSimplifyEquation[] returns True if equations are simplified before output.";
+GetSimplifyEquation::usage = "GetSimplifyEquation[] returns True if equations are simplified before output.";
 
-SetSimplifyEquation::usage = "SetSimplifyEquation[ctx, bool] returns new context with updated flag.\nSetSimplifyEquation[bool] enables or disables simplification of equations before output.";
+SetSimplifyEquation::usage = "SetSimplifyEquation[bool] enables or disables simplification of equations before output.";
 
-GetUseLetterForTensorComponent::usage = "GetUseLetterForTensorComponent[ctx] returns UseLetterForTensorComponent flag from context.\nGetUseLetterForTensorComponent[] returns True if letters are used for tensor component indices instead of numbers.";
+GetUseLetterForTensorComponent::usage = "GetUseLetterForTensorComponent[] returns True if letters are used for tensor component indices instead of numbers.";
 
-SetUseLetterForTensorComponent::usage = "SetUseLetterForTensorComponent[ctx, bool] returns new context with updated flag.\nSetUseLetterForTensorComponent[bool] sets whether to use letters for tensor component indices instead of numbers.";
+SetUseLetterForTensorComponent::usage = "SetUseLetterForTensorComponent[bool] sets whether to use letters for tensor component indices instead of numbers.";
 
-GetTempVariableType::usage = "GetTempVariableType[ctx] returns TempVariableType from context.\nGetTempVariableType[] returns the C type string used for temporary variables.";
+GetTempVariableType::usage = "GetTempVariableType[] returns the C type string used for temporary variables.";
 
-SetTempVariableType::usage = "SetTempVariableType[ctx, type] returns new context with updated type.\nSetTempVariableType[type] sets the C type string used for temporary variables.";
+SetTempVariableType::usage = "SetTempVariableType[type] sets the C type string used for temporary variables.";
 
-GetInterfaceWithNonCoordBasis::usage = "GetInterfaceWithNonCoordBasis[ctx] returns InterfaceWithNonCoordBasis flag from context.\nGetInterfaceWithNonCoordBasis[] returns True if interfacing with non-coordinate basis tensors.";
+GetInterfaceWithNonCoordBasis::usage = "GetInterfaceWithNonCoordBasis[] returns True if interfacing with non-coordinate basis tensors.";
 
-SetInterfaceWithNonCoordBasis::usage = "SetInterfaceWithNonCoordBasis[ctx, bool] returns new context with updated flag.\nSetInterfaceWithNonCoordBasis[bool] enables or disables interfacing with non-coordinate basis tensors.";
+SetInterfaceWithNonCoordBasis::usage = "SetInterfaceWithNonCoordBasis[bool] enables or disables interfacing with non-coordinate basis tensors.";
 
-GetSuffixName::usage = "GetSuffixName[ctx] returns SuffixName from context.\nGetSuffixName[] returns the suffix appended to variable names in the current varlist.";
+GetSuffixName::usage = "GetSuffixName[] returns the suffix appended to variable names in the current varlist.";
 
-SetSuffixName::usage = "SetSuffixName[ctx, suffix] returns new context with updated suffix.\nSetSuffixName[suffix] sets the suffix appended to variable names in the current varlist.";
+SetSuffixName::usage = "SetSuffixName[suffix] sets the suffix appended to variable names in the current varlist.";
 
-GetPrefixDt::usage = "GetPrefixDt[ctx] returns PrefixDt from context.\nGetPrefixDt[] returns the prefix used for time derivatives of variables.";
+GetPrefixDt::usage = "GetPrefixDt[] returns the prefix used for time derivatives of variables.";
 
-SetPrefixDt::usage = "SetPrefixDt[ctx, prefix] returns new context with updated prefix.\nSetPrefixDt[prefix] sets the prefix used for time derivatives of variables.";
+SetPrefixDt::usage = "SetPrefixDt[prefix] sets the prefix used for time derivatives of variables.";
 
 ParseComponent::usage = "ParseComponent[varinfo, compindexlist, coordinate, extrareplacerules] processes a single tensor component for setting or printing.";
 
@@ -54,162 +54,90 @@ Begin["`Private`"];
 
 (* Function *)
 
-(* Context-aware getter *)
-GetMapComponentToVarlist[ctx_Association] := GetCtx[ctx, "MapComponentToVarlist"];
-
-(* Global getter - reads from $CurrentContext *)
 GetMapComponentToVarlist[] := $CurrentContext["MapComponentToVarlist"];
 
 Protect[GetMapComponentToVarlist];
 
-(* Context-aware setter - returns new context *)
-SetMapComponentToVarlist[ctx_Association, map_] :=
-  SetCtx[ctx, "MapComponentToVarlist", map];
-
-(* Global setter - writes to $CurrentContext *)
 SetMapComponentToVarlist[map_] :=
   Module[{},
-    $CurrentContext = SetCtx[$CurrentContext, "MapComponentToVarlist", map]
+    $CurrentContext = Append[$CurrentContext, "MapComponentToVarlist" -> map]
   ];
 
 Protect[SetMapComponentToVarlist];
 
-(* Context-aware getter *)
-GetProcessNewVarlist[ctx_Association] := GetCtx[ctx, "ProcessNewVarlist"];
-
-(* Global getter - reads from $CurrentContext *)
 GetProcessNewVarlist[] := $CurrentContext["ProcessNewVarlist"];
 
 Protect[GetProcessNewVarlist];
 
-(* Context-aware setter - returns new context *)
-SetProcessNewVarlist[ctx_Association, isnew_] :=
-  SetCtx[ctx, "ProcessNewVarlist", isnew];
-
-(* Global setter - writes to $CurrentContext *)
 SetProcessNewVarlist[isnew_] :=
   Module[{},
-    $CurrentContext = SetCtx[$CurrentContext, "ProcessNewVarlist", isnew]
+    $CurrentContext = Append[$CurrentContext, "ProcessNewVarlist" -> isnew]
   ];
 
 Protect[SetProcessNewVarlist];
 
-(* Context-aware getter *)
-GetSimplifyEquation[ctx_Association] := GetCtx[ctx, "SimplifyEquation"];
-
-(* Global getter - reads from $CurrentContext *)
 GetSimplifyEquation[] := $CurrentContext["SimplifyEquation"];
 
 Protect[GetSimplifyEquation];
 
-(* Context-aware setter - returns new context *)
-SetSimplifyEquation[ctx_Association, simplify_] :=
-  SetCtx[ctx, "SimplifyEquation", simplify];
-
-(* Global setter - writes to $CurrentContext *)
 SetSimplifyEquation[simplify_] :=
   Module[{},
-    $CurrentContext = SetCtx[$CurrentContext, "SimplifyEquation", simplify]
+    $CurrentContext = Append[$CurrentContext, "SimplifyEquation" -> simplify]
   ];
 
 Protect[SetSimplifyEquation];
 
-(* Context-aware getter *)
-GetUseLetterForTensorComponent[ctx_Association] := GetCtx[ctx, "UseLetterForTensorComponent"];
-
-(* Global getter - reads from $CurrentContext *)
 GetUseLetterForTensorComponent[] := $CurrentContext["UseLetterForTensorComponent"];
 
 Protect[GetUseLetterForTensorComponent];
 
-(* Context-aware setter - returns new context *)
-SetUseLetterForTensorComponent[ctx_Association, useletter_] :=
-  SetCtx[ctx, "UseLetterForTensorComponent", useletter];
-
-(* Global setter - writes to $CurrentContext *)
 SetUseLetterForTensorComponent[useletter_] :=
   Module[{},
-    $CurrentContext = SetCtx[$CurrentContext, "UseLetterForTensorComponent", useletter]
+    $CurrentContext = Append[$CurrentContext, "UseLetterForTensorComponent" -> useletter]
   ];
 
 Protect[SetUseLetterForTensorComponent];
 
-(* Context-aware getter *)
-GetTempVariableType[ctx_Association] := GetCtx[ctx, "TempVariableType"];
-
-(* Global getter - reads from $CurrentContext *)
 GetTempVariableType[] := $CurrentContext["TempVariableType"];
 
 Protect[GetTempVariableType];
 
-(* Context-aware setter - returns new context *)
-SetTempVariableType[ctx_Association, type_] :=
-  SetCtx[ctx, "TempVariableType", type];
-
-(* Global setter - writes to $CurrentContext *)
 SetTempVariableType[type_] :=
   Module[{},
-    $CurrentContext = SetCtx[$CurrentContext, "TempVariableType", type]
+    $CurrentContext = Append[$CurrentContext, "TempVariableType" -> type]
   ];
 
 Protect[SetTempVariableType];
 
-(* Context-aware getter *)
-GetInterfaceWithNonCoordBasis[ctx_Association] := GetCtx[ctx, "InterfaceWithNonCoordBasis"];
-
-(* Global getter - reads from $CurrentContext *)
 GetInterfaceWithNonCoordBasis[] := $CurrentContext["InterfaceWithNonCoordBasis"];
 
 Protect[GetInterfaceWithNonCoordBasis];
 
-(* Context-aware setter - returns new context *)
-SetInterfaceWithNonCoordBasis[ctx_Association, noncoordbasis_] :=
-  SetCtx[ctx, "InterfaceWithNonCoordBasis", noncoordbasis];
-
-(* Global setter - writes to $CurrentContext *)
 SetInterfaceWithNonCoordBasis[noncoordbasis_] :=
   Module[{},
-    $CurrentContext = SetCtx[$CurrentContext, "InterfaceWithNonCoordBasis", noncoordbasis]
+    $CurrentContext = Append[$CurrentContext, "InterfaceWithNonCoordBasis" -> noncoordbasis]
   ];
 
 Protect[SetInterfaceWithNonCoordBasis];
 
-(* Context-aware getter *)
-GetSuffixName[ctx_Association] := GetCtx[ctx, "SuffixName"];
-
-(* Global getter - reads from $CurrentContext *)
 GetSuffixName[] := $CurrentContext["SuffixName"];
 
 Protect[GetSuffixName];
 
-(* Context-aware setter - returns new context *)
-SetSuffixName[ctx_Association, suffix_] :=
-  SetCtx[ctx, "SuffixName", suffix];
-
-(* Global setter - writes to $CurrentContext *)
 SetSuffixName[suffix_] :=
   Module[{},
-    $CurrentContext = SetCtx[$CurrentContext, "SuffixName", suffix]
+    $CurrentContext = Append[$CurrentContext, "SuffixName" -> suffix]
   ];
 
 Protect[SetSuffixName];
 
-(* Context-aware getter *)
-GetPrefixDt[ctx_Association] := GetCtx[ctx, "PrefixDt"];
-
-(* Global getter - reads from $CurrentContext *)
 GetPrefixDt[] := $CurrentContext["PrefixDt"];
 
 Protect[GetPrefixDt];
 
-(* Context-aware setter - returns new context *)
-SetPrefixDt[ctx_Association, prefix_] :=
-  SetCtx[ctx, "PrefixDt", prefix];
-
-(* Global setter - writes to $CurrentContext *)
 SetPrefixDt[prefix_] :=
   Module[{},
-    $CurrentContext = SetCtx[$CurrentContext, "PrefixDt", prefix]
+    $CurrentContext = Append[$CurrentContext, "PrefixDt" -> prefix]
   ];
 
 Protect[SetPrefixDt];
@@ -246,11 +174,11 @@ PrintComponent[coordinate_, varinfo_, compname_, extrareplacerules_] :=
     Which[
       InInitializationsMode[],
         PrintVerbose["    PrintComponentInitialization ", compname, "..."];
-        Global`PrintComponentInitialization[$CurrentContext, varinfo, compname]
+        Global`PrintComponentInitialization[varinfo, compname]
       ,
       InEquationsMode[],
         PrintVerbose["    PrintComponentEquation ", compname, "..."];
-        Global`PrintComponentEquation[$CurrentContext, coordinate, compname, extrareplacerules]
+        Global`PrintComponentEquation[coordinate, compname, extrareplacerules]
       ,
       True,
         Throw @ Message[PrintComponent::EMode]

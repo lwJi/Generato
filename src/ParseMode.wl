@@ -11,43 +11,43 @@ If[Environment["QUIET"] =!= "1",
 ];
 
 (* Core Functions *)
-WithMode::usage = "WithMode[settings, body] sets modes, evaluates body, then restores previous mode state.";
+WithMode::usage = "WithMode[settings, body] sets modes, evaluates body, then restores previous mode state. Settings use flat keys (e.g., \"Phase\" -> \"SetComp\").";
 
 (* Phase Helpers *)
-GetPhase::usage = "GetPhase[ctx] returns phase from context.\nGetPhase[] returns current phase from global mode.";
-SetPhase::usage = "SetPhase[ctx, phase] returns new context with updated phase.";
-InSetCompPhase::usage = "InSetCompPhase[ctx] returns True if context is in SetComp phase.\nInSetCompPhase[] returns True if in SetComp phase.";
-InPrintCompPhase::usage = "InPrintCompPhase[ctx] returns True if context is in PrintComp phase.\nInPrintCompPhase[] returns True if in PrintComp phase.";
+GetPhase::usage = "GetPhase[] returns current phase.";
+SetPhase::usage = "SetPhase[phase] sets the current phase.";
+InSetCompPhase::usage = "InSetCompPhase[] returns True if in SetComp phase.";
+InPrintCompPhase::usage = "InPrintCompPhase[] returns True if in PrintComp phase.";
 
 (* PrintComp Type Helpers *)
-GetPrintCompType::usage = "GetPrintCompType[ctx] returns print comp type from context.\nGetPrintCompType[] returns current print comp type.";
-SetPrintCompType::usage = "SetPrintCompType[ctx, type] returns new context with updated print comp type.";
-InInitializationsMode::usage = "InInitializationsMode[ctx] returns True if context is in Initializations mode.\nInInitializationsMode[] returns True if in Initializations mode.";
-InEquationsMode::usage = "InEquationsMode[ctx] returns True if context is in Equations mode.\nInEquationsMode[] returns True if in Equations mode.";
+GetPrintCompType::usage = "GetPrintCompType[] returns current print comp type.";
+SetPrintCompType::usage = "SetPrintCompType[type] sets the current print comp type.";
+InInitializationsMode::usage = "InInitializationsMode[] returns True if in Initializations mode.";
+InEquationsMode::usage = "InEquationsMode[] returns True if in Equations mode.";
 
 (* Initializations Mode Helpers *)
-GetInitializationsMode::usage = "GetInitializationsMode[ctx] returns initialization mode from context.\nGetInitializationsMode[] returns current initialization mode.";
-SetInitializationsMode::usage = "SetInitializationsMode[ctx, mode] returns new context with updated initialization mode.";
-GetTensorType::usage = "GetTensorType[ctx] returns tensor type from context.\nGetTensorType[] returns current tensor type.";
-SetTensorType::usage = "SetTensorType[ctx, type] returns new context with updated tensor type.";
-GetStorageType::usage = "GetStorageType[ctx] returns storage type from context.\nGetStorageType[] returns current storage type.";
-SetStorageType::usage = "SetStorageType[ctx, type] returns new context with updated storage type.";
-GetDerivsOrder::usage = "GetDerivsOrder[ctx] returns derivative order from context.\nGetDerivsOrder[] returns derivative order.";
-SetDerivsOrder::usage = "SetDerivsOrder[ctx, order] returns new context with updated derivative order.";
-GetDerivsAccuracy::usage = "GetDerivsAccuracy[ctx] returns derivative accuracy from context.\nGetDerivsAccuracy[] returns derivative accuracy.";
-SetDerivsAccuracy::usage = "SetDerivsAccuracy[ctx, accuracy] returns new context with updated derivative accuracy.";
+GetInitializationsMode::usage = "GetInitializationsMode[] returns current initialization mode.";
+SetInitializationsMode::usage = "SetInitializationsMode[mode] sets the current initialization mode.";
+GetTensorType::usage = "GetTensorType[] returns current tensor type.";
+SetTensorType::usage = "SetTensorType[type] sets the current tensor type.";
+GetStorageType::usage = "GetStorageType[] returns current storage type.";
+SetStorageType::usage = "SetStorageType[type] sets the current storage type.";
+GetDerivsOrder::usage = "GetDerivsOrder[] returns derivative order.";
+SetDerivsOrder::usage = "SetDerivsOrder[order] sets the derivative order.";
+GetDerivsAccuracy::usage = "GetDerivsAccuracy[] returns derivative accuracy.";
+SetDerivsAccuracy::usage = "SetDerivsAccuracy[accuracy] sets the derivative accuracy.";
 
 (* Equations Mode Helper *)
-GetEquationsMode::usage = "GetEquationsMode[ctx] returns equation mode from context.\nGetEquationsMode[] returns current equation mode.";
-SetEquationsMode::usage = "SetEquationsMode[ctx, mode] returns new context with updated equation mode.";
+GetEquationsMode::usage = "GetEquationsMode[] returns current equation mode.";
+SetEquationsMode::usage = "SetEquationsMode[mode] sets the current equation mode.";
 
 (* IndexOptions Helpers *)
-GetIndependentVarlistIndex::usage = "GetIndependentVarlistIndex[ctx] returns IndependentVarlistIndex from context.\nGetIndependentVarlistIndex[] returns IndependentVarlistIndex setting.";
-SetIndependentVarlistIndex::usage = "SetIndependentVarlistIndex[ctx, val] returns new context with updated IndependentVarlistIndex.";
-GetWithoutGridPointIndex::usage = "GetWithoutGridPointIndex[ctx] returns WithoutGridPointIndex from context.\nGetWithoutGridPointIndex[] returns WithoutGridPointIndex setting.";
-SetWithoutGridPointIndex::usage = "SetWithoutGridPointIndex[ctx, val] returns new context with updated WithoutGridPointIndex.";
-GetUseTilePointIndex::usage = "GetUseTilePointIndex[ctx] returns UseTilePointIndex from context.\nGetUseTilePointIndex[] returns UseTilePointIndex setting.";
-SetUseTilePointIndex::usage = "SetUseTilePointIndex[ctx, val] returns new context with updated UseTilePointIndex.";
+GetIndependentVarlistIndex::usage = "GetIndependentVarlistIndex[] returns IndependentVarlistIndex setting.";
+SetIndependentVarlistIndex::usage = "SetIndependentVarlistIndex[val] sets IndependentVarlistIndex.";
+GetWithoutGridPointIndex::usage = "GetWithoutGridPointIndex[] returns WithoutGridPointIndex setting.";
+SetWithoutGridPointIndex::usage = "SetWithoutGridPointIndex[val] sets WithoutGridPointIndex.";
+GetUseTilePointIndex::usage = "GetUseTilePointIndex[] returns UseTilePointIndex setting.";
+SetUseTilePointIndex::usage = "SetUseTilePointIndex[val] sets UseTilePointIndex.";
 
 Begin["`Private`"];
 
@@ -88,67 +88,31 @@ ValidateContextModeValue[key_String, value_] :=
     ]
   ];
 
-(* Map nested paths to flat context keys *)
-PathToFlatKey[path_List] := Switch[path,
-  {"Phase"}, "Phase",
-  {"IndexOptions", "IndependentVarlistIndex"}, "IndependentVarlistIndex",
-  {"IndexOptions", "WithoutGridPointIndex"}, "WithoutGridPointIndex",
-  {"IndexOptions", "UseTilePointIndex"}, "UseTilePointIndex",
-  {"PrintComp", "Type"}, "PrintCompType",
-  {"PrintComp", "Initializations", "Mode"}, "InitializationsMode",
-  {"PrintComp", "Initializations", "TensorType"}, "TensorType",
-  {"PrintComp", "Initializations", "StorageType"}, "StorageType",
-  {"PrintComp", "Initializations", "DerivsOrder"}, "DerivsOrder",
-  {"PrintComp", "Initializations", "DerivsAccuracy"}, "DerivsAccuracy",
-  {"PrintComp", "Equations", "Mode"}, "EquationsMode",
-  _, Throw @ Message[PathToFlatKey::EUnknownPath, path]
-];
-
-PathToFlatKey::EUnknownPath = "Unknown nested path: `1`";
-
-(* Scoped mode context with automatic restore - global mode version *)
-(* Converts nested path settings to flat keys and applies to $CurrentContext *)
-(* Only saves/restores the specific keys that are modified, preserving other state changes *)
+(* Scoped mode settings with automatic restore *)
+(* settings is a list of "FlatKey" -> value rules *)
 SetAttributes[WithMode, HoldRest];
 
 WithMode[settings_List, body_] :=
   Module[{flatKeys, savedValues},
-    (* Convert nested paths to flat keys *)
-    flatKeys = PathToFlatKey[First[#]] & /@ settings;
-    (* Save only the values for keys we're about to modify *)
+    (* Extract flat keys from settings *)
+    flatKeys = First /@ settings;
+    (* Save current values for keys we're about to modify *)
     savedValues = $CurrentContext[#] & /@ flatKeys;
-    (* Apply the new settings *)
+    (* Apply new settings *)
     Scan[
       Function[setting,
-        With[{flatKey = PathToFlatKey[First[setting]], value = Last[setting]},
-          $CurrentContext = SetCtx[$CurrentContext, flatKey, value]
-        ]
+        $CurrentContext = Append[$CurrentContext, First[setting] -> Last[setting]]
       ],
       settings
     ];
-    (* Restore only the specific keys that were modified *)
+    (* Restore after body evaluates *)
     WithCleanup[
       body,
       Do[
-        $CurrentContext = SetCtx[$CurrentContext, flatKeys[[i]], savedValues[[i]]],
+        $CurrentContext = Append[$CurrentContext, flatKeys[[i]] -> savedValues[[i]]],
         {i, Length[flatKeys]}
       ]
     ]
-  ];
-
-(* Context-aware WithMode - applies flat key-value settings to context *)
-(* settings is a list of {key, value} pairs or key -> value rules *)
-WithMode[ctx_Association, settings_List, body_] :=
-  Module[{newCtx},
-    newCtx = Fold[
-      If[Head[#2] === Rule,
-        SetCtx[#1, First[#2], Last[#2]],
-        SetCtx[#1, #2[[1]], #2[[2]]]
-      ] &,
-      ctx,
-      settings
-    ];
-    WithContext[newCtx, body]
   ];
 
 Protect[WithMode];
@@ -157,23 +121,20 @@ Protect[WithMode];
 (* Convenience Helpers *)
 (* ========================================= *)
 
-(* Phase helpers - context-aware versions *)
-GetPhase[ctx_Association] := GetCtx[ctx, "Phase"];
+(* Phase helpers - global versions only *)
 GetPhase[] := $CurrentContext["Phase"];
 
-InSetCompPhase[ctx_Association] := GetPhase[ctx] === "SetComp";
 InSetCompPhase[] := $CurrentContext["Phase"] === "SetComp";
 
-InPrintCompPhase[ctx_Association] := GetPhase[ctx] === "PrintComp";
 InPrintCompPhase[] := $CurrentContext["Phase"] === "PrintComp";
 
-(* Phase setters - context-aware versions return new context *)
-SetPhase[ctx_Association, phase_] :=
+(* Phase setter - global version with validation *)
+SetPhase[phase_] :=
   Module[{},
     If[!ValidateContextModeValue["Phase", phase],
       Throw @ Message[SetPhase::EInvalidValue, phase]
     ];
-    SetCtx[ctx, "Phase", phase]
+    $CurrentContext = Append[$CurrentContext, "Phase" -> phase]
   ];
 
 SetPhase::EInvalidValue = "Invalid phase value: `1`";
@@ -183,23 +144,20 @@ Protect[InSetCompPhase];
 Protect[InPrintCompPhase];
 Protect[SetPhase];
 
-(* PrintComp type helpers - context-aware versions *)
-GetPrintCompType[ctx_Association] := GetCtx[ctx, "PrintCompType"];
+(* PrintComp type helpers - global versions only *)
 GetPrintCompType[] := $CurrentContext["PrintCompType"];
 
-InInitializationsMode[ctx_Association] := GetPrintCompType[ctx] === "Initializations";
 InInitializationsMode[] := $CurrentContext["PrintCompType"] === "Initializations";
 
-InEquationsMode[ctx_Association] := GetPrintCompType[ctx] === "Equations";
 InEquationsMode[] := $CurrentContext["PrintCompType"] === "Equations";
 
-(* PrintCompType setter - context-aware version *)
-SetPrintCompType[ctx_Association, ptype_] :=
+(* PrintCompType setter - global version with validation *)
+SetPrintCompType[ptype_] :=
   Module[{},
     If[!ValidateContextModeValue["PrintCompType", ptype],
       Throw @ Message[SetPrintCompType::EInvalidValue, ptype]
     ];
-    SetCtx[ctx, "PrintCompType", ptype]
+    $CurrentContext = Append[$CurrentContext, "PrintCompType" -> ptype]
   ];
 
 SetPrintCompType::EInvalidValue = "Invalid PrintCompType value: `1`";
@@ -209,69 +167,64 @@ Protect[InInitializationsMode];
 Protect[InEquationsMode];
 Protect[SetPrintCompType];
 
-(* Initializations mode helpers - context-aware versions *)
-GetInitializationsMode[ctx_Association] := GetCtx[ctx, "InitializationsMode"];
+(* Initializations mode helpers - global versions only *)
 GetInitializationsMode[] := $CurrentContext["InitializationsMode"];
 
-GetTensorType[ctx_Association] := GetCtx[ctx, "TensorType"];
 GetTensorType[] := $CurrentContext["TensorType"];
 
-GetStorageType[ctx_Association] := GetCtx[ctx, "StorageType"];
 GetStorageType[] := $CurrentContext["StorageType"];
 
-GetDerivsOrder[ctx_Association] := GetCtx[ctx, "DerivsOrder"];
 GetDerivsOrder[] := $CurrentContext["DerivsOrder"];
 
-GetDerivsAccuracy[ctx_Association] := GetCtx[ctx, "DerivsAccuracy"];
 GetDerivsAccuracy[] := $CurrentContext["DerivsAccuracy"];
 
-(* Initializations mode setters - context-aware versions *)
-SetInitializationsMode[ctx_Association, mode_] :=
+(* Initializations mode setters - global versions with validation *)
+SetInitializationsMode[mode_] :=
   Module[{},
     If[!ValidateContextModeValue["InitializationsMode", mode],
       Throw @ Message[SetInitializationsMode::EInvalidValue, mode]
     ];
-    SetCtx[ctx, "InitializationsMode", mode]
+    $CurrentContext = Append[$CurrentContext, "InitializationsMode" -> mode]
   ];
 
 SetInitializationsMode::EInvalidValue = "Invalid InitializationsMode value: `1`";
 
-SetTensorType[ctx_Association, ttype_] :=
+SetTensorType[ttype_] :=
   Module[{},
     If[!ValidateContextModeValue["TensorType", ttype],
       Throw @ Message[SetTensorType::EInvalidValue, ttype]
     ];
-    SetCtx[ctx, "TensorType", ttype]
+    $CurrentContext = Append[$CurrentContext, "TensorType" -> ttype]
   ];
 
 SetTensorType::EInvalidValue = "Invalid TensorType value: `1`";
 
-SetStorageType[ctx_Association, stype_] :=
+SetStorageType[stype_] :=
   Module[{},
     If[!ValidateContextModeValue["StorageType", stype],
       Throw @ Message[SetStorageType::EInvalidValue, stype]
     ];
-    SetCtx[ctx, "StorageType", stype]
+    $CurrentContext = Append[$CurrentContext, "StorageType" -> stype]
   ];
 
 SetStorageType::EInvalidValue = "Invalid StorageType value: `1`";
 
-SetDerivsOrder[ctx_Association, order_] :=
+SetDerivsOrder[order_] :=
   Module[{},
     If[!ValidateContextModeValue["DerivsOrder", order],
       Throw @ Message[SetDerivsOrder::EInvalidValue, order]
     ];
-    SetCtx[ctx, "DerivsOrder", order]
+    $CurrentContext = Append[$CurrentContext, "DerivsOrder" -> order]
   ];
 
 SetDerivsOrder::EInvalidValue = "Invalid DerivsOrder value: `1`";
 
-SetDerivsAccuracy[ctx_Association, accuracy_] :=
+SetDerivsAccuracy[accuracy_] :=
   Module[{},
     If[!ValidateContextModeValue["DerivsAccuracy", accuracy],
       Throw @ Message[SetDerivsAccuracy::EInvalidValue, accuracy]
     ];
-    SetCtx[ctx, "DerivsAccuracy", accuracy]
+    $CurrentContext = Append[$CurrentContext, "DerivsAccuracy" -> accuracy]
   ];
 
 SetDerivsAccuracy::EInvalidValue = "Invalid DerivsAccuracy value: `1`";
@@ -287,16 +240,15 @@ Protect[SetStorageType];
 Protect[SetDerivsOrder];
 Protect[SetDerivsAccuracy];
 
-(* Equations mode helper - context-aware versions *)
-GetEquationsMode[ctx_Association] := GetCtx[ctx, "EquationsMode"];
+(* Equations mode helper - global versions only *)
 GetEquationsMode[] := $CurrentContext["EquationsMode"];
 
-SetEquationsMode[ctx_Association, mode_] :=
+SetEquationsMode[mode_] :=
   Module[{},
     If[!ValidateContextModeValue["EquationsMode", mode],
       Throw @ Message[SetEquationsMode::EInvalidValue, mode]
     ];
-    SetCtx[ctx, "EquationsMode", mode]
+    $CurrentContext = Append[$CurrentContext, "EquationsMode" -> mode]
   ];
 
 SetEquationsMode::EInvalidValue = "Invalid EquationsMode value: `1`";
@@ -304,43 +256,40 @@ SetEquationsMode::EInvalidValue = "Invalid EquationsMode value: `1`";
 Protect[GetEquationsMode];
 Protect[SetEquationsMode];
 
-(* IndexOptions helpers - context-aware versions *)
-GetIndependentVarlistIndex[ctx_Association] := GetCtx[ctx, "IndependentVarlistIndex"];
+(* IndexOptions helpers - global versions only *)
 GetIndependentVarlistIndex[] := $CurrentContext["IndependentVarlistIndex"];
 
-GetWithoutGridPointIndex[ctx_Association] := GetCtx[ctx, "WithoutGridPointIndex"];
 GetWithoutGridPointIndex[] := $CurrentContext["WithoutGridPointIndex"];
 
-GetUseTilePointIndex[ctx_Association] := GetCtx[ctx, "UseTilePointIndex"];
 GetUseTilePointIndex[] := $CurrentContext["UseTilePointIndex"];
 
-(* IndexOptions setters - context-aware versions *)
-SetIndependentVarlistIndex[ctx_Association, val_] :=
+(* IndexOptions setters - global versions with validation *)
+SetIndependentVarlistIndex[val_] :=
   Module[{},
     If[!ValidateContextModeValue["IndependentVarlistIndex", val],
       Throw @ Message[SetIndependentVarlistIndex::EInvalidValue, val]
     ];
-    SetCtx[ctx, "IndependentVarlistIndex", val]
+    $CurrentContext = Append[$CurrentContext, "IndependentVarlistIndex" -> val]
   ];
 
 SetIndependentVarlistIndex::EInvalidValue = "Invalid IndependentVarlistIndex value: `1`";
 
-SetWithoutGridPointIndex[ctx_Association, val_] :=
+SetWithoutGridPointIndex[val_] :=
   Module[{},
     If[!ValidateContextModeValue["WithoutGridPointIndex", val],
       Throw @ Message[SetWithoutGridPointIndex::EInvalidValue, val]
     ];
-    SetCtx[ctx, "WithoutGridPointIndex", val]
+    $CurrentContext = Append[$CurrentContext, "WithoutGridPointIndex" -> val]
   ];
 
 SetWithoutGridPointIndex::EInvalidValue = "Invalid WithoutGridPointIndex value: `1`";
 
-SetUseTilePointIndex[ctx_Association, val_] :=
+SetUseTilePointIndex[val_] :=
   Module[{},
     If[!ValidateContextModeValue["UseTilePointIndex", val],
       Throw @ Message[SetUseTilePointIndex::EInvalidValue, val]
     ];
-    SetCtx[ctx, "UseTilePointIndex", val]
+    $CurrentContext = Append[$CurrentContext, "UseTilePointIndex" -> val]
   ];
 
 SetUseTilePointIndex::EInvalidValue = "Invalid UseTilePointIndex value: `1`";

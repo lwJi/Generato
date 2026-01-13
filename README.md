@@ -50,7 +50,7 @@ Generato GHG_rhs.wl
 - **stencils/FiniteDifferenceStencils.wl** - Finite difference stencil generation
 
 ### Backends (codes/)
-Each backend implements `PrintComponentInitialization` and `PrintComponentEquation`:
+Each backend implements `PrintComponentInitialization[varinfo, compname]` and `PrintComponentEquation[coordinate, compname, extrareplacerules]`:
 - **CarpetX.wl** - CarpetX AMR with GF3D2 storage
 - **CarpetXGPU.wl** - GPU-enabled CarpetX
 - **CarpetXPointDesc.wl** - Point description variant
