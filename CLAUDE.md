@@ -14,7 +14,7 @@ Generato file1.wl file2.wl          # Multiple files
 
 ### Core (src/)
 - **Generato.wl** - Package loader
-- **Context.wl** - Context-based state management (CreateContext, GetCtx, SetCtx, UpdateCtx, WithContext)
+- **Context.wl** - Global state management via `$CurrentContext`
 - **Basic.wl** - Config state, tensor utilities, SetEQN/SetEQNDelayed
 - **ParseMode.wl** - Phase management (SetComp/PrintComp phases), WithMode for scoped settings
 - **Component.wl** - Tensor component to varlist index mapping
@@ -26,7 +26,7 @@ Generato file1.wl file2.wl          # Multiple files
 - **stencils/FiniteDifferenceStencils.wl** - FD stencils for orders 2-12
 
 ### Backends (codes/)
-Each implements `PrintComponentInitialization[ctx, varinfo, compname]` and `PrintComponentEquation[ctx, coordinate, compname, extrareplacerules]`:
+Each implements `PrintComponentInitialization[varinfo, compname]` and `PrintComponentEquation[coordinate, compname, extrareplacerules]`:
 - **CarpetX.wl**, **CarpetXGPU.wl**, **CarpetXPointDesc.wl** - CarpetX variants
 - **Carpet.wl** - Original Carpet framework
 - **AMReX.wl** - AMReX library
@@ -36,23 +36,19 @@ Common backend code is in `BackendCommon.wl`.
 
 ### State Management
 
-All state is stored in `$CurrentContext`, a flat association that serves as the single source of truth. Global getters/setters read/write `$CurrentContext` directly, and context-aware functions take `ctx` as the first parameter.
+All state is stored in `$CurrentContext`, a flat association that serves as the single source of truth. All getters/setters read/write `$CurrentContext` directly.
 
 ```wolfram
 (* Global API - reads/writes $CurrentContext *)
 SetGridPointIndex["[[ijk]]"];
 GetGridPointIndex[];
-
-(* Context-aware API - functional, returns new context *)
-ctx = CreateContext[];
-ctx = SetGridPointIndex[ctx, "[[ijk]]"];
 ```
 
 Use `WithMode` for scoped settings that auto-restore:
 ```wolfram
 WithMode[{
-  {"Phase"} -> "PrintComp",
-  {"PrintComp", "Type"} -> "Equations"
+  "Phase" -> "PrintComp",
+  "PrintCompType" -> "Equations"
 },
   (* body - settings restored after *)
 ];
@@ -64,16 +60,27 @@ Code generation uses explicit phases:
 
 1. **SetComp Phase**: Maps tensor components to varlist indices
 ```wolfram
-ctx = WithSetCompPhase[ctx,
-  SetComponents[ctx, {}, varlist]
+WithMode[{"Phase" -> "SetComp"},
+  SetComponents[varlist]
 ];
 ```
 
 2. **PrintComp Phase**: Generates C/C++ code
 ```wolfram
-ctx = WithPrintCompPhase[ctx,
-  PrintInitializations[ctx, {Mode -> "MainOut"}, varlist];
-  PrintEquations[ctx, {Mode -> "Temp"}, varlist];
+WithMode[{
+  "Phase" -> "PrintComp",
+  "PrintCompType" -> "Initializations",
+  "InitializationsMode" -> "MainOut"
+},
+  PrintInitializations[varlist]
+];
+
+WithMode[{
+  "Phase" -> "PrintComp",
+  "PrintCompType" -> "Equations",
+  "EquationsMode" -> "Temp"
+},
+  PrintEquations[varlist]
 ];
 ```
 
