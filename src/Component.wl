@@ -60,8 +60,13 @@ Protect[GetMapComponentToVarlist];
 
 SetMapComponentToVarlist[map_] :=
   Module[{},
+    If[!ValidateContextModeValue["MapComponentToVarlist", map],
+      Throw @ Message[SetMapComponentToVarlist::EInvalidValue, map]
+    ];
     $CurrentContext = Append[$CurrentContext, "MapComponentToVarlist" -> map]
   ];
+
+SetMapComponentToVarlist::EInvalidValue = "Invalid MapComponentToVarlist value: `1`. Expected an Association.";
 
 Protect[SetMapComponentToVarlist];
 
@@ -71,8 +76,13 @@ Protect[GetProcessNewVarlist];
 
 SetProcessNewVarlist[isnew_] :=
   Module[{},
+    If[!ValidateContextModeValue["ProcessNewVarlist", isnew],
+      Throw @ Message[SetProcessNewVarlist::EInvalidValue, isnew]
+    ];
     $CurrentContext = Append[$CurrentContext, "ProcessNewVarlist" -> isnew]
   ];
+
+SetProcessNewVarlist::EInvalidValue = "Invalid ProcessNewVarlist value: `1`. Expected True or False.";
 
 Protect[SetProcessNewVarlist];
 
@@ -82,8 +92,13 @@ Protect[GetSimplifyEquation];
 
 SetSimplifyEquation[simplify_] :=
   Module[{},
+    If[!ValidateContextModeValue["SimplifyEquation", simplify],
+      Throw @ Message[SetSimplifyEquation::EInvalidValue, simplify]
+    ];
     $CurrentContext = Append[$CurrentContext, "SimplifyEquation" -> simplify]
   ];
+
+SetSimplifyEquation::EInvalidValue = "Invalid SimplifyEquation value: `1`. Expected True or False.";
 
 Protect[SetSimplifyEquation];
 
@@ -93,8 +108,13 @@ Protect[GetUseLetterForTensorComponent];
 
 SetUseLetterForTensorComponent[useletter_] :=
   Module[{},
+    If[!ValidateContextModeValue["UseLetterForTensorComponent", useletter],
+      Throw @ Message[SetUseLetterForTensorComponent::EInvalidValue, useletter]
+    ];
     $CurrentContext = Append[$CurrentContext, "UseLetterForTensorComponent" -> useletter]
   ];
+
+SetUseLetterForTensorComponent::EInvalidValue = "Invalid UseLetterForTensorComponent value: `1`. Expected True or False.";
 
 Protect[SetUseLetterForTensorComponent];
 
@@ -104,8 +124,13 @@ Protect[GetTempVariableType];
 
 SetTempVariableType[type_] :=
   Module[{},
+    If[!ValidateContextModeValue["TempVariableType", type],
+      Throw @ Message[SetTempVariableType::EInvalidValue, type]
+    ];
     $CurrentContext = Append[$CurrentContext, "TempVariableType" -> type]
   ];
+
+SetTempVariableType::EInvalidValue = "Invalid TempVariableType value: `1`. Expected a String.";
 
 Protect[SetTempVariableType];
 
@@ -115,8 +140,13 @@ Protect[GetInterfaceWithNonCoordBasis];
 
 SetInterfaceWithNonCoordBasis[noncoordbasis_] :=
   Module[{},
+    If[!ValidateContextModeValue["InterfaceWithNonCoordBasis", noncoordbasis],
+      Throw @ Message[SetInterfaceWithNonCoordBasis::EInvalidValue, noncoordbasis]
+    ];
     $CurrentContext = Append[$CurrentContext, "InterfaceWithNonCoordBasis" -> noncoordbasis]
   ];
+
+SetInterfaceWithNonCoordBasis::EInvalidValue = "Invalid InterfaceWithNonCoordBasis value: `1`. Expected True or False.";
 
 Protect[SetInterfaceWithNonCoordBasis];
 
@@ -126,8 +156,13 @@ Protect[GetSuffixName];
 
 SetSuffixName[suffix_] :=
   Module[{},
+    If[!ValidateContextModeValue["SuffixName", suffix],
+      Throw @ Message[SetSuffixName::EInvalidValue, suffix]
+    ];
     $CurrentContext = Append[$CurrentContext, "SuffixName" -> suffix]
   ];
+
+SetSuffixName::EInvalidValue = "Invalid SuffixName value: `1`. Expected a String.";
 
 Protect[SetSuffixName];
 
@@ -137,8 +172,13 @@ Protect[GetPrefixDt];
 
 SetPrefixDt[prefix_] :=
   Module[{},
+    If[!ValidateContextModeValue["PrefixDt", prefix],
+      Throw @ Message[SetPrefixDt::EInvalidValue, prefix]
+    ];
     $CurrentContext = Append[$CurrentContext, "PrefixDt" -> prefix]
   ];
+
+SetPrefixDt::EInvalidValue = "Invalid PrefixDt value: `1`. Expected a String.";
 
 Protect[SetPrefixDt];
 

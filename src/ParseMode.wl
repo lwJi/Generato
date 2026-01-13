@@ -51,42 +51,9 @@ SetUseTilePointIndex::usage = "SetUseTilePointIndex[val] sets UseTilePointIndex.
 
 Begin["`Private`"];
 
-(* Valid values for flat context keys *)
-$ContextModeValidValues = <|
-  "Phase" -> {None, "SetComp", "PrintComp"},
-  "IndependentVarlistIndex" -> {True, False},
-  "WithoutGridPointIndex" -> {True, False},
-  "UseTilePointIndex" -> {True, False},
-  "PrintCompType" -> {None, "Initializations", "Equations"},
-  "InitializationsMode" -> {None, "MainOut", "MainIn", "Derivs", "Derivs1st", "Derivs2nd", "MoreInOut", "Temp"},
-  "TensorType" -> {None, "Scal", "Vect", "Smat"},
-  "StorageType" -> {None, "GF", "Tile"},
-  "DerivsOrder" -> _Integer,
-  "DerivsAccuracy" -> _Integer,
-  "EquationsMode" -> {None, "Temp", "MainOut", "AddToMainOut"}
-|>;
-
-
 (* ========================================= *)
 (* Core Functions *)
 (* ========================================= *)
-
-(* Validate value for flat context key *)
-ValidateContextModeValue[key_String, value_] :=
-  Module[{validValues},
-    If[!KeyExistsQ[$ContextModeValidValues, key],
-      (* No validation for this key - allow any value *)
-      True
-      ,
-      validValues = $ContextModeValidValues[key];
-      If[ListQ[validValues],
-        MemberQ[validValues, value]
-        ,
-        (* It's a pattern (e.g., _Integer) - use pattern matching *)
-        MatchQ[value, validValues]
-      ]
-    ]
-  ];
 
 (* Scoped mode settings with automatic restore *)
 (* settings is a list of "FlatKey" -> value rules *)
