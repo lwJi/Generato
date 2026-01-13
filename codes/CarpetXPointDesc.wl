@@ -90,11 +90,11 @@ PrintFDExpressionMix2nd[accuracyOrd_?IntegerQ,
 (*            Print initialization of each component of a tensor              *)
 (******************************************************************************)
 
-PrintComponentInitialization[ctx_Association, varinfo_, compname_] :=
+PrintComponentInitialization[varinfo_, compname_] :=
   Module[{varlistindex, compToValue, varname, symmetry, buf, subbuf, len},
     (* Extract common component info using shared function *)
     {varlistindex, compToValue, varname, symmetry, len} =
-      ExtractComponentInfo[ctx, varinfo, compname];
+      ExtractComponentInfo[varinfo, compname];
 
     (* set subbuf *)
     subbuf = If[len == 0, "", "[" <> ToString[varlistindex] <> "]"];
@@ -102,25 +102,25 @@ PrintComponentInitialization[ctx_Association, varinfo_, compname_] :=
     (* set buf *)
     buf =
       Which[
-        GetInitializationsMode[ctx] === "MainIn" || GetInitializationsMode[ctx] === "MainOut",
+        GetInitializationsMode[] === "MainIn" || GetInitializationsMode[] === "MainOut",
           "const auto &"
-          <> StringTrim[ToString[compToValue], GetGridPointIndex[ctx]]
+          <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
           <> " = gf_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
         ,
-        GetInitializationsMode[ctx] === "Derivs1st",
+        GetInitializationsMode[] === "Derivs1st",
           "const auto " <> ToString[compToValue]
           <> " = fd_1st<" <> ToString[compname[[1]][[1]]] <> ">("
           <> StringDrop[StringDrop[ToString[compToValue], 1], {-len, -len + 0}]
           <> ", p);"
         ,
-        GetInitializationsMode[ctx] === "Derivs2nd",
+        GetInitializationsMode[] === "Derivs2nd",
           "const auto " <> ToString[compToValue]
           <> " = fd_2nd<" <> ToString[compname[[1]][[1]]] <> ", "
           <> ToString[compname[[2]][[1]]] <> ">("
           <> StringDrop[StringDrop[ToString[compToValue], 2], {-len, -len + 1}]
           <> ", p);"
         ,
-        GetInitializationsMode[ctx] === "Temp",
+        GetInitializationsMode[] === "Temp",
           buf = "auto " <> ToString[compToValue] <> ";"
         ,
         True,
@@ -142,11 +142,11 @@ Protect[PrintComponentInitialization];
  *        introduced to replace say coordinates representation of metric.
  *)
 
-PrintComponentEquation[ctx_Association, coordinate_, compname_, extrareplacerules_] :=
-  Module[{outputfile = GetOutputFile[ctx], compToValue, rhssToValue},
+PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
+  Module[{outputfile = GetOutputFile[], compToValue, rhssToValue},
     compToValue = compname // ToValues;
-    rhssToValue = ComputeRHSValue[ctx, coordinate, compname, extrareplacerules];
-    PrintEquationByMode[ctx, compToValue, rhssToValue,
+    rhssToValue = ComputeRHSValue[coordinate, compname, extrareplacerules];
+    PrintEquationByMode[compToValue, rhssToValue,
       (* MainOut formatter - standard assignment *)
       Function[{comp, rhs},
         PutAppend[CForm[comp], outputfile];
@@ -156,7 +156,7 @@ PrintComponentEquation[ctx_Association, coordinate_, compname_, extrareplacerule
       ],
       (* Temp formatter - CarpetXPointDesc specific: const prefix *)
       Function[{comp, rhs},
-        Global`pr["const " <> GetTempVariableType[ctx] <> " "];
+        Global`pr["const " <> GetTempVariableType[] <> " "];
         PutAppend[CForm[comp], outputfile];
         Global`pr["="];
         PutAppend[CForm[rhs], outputfile];

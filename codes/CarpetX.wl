@@ -25,14 +25,14 @@ Protect[PrintListInitializations];
     Print initialization of each component of a tensor
 *)
 
-PrintComponentInitialization[ctx_Association, varinfo_, compname_] :=
+PrintComponentInitialization[varinfo_, compname_] :=
   Module[{varlistindex, compToValue, varname, symmetry, buf, subbuf, len, isGF3D2, isGF3D5},
     (* Extract common component info using shared function *)
     {varlistindex, compToValue, varname, symmetry, len} =
-      ExtractComponentInfo[ctx, varinfo, compname];
+      ExtractComponentInfo[varinfo, compname];
     (* set subbuf *)
     Which[
-      GetTensorType[ctx] === "Scal",
+      GetTensorType[] === "Scal",
         Which[
           Length[varname] == 0,
             subbuf = ""
@@ -54,7 +54,7 @@ PrintComponentInitialization[ctx_Association, varinfo_, compname_] :=
             Throw @ Message[PrintComponentInitialization::EVarLength]
         ]
       ,
-      GetTensorType[ctx] === "Vect",
+      GetTensorType[] === "Vect",
         Which[
           Length[varname] == 1,
             subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> ")"
@@ -76,7 +76,7 @@ PrintComponentInitialization[ctx_Association, varinfo_, compname_] :=
             Throw @ Message[PrintComponentInitialization::EVarLength]
         ]
       ,
-      GetTensorType[ctx] === "Smat",
+      GetTensorType[] === "Smat",
         Which[
           Length[varname] == 2,
             subbuf = "(" <> ToString[compname[[1]][[1]] - 1] <> "," <> ToString[compname[[2]][[1]] - 1] <> ")"
@@ -95,20 +95,20 @@ PrintComponentInitialization[ctx_Association, varinfo_, compname_] :=
         Throw @ Message[PrintComponentInitialization::EMode]
     ];
     (* combine buf *)
-    isGF3D2 = GetStorageType[ctx] === "GF";
-    isGF3D5 = GetStorageType[ctx] === "Tile";
+    isGF3D2 = GetStorageType[] === "GF";
+    isGF3D5 = GetStorageType[] === "Tile";
     buf =
       Which[
-        GetInitializationsMode[ctx] === "MainOut" && isGF3D2,
-          "const GF3D2<CCTK_REAL> &local_" <> StringTrim[ToString[compToValue], GetGridPointIndex[ctx]] <> " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[ctx]] <> subbuf <> ";"
+        GetInitializationsMode[] === "MainOut" && isGF3D2,
+          "const GF3D2<CCTK_REAL> &local_" <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = gf_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]] <> subbuf <> ";"
         ,
-        GetInitializationsMode[ctx] === "MainIn" && isGF3D2,
-          "const vreal " <> StringTrim[ToString[compToValue], GetGridPointIndex[ctx]] <> " = tmp_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[ctx]] <> subbuf <> ";"
+        GetInitializationsMode[] === "MainIn" && isGF3D2,
+          "const vreal " <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = tmp_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]] <> subbuf <> ";"
         ,
-        GetInitializationsMode[ctx] === "MainIn" && isGF3D5,
-          "const vreal " <> StringTrim[ToString[compToValue], GetGridPointIndex[ctx]] <> " = tmp_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[ctx]] <> subbuf <> ";"
+        GetInitializationsMode[] === "MainIn" && isGF3D5,
+          "const vreal " <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = tmp_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]] <> subbuf <> ";"
         ,
-        GetInitializationsMode[ctx] === "Temp",
+        GetInitializationsMode[] === "Temp",
           buf = "vreal " <> ToString[compToValue] <> ";"
         ,
         True,
@@ -130,11 +130,11 @@ Protect[PrintComponentInitialization];
  *        introduced to replace say coordinates representation of metric.
  *)
 
-PrintComponentEquation[ctx_Association, coordinate_, compname_, extrareplacerules_] :=
-  Module[{outputfile = GetOutputFile[ctx], compToValue, rhssToValue},
+PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
+  Module[{outputfile = GetOutputFile[], compToValue, rhssToValue},
     compToValue = compname // ToValues;
-    rhssToValue = ComputeRHSValue[ctx, coordinate, compname, extrareplacerules];
-    PrintEquationByMode[ctx, compToValue, rhssToValue,
+    rhssToValue = ComputeRHSValue[coordinate, compname, extrareplacerules];
+    PrintEquationByMode[compToValue, rhssToValue,
       (* MainOut formatter - CarpetX specific *)
       Function[{comp, rhs},
         Global`pr["local_" <> ToString[CForm[comp]] <> ".store(mask, index2, "];

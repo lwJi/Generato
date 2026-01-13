@@ -4,7 +4,6 @@
 
 BeginPackage["Generato`BackendCommon`"];
 
-Needs["Generato`Context`"];
 Needs["Generato`Basic`"];
 Needs["Generato`ParseMode`"];
 Needs["Generato`Component`"];
@@ -21,7 +20,7 @@ GetInterfaceName::usage = "GetInterfaceName[compname] returns the interface name
 ComputeRHSValue::usage = "ComputeRHSValue[coordinate, compname, extrareplacerules] computes the RHS value for an equation.";
 PrintEquationByMode::usage = "PrintEquationByMode[compToValue, rhssToValue, mainFormatter, tempFormatter] prints equation based on current EquationsMode. tempFormatter is optional (defaults to Automatic for standard Temp output).";
 GetTensorIndexSubbuf::usage = "GetTensorIndexSubbuf[len, varlistindex] computes subbuf string for tensor component indexing.";
-ExtractComponentInfo::usage = "ExtractComponentInfo[ctx, varinfo, compname] extracts {varlistindex, compToValue, varname, symmetry, len} for component initialization.";
+ExtractComponentInfo::usage = "ExtractComponentInfo[varinfo, compname] extracts {varlistindex, compToValue, varname, symmetry, len} for component initialization.";
 
 Begin["`Private`"];
 
@@ -59,7 +58,7 @@ Protect[GetGFIndexNameMix2nd];
   GetInterfaceName - Returns the interface name for a component
   Previously duplicated in: Carpet.wl, CarpetXGPU.wl, CarpetXPointDesc.wl
 *)
-GetInterfaceName[ctx_Association, compname_] :=
+GetInterfaceName[compname_] :=
   Module[{intfname = ToString[compname[[0]]], colist = {"t", "x", "y", "z"}},
     Do[
       coindex = compname[[icomp]][[1]];
@@ -67,12 +66,9 @@ GetInterfaceName[ctx_Association, compname_] :=
       ,
       {icomp, 1, Length[compname]}
     ];
-    intfname = ToString[CForm[ToExpression[intfname <> GetGridPointIndex[ctx]]]];
+    intfname = ToString[CForm[ToExpression[intfname <> GetGridPointIndex[]]]];
     Return[intfname];
   ];
-
-(* Backwards compat *)
-GetInterfaceName[compname_] := GetInterfaceName[$CurrentContext, compname];
 
 Protect[GetInterfaceName];
 
@@ -80,12 +76,12 @@ Protect[GetInterfaceName];
   ComputeRHSValue - Computes the RHS value for an equation
   Previously duplicated in all 6 backends
 *)
-ComputeRHSValue[ctx_Association, coordinate_, compname_, extrareplacerules_] :=
+ComputeRHSValue[coordinate_, compname_, extrareplacerules_] :=
   Module[{rhssToValue},
     rhssToValue =
-      (compname /. {compname[[0]] -> RHSOf[compname[[0]], GetSuffixName[ctx]]}) //
+      (compname /. {compname[[0]] -> RHSOf[compname[[0]], GetSuffixName[]]}) //
       DummyToBasis[coordinate] // TraceBasisDummy // ToValues;
-    If[GetSimplifyEquation[ctx],
+    If[GetSimplifyEquation[],
       rhssToValue = rhssToValue // Simplify
     ];
     If[Length[extrareplacerules] > 0,
@@ -94,34 +90,30 @@ ComputeRHSValue[ctx_Association, coordinate_, compname_, extrareplacerules_] :=
     rhssToValue
   ];
 
-(* Backwards compat *)
-ComputeRHSValue[coordinate_, compname_, extrareplacerules_] :=
-  ComputeRHSValue[$CurrentContext, coordinate, compname, extrareplacerules];
-
 Protect[ComputeRHSValue];
 
 (*
   PrintEquationByMode - Prints equation based on current EquationsMode
 
   Calling conventions:
-  1. PrintEquationByMode[ctx, compToValue, rhssToValue, mainFormatter] - callback for MainOut,
+  1. PrintEquationByMode[compToValue, rhssToValue, mainFormatter] - callback for MainOut,
      default Temp (no const, CForm[compToValue]), shared AddToMainOut
-  2. PrintEquationByMode[ctx, compToValue, rhssToValue, mainFormatter, tempFormatter] - callbacks
+  2. PrintEquationByMode[compToValue, rhssToValue, mainFormatter, tempFormatter] - callbacks
      for both MainOut and Temp, shared AddToMainOut
 
   The tempFormatter function takes (compToValue, rhssToValue) and prints the Temp mode output.
-  If tempFormatter is Automatic (default), uses standard: GetTempVariableType[ctx] + CForm[compToValue]
+  If tempFormatter is Automatic (default), uses standard: GetTempVariableType[] + CForm[compToValue]
 *)
-PrintEquationByMode[ctx_Association, compToValue_, rhssToValue_, mainFormatter_] :=
-  PrintEquationByMode[ctx, compToValue, rhssToValue, mainFormatter, Automatic];
+PrintEquationByMode[compToValue_, rhssToValue_, mainFormatter_] :=
+  PrintEquationByMode[compToValue, rhssToValue, mainFormatter, Automatic];
 
-PrintEquationByMode[ctx_Association, compToValue_, rhssToValue_, mainFormatter_, tempFormatter_] :=
-  Module[{outputfile = GetOutputFile[ctx]},
+PrintEquationByMode[compToValue_, rhssToValue_, mainFormatter_, tempFormatter_] :=
+  Module[{outputfile = GetOutputFile[]},
     Which[
-      GetEquationsMode[ctx] === "Temp",
+      GetEquationsMode[] === "Temp",
         If[tempFormatter === Automatic,
           (* Default Temp handling: no const prefix, CForm[compToValue] *)
-          Global`pr[GetTempVariableType[ctx] <> " "];
+          Global`pr[GetTempVariableType[] <> " "];
           PutAppend[CForm[compToValue], outputfile];
           Global`pr["="];
           PutAppend[CForm[rhssToValue], outputfile];
@@ -131,10 +123,10 @@ PrintEquationByMode[ctx_Association, compToValue_, rhssToValue_, mainFormatter_,
           tempFormatter[compToValue, rhssToValue]
         ]
       ,
-      GetEquationsMode[ctx] === "MainOut",
+      GetEquationsMode[] === "MainOut",
         mainFormatter[compToValue, rhssToValue]
       ,
-      GetEquationsMode[ctx] === "AddToMainOut",
+      GetEquationsMode[] === "AddToMainOut",
         (* Shared AddToMainOut - identical across all backends *)
         PutAppend[CForm[compToValue], outputfile];
         Global`pr["+="];
@@ -145,13 +137,6 @@ PrintEquationByMode[ctx_Association, compToValue_, rhssToValue_, mainFormatter_,
         Throw @ Message[PrintEquationByMode::EMode]
     ]
   ];
-
-(* Backwards compat *)
-PrintEquationByMode[compToValue_, rhssToValue_, mainFormatter_] :=
-  PrintEquationByMode[$CurrentContext, compToValue, rhssToValue, mainFormatter, Automatic];
-
-PrintEquationByMode[compToValue_, rhssToValue_, mainFormatter_, tempFormatter_] :=
-  PrintEquationByMode[$CurrentContext, compToValue, rhssToValue, mainFormatter, tempFormatter];
 
 PrintEquationByMode::EMode = "PrintEquationByMode: EquationsMode unrecognized!";
 
@@ -167,8 +152,8 @@ Protect[PrintEquationByMode];
   For "Scal" TensorType, any tensor length is handled with simple [varlistindex]
   because TensorType=Scal means each component is treated as independent scalar.
 *)
-GetTensorIndexSubbuf[ctx_Association, len_Integer, varlistindex_Integer] :=
-  Module[{tensorType = GetTensorType[ctx]},
+GetTensorIndexSubbuf[len_Integer, varlistindex_Integer] :=
+  Module[{tensorType = GetTensorType[]},
     Which[
       tensorType === "Scal",
         (* Scal treats all components as independent scalars *)
@@ -200,10 +185,6 @@ GetTensorIndexSubbuf[ctx_Association, len_Integer, varlistindex_Integer] :=
     ]
   ];
 
-(* Backwards compat *)
-GetTensorIndexSubbuf[len_Integer, varlistindex_Integer] :=
-  GetTensorIndexSubbuf[$CurrentContext, len, varlistindex];
-
 GetTensorIndexSubbuf::ELength = "GetTensorIndexSubbuf: Unsupported tensor rank for tensor type.";
 GetTensorIndexSubbuf::ETensorType = "GetTensorIndexSubbuf: Unknown tensor type.";
 
@@ -214,14 +195,14 @@ Protect[GetTensorIndexSubbuf];
   Returns: {varlistindex, compToValue, varname, symmetry, len}
 
   Previously duplicated pattern in all 6 backends:
-    varlistindex = GetMapComponentToVarlist[ctx][compname];
+    varlistindex = GetMapComponentToVarlist[][compname];
     compToValue = compname // ToValues;
     {varname, symmetry} = varinfo;
     len = Length[varname];
 *)
-ExtractComponentInfo[ctx_Association, varinfo_, compname_] :=
+ExtractComponentInfo[varinfo_, compname_] :=
   Module[{varlistindex, compToValue, varname, symmetry, len},
-    varlistindex = GetMapComponentToVarlist[ctx][compname];
+    varlistindex = GetMapComponentToVarlist[][compname];
     compToValue = compname // ToValues;
     {varname, symmetry} = varinfo;
     len = Length[varname];

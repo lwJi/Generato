@@ -342,11 +342,11 @@ $MainPrint[] :=
       (* set d_k g_{ab} *)
       printdg[cc_, aa_, bb_] :=
         WithMode[{
-          {"Phase"} -> "PrintComp",
-          {"PrintComp", "Type"} -> "Equations",
-          {"PrintComp", "Equations", "Mode"} -> "MainOut"
+          "Phase" -> "PrintComp",
+          "PrintCompType" -> "Equations",
+          "EquationsMode" -> "MainOut"
         },
-          PrintComponentEquation[$CurrentContext, GetDefaultChart[], dmetricg[{cc, -GetDefaultChart[]}, {aa, -GetDefaultChart[]}, {bb, -GetDefaultChart[]}], {}]
+          PrintComponentEquation[GetDefaultChart[], dmetricg[{cc, -GetDefaultChart[]}, {aa, -GetDefaultChart[]}, {bb, -GetDefaultChart[]}], {}]
         ];
       Do[printdg[cc, aa, bb], {cc, 3, 1, -1}, {aa, 3, 0, -1}, {bb, 3, aa, -1}];
       (* set d_t g_{ab} *)
@@ -357,11 +357,11 @@ $MainPrint[] :=
           Module[{savedSuffix = GetSuffixName[]},
             SetSuffixName["Ein"];
             WithMode[{
-              {"Phase"} -> "PrintComp",
-              {"PrintComp", "Type"} -> "Equations",
-              {"PrintComp", "Equations", "Mode"} -> "MainOut"
+              "Phase" -> "PrintComp",
+              "PrintCompType" -> "Equations",
+              "EquationsMode" -> "MainOut"
             },
-              PrintComponentEquation[$CurrentContext, GetDefaultChart[], dmetricg[{cc, -GetDefaultChart[]}, {aa, -GetDefaultChart[]}, {bb, -GetDefaultChart[]}], {}]
+              PrintComponentEquation[GetDefaultChart[], dmetricg[{cc, -GetDefaultChart[]}, {aa, -GetDefaultChart[]}, {bb, -GetDefaultChart[]}], {}]
             ];
             SetSuffixName[savedSuffix]
           ];

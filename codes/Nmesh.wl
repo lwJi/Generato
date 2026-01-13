@@ -22,40 +22,40 @@ GetInitialComp[varname_] :=
     Print initialization of each component of a tensor
 *)
 
-PrintComponentInitialization[ctx_Association, varinfo_, compname_] :=
+PrintComponentInitialization[varinfo_, compname_] :=
   Module[{varlistindex, compToValue, varname, symmetry, len, buf},
     (* Extract common component info using shared function *)
     {varlistindex, compToValue, varname, symmetry, len} =
-      ExtractComponentInfo[ctx, varinfo, compname];
+      ExtractComponentInfo[varinfo, compname];
     Which[
-      GetInitializationsMode[ctx] === "MainOut",
+      GetInitializationsMode[] === "MainOut",
         buf =
-          "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[ctx]] <> " = Vard(node, Vind(vlr," <> ToString[GetProject[ctx]] <> "->i_" <> StringTrim[ToString[varname[[0]]], (GetPrefixDt[ctx] | GetSuffixUnprotected[ctx])] <> GetInitialComp[varname] <>
+          "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = Vard(node, Vind(vlr," <> ToString[GetProject[]] <> "->i_" <> StringTrim[ToString[varname[[0]]], (GetPrefixDt[] | GetSuffixUnprotected[])] <> GetInitialComp[varname] <>
             If[varlistindex == 0,
               ""
               ,
               "+" <> ToString[varlistindex]
             ] <> "));"
       ,
-      GetInitializationsMode[ctx] === "MainIn",
+      GetInitializationsMode[] === "MainIn",
         buf =
-          "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[ctx]] <> " = Vard(node, Vind(vlu," <> ToString[GetProject[ctx]] <> "->i_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[ctx]] <> GetInitialComp[varname] <>
+          "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = Vard(node, Vind(vlu," <> ToString[GetProject[]] <> "->i_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]] <> GetInitialComp[varname] <>
             If[varlistindex == 0,
               ""
               ,
               "+" <> ToString[varlistindex]
             ] <> "));"
       ,
-      GetInitializationsMode[ctx] === "MoreInOut",
+      GetInitializationsMode[] === "MoreInOut",
         buf =
-          "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[ctx]] <> " = Vard(node, i" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[ctx]] <> GetInitialComp[varname] <>
+          "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = Vard(node, i" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]] <> GetInitialComp[varname] <>
             If[varlistindex == 0,
               ""
               ,
               "+" <> ToString[varlistindex]
             ] <> ");"
       ,
-      GetInitializationsMode[ctx] === "Temp",
+      GetInitializationsMode[] === "Temp",
         buf = "double " <> ToString[compToValue] <> ";"
       ,
       True,
@@ -77,11 +77,11 @@ Protect[PrintComponentInitialization];
  *        introduced to replace say coordinates representation of metric.
  *)
 
-PrintComponentEquation[ctx_Association, coordinate_, compname_, extrareplacerules_] :=
-  Module[{outputfile = GetOutputFile[ctx], compToValue, rhssToValue},
+PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
+  Module[{outputfile = GetOutputFile[], compToValue, rhssToValue},
     compToValue = compname // ToValues;
-    rhssToValue = ComputeRHSValue[ctx, coordinate, compname, extrareplacerules];
-    PrintEquationByMode[ctx, compToValue, rhssToValue,
+    rhssToValue = ComputeRHSValue[coordinate, compname, extrareplacerules];
+    PrintEquationByMode[compToValue, rhssToValue,
       (* MainOut formatter - standard assignment *)
       Function[{comp, rhs},
         PutAppend[CForm[comp], outputfile];

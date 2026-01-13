@@ -175,9 +175,12 @@ AppendTo[$AllTests,
   VerificationTest[
     (* ParseVarlist should process a list of variable definitions *)
     (* This is a basic smoke test - full functionality tested via GridTensors *)
+    (* Use Quiet to suppress messages when tensor is already defined on re-run *)
     varlist = {{parseVarlistTest[i], PrintAs -> "pvt"}};
-    WithMode[{{"Phase"} -> "SetComp"},
-      ParseVarlist[varlist, testCart]
+    Quiet[
+      WithMode[{"Phase" -> "SetComp"},
+        ParseVarlist[varlist, testCart]
+      ]
     ];
     True,
     True,
