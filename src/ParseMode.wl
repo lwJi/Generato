@@ -96,6 +96,15 @@ WithMode[settings_List, body_] :=
   Module[{flatKeys, savedValues},
     (* Extract flat keys from settings *)
     flatKeys = First /@ settings;
+    (* Validate all settings before applying any *)
+    Scan[
+      Function[setting,
+        If[!ValidateContextModeValue[First[setting], Last[setting]],
+          Throw @ Message[WithMode::EInvalidValue, First[setting], Last[setting]]
+        ]
+      ],
+      settings
+    ];
     (* Save current values for keys we're about to modify *)
     savedValues = $CurrentContext[#] & /@ flatKeys;
     (* Apply new settings *)
@@ -116,6 +125,8 @@ WithMode[settings_List, body_] :=
   ];
 
 Protect[WithMode];
+
+WithMode::EInvalidValue = "Invalid value for key \"`1`\": `2`";
 
 (* ========================================= *)
 (* Convenience Helpers *)

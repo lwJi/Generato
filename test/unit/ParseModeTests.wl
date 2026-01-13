@@ -237,6 +237,48 @@ AppendTo[$AllTests,
 ];
 
 (* ========================================= *)
+(* Test: WithMode validation *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    ResetContext[];
+    (* WithMode should throw on invalid Phase value *)
+    Catch[
+      WithMode[{"Phase" -> "InvalidPhase"}, GetPhase[]];
+      "NoThrow"
+    ],
+    Null,  (* Message returns Null, Throw propagates it *)
+    {WithMode::EInvalidValue},
+    TestID -> "Mode-WithMode-Validation-InvalidPhase"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    ResetContext[];
+    (* WithMode should throw on invalid DerivsOrder value *)
+    Catch[
+      WithMode[{"DerivsOrder" -> "NotAnInteger"}, GetDerivsOrder[]];
+      "NoThrow"
+    ],
+    Null,
+    {WithMode::EInvalidValue},
+    TestID -> "Mode-WithMode-Validation-InvalidDerivsOrder"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    ResetContext[];
+    (* Keys without validation rules should still work *)
+    WithMode[{"SuffixName" -> "anything"}, GetSuffixName[]],
+    "anything",
+    TestID -> "Mode-WithMode-NoValidation-SuffixName"
+  ]
+];
+
+(* ========================================= *)
 (* Cleanup *)
 (* ========================================= *)
 
