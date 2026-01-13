@@ -88,8 +88,13 @@ Protect[GetCheckInputEquations];
 
 SetCheckInputEquations[checkinput_] :=
   Module[{},
+    If[!ValidateContextModeValue["CheckInputEquations", checkinput],
+      Throw @ Message[SetCheckInputEquations::EInvalidValue, checkinput]
+    ];
     $CurrentContext = Append[$CurrentContext, "CheckInputEquations" -> checkinput]
   ];
+
+SetCheckInputEquations::EInvalidValue = "Invalid CheckInputEquations value: `1`. Expected True or False.";
 
 Protect[SetCheckInputEquations];
 
@@ -99,8 +104,13 @@ Protect[GetPVerbose];
 
 SetPVerbose[verbose_] :=
   Module[{},
+    If[!ValidateContextModeValue["PVerbose", verbose],
+      Throw @ Message[SetPVerbose::EInvalidValue, verbose]
+    ];
     $CurrentContext = Append[$CurrentContext, "PVerbose" -> verbose]
   ];
+
+SetPVerbose::EInvalidValue = "Invalid PVerbose value: `1`. Expected True or False.";
 
 Protect[SetPVerbose];
 
@@ -110,8 +120,13 @@ Protect[GetPrintDate];
 
 SetPrintDate[print_] :=
   Module[{},
+    If[!ValidateContextModeValue["PrintDate", print],
+      Throw @ Message[SetPrintDate::EInvalidValue, print]
+    ];
     $CurrentContext = Append[$CurrentContext, "PrintDate" -> print]
   ];
+
+SetPrintDate::EInvalidValue = "Invalid PrintDate value: `1`. Expected True or False.";
 
 Protect[SetPrintDate];
 
@@ -121,8 +136,13 @@ Protect[GetPrintHeaderMacro];
 
 SetPrintHeaderMacro[print_] :=
   Module[{},
+    If[!ValidateContextModeValue["PrintHeaderMacro", print],
+      Throw @ Message[SetPrintHeaderMacro::EInvalidValue, print]
+    ];
     $CurrentContext = Append[$CurrentContext, "PrintHeaderMacro" -> print]
   ];
+
+SetPrintHeaderMacro::EInvalidValue = "Invalid PrintHeaderMacro value: `1`. Expected True or False.";
 
 Protect[SetPrintHeaderMacro];
 
@@ -132,8 +152,13 @@ Protect[GetGridPointIndex];
 
 SetGridPointIndex[gridindex_] :=
   Module[{},
+    If[!ValidateContextModeValue["GridPointIndex", gridindex],
+      Throw @ Message[SetGridPointIndex::EInvalidValue, gridindex]
+    ];
     $CurrentContext = Append[$CurrentContext, "GridPointIndex" -> gridindex]
   ];
+
+SetGridPointIndex::EInvalidValue = "Invalid GridPointIndex value: `1`. Expected a String.";
 
 Protect[SetGridPointIndex];
 
@@ -143,8 +168,13 @@ Protect[GetTilePointIndex];
 
 SetTilePointIndex[tileindex_] :=
   Module[{},
+    If[!ValidateContextModeValue["TilePointIndex", tileindex],
+      Throw @ Message[SetTilePointIndex::EInvalidValue, tileindex]
+    ];
     $CurrentContext = Append[$CurrentContext, "TilePointIndex" -> tileindex]
   ];
+
+SetTilePointIndex::EInvalidValue = "Invalid TilePointIndex value: `1`. Expected a String.";
 
 Protect[SetTilePointIndex];
 
@@ -154,8 +184,13 @@ Protect[GetSuffixUnprotected];
 
 SetSuffixUnprotected[suffix_] :=
   Module[{},
+    If[!ValidateContextModeValue["SuffixUnprotected", suffix],
+      Throw @ Message[SetSuffixUnprotected::EInvalidValue, suffix]
+    ];
     $CurrentContext = Append[$CurrentContext, "SuffixUnprotected" -> suffix]
   ];
+
+SetSuffixUnprotected::EInvalidValue = "Invalid SuffixUnprotected value: `1`. Expected a String.";
 
 Protect[SetSuffixUnprotected];
 
@@ -165,8 +200,13 @@ Protect[GetOutputFile];
 
 SetOutputFile[filename_] :=
   Module[{},
+    If[!ValidateContextModeValue["OutputFile", filename],
+      Throw @ Message[SetOutputFile::EInvalidValue, filename]
+    ];
     $CurrentContext = Append[$CurrentContext, "OutputFile" -> filename]
   ];
+
+SetOutputFile::EInvalidValue = "Invalid OutputFile value: `1`. Expected a String.";
 
 Protect[SetOutputFile];
 
@@ -176,8 +216,13 @@ Protect[GetProject];
 
 SetProject[name_] :=
   Module[{},
+    If[!ValidateContextModeValue["Project", name],
+      Throw @ Message[SetProject::EInvalidValue, name]
+    ];
     $CurrentContext = Append[$CurrentContext, "Project" -> name]
   ];
+
+SetProject::EInvalidValue = "Invalid Project value: `1`. Expected a String.";
 
 Protect[SetProject];
 
