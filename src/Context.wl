@@ -93,14 +93,14 @@ $ContextModeValidValues = <|
 (* Validate value for context key *)
 ValidateContextModeValue::usage = "ValidateContextModeValue[key, value] returns True if value is valid for key.";
 
-ValidateContextModeValue[key_String, value_] :=
+ValidateContextModeValue[contextKey_String, contextValue_] :=
   Module[{validValues},
-    If[!KeyExistsQ[$ContextModeValidValues, key],
+    If[!KeyExistsQ[$ContextModeValidValues, contextKey],
       True,
-      validValues = $ContextModeValidValues[key];
+      validValues = $ContextModeValidValues[contextKey];
       If[ListQ[validValues],
-        MemberQ[validValues, value],
-        MatchQ[value, validValues]
+        MemberQ[validValues, contextValue],
+        MatchQ[contextValue, validValues]
       ]
     ]
   ];
@@ -189,11 +189,11 @@ Begin["`Private`"];
 (* ========================================= *)
 
 (* Generate error message text based on validation rule *)
-expectedValueText[key_String] :=
+expectedValueText[contextKey_String] :=
   Module[{validValues},
-    If[!KeyExistsQ[$ContextModeValidValues, key],
+    If[!KeyExistsQ[$ContextModeValidValues, contextKey],
       "a valid value",
-      validValues = $ContextModeValidValues[key];
+      validValues = $ContextModeValidValues[contextKey];
       If[ListQ[validValues],
         StringJoin[ToString /@ Riffle[validValues, " or "]],
         Switch[validValues,
@@ -207,16 +207,16 @@ expectedValueText[key_String] :=
   ];
 
 (* Common setter implementation - validates and updates context *)
-setContextValue[key_String, setterSymbol_Symbol, value_] :=
-  If[!ValidateContextModeValue[key, value],
-    Throw @ Message[MessageName[setterSymbol, "EInvalidValue"], value, expectedValueText[key]],
-    $CurrentContext = Append[$CurrentContext, key -> value]
+setContextValue[contextKey_String, setterSymbol_Symbol, contextValue_] :=
+  If[!ValidateContextModeValue[contextKey, contextValue],
+    Throw @ Message[MessageName[setterSymbol, "EInvalidValue"], contextValue, expectedValueText[contextKey]],
+    $CurrentContext = Append[$CurrentContext, contextKey -> contextValue]
   ];
 
 (* Macro to define standard getter/setter pairs *)
-defineAccessor[key_String, getterSymbol_Symbol, setterSymbol_Symbol] := (
-  getterSymbol[] := $CurrentContext[key];
-  setterSymbol[val_] := setContextValue[key, setterSymbol, val];
+defineAccessor[contextKey_String, getterSymbol_Symbol, setterSymbol_Symbol] := (
+  getterSymbol[] := $CurrentContext[contextKey];
+  setterSymbol[val_] := setContextValue[contextKey, setterSymbol, val];
   MessageName[setterSymbol, "EInvalidValue"] = "Invalid value: `1`. Expected `2`.";
 );
 
