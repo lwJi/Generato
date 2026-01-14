@@ -93,6 +93,22 @@ $ContextModeValidValues = <|
 (* Validate value for context key *)
 ValidateContextModeValue::usage = "ValidateContextModeValue[key, value] returns True if value is valid for key.";
 
+ValidateContextModeValue[key_String, value_] :=
+  Module[{validValues},
+    If[!KeyExistsQ[$ContextModeValidValues, key],
+      True,
+      validValues = $ContextModeValidValues[key];
+      If[ListQ[validValues],
+        MemberQ[validValues, value],
+        MatchQ[value, validValues]
+      ]
+    ]
+  ];
+
+(* ========================================= *)
+(* Accessor Usage Declarations *)
+(* ========================================= *)
+
 (* Basic.wl state accessors *)
 GetCheckInputEquations::usage = "GetCheckInputEquations[] returns True if input equation checking is enabled.";
 SetCheckInputEquations::usage = "SetCheckInputEquations[bool] enables or disables checking of input equations.";
@@ -163,41 +179,23 @@ SetPrefixDt::usage = "SetPrefixDt[prefix] sets the prefix used for time derivati
 SetMainPrint::usage = "SetMainPrint[content] sets the content to be written as the main body of the output file.";
 GetMainPrint::usage = "GetMainPrint[] returns and evaluates the content set by SetMainPrint.";
 
-ValidateContextModeValue[key_String, value_] :=
-  Module[{validValues},
-    If[!KeyExistsQ[$ContextModeValidValues, key],
-      (* No validation for this key - allow any value *)
-      True
-      ,
-      validValues = $ContextModeValidValues[key];
-      If[ListQ[validValues],
-        MemberQ[validValues, value]
-        ,
-        (* It's a pattern (e.g., _Integer) - use pattern matching *)
-        MatchQ[value, validValues]
-      ]
-    ]
-  ];
-
 (* Initialize global context with defaults *)
 $CurrentContext = $ContextDefaults;
 
 Begin["`Private`"];
 
 (* ========================================= *)
-(* Accessor Generation Helpers *)
+(* Accessor Generation Infrastructure *)
 (* ========================================= *)
 
 (* Generate error message text based on validation rule *)
 expectedValueText[key_String] :=
   Module[{validValues},
     If[!KeyExistsQ[$ContextModeValidValues, key],
-      "a valid value"
-      ,
+      "a valid value",
       validValues = $ContextModeValidValues[key];
       If[ListQ[validValues],
-        StringJoin[ToString /@ Riffle[validValues, " or "]]
-        ,
+        StringJoin[ToString /@ Riffle[validValues, " or "]],
         Switch[validValues,
           _String, "a String",
           _Integer, "an Integer",
@@ -210,209 +208,126 @@ expectedValueText[key_String] :=
 
 (* Common setter implementation - validates and updates context *)
 setContextValue[key_String, setterSymbol_Symbol, value_] :=
-  Module[{},
-    If[!ValidateContextModeValue[key, value],
-      Throw @ Message[MessageName[setterSymbol, "EInvalidValue"], value, expectedValueText[key]]
-    ];
+  If[!ValidateContextModeValue[key, value],
+    Throw @ Message[MessageName[setterSymbol, "EInvalidValue"], value, expectedValueText[key]],
     $CurrentContext = Append[$CurrentContext, key -> value]
   ];
 
-(* ========================================= *)
-(* Basic.wl State Accessors *)
-(* ========================================= *)
-
-GetCheckInputEquations[] := $CurrentContext["CheckInputEquations"];
-SetCheckInputEquations[val_] := setContextValue["CheckInputEquations", SetCheckInputEquations, val];
-SetCheckInputEquations::EInvalidValue = "Invalid value: `1`. Expected `2`.";
-
-GetPVerbose[] := $CurrentContext["PVerbose"];
-SetPVerbose[val_] := setContextValue["PVerbose", SetPVerbose, val];
-SetPVerbose::EInvalidValue = "Invalid value: `1`. Expected `2`.";
-
-GetPrintDate[] := $CurrentContext["PrintDate"];
-SetPrintDate[val_] := setContextValue["PrintDate", SetPrintDate, val];
-SetPrintDate::EInvalidValue = "Invalid value: `1`. Expected `2`.";
-
-GetPrintHeaderMacro[] := $CurrentContext["PrintHeaderMacro"];
-SetPrintHeaderMacro[val_] := setContextValue["PrintHeaderMacro", SetPrintHeaderMacro, val];
-SetPrintHeaderMacro::EInvalidValue = "Invalid value: `1`. Expected `2`.";
-
-GetGridPointIndex[] := $CurrentContext["GridPointIndex"];
-SetGridPointIndex[val_] := setContextValue["GridPointIndex", SetGridPointIndex, val];
-SetGridPointIndex::EInvalidValue = "Invalid value: `1`. Expected `2`.";
-
-GetTilePointIndex[] := $CurrentContext["TilePointIndex"];
-SetTilePointIndex[val_] := setContextValue["TilePointIndex", SetTilePointIndex, val];
-SetTilePointIndex::EInvalidValue = "Invalid value: `1`. Expected `2`.";
-
-GetSuffixUnprotected[] := $CurrentContext["SuffixUnprotected"];
-SetSuffixUnprotected[val_] := setContextValue["SuffixUnprotected", SetSuffixUnprotected, val];
-SetSuffixUnprotected::EInvalidValue = "Invalid value: `1`. Expected `2`.";
-
-GetOutputFile[] := $CurrentContext["OutputFile"];
-SetOutputFile[val_] := setContextValue["OutputFile", SetOutputFile, val];
-SetOutputFile::EInvalidValue = "Invalid value: `1`. Expected `2`.";
-
-GetProject[] := $CurrentContext["Project"];
-SetProject[val_] := setContextValue["Project", SetProject, val];
-SetProject::EInvalidValue = "Invalid value: `1`. Expected `2`.";
-
-Protect[GetCheckInputEquations, SetCheckInputEquations];
-Protect[GetPVerbose, SetPVerbose];
-Protect[GetPrintDate, SetPrintDate];
-Protect[GetPrintHeaderMacro, SetPrintHeaderMacro];
-Protect[GetGridPointIndex, SetGridPointIndex];
-Protect[GetTilePointIndex, SetTilePointIndex];
-Protect[GetSuffixUnprotected, SetSuffixUnprotected];
-Protect[GetOutputFile, SetOutputFile];
-Protect[GetProject, SetProject];
+(* Macro to define standard getter/setter pairs *)
+defineAccessor[key_String, getterSymbol_Symbol, setterSymbol_Symbol] := (
+  getterSymbol[] := $CurrentContext[key];
+  setterSymbol[val_] := setContextValue[key, setterSymbol, val];
+  MessageName[setterSymbol, "EInvalidValue"] = "Invalid value: `1`. Expected `2`.";
+);
 
 (* ========================================= *)
-(* ParseMode.wl State Accessors *)
+(* Generate All Standard Accessors *)
 (* ========================================= *)
 
-(* Phase helpers *)
-GetPhase[] := $CurrentContext["Phase"];
-SetPhase[val_] := setContextValue["Phase", SetPhase, val];
-SetPhase::EInvalidValue = "Invalid value: `1`. Expected `2`.";
+(* Basic.wl state accessors *)
+defineAccessor["CheckInputEquations", GetCheckInputEquations, SetCheckInputEquations];
+defineAccessor["PVerbose", GetPVerbose, SetPVerbose];
+defineAccessor["PrintDate", GetPrintDate, SetPrintDate];
+defineAccessor["PrintHeaderMacro", GetPrintHeaderMacro, SetPrintHeaderMacro];
+defineAccessor["GridPointIndex", GetGridPointIndex, SetGridPointIndex];
+defineAccessor["TilePointIndex", GetTilePointIndex, SetTilePointIndex];
+defineAccessor["SuffixUnprotected", GetSuffixUnprotected, SetSuffixUnprotected];
+defineAccessor["OutputFile", GetOutputFile, SetOutputFile];
+defineAccessor["Project", GetProject, SetProject];
+
+(* ParseMode.wl state accessors *)
+defineAccessor["Phase", GetPhase, SetPhase];
+defineAccessor["PrintCompType", GetPrintCompType, SetPrintCompType];
+defineAccessor["InitializationsMode", GetInitializationsMode, SetInitializationsMode];
+defineAccessor["TensorType", GetTensorType, SetTensorType];
+defineAccessor["StorageType", GetStorageType, SetStorageType];
+defineAccessor["DerivsOrder", GetDerivsOrder, SetDerivsOrder];
+defineAccessor["DerivsAccuracy", GetDerivsAccuracy, SetDerivsAccuracy];
+defineAccessor["EquationsMode", GetEquationsMode, SetEquationsMode];
+defineAccessor["IndependentVarlistIndex", GetIndependentVarlistIndex, SetIndependentVarlistIndex];
+defineAccessor["WithoutGridPointIndex", GetWithoutGridPointIndex, SetWithoutGridPointIndex];
+defineAccessor["UseTilePointIndex", GetUseTilePointIndex, SetUseTilePointIndex];
+
+(* Component.wl state accessors *)
+defineAccessor["MapComponentToVarlist", GetMapComponentToVarlist, SetMapComponentToVarlist];
+defineAccessor["ProcessNewVarlist", GetProcessNewVarlist, SetProcessNewVarlist];
+defineAccessor["SimplifyEquation", GetSimplifyEquation, SetSimplifyEquation];
+defineAccessor["UseLetterForTensorComponent", GetUseLetterForTensorComponent, SetUseLetterForTensorComponent];
+defineAccessor["TempVariableType", GetTempVariableType, SetTempVariableType];
+defineAccessor["InterfaceWithNonCoordBasis", GetInterfaceWithNonCoordBasis, SetInterfaceWithNonCoordBasis];
+defineAccessor["SuffixName", GetSuffixName, SetSuffixName];
+defineAccessor["PrefixDt", GetPrefixDt, SetPrefixDt];
+
+(* ========================================= *)
+(* Convenience Helpers *)
+(* ========================================= *)
 
 InSetCompPhase[] := $CurrentContext["Phase"] === "SetComp";
 InPrintCompPhase[] := $CurrentContext["Phase"] === "PrintComp";
-
-Protect[GetPhase, SetPhase, InSetCompPhase, InPrintCompPhase];
-
-(* PrintComp type helpers *)
-GetPrintCompType[] := $CurrentContext["PrintCompType"];
-SetPrintCompType[val_] := setContextValue["PrintCompType", SetPrintCompType, val];
-SetPrintCompType::EInvalidValue = "Invalid value: `1`. Expected `2`.";
-
 InInitializationsMode[] := $CurrentContext["PrintCompType"] === "Initializations";
 InEquationsMode[] := $CurrentContext["PrintCompType"] === "Equations";
 
-Protect[GetPrintCompType, SetPrintCompType, InInitializationsMode, InEquationsMode];
-
-(* Initializations mode helpers *)
-GetInitializationsMode[] := $CurrentContext["InitializationsMode"];
-SetInitializationsMode[val_] := setContextValue["InitializationsMode", SetInitializationsMode, val];
-SetInitializationsMode::EInvalidValue = "Invalid value: `1`. Expected `2`.";
-
-GetTensorType[] := $CurrentContext["TensorType"];
-SetTensorType[val_] := setContextValue["TensorType", SetTensorType, val];
-SetTensorType::EInvalidValue = "Invalid value: `1`. Expected `2`.";
-
-GetStorageType[] := $CurrentContext["StorageType"];
-SetStorageType[val_] := setContextValue["StorageType", SetStorageType, val];
-SetStorageType::EInvalidValue = "Invalid value: `1`. Expected `2`.";
-
-GetDerivsOrder[] := $CurrentContext["DerivsOrder"];
-SetDerivsOrder[val_] := setContextValue["DerivsOrder", SetDerivsOrder, val];
-SetDerivsOrder::EInvalidValue = "Invalid value: `1`. Expected `2`.";
-
-GetDerivsAccuracy[] := $CurrentContext["DerivsAccuracy"];
-SetDerivsAccuracy[val_] := setContextValue["DerivsAccuracy", SetDerivsAccuracy, val];
-SetDerivsAccuracy::EInvalidValue = "Invalid value: `1`. Expected `2`.";
-
-Protect[GetInitializationsMode, SetInitializationsMode];
-Protect[GetTensorType, SetTensorType];
-Protect[GetStorageType, SetStorageType];
-Protect[GetDerivsOrder, SetDerivsOrder];
-Protect[GetDerivsAccuracy, SetDerivsAccuracy];
-
-(* Equations mode helper *)
-GetEquationsMode[] := $CurrentContext["EquationsMode"];
-SetEquationsMode[val_] := setContextValue["EquationsMode", SetEquationsMode, val];
-SetEquationsMode::EInvalidValue = "Invalid value: `1`. Expected `2`.";
-
-Protect[GetEquationsMode, SetEquationsMode];
-
-(* IndexOptions helpers *)
-GetIndependentVarlistIndex[] := $CurrentContext["IndependentVarlistIndex"];
-SetIndependentVarlistIndex[val_] := setContextValue["IndependentVarlistIndex", SetIndependentVarlistIndex, val];
-SetIndependentVarlistIndex::EInvalidValue = "Invalid value: `1`. Expected `2`.";
-
-GetWithoutGridPointIndex[] := $CurrentContext["WithoutGridPointIndex"];
-SetWithoutGridPointIndex[val_] := setContextValue["WithoutGridPointIndex", SetWithoutGridPointIndex, val];
-SetWithoutGridPointIndex::EInvalidValue = "Invalid value: `1`. Expected `2`.";
-
-GetUseTilePointIndex[] := $CurrentContext["UseTilePointIndex"];
-SetUseTilePointIndex[val_] := setContextValue["UseTilePointIndex", SetUseTilePointIndex, val];
-SetUseTilePointIndex::EInvalidValue = "Invalid value: `1`. Expected `2`.";
-
-Protect[GetIndependentVarlistIndex, SetIndependentVarlistIndex];
-Protect[GetWithoutGridPointIndex, SetWithoutGridPointIndex];
-Protect[GetUseTilePointIndex, SetUseTilePointIndex];
-
 (* ========================================= *)
-(* Component.wl State Accessors *)
+(* Special Accessors for MainPrint *)
 (* ========================================= *)
 
-GetMapComponentToVarlist[] := $CurrentContext["MapComponentToVarlist"];
-SetMapComponentToVarlist[val_] := setContextValue["MapComponentToVarlist", SetMapComponentToVarlist, val];
-SetMapComponentToVarlist::EInvalidValue = "Invalid value: `1`. Expected `2`.";
-
-GetProcessNewVarlist[] := $CurrentContext["ProcessNewVarlist"];
-SetProcessNewVarlist[val_] := setContextValue["ProcessNewVarlist", SetProcessNewVarlist, val];
-SetProcessNewVarlist::EInvalidValue = "Invalid value: `1`. Expected `2`.";
-
-GetSimplifyEquation[] := $CurrentContext["SimplifyEquation"];
-SetSimplifyEquation[val_] := setContextValue["SimplifyEquation", SetSimplifyEquation, val];
-SetSimplifyEquation::EInvalidValue = "Invalid value: `1`. Expected `2`.";
-
-GetUseLetterForTensorComponent[] := $CurrentContext["UseLetterForTensorComponent"];
-SetUseLetterForTensorComponent[val_] := setContextValue["UseLetterForTensorComponent", SetUseLetterForTensorComponent, val];
-SetUseLetterForTensorComponent::EInvalidValue = "Invalid value: `1`. Expected `2`.";
-
-GetTempVariableType[] := $CurrentContext["TempVariableType"];
-SetTempVariableType[val_] := setContextValue["TempVariableType", SetTempVariableType, val];
-SetTempVariableType::EInvalidValue = "Invalid value: `1`. Expected `2`.";
-
-GetInterfaceWithNonCoordBasis[] := $CurrentContext["InterfaceWithNonCoordBasis"];
-SetInterfaceWithNonCoordBasis[val_] := setContextValue["InterfaceWithNonCoordBasis", SetInterfaceWithNonCoordBasis, val];
-SetInterfaceWithNonCoordBasis::EInvalidValue = "Invalid value: `1`. Expected `2`.";
-
-GetSuffixName[] := $CurrentContext["SuffixName"];
-SetSuffixName[val_] := setContextValue["SuffixName", SetSuffixName, val];
-SetSuffixName::EInvalidValue = "Invalid value: `1`. Expected `2`.";
-
-GetPrefixDt[] := $CurrentContext["PrefixDt"];
-SetPrefixDt[val_] := setContextValue["PrefixDt", SetPrefixDt, val];
-SetPrefixDt::EInvalidValue = "Invalid value: `1`. Expected `2`.";
-
-Protect[GetMapComponentToVarlist, SetMapComponentToVarlist];
-Protect[GetProcessNewVarlist, SetProcessNewVarlist];
-Protect[GetSimplifyEquation, SetSimplifyEquation];
-Protect[GetUseLetterForTensorComponent, SetUseLetterForTensorComponent];
-Protect[GetTempVariableType, SetTempVariableType];
-Protect[GetInterfaceWithNonCoordBasis, SetInterfaceWithNonCoordBasis];
-Protect[GetSuffixName, SetSuffixName];
-Protect[GetPrefixDt, SetPrefixDt];
-
-(* ========================================= *)
-(* Writefile.wl State Accessors *)
-(* ========================================= *)
-
-(* Special getter - reads from $CurrentContext and evaluates held content *)
+(* GetMainPrint evaluates held content *)
 GetMainPrint[] :=
   Module[{mainPrint},
     mainPrint = $CurrentContext["MainPrint"];
     If[Head[mainPrint] === Hold,
-      ReleaseHold[mainPrint]
-      ,
+      ReleaseHold[mainPrint],
       mainPrint
     ]
   ];
 
-Protect[GetMainPrint];
-
-(* Special setter - has HoldAll attribute, wraps content in Hold *)
+(* SetMainPrint has HoldAll attribute to wrap content in Hold *)
 SetAttributes[SetMainPrint, HoldAll];
 
 SetMainPrint[content_] :=
-  Module[{},
-    $CurrentContext = Append[$CurrentContext, "MainPrint" -> Hold[content]]
-  ];
+  $CurrentContext = Append[$CurrentContext, "MainPrint" -> Hold[content]];
 
-Protect[SetMainPrint];
+(* ========================================= *)
+(* Protect All Public Symbols *)
+(* ========================================= *)
+
+Protect[
+  (* Basic.wl accessors *)
+  GetCheckInputEquations, SetCheckInputEquations,
+  GetPVerbose, SetPVerbose,
+  GetPrintDate, SetPrintDate,
+  GetPrintHeaderMacro, SetPrintHeaderMacro,
+  GetGridPointIndex, SetGridPointIndex,
+  GetTilePointIndex, SetTilePointIndex,
+  GetSuffixUnprotected, SetSuffixUnprotected,
+  GetOutputFile, SetOutputFile,
+  GetProject, SetProject,
+  (* ParseMode.wl accessors *)
+  GetPhase, SetPhase,
+  InSetCompPhase, InPrintCompPhase,
+  GetPrintCompType, SetPrintCompType,
+  InInitializationsMode, InEquationsMode,
+  GetInitializationsMode, SetInitializationsMode,
+  GetTensorType, SetTensorType,
+  GetStorageType, SetStorageType,
+  GetDerivsOrder, SetDerivsOrder,
+  GetDerivsAccuracy, SetDerivsAccuracy,
+  GetEquationsMode, SetEquationsMode,
+  GetIndependentVarlistIndex, SetIndependentVarlistIndex,
+  GetWithoutGridPointIndex, SetWithoutGridPointIndex,
+  GetUseTilePointIndex, SetUseTilePointIndex,
+  (* Component.wl accessors *)
+  GetMapComponentToVarlist, SetMapComponentToVarlist,
+  GetProcessNewVarlist, SetProcessNewVarlist,
+  GetSimplifyEquation, SetSimplifyEquation,
+  GetUseLetterForTensorComponent, SetUseLetterForTensorComponent,
+  GetTempVariableType, SetTempVariableType,
+  GetInterfaceWithNonCoordBasis, SetInterfaceWithNonCoordBasis,
+  GetSuffixName, SetSuffixName,
+  GetPrefixDt, SetPrefixDt,
+  (* Writefile.wl accessors *)
+  GetMainPrint, SetMainPrint
+];
 
 End[];
 
