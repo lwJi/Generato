@@ -16,40 +16,11 @@ If[Environment["QUIET"] =!= "1",
   System`Print["------------------------------------------------------------"];
 ];
 
-SetMainPrint::usage = "SetMainPrint[content] sets the content to be written as the main body of the output file.";
-
-GetMainPrint::usage = "GetMainPrint[] returns and evaluates the content set by SetMainPrint.";
-
 WriteToFile::usage = "WriteToFile[filename] writes the main content to the specified file with header and footer.";
 
 ReplaceGFIndexName::usage = "ReplaceGFIndexName[filename, rule] applies string replacement rule to the contents of filename.";
 
 Begin["`Private`"];
-
-(* Function *)
-
-(* Global getter - reads from $CurrentContext and evaluates held content *)
-GetMainPrint[] :=
-  Module[{mainPrint},
-    mainPrint = $CurrentContext["MainPrint"];
-    If[Head[mainPrint] === Hold,
-      ReleaseHold[mainPrint]
-      ,
-      mainPrint
-    ]
-  ];
-
-Protect[GetMainPrint];
-
-SetAttributes[SetMainPrint, HoldAll];
-
-(* Global setter - writes to $CurrentContext with Hold *)
-SetMainPrint[content_] :=
-  Module[{},
-    $CurrentContext = Append[$CurrentContext, "MainPrint" -> Hold[content]]
-  ];
-
-Protect[SetMainPrint];
 
 (* WriteToFile - uses global getters *)
 WriteToFile[outputfile_String] :=
