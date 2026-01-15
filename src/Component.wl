@@ -66,7 +66,7 @@ PrintComponent[coordinate_, varinfo_, compname_, extrareplacerules_] :=
 PrintComponent::EMode = "PrintMode unrecognized!";
 
 (*
-    1. Set components for tensors (How would print them in c/c++ code)
+    1. Set components for tensors (How to print them in c/c++ code)
     2. Set global map between tensor component and varlist index ( $MapComponentToVarlist ):
         case1 (start at 'new varlist', in this case, user should be careful when they define varlist)
             {a00 a01 ... b00 b01 ...}, {e00 e01 ... f00 f01 ...}, ...

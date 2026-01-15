@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* Carpet.wl, set up functions adapted to Carpet code *)
+(* CarpetXGPU.wl, set up functions adapted to CarpetXGPU code *)
 
 (* (c) Liwei Ji, 01/2025 *)
 
