@@ -218,6 +218,7 @@ Protect[ExtractComponentInfo];
 *)
 PrintComponentInitialization::EMode = "PrintComponentInitialization mode unrecognized!";
 PrintComponentInitialization::EVarLength = "PrintComponentInitialization variable's tensor type unsupported!";
+PrintComponentInitialization::EDerivativeName = "PrintComponentInitialization: derivative tensor name '`1`' does not contain 'd'!";
 
 End[];
 

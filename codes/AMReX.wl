@@ -93,10 +93,13 @@ PrintComponentInitialization[varinfo_, compname_] :=
             ,
             tensorname = StringDrop[ToString[compToValue], {-len, -len + offset}];
             pos1stbackwards =
-              If[StringStartsQ[tensorname, "d"],
-                fdorder
-                ,
-                StringPosition[tensorname, "d"][[-1]][[1]]
+              Which[
+                StringStartsQ[tensorname, "d"],
+                  fdorder,
+                StringContainsQ[tensorname, "d"],
+                  StringPosition[tensorname, "d"][[-1]][[1]],
+                True,
+                  Throw @ Message[PrintComponentInitialization::EDerivativeName, tensorname]
               ];
             "const auto " <> ToString[compToValue]
             <> " = calcderivs" <> ToString[fdorder] <> "_"
