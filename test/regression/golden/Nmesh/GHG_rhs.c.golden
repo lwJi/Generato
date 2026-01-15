@@ -209,565 +209,674 @@ gamma0 = gammas[0];
 gamma1 = gammas[1];
 gamma2 = gammas[2];
 
-double detinvh
+double
+detinvh
 =
 -(1/(Power(g13[ijk],2)*g22[ijk] - 2*g12[ijk]*g13[ijk]*g23[ijk] +
       Power(g12[ijk],2)*g33[ijk] +
       g11[ijk]*(Power(g23[ijk],2) - g22[ijk]*g33[ijk])))
 ;
 
-double invh11
+double
+invh11
 =
 detinvh*(-Power(g23[ijk],2) + g22[ijk]*g33[ijk])
 ;
 
-double invh12
+double
+invh12
 =
 detinvh*(g13[ijk]*g23[ijk] - g12[ijk]*g33[ijk])
 ;
 
-double invh13
+double
+invh13
 =
 detinvh*(-(g13[ijk]*g22[ijk]) + g12[ijk]*g23[ijk])
 ;
 
-double invh22
+double
+invh22
 =
 detinvh*(-Power(g13[ijk],2) + g11[ijk]*g33[ijk])
 ;
 
-double invh23
+double
+invh23
 =
 detinvh*(g12[ijk]*g13[ijk] - g11[ijk]*g23[ijk])
 ;
 
-double invh33
+double
+invh33
 =
 detinvh*(-Power(g12[ijk],2) + g11[ijk]*g22[ijk])
 ;
 
-double nvec0
+double
+nvec0
 =
 1/alpha[ijk]
 ;
 
-double nvec1
+double
+nvec1
 =
 -(beta1[ijk]/alpha[ijk])
 ;
 
-double nvec2
+double
+nvec2
 =
 -(beta2[ijk]/alpha[ijk])
 ;
 
-double nvec3
+double
+nvec3
 =
 -(beta3[ijk]/alpha[ijk])
 ;
 
-double ndua0
+double
+ndua0
 =
 -alpha[ijk]
 ;
 
-double ndua1
+double
+ndua1
 =
 0.
 ;
 
-double ndua2
+double
+ndua2
 =
 0.
 ;
 
-double ndua3
+double
+ndua3
 =
 0.
 ;
 
-double invg00
+double
+invg00
 =
 -Power(nvec0,2)
 ;
 
-double invg01
+double
+invg01
 =
 -(nvec0*nvec1)
 ;
 
-double invg02
+double
+invg02
 =
 -(nvec0*nvec2)
 ;
 
-double invg03
+double
+invg03
 =
 -(nvec0*nvec3)
 ;
 
-double invg11
+double
+invg11
 =
 invh11 - Power(nvec1,2)
 ;
 
-double invg12
+double
+invg12
 =
 invh12 - nvec1*nvec2
 ;
 
-double invg13
+double
+invg13
 =
 invh13 - nvec1*nvec3
 ;
 
-double invg22
+double
+invg22
 =
 invh22 - Power(nvec2,2)
 ;
 
-double invg23
+double
+invg23
 =
 invh23 - nvec2*nvec3
 ;
 
-double invg33
+double
+invg33
 =
 invh33 - Power(nvec3,2)
 ;
 
-double dginFO000
+double
+dginFO000
 =
 beta1[ijk]*Phi100[ijk] + beta2[ijk]*Phi200[ijk] + beta3[ijk]*Phi300[ijk] -
   alpha[ijk]*Pi00[ijk]
 ;
 
-double dginFO001
+double
+dginFO001
 =
 beta1[ijk]*Phi101[ijk] + beta2[ijk]*Phi201[ijk] + beta3[ijk]*Phi301[ijk] -
   alpha[ijk]*Pi01[ijk]
 ;
 
-double dginFO002
+double
+dginFO002
 =
 beta1[ijk]*Phi102[ijk] + beta2[ijk]*Phi202[ijk] + beta3[ijk]*Phi302[ijk] -
   alpha[ijk]*Pi02[ijk]
 ;
 
-double dginFO003
+double
+dginFO003
 =
 beta1[ijk]*Phi103[ijk] + beta2[ijk]*Phi203[ijk] + beta3[ijk]*Phi303[ijk] -
   alpha[ijk]*Pi03[ijk]
 ;
 
-double dginFO011
+double
+dginFO011
 =
 beta1[ijk]*Phi111[ijk] + beta2[ijk]*Phi211[ijk] + beta3[ijk]*Phi311[ijk] -
   alpha[ijk]*Pi11[ijk]
 ;
 
-double dginFO012
+double
+dginFO012
 =
 beta1[ijk]*Phi112[ijk] + beta2[ijk]*Phi212[ijk] + beta3[ijk]*Phi312[ijk] -
   alpha[ijk]*Pi12[ijk]
 ;
 
-double dginFO013
+double
+dginFO013
 =
 beta1[ijk]*Phi113[ijk] + beta2[ijk]*Phi213[ijk] + beta3[ijk]*Phi313[ijk] -
   alpha[ijk]*Pi13[ijk]
 ;
 
-double dginFO022
+double
+dginFO022
 =
 beta1[ijk]*Phi122[ijk] + beta2[ijk]*Phi222[ijk] + beta3[ijk]*Phi322[ijk] -
   alpha[ijk]*Pi22[ijk]
 ;
 
-double dginFO023
+double
+dginFO023
 =
 beta1[ijk]*Phi123[ijk] + beta2[ijk]*Phi223[ijk] + beta3[ijk]*Phi323[ijk] -
   alpha[ijk]*Pi23[ijk]
 ;
 
-double dginFO033
+double
+dginFO033
 =
 beta1[ijk]*Phi133[ijk] + beta2[ijk]*Phi233[ijk] + beta3[ijk]*Phi333[ijk] -
   alpha[ijk]*Pi33[ijk]
 ;
 
-double dginFO100
+double
+dginFO100
 =
 Phi100[ijk]
 ;
 
-double dginFO101
+double
+dginFO101
 =
 Phi101[ijk]
 ;
 
-double dginFO102
+double
+dginFO102
 =
 Phi102[ijk]
 ;
 
-double dginFO103
+double
+dginFO103
 =
 Phi103[ijk]
 ;
 
-double dginFO111
+double
+dginFO111
 =
 Phi111[ijk]
 ;
 
-double dginFO112
+double
+dginFO112
 =
 Phi112[ijk]
 ;
 
-double dginFO113
+double
+dginFO113
 =
 Phi113[ijk]
 ;
 
-double dginFO122
+double
+dginFO122
 =
 Phi122[ijk]
 ;
 
-double dginFO123
+double
+dginFO123
 =
 Phi123[ijk]
 ;
 
-double dginFO133
+double
+dginFO133
 =
 Phi133[ijk]
 ;
 
-double dginFO200
+double
+dginFO200
 =
 Phi200[ijk]
 ;
 
-double dginFO201
+double
+dginFO201
 =
 Phi201[ijk]
 ;
 
-double dginFO202
+double
+dginFO202
 =
 Phi202[ijk]
 ;
 
-double dginFO203
+double
+dginFO203
 =
 Phi203[ijk]
 ;
 
-double dginFO211
+double
+dginFO211
 =
 Phi211[ijk]
 ;
 
-double dginFO212
+double
+dginFO212
 =
 Phi212[ijk]
 ;
 
-double dginFO213
+double
+dginFO213
 =
 Phi213[ijk]
 ;
 
-double dginFO222
+double
+dginFO222
 =
 Phi222[ijk]
 ;
 
-double dginFO223
+double
+dginFO223
 =
 Phi223[ijk]
 ;
 
-double dginFO233
+double
+dginFO233
 =
 Phi233[ijk]
 ;
 
-double dginFO300
+double
+dginFO300
 =
 Phi300[ijk]
 ;
 
-double dginFO301
+double
+dginFO301
 =
 Phi301[ijk]
 ;
 
-double dginFO302
+double
+dginFO302
 =
 Phi302[ijk]
 ;
 
-double dginFO303
+double
+dginFO303
 =
 Phi303[ijk]
 ;
 
-double dginFO311
+double
+dginFO311
 =
 Phi311[ijk]
 ;
 
-double dginFO312
+double
+dginFO312
 =
 Phi312[ijk]
 ;
 
-double dginFO313
+double
+dginFO313
 =
 Phi313[ijk]
 ;
 
-double dginFO322
+double
+dginFO322
 =
 Phi322[ijk]
 ;
 
-double dginFO323
+double
+dginFO323
 =
 Phi323[ijk]
 ;
 
-double dginFO333
+double
+dginFO333
 =
 Phi333[ijk]
 ;
 
-double Gam000
+double
+Gam000
 =
 dginFO000/2.
 ;
 
-double Gam001
+double
+Gam001
 =
 dginFO100/2.
 ;
 
-double Gam002
+double
+Gam002
 =
 dginFO200/2.
 ;
 
-double Gam003
+double
+Gam003
 =
 dginFO300/2.
 ;
 
-double Gam011
+double
+Gam011
 =
 -0.5*dginFO011 + dginFO101
 ;
 
-double Gam012
+double
+Gam012
 =
 (-dginFO012 + dginFO102 + dginFO201)/2.
 ;
 
-double Gam013
+double
+Gam013
 =
 (-dginFO013 + dginFO103 + dginFO301)/2.
 ;
 
-double Gam022
+double
+Gam022
 =
 -0.5*dginFO022 + dginFO202
 ;
 
-double Gam023
+double
+Gam023
 =
 (-dginFO023 + dginFO203 + dginFO302)/2.
 ;
 
-double Gam033
+double
+Gam033
 =
 -0.5*dginFO033 + dginFO303
 ;
 
-double Gam100
+double
+Gam100
 =
 dginFO001 - dginFO100/2.
 ;
 
-double Gam101
+double
+Gam101
 =
 dginFO011/2.
 ;
 
-double Gam102
+double
+Gam102
 =
 (dginFO012 - dginFO102 + dginFO201)/2.
 ;
 
-double Gam103
+double
+Gam103
 =
 (dginFO013 - dginFO103 + dginFO301)/2.
 ;
 
-double Gam111
+double
+Gam111
 =
 dginFO111/2.
 ;
 
-double Gam112
+double
+Gam112
 =
 dginFO211/2.
 ;
 
-double Gam113
+double
+Gam113
 =
 dginFO311/2.
 ;
 
-double Gam122
+double
+Gam122
 =
 -0.5*dginFO122 + dginFO212
 ;
 
-double Gam123
+double
+Gam123
 =
 (-dginFO123 + dginFO213 + dginFO312)/2.
 ;
 
-double Gam133
+double
+Gam133
 =
 -0.5*dginFO133 + dginFO313
 ;
 
-double Gam200
+double
+Gam200
 =
 dginFO002 - dginFO200/2.
 ;
 
-double Gam201
+double
+Gam201
 =
 (dginFO012 + dginFO102 - dginFO201)/2.
 ;
 
-double Gam202
+double
+Gam202
 =
 dginFO022/2.
 ;
 
-double Gam203
+double
+Gam203
 =
 (dginFO023 - dginFO203 + dginFO302)/2.
 ;
 
-double Gam211
+double
+Gam211
 =
 dginFO112 - dginFO211/2.
 ;
 
-double Gam212
+double
+Gam212
 =
 dginFO122/2.
 ;
 
-double Gam213
+double
+Gam213
 =
 (dginFO123 - dginFO213 + dginFO312)/2.
 ;
 
-double Gam222
+double
+Gam222
 =
 dginFO222/2.
 ;
 
-double Gam223
+double
+Gam223
 =
 dginFO322/2.
 ;
 
-double Gam233
+double
+Gam233
 =
 -0.5*dginFO233 + dginFO323
 ;
 
-double Gam300
+double
+Gam300
 =
 dginFO003 - dginFO300/2.
 ;
 
-double Gam301
+double
+Gam301
 =
 (dginFO013 + dginFO103 - dginFO301)/2.
 ;
 
-double Gam302
+double
+Gam302
 =
 (dginFO023 + dginFO203 - dginFO302)/2.
 ;
 
-double Gam303
+double
+Gam303
 =
 dginFO033/2.
 ;
 
-double Gam311
+double
+Gam311
 =
 dginFO113 - dginFO311/2.
 ;
 
-double Gam312
+double
+Gam312
 =
 (dginFO123 + dginFO213 - dginFO312)/2.
 ;
 
-double Gam313
+double
+Gam313
 =
 dginFO133/2.
 ;
 
-double Gam322
+double
+Gam322
 =
 dginFO223 - dginFO322/2.
 ;
 
-double Gam323
+double
+Gam323
 =
 dginFO233/2.
 ;
 
-double Gam333
+double
+Gam333
 =
 dginFO333/2.
 ;
 
-double trGam0
+double
+trGam0
 =
 Gam000*invg00 + 2*Gam001*invg01 + 2*Gam002*invg02 + 2*Gam003*invg03 +
   Gam011*invg11 + 2*Gam012*invg12 + 2*Gam013*invg13 + Gam022*invg22 +
   2*Gam023*invg23 + Gam033*invg33
 ;
 
-double trGam1
+double
+trGam1
 =
 Gam100*invg00 + 2*Gam101*invg01 + 2*Gam102*invg02 + 2*Gam103*invg03 +
   Gam111*invg11 + 2*Gam112*invg12 + 2*Gam113*invg13 + Gam122*invg22 +
   2*Gam123*invg23 + Gam133*invg33
 ;
 
-double trGam2
+double
+trGam2
 =
 Gam200*invg00 + 2*Gam201*invg01 + 2*Gam202*invg02 + 2*Gam203*invg03 +
   Gam211*invg11 + 2*Gam212*invg12 + 2*Gam213*invg13 + Gam222*invg22 +
   2*Gam223*invg23 + Gam233*invg33
 ;
 
-double trGam3
+double
+trGam3
 =
 Gam300*invg00 + 2*Gam301*invg01 + 2*Gam302*invg02 + 2*Gam303*invg03 +
   Gam311*invg11 + 2*Gam312*invg12 + 2*Gam313*invg13 + Gam322*invg22 +

@@ -226,7 +226,8 @@ TIMER_START;
 forpoints(node, ijk)
 {
 
-double detgamma
+double
+detgamma
 =
 -(Power(gamma13[ijk],2)*gamma22[ijk]) +
   2*gamma12[ijk]*gamma13[ijk]*gamma23[ijk] -
@@ -234,58 +235,69 @@ double detgamma
   gamma11[ijk]*(-Power(gamma23[ijk],2) + gamma22[ijk]*gamma33[ijk])
 ;
 
-double invgamma11
+double
+invgamma11
 =
 (-Power(gamma23[ijk],2) + gamma22[ijk]*gamma33[ijk])/detgamma
 ;
 
-double invgamma12
+double
+invgamma12
 =
 (gamma13[ijk]*gamma23[ijk] - gamma12[ijk]*gamma33[ijk])/detgamma
 ;
 
-double invgamma13
+double
+invgamma13
 =
 (-(gamma13[ijk]*gamma22[ijk]) + gamma12[ijk]*gamma23[ijk])/detgamma
 ;
 
-double invgamma22
+double
+invgamma22
 =
 (-Power(gamma13[ijk],2) + gamma11[ijk]*gamma33[ijk])/detgamma
 ;
 
-double invgamma23
+double
+invgamma23
 =
 (gamma12[ijk]*gamma13[ijk] - gamma11[ijk]*gamma23[ijk])/detgamma
 ;
 
-double invgamma33
+double
+invgamma33
 =
 (-Power(gamma12[ijk],2) + gamma11[ijk]*gamma22[ijk])/detgamma
 ;
 
-double trK
+double
+trK
 =
 invgamma11*exK11[ijk] + 2*invgamma12*exK12[ijk] + 2*invgamma13*exK13[ijk] +
   invgamma22*exK22[ijk] + 2*invgamma23*exK23[ijk] + invgamma33*exK33[ijk]
 ;
 
-double nvec0
+double
+nvec0
 =
 1/alpha[ijk]
 ;
 
-double nvec1
+double
+nvec1
 =
 -(beta1[ijk]/alpha[ijk])
 ;
 
-double nvec2
+double
+nvec2
 =
 -(beta2[ijk]/alpha[ijk])
 ;
 
-double nvec3
+double
+nvec3
 =
 -(beta3[ijk]/alpha[ijk])
 ;
@@ -571,7 +583,8 @@ dtbeta3
 
 } else if (GHG->gauge_puncture) {
 
-double tr3Gam1
+double
+tr3Gam1
 =
 (Power(detgamma,0.3333333333333333)*
     (2*Power(invgamma11,2)*dgamma111[ijk] +
@@ -605,7 +618,8 @@ double tr3Gam1
       2*invgamma13*invgamma33*dgamma333[ijk]))/3.
 ;
 
-double tr3Gam2
+double
+tr3Gam2
 =
 (Power(detgamma,0.3333333333333333)*
     (2*invgamma11*invgamma12*dgamma111[ijk] +
@@ -638,7 +652,8 @@ double tr3Gam2
       2*invgamma23*invgamma33*dgamma333[ijk]))/3.
 ;
 
-double tr3Gam3
+double
+tr3Gam3
 =
 (Power(detgamma,0.3333333333333333)*
     (2*invgamma11*invgamma13*dgamma111[ijk] +
@@ -697,7 +712,8 @@ parnu*tr3Gam3 + beta1[ijk]*dbeta31[ijk] + beta2[ijk]*dbeta32[ijk] +
 
 } else if (GHG->gauge_DW) {
 
-double betaD0
+double
+betaD0
 =
 Power(beta1[ijk],2)*gamma11[ijk] +
   2*beta1[ijk]*(beta2[ijk]*gamma12[ijk] + beta3[ijk]*gamma13[ijk]) +
@@ -705,52 +721,62 @@ Power(beta1[ijk],2)*gamma11[ijk] +
   Power(beta3[ijk],2)*gamma33[ijk]
 ;
 
-double betaD1
+double
+betaD1
 =
 beta1[ijk]*gamma11[ijk] + beta2[ijk]*gamma12[ijk] + beta3[ijk]*gamma13[ijk]
 ;
 
-double betaD2
+double
+betaD2
 =
 beta1[ijk]*gamma12[ijk] + beta2[ijk]*gamma22[ijk] + beta3[ijk]*gamma23[ijk]
 ;
 
-double betaD3
+double
+betaD3
 =
 beta1[ijk]*gamma13[ijk] + beta2[ijk]*gamma23[ijk] + beta3[ijk]*gamma33[ijk]
 ;
 
-double logSgOa
+double
+logSgOa
 =
 Log(Sqrt(detgamma)/alpha[ijk])
 ;
 
-double muL
+double
+muL
 =
 Power(logSgOa,2)*parmu0
 ;
 
-double muS
+double
+muS
 =
 muL
 ;
 
-double HofGH0
+double
+HofGH0
 =
 -((betaD0*muS)/alpha[ijk]) - logSgOa*muL*alpha[ijk]
 ;
 
-double HofGH1
+double
+HofGH1
 =
 -((betaD1*muS)/alpha[ijk])
 ;
 
-double HofGH2
+double
+HofGH2
 =
 -((betaD2*muS)/alpha[ijk])
 ;
 
-double HofGH3
+double
+HofGH3
 =
 -((betaD3*muS)/alpha[ijk])
 ;
@@ -930,257 +956,308 @@ dmetricg000
 
 }
 
-double metricgUU00
+double
+metricgUU00
 =
 -Power(nvec0,2)
 ;
 
-double metricgUU01
+double
+metricgUU01
 =
 -(nvec0*nvec1)
 ;
 
-double metricgUU02
+double
+metricgUU02
 =
 -(nvec0*nvec2)
 ;
 
-double metricgUU03
+double
+metricgUU03
 =
 -(nvec0*nvec3)
 ;
 
-double metricgUU11
+double
+metricgUU11
 =
 invgamma11 - Power(nvec1,2)
 ;
 
-double metricgUU12
+double
+metricgUU12
 =
 invgamma12 - nvec1*nvec2
 ;
 
-double metricgUU13
+double
+metricgUU13
 =
 invgamma13 - nvec1*nvec3
 ;
 
-double metricgUU22
+double
+metricgUU22
 =
 invgamma22 - Power(nvec2,2)
 ;
 
-double metricgUU23
+double
+metricgUU23
 =
 invgamma23 - nvec2*nvec3
 ;
 
-double metricgUU33
+double
+metricgUU33
 =
 invgamma33 - Power(nvec3,2)
 ;
 
-double GamDDD000
+double
+GamDDD000
 =
 dmetricg000/2.
 ;
 
-double GamDDD001
+double
+GamDDD001
 =
 dmetricg100/2.
 ;
 
-double GamDDD002
+double
+GamDDD002
 =
 dmetricg200/2.
 ;
 
-double GamDDD003
+double
+GamDDD003
 =
 dmetricg300/2.
 ;
 
-double GamDDD011
+double
+GamDDD011
 =
 -0.5*dmetricg011 + dmetricg101
 ;
 
-double GamDDD012
+double
+GamDDD012
 =
 (-dmetricg012 + dmetricg102 + dmetricg201)/2.
 ;
 
-double GamDDD013
+double
+GamDDD013
 =
 (-dmetricg013 + dmetricg103 + dmetricg301)/2.
 ;
 
-double GamDDD022
+double
+GamDDD022
 =
 -0.5*dmetricg022 + dmetricg202
 ;
 
-double GamDDD023
+double
+GamDDD023
 =
 (-dmetricg023 + dmetricg203 + dmetricg302)/2.
 ;
 
-double GamDDD033
+double
+GamDDD033
 =
 -0.5*dmetricg033 + dmetricg303
 ;
 
-double GamDDD100
+double
+GamDDD100
 =
 dmetricg001 - dmetricg100/2.
 ;
 
-double GamDDD101
+double
+GamDDD101
 =
 dmetricg011/2.
 ;
 
-double GamDDD102
+double
+GamDDD102
 =
 (dmetricg012 - dmetricg102 + dmetricg201)/2.
 ;
 
-double GamDDD103
+double
+GamDDD103
 =
 (dmetricg013 - dmetricg103 + dmetricg301)/2.
 ;
 
-double GamDDD111
+double
+GamDDD111
 =
 dmetricg111/2.
 ;
 
-double GamDDD112
+double
+GamDDD112
 =
 dmetricg211/2.
 ;
 
-double GamDDD113
+double
+GamDDD113
 =
 dmetricg311/2.
 ;
 
-double GamDDD122
+double
+GamDDD122
 =
 -0.5*dmetricg122 + dmetricg212
 ;
 
-double GamDDD123
+double
+GamDDD123
 =
 (-dmetricg123 + dmetricg213 + dmetricg312)/2.
 ;
 
-double GamDDD133
+double
+GamDDD133
 =
 -0.5*dmetricg133 + dmetricg313
 ;
 
-double GamDDD200
+double
+GamDDD200
 =
 dmetricg002 - dmetricg200/2.
 ;
 
-double GamDDD201
+double
+GamDDD201
 =
 (dmetricg012 + dmetricg102 - dmetricg201)/2.
 ;
 
-double GamDDD202
+double
+GamDDD202
 =
 dmetricg022/2.
 ;
 
-double GamDDD203
+double
+GamDDD203
 =
 (dmetricg023 - dmetricg203 + dmetricg302)/2.
 ;
 
-double GamDDD211
+double
+GamDDD211
 =
 dmetricg112 - dmetricg211/2.
 ;
 
-double GamDDD212
+double
+GamDDD212
 =
 dmetricg122/2.
 ;
 
-double GamDDD213
+double
+GamDDD213
 =
 (dmetricg123 - dmetricg213 + dmetricg312)/2.
 ;
 
-double GamDDD222
+double
+GamDDD222
 =
 dmetricg222/2.
 ;
 
-double GamDDD223
+double
+GamDDD223
 =
 dmetricg322/2.
 ;
 
-double GamDDD233
+double
+GamDDD233
 =
 -0.5*dmetricg233 + dmetricg323
 ;
 
-double GamDDD300
+double
+GamDDD300
 =
 dmetricg003 - dmetricg300/2.
 ;
 
-double GamDDD301
+double
+GamDDD301
 =
 (dmetricg013 + dmetricg103 - dmetricg301)/2.
 ;
 
-double GamDDD302
+double
+GamDDD302
 =
 (dmetricg023 + dmetricg203 - dmetricg302)/2.
 ;
 
-double GamDDD303
+double
+GamDDD303
 =
 dmetricg033/2.
 ;
 
-double GamDDD311
+double
+GamDDD311
 =
 dmetricg113 - dmetricg311/2.
 ;
 
-double GamDDD312
+double
+GamDDD312
 =
 (dmetricg123 + dmetricg213 - dmetricg312)/2.
 ;
 
-double GamDDD313
+double
+GamDDD313
 =
 dmetricg133/2.
 ;
 
-double GamDDD322
+double
+GamDDD322
 =
 dmetricg223 - dmetricg322/2.
 ;
 
-double GamDDD323
+double
+GamDDD323
 =
 dmetricg233/2.
 ;
 
-double GamDDD333
+double
+GamDDD333
 =
 dmetricg333/2.
 ;
 
-double trGam0
+double
+trGam0
 =
 GamDDD000*metricgUU00 + 2*GamDDD001*metricgUU01 + 2*GamDDD002*metricgUU02 +
   2*GamDDD003*metricgUU03 + GamDDD011*metricgUU11 +
@@ -1188,7 +1265,8 @@ GamDDD000*metricgUU00 + 2*GamDDD001*metricgUU01 + 2*GamDDD002*metricgUU02 +
   GamDDD022*metricgUU22 + 2*GamDDD023*metricgUU23 + GamDDD033*metricgUU33
 ;
 
-double trGam1
+double
+trGam1
 =
 GamDDD100*metricgUU00 + 2*GamDDD101*metricgUU01 + 2*GamDDD102*metricgUU02 +
   2*GamDDD103*metricgUU03 + GamDDD111*metricgUU11 +
@@ -1196,7 +1274,8 @@ GamDDD100*metricgUU00 + 2*GamDDD101*metricgUU01 + 2*GamDDD102*metricgUU02 +
   GamDDD122*metricgUU22 + 2*GamDDD123*metricgUU23 + GamDDD133*metricgUU33
 ;
 
-double trGam2
+double
+trGam2
 =
 GamDDD200*metricgUU00 + 2*GamDDD201*metricgUU01 + 2*GamDDD202*metricgUU02 +
   2*GamDDD203*metricgUU03 + GamDDD211*metricgUU11 +
@@ -1204,7 +1283,8 @@ GamDDD200*metricgUU00 + 2*GamDDD201*metricgUU01 + 2*GamDDD202*metricgUU02 +
   GamDDD222*metricgUU22 + 2*GamDDD223*metricgUU23 + GamDDD233*metricgUU33
 ;
 
-double trGam3
+double
+trGam3
 =
 GamDDD300*metricgUU00 + 2*GamDDD301*metricgUU01 + 2*GamDDD302*metricgUU02 +
   2*GamDDD303*metricgUU03 + GamDDD311*metricgUU11 +

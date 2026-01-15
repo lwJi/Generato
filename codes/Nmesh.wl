@@ -99,36 +99,4 @@ Protect[PrintComponentEquation];
     Write to files
 *)
 
-Module[{outputfile = GetOutputFile[], filepointer},
-  If[Environment["QUIET"] =!= "1", System`Print["Writing to \"", outputfile, "\"...\n"]];
-  If[FileExistsQ[outputfile],
-    If[Environment["QUIET"] =!= "1", System`Print["\"", outputfile, "\" already exists, replacing it ...\n"]];
-    DeleteFile[outputfile]
-  ];
-  (* define pr *)
-  filepointer = OpenAppend[outputfile];
-  pr[x_:""] :=
-    Module[{},
-      If[x == "double ",
-        WriteString[filepointer, x]
-        ,
-        WriteLine[filepointer, x]
-      ]
-    ];
-  (* print first few lines *)
-  pr["/* " <> FileNameTake[outputfile] <> " */"];
-  pr[
-    "/* Produced with Generato" <>
-      If[GetPrintDate[],
-        " on " <> DateString[{"Month", "/", "Day", "/", "Year"}]
-        ,
-        ""
-      ] <> " */"
-  ];
-  pr[];
-  $MainPrint[];
-  pr[];
-  pr["/* " <> FileNameTake[outputfile] <> " */"];
-  If[Environment["QUIET"] =!= "1", System`Print["Done generating \"", outputfile, "\"\n"]];
-  Close[filepointer]
-];
+WriteToFile[GetOutputFile[]];

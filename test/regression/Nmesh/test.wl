@@ -10,6 +10,8 @@ SetPVerbose[False];
 
 SetPrintDate[False];
 
+SetPrintHeaderMacro[False];
+
 SetGridPointIndex["[[ijk]]"];
 
 DefManifold[M3, 3, IndexRange[a, z]];
@@ -47,7 +49,7 @@ SetOutputFile[FileNameJoin[{Directory[], "test.c"}]];
 
 SetProject["C3GH"];
 
-$MainPrint[] :=
+SetMainPrint[
   Module[{project = GetProject[]},
     pr["#include \"nmesh.h\""];
     pr["#include \"" <> project <> ".h\""];
@@ -89,6 +91,7 @@ $MainPrint[] :=
     pr["} /* end of points */"];
     pr["} /* end of nodes */"];
     pr["}"];
-  ];
+  ]
+];
 
 Import[FileNameJoin[{Environment["GENERATO"], "codes/Nmesh.wl"}]];
