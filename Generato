@@ -47,7 +47,10 @@ for input_file in "$@"; do
 
   # Run wolframscript on the input file
   [[ "$QUIET" != "1" ]] && echo "Processing '$input_file'..."
-  wolframscript -f "$input_file"
+  if ! wolframscript -f "$input_file"; then
+    echo "Error: Failed to process '$input_file'. Skipping output cleanup."
+    continue
+  fi
 
   # Check for any supported output file extensions and clean them
   found_output=false
