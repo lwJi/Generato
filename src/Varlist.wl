@@ -32,16 +32,18 @@ Options[ParseVarlist] :=
   {ExtraReplaceRules -> {}};
 
 ParseVarlist[OptionsPattern[], varlist_?ListQ, chartname_] :=
-  Module[{iMin, iMax = 3, var, varinfo, varname, symmetry, printname, symname, symindex, parseComponentValue, extrareplacerules},
+  Module[{dim, iMin, iMax, var, varinfo, varname, symmetry, printname, symname, symindex, parseComponentValue, extrareplacerules},
     {extrareplacerules} = OptionValue[{ExtraReplaceRules}];
     PrintVerbose["ParseVarlist..."];
-    PrintVerbose["  Dim = ", GetDim[], ", Chart = ", chartname];
+    dim = GetDim[];
+    PrintVerbose["  Dim = ", dim, ", Chart = ", chartname];
     PrintVerbose["  List: ", varlist];
-    If[GetDim[] == 3,
+    If[dim == 3,
       iMin = 1
       ,
       iMin = 0
     ];
+    iMax = dim - 1 + iMin;
     SetProcessNewVarlist[True];
     Do[
       var = varlist[[ivar]];
