@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* Carpet.wl, set up functions adapted to Carpet code *)
+(* CarpetXPointDesc.wl, set up functions adapted to CarpetXPointDesc code *)
 
 (* (c) Liwei Ji, 01/2025 *)
 

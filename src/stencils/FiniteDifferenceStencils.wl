@@ -65,7 +65,7 @@ GetFiniteDifferenceCoefficients::shortSample = "The 'sample' list must have at l
 
 Protect[GetFiniteDifferenceCoefficients];
 
-(* calculate the coefficients used in Derivs thorn when use upwind derivative:
+(* calculate the coefficients used in Derivs thorn when using upwind derivative:
    https://github.com/EinsteinToolkit/CarpetX/blob/main/Derivs/src/derivs.hxx
 *)
 GetUpwindCoefficients[sample_?ListQ] := Module[{numPoints, numCoeff, upwind, dnwind, symmCoeffs, antiCoeffs, symm, anti, eqns, coeffs},
