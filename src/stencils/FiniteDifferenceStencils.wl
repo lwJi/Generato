@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* stencils.wl *)
+(* FiniteDifferenceStencils.wl *)
 
 (* (c) Liwei Ji, 01/2025 *)
 
