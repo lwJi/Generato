@@ -24,7 +24,7 @@ Begin["`Private`"];
 
 (* WriteToFile - uses global getters *)
 WriteToFile[outputfile_String] :=
-  Module[{filepointer},
+  Module[{filepointer, headerGuard},
     If[Environment["QUIET"] =!= "1",
       System`Print["Writing to \"", outputfile, "\"...\n"]
     ];
@@ -36,6 +36,11 @@ WriteToFile[outputfile_String] :=
     ];
     (* define pr *)
     filepointer = OpenAppend[outputfile];
+    headerGuard =
+      StringReplace[
+        ToUpperCase[FileNameTake[outputfile]],
+        Except[LetterCharacter | DigitCharacter] -> "_"
+      ];
     Block[{Global`pr},
       Global`pr[x_:""] :=
         Module[{},
@@ -57,15 +62,15 @@ WriteToFile[outputfile_String] :=
       ];
       Global`pr[];
       If[GetPrintHeaderMacro[],
-        Global`pr["#ifndef " <> StringReplace[ToUpperCase[FileNameTake[outputfile]], "." -> "_"]];
-        Global`pr["#define " <> StringReplace[ToUpperCase[FileNameTake[outputfile]], "." -> "_"]];
+        Global`pr["#ifndef " <> headerGuard];
+        Global`pr["#define " <> headerGuard];
         Global`pr[]
       ];
       (* GetMainPrint[] evaluates the held main print content *)
       GetMainPrint[];
       Global`pr[];
       If[GetPrintHeaderMacro[],
-        Global`pr["#endif // #ifndef " <> StringReplace[ToUpperCase[FileNameTake[outputfile]], "." -> "_"]];
+        Global`pr["#endif // #ifndef " <> headerGuard];
         Global`pr[]
       ];
       Global`pr["/* " <> FileNameTake[outputfile] <> " */"];
