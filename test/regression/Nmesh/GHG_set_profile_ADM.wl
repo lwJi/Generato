@@ -10,6 +10,8 @@ SetPVerbose[False];
 
 SetPrintDate[False];
 
+SetPrintHeaderMacro[False];
+
 SetGridPointIndex["[[ijk]]"];
 
 DefManifold[M4, 4, Union[Complement[IndexRange[a, z], {g}], Table[ToExpression["h" <> ToString[i]], {i, 1, 9}], Table[ToExpression["z" <> ToString[i]], {i, 1, 9}]]];
@@ -265,7 +267,7 @@ SetOutputFile[FileNameJoin[{Directory[], "GHG_set_profile_ADM.c"}]];
 
 SetProject["GHG"];
 
-$MainPrint[] :=
+SetMainPrint[
   Module[{project = GetProject[]},
     pr["#include \"nmesh.h\""];
     pr["#include \"" <> project <> ".h\""];
@@ -411,7 +413,8 @@ $MainPrint[] :=
     pr[];
     pr["return 0;"];
     pr["} /* end of function */"];
-  ];
+  ]
+];
 
 Import[FileNameJoin[{Environment["GENERATO"], "codes/Nmesh.wl"}]];
 
