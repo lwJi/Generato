@@ -93,7 +93,7 @@ SetComponent[compname_, exprname_] :=
   ];
 
 (*
-    compname: component expr in Mathematica kernal, say Pi[{1,-cart},{2,-cart}]
+    compname: component expr in Mathematica kernel, say Pi[{1,-cart},{2,-cart}]
 *)
 
 SetCompName[varname_, compindexlist_, coordinate_] :=
