@@ -2,7 +2,7 @@
 
 A Wolfram Language code generator that produces C/C++ from symbolic tensor expressions using xAct. Designed for numerical relativity and computational physics applications.
 
-## Pre-Requisites
+## Prerequisites
 
 - [Wolfram Engine](https://www.wolfram.com/developer/) (free) or Mathematica
 - [xAct](http://www.xact.es) tensor algebra package
