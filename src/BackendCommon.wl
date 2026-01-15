@@ -59,7 +59,7 @@ Protect[GetGFIndexNameMix2nd];
   Previously duplicated in: Carpet.wl, CarpetXGPU.wl, CarpetXPointDesc.wl
 *)
 GetInterfaceName[compname_] :=
-  Module[{intfname = ToString[compname[[0]]], colist = {"t", "x", "y", "z"}},
+  Module[{intfname = ToString[compname[[0]]], colist = {"t", "x", "y", "z"}, coindex},
     Do[
       coindex = compname[[icomp]][[1]];
       intfname = intfname <> colist[[coindex + 1]]
