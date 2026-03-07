@@ -18,6 +18,12 @@ ADMVarlist =
     {ADMbeta[i], PrintAs -> "\!\(\*SuperscriptBox[\(\[Beta]\), \((ADM)\)]\)"}
   ];
 
+(*************************************)
+
+(* Time Derivatives of ADM Variables *)
+
+(*************************************)
+
 ADMdtVarlist =
   GridTensors[
     {ADMdtalpha[], PrintAs -> "\!\(\*SubscriptBox[\(\[PartialD]\), \(t\)]\)\!\(\*SuperscriptBox[\(\[Alpha]\), \((ADM)\)]\)"},
