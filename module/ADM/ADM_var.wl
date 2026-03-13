@@ -18,6 +18,19 @@ ADMVarlist =
     {ADMbeta[i], PrintAs -> "\!\(\*SuperscriptBox[\(\[Beta]\), \((ADM)\)]\)"}
   ];
 
+(****************************************)
+
+(* Spatial Derivatives of ADM Variables *)
+
+(****************************************)
+
+ADMdVarlist =
+  TempTensors[
+    {ADMdgam[-i, -j, -k], Symmetric[{-i, -j}], PrintAs -> "\[PartialD]\[Gamma]"},
+    {ADMdalpha      [-k], PrintAs -> "\[PartialD]\[Alpha]"},
+    {ADMdbeta    [i, -k], PrintAs -> "\[PartialD]\[Beta]"}
+  ];
+
 (*************************************)
 
 (* Time Derivatives of ADM Variables *)
