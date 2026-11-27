@@ -10,6 +10,10 @@ Generato test.wl                    # Single file
 Generato file1.wl file2.wl          # Multiple files
 ```
 
+## Design rules
+
+Before adding code, read `agent_docs/design-rules.md`, the rules the code is being arranged to.
+
 ## Architecture
 
 ### Core (src/)
@@ -26,7 +30,7 @@ Generato file1.wl file2.wl          # Multiple files
 
 ### Backends (codes/)
 Each implements `PrintComponentInitialization` and `PrintComponentEquation`:
-- CarpetX.wl, CarpetXGPU.wl, CarpetXPointDesc.wl, Carpet.wl, AMReX.wl, Nmesh.wl
+- CarpetXGPU.wl, AMReX.wl, Nmesh.wl
 
 ### Key Patterns
 - **State**: All in `$CurrentContext`; use `WithMode[{...}, body]` for scoped settings

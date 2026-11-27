@@ -72,7 +72,7 @@ $ContextModeValidValues = <|
   "WithoutGridPointIndex" -> {True, False},
   "UseTilePointIndex" -> {True, False},
   "PrintCompType" -> {None, "Initializations", "Equations"},
-  "InitializationsMode" -> {None, "MainOut", "MainIn", "Derivs", "Derivs1st", "Derivs2nd", "MoreInOut", "Temp"},
+  "InitializationsMode" -> {None, "MainOut", "MainIn", "Derivs", "MoreInOut", "Temp"},
   "TensorType" -> {None, "Scal", "Vect", "Smat"},
   "StorageType" -> {None, "GF", "Tile"},
   "DerivsOrder" -> _Integer,

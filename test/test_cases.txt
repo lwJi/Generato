@@ -1,12 +1,9 @@
 # Test case definitions for Generato
 # Format: backend:test_name:extension
 # Lines starting with # are comments
-#CarpetX:test:.hxx
 CarpetXGPU:test:.hxx
 CarpetXGPU:testTile:.hxx
 CarpetXGPU:testDerivs:.hxx
-#CarpetXPointDesc:test:.hxx
-#Carpet:test:.hxx
 AMReX:test:.hxx
 #Nmesh:test:.c
 #Nmesh:GHG_rhs:.c

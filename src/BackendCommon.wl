@@ -145,8 +145,8 @@ Protect[PrintEquationByMode];
 (*
   GetTensorIndexSubbuf - Computes subbuf string for tensor component indexing
   This handles the common Scal/Vect/Smat pattern using varlistindex with
-  bracket notation. Used by backends like CarpetXGPU and AMReX.
-  Note: Some backends (CarpetX, Nmesh) have different indexing schemes
+  bracket notation. Used by AMReX.
+  Note: CarpetXGPU and Nmesh have different indexing schemes
   and do not use this function.
 
   For "Scal" TensorType, any tensor length is handled with simple [varlistindex]

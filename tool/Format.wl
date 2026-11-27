@@ -1,6 +1,6 @@
 Needs["CodeFormatter`"]
 
-Module[{dirs = {"src", "test/regression/Nmesh", "test/regression/CarpetX"}},
+Module[{dirs = {"src", "test/regression/Nmesh"}},
   Do[
     System`Print["Formatting '.wl' files in "<>dir<>" ..."];
     files = FileNames["*.wl", dir];

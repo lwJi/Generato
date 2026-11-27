@@ -18,8 +18,6 @@ If[Environment["QUIET"] =!= "1",
 
 WriteToFile::usage = "WriteToFile[filename] writes the main content to the specified file with header and footer.";
 
-ReplaceGFIndexName::usage = "ReplaceGFIndexName[filename, rule] applies string replacement rule to the contents of filename.";
-
 Begin["`Private`"];
 
 (* WriteToFile - uses global getters *)
@@ -82,14 +80,6 @@ WriteToFile[outputfile_String] :=
   ];
 
 Protect[WriteToFile];
-
-ReplaceGFIndexName[outputfile_, replacerule_] :=
-  Module[{content},
-    content = Import[outputfile, "Text"];
-    Export[outputfile, StringReplace[content, replacerule] <> "\n", "Text"];
-  ];
-
-Protect[ReplaceGFIndexName];
 
 End[];
 
