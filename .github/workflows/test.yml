@@ -38,24 +38,6 @@ jobs:
       #     wolframscript -activate
 
       # Integration Tests: Generate code for each backend
-      - name: Run Integration Tests (CarpetX)
-        if: ${{ false }}  # Disabled until Wolfram Engine is configured
-        run: |
-          cd test/CarpetX
-          $GENERATO/Generato test.wl
-
-      - name: Run Integration Tests (CarpetXPointDesc)
-        if: ${{ false }}  # Disabled until Wolfram Engine is configured
-        run: |
-          cd test/CarpetXPointDesc
-          $GENERATO/Generato test.wl
-
-      - name: Run Integration Tests (Carpet)
-        if: ${{ false }}  # Disabled until Wolfram Engine is configured
-        run: |
-          cd test/Carpet
-          $GENERATO/Generato test.wl
-
       - name: Run Integration Tests (AMReX)
         if: ${{ false }}  # Disabled until Wolfram Engine is configured
         run: |
@@ -76,12 +58,6 @@ jobs:
           wolframscript -f test/regression/compare_golden.wl
 
       # Syntax Check: Verify generated C/C++ code compiles
-      - name: Check CarpetX output syntax
-        run: |
-          if [ -f test/CarpetX/test.hxx ]; then
-            g++ -fsyntax-only -x c++ test/CarpetX/test.hxx 2>/dev/null || echo "Note: CarpetX test.hxx may require framework headers"
-          fi
-
       - name: Check Nmesh output syntax
         run: |
           if [ -f test/Nmesh/test.c ]; then

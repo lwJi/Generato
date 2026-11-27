@@ -40,7 +40,7 @@ SetMainPrint[
   PrintInitializations[{Mode -> "MainIn"}, InputVars];
   PrintEquations[{Mode -> "MainOut"}, OutputVars];
 ];
-Import[FileNameJoin[{Environment["GENERATO"], "codes/CarpetX.wl"}]];
+Import[FileNameJoin[{Environment["GENERATO"], "codes/CarpetXGPU.wl"}]];
 ```
 
 Run with: `Generato script.wl`
@@ -49,7 +49,7 @@ Run with: `Generato script.wl`
 
 **Simple example:**
 ```bash
-cd test/regression/CarpetX && Generato test.wl
+cd test/regression/CarpetXGPU && Generato test.wl
 ```
 
 **GHG formulation of Einstein's equations:**
@@ -82,10 +82,7 @@ cd test/regression/CarpetX && Generato test.wl
 
 | Backend | Output | Description |
 |---------|--------|-------------|
-| CarpetX.wl | .hxx | CarpetX AMR with GF3D2 storage |
 | CarpetXGPU.wl | .hxx | GPU-enabled CarpetX |
-| CarpetXPointDesc.wl | .hxx | Point descriptor variant |
-| Carpet.wl | .hxx | Original Carpet framework |
 | AMReX.wl | .hxx | AMReX AMR library |
 | Nmesh.wl | .c | Structured mesh (C output) |
 

@@ -45,38 +45,6 @@ AppendTo[$AllTests,
 ];
 
 (* ========================================= *)
-(* Test: ReplaceGFIndexName *)
-(* ========================================= *)
-
-AppendTo[$AllTests,
-  VerificationTest[
-    (* Create a temp file, apply replacement, verify result *)
-    tempFile = FileNameJoin[{$TemporaryDirectory, "test_replace_gf.txt"}];
-    Export[tempFile, "gf_var[[ijk]] = value;", "Text"];
-    ReplaceGFIndexName[tempFile, "[[ijk]]" -> "[i][j][k]"];
-    result = Import[tempFile, "Text"];
-    DeleteFile[tempFile];
-    StringContainsQ[result, "[i][j][k]"],
-    True,
-    TestID -> "ReplaceGFIndexName-AppliesReplacement"
-  ]
-];
-
-AppendTo[$AllTests,
-  VerificationTest[
-    (* Multiple replacements - Import["Text"] strips trailing newlines *)
-    tempFile = FileNameJoin[{$TemporaryDirectory, "test_replace_multi.txt"}];
-    Export[tempFile, "a[[ijk]] + b[[ijk]]", "Text"];
-    ReplaceGFIndexName[tempFile, "[[ijk]]" -> ""];
-    result = Import[tempFile, "Text"];
-    DeleteFile[tempFile];
-    result,
-    "a + b",
-    TestID -> "ReplaceGFIndexName-MultipleReplacements"
-  ]
-];
-
-(* ========================================= *)
 (* Test: WriteToFile *)
 (* ========================================= *)
 
