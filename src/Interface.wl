@@ -10,23 +10,11 @@ Needs["Generato`ParseMode`"];
 
 Needs["Generato`Component`"];
 
-Needs["Generato`Varlist`"];
-
 If[Environment["QUIET"] =!= "1",
   System`Print["------------------------------------------------------------"];
   System`Print["Package Generato`Interface`, {2024, 1, 11}"];
   System`Print["------------------------------------------------------------"];
 ];
-
-DefTensors::usage = "DefTensors[var1, var2, ...] defines tensors without setting their components.";
-
-GridTensors::usage = "GridTensors[var1, var2, ...] defines tensors with grid point indices, sets their components, and returns the varlist.";
-
-TileTensors::usage = "TileTensors[var1, var2, ...] defines tensors with tile point indices, sets their components, and returns the varlist.";
-
-TempTensors::usage = "TempTensors[var1, var2, ...] defines temporary tensors without grid point indices, sets their components, and returns the varlist.";
-
-SetComponents::usage = "SetComponents[varlist] sets tensor components for the given varlist.\nSetComponents[{opts}, varlist] sets components with options ChartName, IndependentVarlistIndex, WithoutGridPointIndex, UseTilePointIndex.";
 
 PrintEquations::usage = "PrintEquations[varlist] prints equations for tensor components in the varlist.\nPrintEquations[{opts}, varlist] prints with options ChartName, SuffixName, Mode, ExtraReplaceRules.";
 
@@ -35,83 +23,21 @@ PrintInitializations::usage = "PrintInitializations[varlist] prints initializati
 Begin["`Private`"];
 
 (*
-    Higher functions
+  PrintVarlist - walks the component records of a varlist.
+  Each var spec resolves through its head to the record of a bound
+  variable, and each component record is handed to the backend in the
+  order BindVariable gave it.
 *)
-
-(* Original API: DefTensors[var1, var2, ...] *)
-DefTensors[vars__] :=
-  Module[{arglist = List[vars], varname, symmetry, printname},
-    Do[
-      {varname, symmetry, printname} = ParseVar[arglist[[ivar]]];
-      DefineTensor[varname, symmetry, printname]
-      ,
-      {ivar, 1, Length[arglist]}
-    ];
-    Return[arglist]
-  ];
-
-Protect[DefTensors];
-
-(* Original API: GridTensors[var1, var2, ...] *)
-GridTensors[vars__] :=
-  Module[{arglist = List[vars]},
-    If[GetCheckInputEquations[],
-      DefTensors[vars]
-      ,
-      SetComponents[arglist]
-    ];
-    Return[arglist]
-  ];
-
-Protect[GridTensors];
-
-(* Original API: TileTensors[var1, var2, ...] *)
-TileTensors[vars__] :=
-  Module[{arglist = List[vars]},
-    If[GetCheckInputEquations[],
-      DefTensors[vars]
-      ,
-      SetComponents[{UseTilePointIndex -> True}, arglist]
-    ];
-    Return[arglist]
-  ];
-
-Protect[TileTensors];
-
-(* Original API: TempTensors[var1, var2, ...] *)
-TempTensors[vars__] :=
-  Module[{arglist = List[vars]},
-    If[GetCheckInputEquations[],
-      DefTensors[vars]
-      ,
-      SetComponents[{WithoutGridPointIndex -> True}, arglist]
-    ];
-    Return[arglist]
-  ];
-
-Protect[TempTensors];
-
-(*
-    Basic functions
-*)
-
-Options[SetComponents] :=
-  {ChartName -> GetDefaultChart[], IndependentVarlistIndex -> True, WithoutGridPointIndex -> False, UseTilePointIndex -> False};
-
-SetComponents[OptionsPattern[], varlist_?ListQ] :=
-  Module[{chartname, indepidx, nogpidx, tlidx},
-    {chartname, indepidx, nogpidx, tlidx} = OptionValue[{ChartName, IndependentVarlistIndex, WithoutGridPointIndex, UseTilePointIndex}];
-    WithMode[{
-      "Phase" -> "SetComp",
-      "IndependentVarlistIndex" -> indepidx,
-      "WithoutGridPointIndex" -> nogpidx,
-      "UseTilePointIndex" -> tlidx
-    },
-      ParseVarlist[varlist, chartname]
+PrintVarlist[varlist_List, chartname_, extrareplacerules_] :=
+  Scan[
+    Function[var,
+      With[{variable = VariableRecord[var]},
+        Scan[PrintComponent[chartname, variable, #, extrareplacerules]&, variable["Components"]]
+      ]
     ]
+    ,
+    varlist
   ];
-
-Protect[SetComponents];
 
 (**
  * \brief Print Equations for each tensor components from a Varlist.
@@ -132,7 +58,7 @@ PrintEquations[OptionsPattern[], varlist_?ListQ] :=
       "EquationsMode" -> mode,
       "SuffixName" -> If[suffixname === Null, "", suffixname]
     },
-      ParseVarlist[{ExtraReplaceRules -> extrareplacerules}, varlist, chartname]
+      PrintVarlist[varlist, chartname, extrareplacerules]
     ]
   ];
 
@@ -160,7 +86,7 @@ PrintInitializations[OptionsPattern[], varlist_?ListQ] :=
       "DerivsOrder" -> derivsorder,
       "DerivsAccuracy" -> accuracyorder
     },
-      ParseVarlist[varlist, chartname]
+      PrintVarlist[varlist, chartname, {}]
     ]
   ];
 

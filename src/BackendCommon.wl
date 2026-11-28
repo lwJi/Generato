@@ -22,7 +22,7 @@ GetInterfaceName::usage = "GetInterfaceName[compname] returns the interface name
 ComputeRHSValue::usage = "ComputeRHSValue[coordinate, compname, extrareplacerules] computes the RHS value for an equation.";
 PrintEquationByMode::usage = "PrintEquationByMode[compToValue, rhssToValue, mainFormatter, tempFormatter] prints equation based on current EquationsMode. tempFormatter is optional (defaults to Automatic for standard Temp output).";
 GetTensorIndexSubbuf::usage = "GetTensorIndexSubbuf[len, varlistindex] computes subbuf string for tensor component indexing.";
-ExtractComponentInfo::usage = "ExtractComponentInfo[varinfo, compname] extracts {varlistindex, compToValue, varname, symmetry, len} for component initialization.";
+ExtractComponentInfo::usage = "ExtractComponentInfo[varinfo, compname] returns {varlistindex, compToValue, varname, symmetry, len} for component initialization, read from the record of the bound variable.";
 
 Begin["`Private`"];
 
@@ -191,23 +191,34 @@ GetTensorIndexSubbuf::ETensorType = "GetTensorIndexSubbuf: Unknown tensor type."
 Protect[GetTensorIndexSubbuf];
 
 (*
-  ExtractComponentInfo - Extracts common component information for initialization
+  ExtractComponentInfo - what a backend reads about a component it initializes
   Returns: {varlistindex, compToValue, varname, symmetry, len}
 
-  Previously duplicated pattern in all 6 backends:
-    varlistindex = GetMapComponentToVarlist[][compname];
-    compToValue = compname // ToValues;
-    {varname, symmetry} = varinfo;
-    len = Length[varname];
+  Every entry is read from the record of the bound variable the component
+  belongs to, which is found through the head of compname:
+    varlistindex   the component's "Slot"
+    compToValue    the component's "Expr"
+    varname        the variable's head with its "Slots", say MDD[-i, -j]
+    symmetry       the variable's "Symmetry"
+    len            the number of slots
+  varinfo is what PrintComponent hands the backend; nothing is read from it.
 *)
 ExtractComponentInfo[varinfo_, compname_] :=
-  Module[{varlistindex, compToValue, varname, symmetry, len},
-    varlistindex = GetMapComponentToVarlist[][compname];
-    compToValue = compname // ToValues;
-    {varname, symmetry} = varinfo;
-    len = Length[varname];
-    {varlistindex, compToValue, varname, symmetry, len}
+  Module[{variable = VariableRecord[Head[compname]], component},
+    component = SelectFirst[variable["Components"], #["Comp"] === compname&, None];
+    If[component === None,
+      Stop[ExtractComponentInfo::EComponent, compname, variable["Head"]]
+    ];
+    {
+      component["Slot"],
+      component["Expr"],
+      variable["Head"] @@ variable["Slots"],
+      variable["Symmetry"],
+      Length[variable["Slots"]]
+    }
   ];
+
+ExtractComponentInfo::EComponent = "`1` is not an independent component of the bound variable `2`.";
 
 Protect[ExtractComponentInfo];
 

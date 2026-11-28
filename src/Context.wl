@@ -38,8 +38,6 @@ $ContextDefaults = <|
   "EquationsMode" -> None,
 
   (* Component.wl state *)
-  "MapComponentToVarlist" -> <||>,
-  "ProcessNewVarlist" -> True,
   "SimplifyEquation" -> True,
   "UseLetterForTensorComponent" -> False,
   "TempVariableType" -> "double",
@@ -80,8 +78,6 @@ $ContextModeValidValues = <|
   "EquationsMode" -> {None, "Temp", "MainOut", "AddToMainOut"},
 
   (* Component.wl keys *)
-  "MapComponentToVarlist" -> _Association,
-  "ProcessNewVarlist" -> {True, False},
   "SimplifyEquation" -> {True, False},
   "UseLetterForTensorComponent" -> {True, False},
   "TempVariableType" -> _String,
@@ -158,10 +154,6 @@ GetUseTilePointIndex::usage = "GetUseTilePointIndex[] returns UseTilePointIndex 
 SetUseTilePointIndex::usage = "SetUseTilePointIndex[val] sets UseTilePointIndex.";
 
 (* Component.wl state accessors *)
-GetMapComponentToVarlist::usage = "GetMapComponentToVarlist[] returns the Association mapping tensor components to varlist indices.";
-SetMapComponentToVarlist::usage = "SetMapComponentToVarlist[map] sets the mapping in global state.";
-GetProcessNewVarlist::usage = "GetProcessNewVarlist[] returns the ProcessNewVarlist flag.";
-SetProcessNewVarlist::usage = "SetProcessNewVarlist[bool] sets whether the next varlist is treated as a new varlist for index numbering.";
 GetSimplifyEquation::usage = "GetSimplifyEquation[] returns True if equations are simplified before output.";
 SetSimplifyEquation::usage = "SetSimplifyEquation[bool] enables or disables simplification of equations before output.";
 GetUseLetterForTensorComponent::usage = "GetUseLetterForTensorComponent[] returns True if letters are used for tensor component indices instead of numbers.";
@@ -249,8 +241,6 @@ defineAccessor["WithoutGridPointIndex", GetWithoutGridPointIndex, SetWithoutGrid
 defineAccessor["UseTilePointIndex", GetUseTilePointIndex, SetUseTilePointIndex];
 
 (* Component.wl state accessors *)
-defineAccessor["MapComponentToVarlist", GetMapComponentToVarlist, SetMapComponentToVarlist];
-defineAccessor["ProcessNewVarlist", GetProcessNewVarlist, SetProcessNewVarlist];
 defineAccessor["SimplifyEquation", GetSimplifyEquation, SetSimplifyEquation];
 defineAccessor["UseLetterForTensorComponent", GetUseLetterForTensorComponent, SetUseLetterForTensorComponent];
 defineAccessor["TempVariableType", GetTempVariableType, SetTempVariableType];
@@ -317,8 +307,6 @@ Protect[
   GetWithoutGridPointIndex, SetWithoutGridPointIndex,
   GetUseTilePointIndex, SetUseTilePointIndex,
   (* Component.wl accessors *)
-  GetMapComponentToVarlist, SetMapComponentToVarlist,
-  GetProcessNewVarlist, SetProcessNewVarlist,
   GetSimplifyEquation, SetSimplifyEquation,
   GetUseLetterForTensorComponent, SetUseLetterForTensorComponent,
   GetTempVariableType, SetTempVariableType,

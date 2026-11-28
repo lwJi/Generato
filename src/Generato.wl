@@ -18,13 +18,13 @@
 
 <<ParseMode.wl
 
+<<Variable.wl
+
 <<Component.wl
 
 <<Emit.wl
 
 <<BackendCommon.wl
-
-<<Varlist.wl
 
 <<Interface.wl
 
