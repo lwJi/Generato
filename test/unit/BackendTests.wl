@@ -728,13 +728,8 @@ AppendTo[$AllTests,
 
 (*
   A backend file is one DefineBackend call, and ResolveBackend reads it when
-  its name is first asked for: nothing here loads CarpetXGPU or AMReX.
-  The file of Nmesh still ends by starting the write of the script that
-  imported it. Here it is read for its table only, so the write is held back.
+  its name is first asked for: nothing here loads CarpetXGPU, AMReX or Nmesh.
 *)
-Block[{WriteToFile},
-  Get[FileNameJoin[{Environment["GENERATO"], "codes", "Nmesh.wl"}]]
-];
 
 AppendTo[$AllTests,
   VerificationTest[

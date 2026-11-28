@@ -136,8 +136,9 @@ Emit[outputfile_String, lines_List] :=
 Protect[Emit];
 
 (*
-  WriteToFile - the write a backend file starts for a script that holds its
-  main content.
+  WriteToFile - the write of a script that holds its main content, started
+  by a backend file that ends in a call of it. No file in codes/ does: each
+  is one DefineBackend call, and a script hands its program to Generate.
   The backend is resolved once, before anything is built, and its table is
   held for this call only, as are the lines pr adds. Emit is handed the
   lines after the main content has finished, so a run that stops inside it

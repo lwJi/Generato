@@ -23,9 +23,9 @@ forpoints(node, ijk)
 {
 int iMDD = Ind("ADM_gxx");
 
-double *rU1 = Vard(node, Vind(vlr,C3GH->i_rUx));
-double *rU2 = Vard(node, Vind(vlr,C3GH->i_rUx+1));
-double *rU3 = Vard(node, Vind(vlr,C3GH->i_rUx+2));
+double *rU1 = Vard(node, Vind(vlr,C3GH->i_uUx));
+double *rU2 = Vard(node, Vind(vlr,C3GH->i_uUx+1));
+double *rU3 = Vard(node, Vind(vlr,C3GH->i_uUx+2));
 double *uU1 = Vard(node, Vind(vlu,C3GH->i_uUx));
 double *uU2 = Vard(node, Vind(vlu,C3GH->i_uUx+1));
 double *uU3 = Vard(node, Vind(vlu,C3GH->i_uUx+2));

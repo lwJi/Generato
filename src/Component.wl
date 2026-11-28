@@ -18,15 +18,17 @@ If[Environment["QUIET"] =!= "1",
 
 IndependentIndices::usage = "IndependentIndices[rank, pairs, {iMin, iMax}] returns the index tuples of the independent components of a tensor, first slot slowest. A pair is {first slot, second slot, 1 symmetric | -1 antisymmetric}.";
 
-GridTensors::usage = "GridTensors[var1, var2, ...] declares tensors, binds them to grid storage (C names carry the grid point index), and returns the varlist.";
+GridTensors::usage = "GridTensors[var1, var2, ...] declares tensors, binds them to grid storage (C names carry the grid point index), and returns the varlist.\nGridTensors[varlist] takes the var specs as one list, say the one DefTensors returned in a module. A variable that is declared already is bound without being declared again.";
 
-TileTensors::usage = "TileTensors[var1, var2, ...] declares tensors, binds them to tile storage (C names carry the tile point index), and returns the varlist.";
+TileTensors::usage = "TileTensors[var1, var2, ...] declares tensors, binds them to tile storage (C names carry the tile point index), and returns the varlist.\nTileTensors[varlist] takes the var specs as one list, say the one DefTensors returned in a module. A variable that is declared already is bound without being declared again.";
 
-TempTensors::usage = "TempTensors[var1, var2, ...] declares tensors, binds them as temporaries (C names carry no point index), and returns the varlist.";
+TempTensors::usage = "TempTensors[var1, var2, ...] declares tensors, binds them as temporaries (C names carry no point index), and returns the varlist.\nTempTensors[varlist] takes the var specs as one list, say the one DefTensors returned in a module. A variable that is declared already is bound without being declared again.";
 
 BoundQ::usage = "BoundQ[variable] returns True if variable is the record of a bound variable: what DeclaredVariable returns for a head once a binding has given it \"Storage\". It is False for the record of a variable that is declared and not bound, and for what DeclaredVariable returns for a head that is not declared.";
 
 VariableRecord::usage = "VariableRecord[head] returns the record of a bound variable.\nVariableRecord[var] returns the record of the bound variable a var spec names. It stops the run if the variable is not bound.";
+
+FindComponent::usage = "FindComponent[variable, comp] returns the component record the record of a bound variable has for a component written in xAct's notation, say gam[{1, -cart}, {2, -cart}], or Missing[\"NotIndependent\", comp] if comp is not one of its independent components.";
 
 ComponentRecord::usage = "ComponentRecord[comp] returns the record of a component written in xAct's notation, say gam[{1, -cart}, {2, -cart}]. It stops the run if comp is not an independent component of a bound variable.";
 
@@ -77,8 +79,12 @@ Protect[IndependentIndices];
   VariableRecord is what a print call reads. A variable that is declared and
   not bound has a record without "Storage", and nothing to print; BoundQ
   tells the two apart without stopping.
-  ComponentRecord finds one component record from the component in xAct's
-  notation, through its head. BaseRecord follows a declared relation to the
+  FindComponent is the one statement of how a component in xAct's notation
+  is found among the records of a variable: it is the "Comp" of one of them.
+  The mirror of a symmetric pair is the "Comp" of none. ComponentRecord
+  finds the record through the head of the component, and stops where
+  FindComponent finds none; whoever checks a program before anything is
+  computed asks FindComponent. BaseRecord follows a declared relation to the
   record of the variable it names.
 *)
 BoundQ[variable_] :=
@@ -101,10 +107,15 @@ VariableRecord::EUnbound = "Variable `1` is not bound. Bind it with GridTensors,
 
 Protect[VariableRecord];
 
+FindComponent[variable_Association, comp_] :=
+  SelectFirst[variable["Components"], #["Comp"] === comp&, Missing["NotIndependent", comp]];
+
+Protect[FindComponent];
+
 ComponentRecord[comp_] :=
   Module[{variable = VariableRecord[Head[comp]], component},
-    component = SelectFirst[variable["Components"], #["Comp"] === comp&, None];
-    If[component === None,
+    component = FindComponent[variable, comp];
+    If[MissingQ[component],
       Stop[ComponentRecord::EComponent, comp, variable["Head"]]
     ];
     component
@@ -190,9 +201,38 @@ ZeroValuedQ[slots_List, indices_List] :=
   ];
 
 (*
-  BindVariable - declares one var, gives it storage and its component records.
-  A var whose head is declared already cannot be bound yet: DefineTensor
-  stops at a tensor that exists.
+  DeclaredForBinding - the declared record of the variable a var names.
+  A var whose head is not declared is declared here, so a script declares
+  and binds in one call. A head that is declared already is the variable of
+  a module, which declares with DefTensors and names no storage: it is bound
+  without being declared again, and the record the declaration wrote stands.
+  The var is the spec the declaration was given, as DefTensors returned it;
+  one that states the variable differently stops the run, since the two
+  could not both be true. A variable is bound once.
+  A head that is a tensor and has no record was defined outside Generato:
+  DefineTensor stops at it.
+*)
+DeclaredForBinding[binding_Symbol, var_] :=
+  Module[{variable = ParseVar[var], declared},
+    declared = DeclaredVariable[variable["Head"]];
+    Which[
+      MissingQ[declared],
+        DefineTensor[variable]
+      ,
+      BoundQ[declared],
+        Stop[MessageName[binding, "EBound"], variable["Head"], declared["Storage"]]
+      ,
+      declared =!= variable,
+        Stop[MessageName[binding, "EDeclared"], variable["Head"], var]
+      ,
+      True,
+        declared
+    ]
+  ];
+
+(*
+  BindVariable - gives the variable of one var its storage and its component
+  records, declaring it first if it is not declared.
   The independent components are one filter over the index tuples, and the
   tuples with a 0 on a spatial slot are a second filter on the same list.
   xAct keeps one copy of what the records say: ToValues needs the rule from
@@ -201,13 +241,9 @@ ZeroValuedQ[slots_List, indices_List] :=
   out of them.
 *)
 BindVariable[binding_Symbol, storage_String, var_] :=
-  Module[{variable = ParseVar[var], head, slots, coordinate, indices, components},
+  Module[{variable = DeclaredForBinding[binding, var], head, slots, coordinate, indices, components},
     head = variable["Head"];
     slots = variable["Slots"];
-    If[BoundQ[DeclaredVariable[head]],
-      Stop[MessageName[binding, "EBound"], head, DeclaredVariable[head]["Storage"]]
-    ];
-    DefineTensor[variable];
     coordinate = GetDefaultChart[];
     indices = IndependentIndices[Length[slots], variable["Pairs"], ComponentIndexRange[]];
     components =
@@ -236,29 +272,40 @@ BindVariable[binding_Symbol, storage_String, var_] :=
 BindVarlist[binding_Symbol, storage_String, varlist_List] :=
   Module[{},
     If[GetCheckInputEquations[],
-      DefTensors @@ varlist
+      Scan[DeclaredForBinding[binding, #]&, varlist]
       ,
       Scan[BindVariable[binding, storage, #]&, varlist]
     ];
     varlist
   ];
 
+(*
+  VarSpecs - the var specs a binding was given: one by one, or as one list,
+  which is how a script hands on the list DefTensors returned in a module.
+  The two are told apart by the elements: a var spec holds its tensor, which
+  is no list, so a list of lists is a list of var specs.
+*)
+VarSpecs[varlist : {__List}] := varlist;
+
+VarSpecs[vars__] := {vars};
+
 (* Original API: GridTensors[var1, var2, ...] *)
 GridTensors[vars__] :=
-  BindVarlist[GridTensors, "Grid", List[vars]];
+  BindVarlist[GridTensors, "Grid", VarSpecs[vars]];
 
 (* Original API: TileTensors[var1, var2, ...] *)
 TileTensors[vars__] :=
-  BindVarlist[TileTensors, "Tile", List[vars]];
+  BindVarlist[TileTensors, "Tile", VarSpecs[vars]];
 
 (* Original API: TempTensors[var1, var2, ...] *)
 TempTensors[vars__] :=
-  BindVarlist[TempTensors, "Temp", List[vars]];
+  BindVarlist[TempTensors, "Temp", VarSpecs[vars]];
 
-(* The message is on the binding the script called *)
+(* The messages are on the binding the script called *)
 Scan[
   Function[binding,
-    MessageName[binding, "EBound"] = "Variable `1` is bound already, as `2` storage. A variable is bound once."
+    MessageName[binding, "EBound"] = "Variable `1` is bound already, as `2` storage. A variable is bound once.";
+    MessageName[binding, "EDeclared"] = "Variable `1` is declared already, and the var `2` states it differently. A variable is declared once: bind it with the var it was declared with, as DefTensors returned it."
   ]
   ,
   {GridTensors, TileTensors, TempTensors}

@@ -3,6 +3,7 @@
 (* ProgramTests.wl *)
 (* Unit tests for Generato`Program module: a node is inert, Generate checks every node before anything is computed *)
 (* and reports every problem with its position, and a program that passes is lowered, rendered and written once *)
+(* A node is about a varlist or about one component, and a binding takes the variables a module declared *)
 (* The store of the records lasts as long as the kernel, like the xAct tensors, so each test uses heads of its own *)
 
 If[Environment["QUIET"] =!= "1", Print["Loading ProgramTests.wl..."]];
@@ -49,6 +50,12 @@ progTestPlainVarlist = TempTensors[{progTestP[-i]}];
 progTestDeclaredVarlist = DefTensors[{progTestD[i]}];
 
 progTestDDVarlist = TempTensors[{progTestDD[-k, i], DerivativeOf -> progTestD}];
+
+(* A symmetric variable: the mirror of one of its components is not an independent component *)
+progTestSymVarlist = GridTensors[{progTestM[-i, -j], Symmetric[{-i, -j}]}];
+
+(* What a module holds: variables that are declared and name no storage, for a test to bind *)
+progTestModuleVars = DefTensors[{progTestMA[], PrintAs -> "a"}, {progTestMB[i]}];
 
 (* A variable whose equation counts how often it is evaluated *)
 progTestCountedVarlist = TempTensors[{progTestW[i]}];
@@ -335,6 +342,117 @@ AppendTo[$AllTests,
 ];
 
 (* ========================================= *)
+(* Test: a node about one component *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a node about one component is lowered to the one statement of that component, the same statement *)
+    (* the node about its varlist gives it; a scalar has the one component *)
+    ResetContext[];
+    {
+      progTestGenerate["progTestKeep",
+        {Load[progTestM[{2, -testCart}, {3, -testCart}], "In"], Load[progTestS[], "In"], Load[progTestT[{3, testCart}], "In"]}
+      ],
+      progTestStatements === {
+        LoadStatement[GetConfiguration[], "In", VariableRecord[progTestM], VariableRecord[progTestM]["Components"][[5]]],
+        LoadStatement[GetConfiguration[], "In", VariableRecord[progTestS], First[VariableRecord[progTestS]["Components"]]],
+        LoadStatement[GetConfiguration[], "In", VariableRecord[progTestT], Last[VariableRecord[progTestT]["Components"]]]
+      }
+    },
+    {{"grid In progTestM23", "grid In progTestS", "tile In progTestT3"}, True},
+    TestID -> "Generate-OneComponent-OneStatement"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* the components of a variable are written in the order the script gives them, which a Table may build, *)
+    (* and a node about one component takes the options of its kind *)
+    ResetContext[];
+    progTestGenerate["progTestKeep",
+      {
+        Table[Store[progTestV[{k, testCart}], "Temp"], {k, 3, 1, -1}],
+        "// alt",
+        Store[progTestR[{2, testCart}], "Out", SuffixName -> "alt", ChartName -> testCart]
+      }
+    ];
+    {#["Component", "Name"], ToString[#["RHS"], InputForm]}& /@ progTestStatements,
+    {
+      {"progTestV3", "progTestS[[ijk]]*progTestU3[[ijk]]"},
+      {"progTestV2", "progTestS[[ijk]]*progTestU2[[ijk]]"},
+      {"progTestV1", "progTestS[[ijk]]*progTestU1[[ijk]]"},
+      {"progTestR2", "2*progTestV2"}
+    },
+    TestID -> "Generate-OneComponent-InTheOrderOfTheScript"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* the mirror of a symmetric pair is an error of the program: it is reported with its node, *)
+    (* and nothing is generated *)
+    ResetContext[];
+    {
+      progTestGenerate["progTestKeep",
+        {Load[progTestM[{2, -testCart}, {3, -testCart}], "In"], Load[progTestM[{3, -testCart}, {2, -testCart}], "In"]}
+      ],
+      progTestStatements,
+      FileExistsQ[progTestFile]
+    },
+    {$Failed, {}, False},
+    {Generate::EComponent, Generate::EProblems},
+    TestID -> "Generate-MirrorOfASymmetricPair-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a component has a record in the chart its variable was bound in: a node that names another chart stops the run *)
+    ResetContext[];
+    progTestGenerate["progTestKeep", {Load[progTestU[{1, testCart}], "In", ChartName -> progTestOtherChart]}],
+    $Failed,
+    {RequireChart::EChart},
+    TestID -> "Generate-OneComponent-OtherChart-Stops"
+  ]
+];
+
+(* ========================================= *)
+(* Test: the variables a module declared *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a module declares and names no storage, so its variables are not bound: a node about them, *)
+    (* or about one of their components, is an error of the program, one problem per variable *)
+    ResetContext[];
+    {
+      progTestGenerate["progTestKeep", {Load[progTestModuleVars, "In"], Load[progTestMB[{1, testCart}], "In"]}],
+      FileExistsQ[progTestFile]
+    },
+    {$Failed, False},
+    {Generate::EUnbound, Generate::EUnbound, Generate::EUnbound, Generate::EProblems},
+    TestID -> "Generate-ModuleVariableNotBound-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* the script binds the list the module's declaration returned, and the same nodes are in order *)
+    ResetContext[];
+    SetGridPointIndex["[[ijk]]"];
+    progTestModuleVarlist = GridTensors[progTestModuleVars];
+    {
+      progTestModuleVarlist === progTestModuleVars,
+      progTestGenerate["progTestKeep", {Load[progTestModuleVarlist, "In"], Load[progTestMB[{1, testCart}], "In"]}],
+      Union[#["Variable", "Storage"]& /@ progTestStatements]
+    },
+    {True, {"grid In progTestMA", "grid In progTestMB1", "grid In progTestMB2", "grid In progTestMB3", "grid In progTestMB1"}, {"Grid"}},
+    TestID -> "Generate-ModuleVariableBoundByTheScript"
+  ]
+];
+
+(* ========================================= *)
 (* Test: the check reports every problem with its position *)
 (* ========================================= *)
 
@@ -360,7 +478,7 @@ AppendTo[$AllTests,
       {
         "// 1",
         {7, {Load[progTestGridVarlist]}},
-        Load[progTestU[i], "In"],
+        Load[progTestU, "In"],
         Load[progTestGridVarlist, "In", SuffixName -> "alt"],
         Store[progTestOutVarlist, "Out", SuffixName -> 5],
         Store[progTestOutVarlist, "Out", ExtraReplaceRules -> progTestNotAList],
@@ -422,6 +540,57 @@ AppendTo[$AllTests,
       {"EBase", 3, progTestDD, "DerivativeOf", progTestD}
     },
     TestID -> "Check-VariableNotBound"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* one component in place of a varlist resolves through its head, and must be an independent component of *)
+    (* a bound variable: the mirror of a symmetric pair is none, and neither is the tensor with abstract indices *)
+    progTestProblems["progTestKeep",
+      {
+        Load[progTestM[{2, -testCart}, {3, -testCart}], "In"],
+        Load[progTestM[{3, -testCart}, {2, -testCart}], "In"],
+        Load[progTestU[i], "In"],
+        Load[progTestS[], "In"],
+        Load[progTestD[{1, testCart}], "In"],
+        Load[progTestNotDeclared[{1, testCart}], "In"]
+      }
+    ],
+    {
+      {"EComponent", 2, "progTestM[{3, -testCart}, {2, -testCart}]", progTestM},
+      {"EComponent", 3, "progTestU[i]", progTestU},
+      {"EUnbound", 5, progTestD},
+      {"EUnbound", 6, progTestNotDeclared}
+    },
+    TestID -> "Check-OneComponent-IndependentOfABoundVariable"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* the variable of one component is checked like a variable of a varlist: the mode, the storage, *)
+    (* the relation a formatter reads and the equation, once each *)
+    progTestProblems["progTestKeep",
+      {
+        Load[progTestU[{1, testCart}], "MoreInOut"],
+        Load[progTestV[{1, testCart}], "In"],
+        Load[progTestP[{1, -testCart}], "Derivs"],
+        Load[progTestDD[{1, -testCart}, {2, testCart}], "Derivs"],
+        Store[progTestS[], "Out"],
+        Store[progTestR[{2, testCart}], "Out", SuffixName -> "Puncture"],
+        Store[progTestR[{2, testCart}], "Out", SuffixName -> "alt"]
+      }
+    ],
+    {
+      {"EMode", 1, "progTestKeep", "Load", "MoreInOut", "It accepts \"In\", \"Derivs\"."},
+      {"EStorage", 2, "progTestKeep", "Load", "In", progTestV, "Temp", "The mode is for \"Grid\", \"Tile\" storage."},
+      {"ERelation", 3, progTestP, "DerivativeOf", "Load", "Derivs", "progTestKeep"},
+      {"EBase", 4, progTestDD, "DerivativeOf", progTestD},
+      {"EEquation", 5, progTestS, ""},
+      {"EEquation", 6, progTestR, " with SuffixName \"Puncture\""}
+    },
+    TestID -> "Check-OneComponent-CheckedLikeAVariable"
   ]
 ];
 

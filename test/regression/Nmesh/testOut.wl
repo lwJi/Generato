@@ -1,7 +1,7 @@
 (* ::Package:: *)
 
 (* testOut.wl *)
-(* Integration test for the "MainOut" initialization: a right-hand side is read from vlr *)
+(* Integration test for the "Out" load: a right-hand side is read from vlr *)
 (* at the index of the variable it is the time derivative of. Reduced from GHG_rhs.wl *)
 
 (* (c) Liwei Ji, 11/2026 *)
@@ -52,43 +52,39 @@ SetEQN[dtPhi[i_, a_, b_], -gamma2 alpha[] Phi[i, a, b]];
 
 (* Write to files *)
 
-SetOutputFile[FileNameJoin[{Directory[], "testOut.c"}]];
-
 SetProject["GHG"];
 
-SetMainPrint[
-  Module[{project = GetProject[]},
-    pr["#include \"nmesh.h\""];
-    pr["#include \"" <> project <> ".h\""];
-    pr[];
-    pr["/* use globals from " <> project <> " */"];
-    pr["extern t" <> project <> " " <> project <> "[1];"];
-    pr[];
-    pr[];
-    pr["int testOut(tNode *node, tVarList *vlr, tVarList *vlu)"];
-    pr["{"];
-    pr["int ialpha = Ind(\"ADM_alpha\");"];
-    pr["int ibetax = Ind(\"ADM_betax\");"];
-    pr["int ijk;"];
-    pr[];
-    PrintInitializations[{Mode -> "MainOut"}, dtEvolVarlist];
-    PrintInitializations[{Mode -> "MainIn"}, EvolVarlist];
-    PrintInitializations[{Mode -> "MoreInOut"}, MoreInVarlist];
-    pr[];
-    pr["forpoints(node, ijk)"];
-    pr["{"];
-    pr["double gammas[3], gamma0, gamma1, gamma2;"];
-    pr["GHG_gammas(node, ijk, gammas);"];
-    pr["gamma0 = gammas[0];"];
-    pr["gamma1 = gammas[1];"];
-    pr["gamma2 = gammas[2];"];
-    pr[];
-    PrintEquations[{Mode -> "MainOut"}, dtEvolVarlist];
-    pr["} /* end of points */"];
-    pr[];
-    pr["return 0;"];
-    pr["} /* end of function */"];
-  ]
+With[{project = GetProject[]},
+  Generate["Nmesh", "testOut.c", {
+    "#include \"nmesh.h\"",
+    "#include \"" <> project <> ".h\"",
+    "",
+    "/* use globals from " <> project <> " */",
+    "extern t" <> project <> " " <> project <> "[1];",
+    "",
+    "",
+    "int testOut(tNode *node, tVarList *vlr, tVarList *vlu)",
+    "{",
+    "int ialpha = Ind(\"ADM_alpha\");",
+    "int ibetax = Ind(\"ADM_betax\");",
+    "int ijk;",
+    "",
+    Load[dtEvolVarlist, "Out"],
+    Load[EvolVarlist, "In"],
+    Load[MoreInVarlist, "MoreInOut"],
+    "",
+    "forpoints(node, ijk)",
+    "{",
+    "double gammas[3], gamma0, gamma1, gamma2;",
+    "GHG_gammas(node, ijk, gammas);",
+    "gamma0 = gammas[0];",
+    "gamma1 = gammas[1];",
+    "gamma2 = gammas[2];",
+    "",
+    Store[dtEvolVarlist, "Out"],
+    "} /* end of points */",
+    "",
+    "return 0;",
+    "} /* end of function */"
+  }]
 ];
-
-Import[FileNameJoin[{Environment["GENERATO"], "codes/Nmesh.wl"}]];

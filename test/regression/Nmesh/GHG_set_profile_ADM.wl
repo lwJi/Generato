@@ -263,159 +263,132 @@ SetEQN[the[a_], -beta[k] dH[-k, a]];
 
 (* ============== *)
 
-SetOutputFile[FileNameJoin[{Directory[], "GHG_set_profile_ADM.c"}]];
-
 SetProject["GHG"];
 
-SetMainPrint[
-  Module[{project = GetProject[]},
-    pr["#include \"nmesh.h\""];
-    pr["#include \"" <> project <> ".h\""];
-    pr[];
-    pr["#define Power(x,y) (pow((double) (x),(double) (y)))"];
-    pr["#define Log(x) log((double) (x))"];
-    pr["#define pow2(x) ((x)*(x))"];
-    pr["#define pow2inv(x) (1.0/((x)*(x)))"];
-    pr["#define Cal(x,y,z) ((x)?(y):(z))"];
-    pr["#define Sqrt(x) sqrt(x)"];
-    pr["#define Abs(x) fabs(x)"];
-    pr[];
-    pr["/* use globals from " <> project <> " */"];
-    pr["extern t" <> project <> " " <> project <> "[1];"];
-    pr[];
-    pr[];
-    pr["int GHG_set_profile_ADM(tVarList *vlu)"];
-    pr["{"];
-    pr["tMesh *mesh = vlu->mesh;"];
-    pr["int ialpha = Ind(\"ADM_alpha\");"];
-    pr["int ibetax = Ind(\"ADM_betax\");"];
-    pr["int igammaxx = Ind(\"ADM_gxx\");"];
-    pr["int iexKxx = Ind(\"ADM_Kxx\");"];
-    pr["int idalphax = Ind(\"ADM_dalphax\");"];
-    pr["int idbetaxx = Ind(\"ADM_dbetaxx\");"];
-    pr["int idgammaxxx = Ind(\"ADM_dgxxx\");"];
-    pr["int idHxt = Ind(\"GHG_dHxt\");"];
-    pr[];
-    pr["formylnodes(mesh)"];
-    pr["{"];
-    pr["tNode *node = MyLnode;"];
-    pr["int ijk;"];
-    pr[];
-    pr["/* derivatives */"];
-    pr["cart_partials_dU_di(node,  ialpha, idalphax);"];
-    pr["cart_partials_dUi_dj(node, ibetax, idbetaxx);"];
-    pr["cart_partials_dSij_dk(node, igammaxx, idgammaxxx);"];
-    pr[];
-    (* print initializations *)
-    PrintInitializations[{Mode -> "MainIn"}, GHGVarlist];
-    PrintInitializations[{Mode -> "MainIn"}, MoreOutputVarlist];
-    PrintInitializations[{Mode -> "MoreInOut"}, ADMVarlist];
-    PrintInitializations[{Mode -> "MoreInOut"}, dADMVarlist];
-    PrintInitializations[{Mode -> "MoreInOut"}, dHVarlist];
-    PrintInitializations[{Mode -> "Temp"}, GaugeVarlist];
-    PrintInitializations[{Mode -> "Temp"}, dgVarlist];
-    pr[];
+(* d_c g_{ab}, one component: the program below writes them in an order of its own *)
+
+dg[cc_, aa_, bb_, opts___] := Store[dmetricg[{cc, -cart}, {aa, -cart}, {bb, -cart}], "Out", opts];
+
+With[{project = GetProject[]},
+  Generate["Nmesh", "GHG_set_profile_ADM.c", {
+    "#include \"nmesh.h\"",
+    "#include \"" <> project <> ".h\"",
+    "",
+    "#define Power(x,y) (pow((double) (x),(double) (y)))",
+    "#define Log(x) log((double) (x))",
+    "#define pow2(x) ((x)*(x))",
+    "#define pow2inv(x) (1.0/((x)*(x)))",
+    "#define Cal(x,y,z) ((x)?(y):(z))",
+    "#define Sqrt(x) sqrt(x)",
+    "#define Abs(x) fabs(x)",
+    "",
+    "/* use globals from " <> project <> " */",
+    "extern t" <> project <> " " <> project <> "[1];",
+    "",
+    "",
+    "int GHG_set_profile_ADM(tVarList *vlu)",
+    "{",
+    "tMesh *mesh = vlu->mesh;",
+    "int ialpha = Ind(\"ADM_alpha\");",
+    "int ibetax = Ind(\"ADM_betax\");",
+    "int igammaxx = Ind(\"ADM_gxx\");",
+    "int iexKxx = Ind(\"ADM_Kxx\");",
+    "int idalphax = Ind(\"ADM_dalphax\");",
+    "int idbetaxx = Ind(\"ADM_dbetaxx\");",
+    "int idgammaxxx = Ind(\"ADM_dgxxx\");",
+    "int idHxt = Ind(\"GHG_dHxt\");",
+    "",
+    "formylnodes(mesh)",
+    "{",
+    "tNode *node = MyLnode;",
+    "int ijk;",
+    "",
+    "/* derivatives */",
+    "cart_partials_dU_di(node,  ialpha, idalphax);",
+    "cart_partials_dUi_dj(node, ibetax, idbetaxx);",
+    "cart_partials_dSij_dk(node, igammaxx, idgammaxxx);",
+    "",
+    (* load the variables *)
+    Load[GHGVarlist, "In"],
+    Load[MoreOutputVarlist, "In"],
+    Load[ADMVarlist, "MoreInOut"],
+    Load[dADMVarlist, "MoreInOut"],
+    Load[dHVarlist, "MoreInOut"],
+    Load[GaugeVarlist, "Temp"],
+    Load[dgVarlist, "Temp"],
+    "",
     (* from Ein case *)
-    pr["int idtgtt;"];
-    pr["if(GHG->gauge_H_dH_from_Ein) {"];
-    pr["  idtgtt = Ind(\"Ein_dtgtt\");"];
-    pr["} else {"];
-    pr["  idtgtt = Ind(\"GHG_gtt\"); /* set to dummy values */"];
-    pr["}"];
-    PrintInitializations[{Mode -> "MoreInOut"}, EinVarlist];
-    pr[];
+    "int idtgtt;",
+    "if(GHG->gauge_H_dH_from_Ein) {",
+    "  idtgtt = Ind(\"Ein_dtgtt\");",
+    "} else {",
+    "  idtgtt = Ind(\"GHG_gtt\"); /* set to dummy values */",
+    "}",
+    Load[EinVarlist, "MoreInOut"],
+    "",
     (* parameters *)
-    pr["double parnu = Getd(GHG->nu);"];
-    pr["double pareta = Getd(GHG->eta2);"];
-    pr["double parmu0 = Getd(GHG->mu0);"];
-    pr[];
-    pr["TIMER_START;"];
-    pr[];
-    pr["/* compute */"];
-    pr["forpoints(node, ijk)"];
-    pr["{"];
-    pr[];
+    "double parnu = Getd(GHG->nu);",
+    "double pareta = Getd(GHG->eta2);",
+    "double parmu0 = Getd(GHG->mu0);",
+    "",
+    "TIMER_START;",
+    "",
+    "/* compute */",
+    "forpoints(node, ijk)",
+    "{",
+    "",
     (* declare temporary vars *)
-    PrintEquations[{Mode -> "Temp"}, TempVarlist];
-    pr[];
-    Module[
-      {printdg}
-      ,
-      (* set d_k g_{ab} *)
-      printdg[cc_, aa_, bb_] :=
-        WithMode[{
-          "Phase" -> "PrintComp",
-          "PrintCompType" -> "Equations",
-          "EquationsMode" -> "MainOut"
-        },
-          PrintComponentEquation[GetDefaultChart[], dmetricg[{cc, -GetDefaultChart[]}, {aa, -GetDefaultChart[]}, {bb, -GetDefaultChart[]}], {}]
-        ];
-      Do[printdg[cc, aa, bb], {cc, 3, 1, -1}, {aa, 3, 0, -1}, {bb, 3, aa, -1}];
-      (* set d_t g_{ab} *)
-      pr["if(GHG->gauge_H_dH_from_Ein) {"];
-      pr[];
-      Module[{printdtgEin},
-        printdtgEin[cc_, aa_, bb_] :=
-          Module[{savedSuffix = GetSuffixName[]},
-            SetSuffixName["Ein"];
-            WithMode[{
-              "Phase" -> "PrintComp",
-              "PrintCompType" -> "Equations",
-              "EquationsMode" -> "MainOut"
-            },
-              PrintComponentEquation[GetDefaultChart[], dmetricg[{cc, -GetDefaultChart[]}, {aa, -GetDefaultChart[]}, {bb, -GetDefaultChart[]}], {}]
-            ];
-            SetSuffixName[savedSuffix]
-          ];
-        Do[printdtgEin[0, aa, bb], {aa, 3, 0, -1}, {bb, 3, aa, -1}];
-        pr[];
-      ];
-      pr["} else {"] pr[];
-      pr["if (GHG->gauge_freeze) {"];
-      pr[];
-      PrintEquations[{Mode -> "MainOut", SuffixName -> "Freeze"}, GaugeVarlist];
-      pr["} else if (GHG->gauge_puncture) {"];
-      pr[];
-      PrintEquations[{Mode -> "Temp"}, GaugePunctureVarlist];
-      PrintEquations[{Mode -> "MainOut", SuffixName -> "Puncture"}, GaugeVarlist];
-      pr["} else if (GHG->gauge_DW) {"];
-      pr[];
-      PrintEquations[{Mode -> "Temp"}, GaugeDWVarlist];
-      PrintEquations[{Mode -> "Temp", SuffixName -> "DW"}, GaugeGHVarlist];
-      PrintEquations[{Mode -> "MainOut", SuffixName -> "GH"}, GaugeVarlist];
-      pr["} else { errorexit(\"unknown ID GHG_gauge!\"); }"];
-      pr[];
-      Do[printdg[0, aa, bb], {aa, 3, 0, -1}, {bb, 3, aa, -1}];
-      pr[];
-      pr["}"]; (* end of if(GHG->gauge_H_dH_from_Ein) *)
-      pr[];
-    ];
+    Store[TempVarlist, "Temp"],
+    "",
+    (* set d_k g_{ab} *)
+    Table[dg[cc, aa, bb], {cc, 3, 1, -1}, {aa, 3, 0, -1}, {bb, 3, aa, -1}],
+    (* set d_t g_{ab} *)
+    "if(GHG->gauge_H_dH_from_Ein) {",
+    "",
+    Table[dg[0, aa, bb, SuffixName -> "Ein"], {aa, 3, 0, -1}, {bb, 3, aa, -1}],
+    "",
+    "} else {",
+    "",
+    "if (GHG->gauge_freeze) {",
+    "",
+    Store[GaugeVarlist, "Out", SuffixName -> "Freeze"],
+    "} else if (GHG->gauge_puncture) {",
+    "",
+    Store[GaugePunctureVarlist, "Temp"],
+    Store[GaugeVarlist, "Out", SuffixName -> "Puncture"],
+    "} else if (GHG->gauge_DW) {",
+    "",
+    Store[GaugeDWVarlist, "Temp"],
+    Store[GaugeGHVarlist, "Temp", SuffixName -> "DW"],
+    Store[GaugeVarlist, "Out", SuffixName -> "GH"],
+    "} else { errorexit(\"unknown ID GHG_gauge!\"); }",
+    "",
+    Table[dg[0, aa, bb], {aa, 3, 0, -1}, {bb, 3, aa, -1}],
+    "",
+    "}", (* end of if(GHG->gauge_H_dH_from_Ein) *)
+    "",
     (* set g^{ab}, Gam_{cab}, Gam_{c} *)
-    PrintEquations[{Mode -> "Temp"}, MoreTempVarlist];
-    pr[];
+    Store[MoreTempVarlist, "Temp"],
+    "",
     (* set GHG vars *)
-    PrintEquations[GHGVarlist];
-    pr[];
-    pr["} /* end of points */"];
-    pr[];
-    pr["/* derivatives */"];
-    pr["cart_partials_diUa(node, Vind(GHG->vlu,GHG->i_Ht), idHxt);"];
-    pr[];
-    pr["forpoints(node, ijk)"];
-    pr["{"];
+    Store[GHGVarlist, "Out"],
+    "",
+    "} /* end of points */",
+    "",
+    "/* derivatives */",
+    "cart_partials_diUa(node, Vind(GHG->vlu,GHG->i_Ht), idHxt);",
+    "",
+    "forpoints(node, ijk)",
+    "{",
     (* set more GHG vars *)
-    PrintEquations[MoreOutputVarlist];
-    pr["} /* end of points */"];
-    pr[];
-    pr["TIMER_STOP;"];
-    pr[];
-    pr["} /* end of nodes */"];
-    pr[];
-    pr["return 0;"];
-    pr["} /* end of function */"];
-  ]
+    Store[MoreOutputVarlist, "Out"],
+    "} /* end of points */",
+    "",
+    "TIMER_STOP;",
+    "",
+    "} /* end of nodes */",
+    "",
+    "return 0;",
+    "} /* end of function */"
+  }]
 ];
-
-Import[FileNameJoin[{Environment["GENERATO"], "codes/Nmesh.wl"}]];
-
-(*<< ../xActToC/Codes/Nmesh.wl*)

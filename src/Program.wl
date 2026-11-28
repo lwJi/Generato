@@ -12,9 +12,9 @@ If[Environment["QUIET"] =!= "1",
   System`Print["------------------------------------------------------------"];
 ];
 
-Load::usage = "Load[varlist, mode] is a node of a program: it brings the components of the variables of varlist into scope. mode is a string, a key the backend that Generate names has under \"Load\". Load[varlist, mode, ChartName -> chart] names the chart of the components. A node is inert: building one generates nothing and changes no state.";
+Load::usage = "Load[varlist, mode] is a node of a program: it brings the components of the variables of varlist into scope. mode is a string, a key the backend that Generate names has under \"Load\". Load[component, mode] is the node of one component, written in xAct's notation, say gam[{1, -cart}, {2, -cart}]: an independent component of a bound variable. Load[varlist, mode, ChartName -> chart] names the chart of the components. A node is inert: building one generates nothing and changes no state.";
 
-Store::usage = "Store[varlist, mode] is a node of a program: it writes the equations of the components of the variables of varlist. mode is a string, a key the backend that Generate names has under \"Store\". Store[varlist, mode, SuffixName -> suffix, ChartName -> chart, ExtraReplaceRules -> rules] takes the suffix name the equations were set with, the chart of the components, and rules applied to both sides of each equation. A node is inert: building one generates nothing and changes no state.";
+Store::usage = "Store[varlist, mode] is a node of a program: it writes the equations of the components of the variables of varlist. mode is a string, a key the backend that Generate names has under \"Store\". Store[component, mode] is the node of one component, written in xAct's notation, say gam[{1, -cart}, {2, -cart}]: an independent component of a bound variable. Store[varlist, mode, SuffixName -> suffix, ChartName -> chart, ExtraReplaceRules -> rules] takes the suffix name the equations were set with, the chart of the components, and rules applied to both sides of each equation. A node is inert: building one generates nothing and changes no state.";
 
 ChartName::usage = "ChartName -> chart, an option of Load and Store, names the chart whose components the node is about. The default is the chart the variables were bound in.";
 
@@ -22,7 +22,7 @@ SuffixName::usage = "SuffixName -> suffix, an option of Store, selects which of 
 
 ExtraReplaceRules::usage = "ExtraReplaceRules -> rules, an option of Store, is a list of rules applied to the right-hand side of each equation and to what it assigns to.";
 
-Generate::usage = "Generate[backend, file, program] writes file: the program, rendered by the backend named. program is a list whose elements are lines of text, Load and Store nodes, and lists of these, nested to any depth; it is flattened and read top to bottom. Every node is checked before anything is computed: its shape, that each variable is bound, that the backend has a formatter for the kind of the node, its mode and the storage of each variable, that each variable declares the relation the formatter reads, and that a Store has an equation. Every problem is reported with the position of its node in the flattened program, and then the run stops and nothing is written.";
+Generate::usage = "Generate[backend, file, program] writes file: the program, rendered by the backend named. program is a list whose elements are lines of text, Load and Store nodes, and lists of these, nested to any depth; it is flattened and read top to bottom. Every node is checked before anything is computed: its shape, that each variable is bound, that a component given alone is an independent one, that the backend has a formatter for the kind of the node, its mode and the storage of each variable, that each variable declares the relation the formatter reads, and that a Store has an equation. Every problem is reported with the position of its node in the flattened program, and then the run stops and nothing is written.";
 
 LoadStatement::usage = "LoadStatement[config, mode, variable, component] returns the Load statement of one component: the record a backend formatter is handed. variable and component are the records binding wrote, and config is the user configuration.";
 
@@ -45,6 +45,16 @@ Begin["`Private`"];
   itself. What a node means is decided by the backend Generate names: the
   mode is a key of its table, and the storage a formatter is looked up under
   is the one the variable was bound with.
+
+  A node takes one component where it takes a varlist, written in xAct's
+  notation:
+
+    Store[dg[{3, -cart}, {0, -cart}, {1, -cart}], "Out"]
+
+  That is how a script writes components in an order of its own, say from a
+  Table, or some of them inside a branch of the C code. The component
+  resolves through its head to a bound variable, and is the "Comp" of one
+  of its records.
 
   The options of a node are named here once. They are read by name, so a
   script may write them as symbols of any context, or as strings.
@@ -132,6 +142,10 @@ Protect[LoadStatement, StoreStatement];
   what it is given. position is the place of the node in the flattened
   program, counted from 1. A node may have several problems, and one per
   variable of its varlist.
+
+  What a node is about is a varlist or one component. Either resolves to
+  bound variables, and from there the two are checked alike: the storage,
+  the relation and the equation are facts of the variable.
 *)
 
 (* The head a var spec names, or $Failed if it is not a var spec *)
@@ -183,6 +197,14 @@ FormatterProblems[table_Association, kind_String, mode_String, variable_Associat
     }
   ];
 
+BoundVariableProblems[table_Association, kind_String, mode_String, modeknown_, suffix_String, position_Integer, variable_Association] :=
+  Join[
+    BaseProblems[variable, position],
+    If[modeknown, FormatterProblems[table, kind, mode, variable, position], {}],
+    If[kind === "Store" && !EquationSetQ[variable["Head"], suffix], {{"EEquation", position, variable["Head"], SuffixText[suffix]}}, {}]
+  ];
+
+(* A var of a varlist names its variable by its head *)
 VariableProblems[table_Association, kind_String, mode_String, modeknown_, suffix_String, position_Integer, var_] :=
   Module[{head = VarHead[var], variable},
     variable = If[head === $Failed, None, DeclaredVariable[head]];
@@ -194,18 +216,40 @@ VariableProblems[table_Association, kind_String, mode_String, modeknown_, suffix
         {{"EUnbound", position, head}}
       ,
       True,
-        Join[
-          BaseProblems[variable, position],
-          If[modeknown, FormatterProblems[table, kind, mode, variable, position], {}],
-          If[kind === "Store" && !EquationSetQ[head, suffix], {{"EEquation", position, head, SuffixText[suffix]}}, {}]
-        ]
+        BoundVariableProblems[table, kind, mode, modeknown, suffix, position, variable]
     ]
   ];
+
+(*
+  One component names its variable by its head too, and must be one of its
+  independent components: the mirror of a symmetric pair is none, and
+  neither is the tensor with its abstract indices.
+*)
+ComponentProblems[table_Association, kind_String, mode_String, modeknown_, suffix_String, position_Integer, comp_] :=
+  With[{variable = DeclaredVariable[Head[comp]]},
+    Which[
+      !BoundQ[variable],
+        {{"EUnbound", position, Head[comp]}}
+      ,
+      MissingQ[FindComponent[variable, comp]],
+        {{"EComponent", position, ShortText[comp], Head[comp]}}
+      ,
+      True,
+        BoundVariableProblems[table, kind, mode, modeknown, suffix, position, variable]
+    ]
+  ];
+
+SubjectProblems[table_Association, kind_String, mode_String, modeknown_, suffix_String, position_Integer, varlist_List] :=
+  Join @@ (VariableProblems[table, kind, mode, modeknown, suffix, position, #]& /@ varlist);
+
+SubjectProblems[table_Association, kind_String, mode_String, modeknown_, suffix_String, position_Integer, comp_] :=
+  ComponentProblems[table, kind, mode, modeknown, suffix, position, comp];
 
 NodeProblems[table_Association, line_String, position_Integer] :=
   {};
 
-NodeProblems[table_Association, (head : Load | Store)[varlist_List, mode_String, options : (_Rule | _RuleDelayed)...], position_Integer] /; NodeOptionsQ[head, {options}] :=
+(* subject: a varlist, or one component, which like a varlist is an expression with a symbol for its head *)
+NodeProblems[table_Association, (head : Load | Store)[subject : _Symbol[___], mode_String, options : (_Rule | _RuleDelayed)...], position_Integer] /; NodeOptionsQ[head, {options}] :=
   With[{kind = $Kinds[head], modes = AcceptedModes[table, $Kinds[head]], suffix = If[head === Store, OptionValue[Store, {options}, SuffixName], ""]},
     Join[
       If[MemberQ[modes, mode],
@@ -218,7 +262,7 @@ NodeProblems[table_Association, (head : Load | Store)[varlist_List, mode_String,
           }
         }
       ],
-      Join @@ (VariableProblems[table, kind, mode, MemberQ[modes, mode], suffix, position, #]& /@ varlist)
+      SubjectProblems[table, kind, mode, MemberQ[modes, mode], suffix, position, subject]
     ]
   ];
 
@@ -252,7 +296,11 @@ ReportProblems[problems_List] :=
   the check has passed.
 *)
 
-(* The {variable record, component record} pairs of a varlist, each a component in the chart *)
+(*
+  The {variable record, component record} pairs of what a node is about,
+  each a component in the chart: every component of every variable of a
+  varlist, or the one component the node names.
+*)
 NodeComponents[varlist_List, coordinate_] :=
   Join @@
     Map[
@@ -268,14 +316,20 @@ NodeComponents[varlist_List, coordinate_] :=
       varlist
     ];
 
+NodeComponents[comp_, coordinate_] :=
+  With[{variable = VariableRecord[Head[comp]], component = ComponentRecord[comp]},
+    RequireChart[variable, component, coordinate];
+    {{variable, component}}
+  ];
+
 NodeStatements[config_Association, line_String, position_Integer] :=
   {line};
 
-NodeStatements[config_Association, Load[varlist_List, mode_String, options___], position_Integer] :=
+NodeStatements[config_Association, Load[subject_, mode_String, options___], position_Integer] :=
   Function[{variable, component},
     PrintVerbose["    Load ", component["Comp"], "..."];
     LoadStatement[config, mode, variable, component]
-  ] @@@ NodeComponents[varlist, NodeChart[Load, {options}]];
+  ] @@@ NodeComponents[subject, NodeChart[Load, {options}]];
 
 (*
   A Store whose variable has an equation may still have a component that no
@@ -283,7 +337,7 @@ NodeStatements[config_Association, Load[varlist_List, mode_String, options___], 
   itself, the symbol RHSOf names applied to the component, which is no C
   code; the run stops at the first one.
 *)
-NodeStatements[config_Association, Store[varlist_List, mode_String, options___], position_Integer] :=
+NodeStatements[config_Association, Store[subject_, mode_String, options___], position_Integer] :=
   With[
     {
       coordinate = NodeChart[Store, {options}],
@@ -298,7 +352,7 @@ NodeStatements[config_Association, Store[varlist_List, mode_String, options___],
         ];
         statement
       ]
-    ] @@@ NodeComponents[varlist, coordinate]
+    ] @@@ NodeComponents[subject, coordinate]
   ];
 
 (*
@@ -326,9 +380,11 @@ Generate[arguments___] :=
 
 Generate::EArguments = "Generate takes the name of a backend, the name of the output file and the program, a list: Generate[backend, file, program]. It was given the arguments `1`.";
 
-Generate::ENode = "Node `1`: `2` is not a part of a program. A program is made of lines of text, Load[varlist, mode] and Store[varlist, mode] nodes, and lists of these. Load takes the option ChartName; Store takes ChartName, SuffixName, a string, and ExtraReplaceRules, a list of rules.";
+Generate::ENode = "Node `1`: `2` is not a part of a program. A program is made of lines of text, Load[varlist, mode] and Store[varlist, mode] nodes, and lists of these. A node takes one component in place of a varlist. Load takes the option ChartName; Store takes ChartName, SuffixName, a string, and ExtraReplaceRules, a list of rules.";
 
-Generate::EVar = "Node `1`: `2` is not a var spec. A node takes a varlist as GridTensors, TileTensors or TempTensors returned it, or a part of one.";
+Generate::EVar = "Node `1`: `2` is not a var spec. A node takes a varlist as GridTensors, TileTensors or TempTensors returned it, or a part of one, or one component that is not in a list.";
+
+Generate::EComponent = "Node `1`: `2` is not an independent component of the bound variable `3`. A component is written in xAct's notation, with a number and a chart on each slot, and the mirror of a symmetric pair is not independent.";
 
 Generate::EUnbound = "Node `1`: variable `2` is not bound. Bind it with GridTensors, TileTensors or TempTensors before the program is generated.";
 
