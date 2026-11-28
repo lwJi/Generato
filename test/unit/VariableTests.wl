@@ -2,7 +2,7 @@
 
 (* VariableTests.wl *)
 (* Unit tests for Generato`Variable`: a var spec becomes a variable record and an xAct tensor *)
-(* Tests: ParseVar, DefineTensor, DefTensors, DeclaredVariable, RecordBinding *)
+(* Tests: ParseVar, DefineTensor, DefTensors, DeclaredVariable, RecordBinding, and the relations DerivativeOf and TimeDerivativeOf *)
 (* The store of the records lasts as long as the kernel, like the xAct tensors, so each test uses heads of its own *)
 
 If[Environment["QUIET"] =!= "1", Print["Loading VariableTests.wl..."]];
@@ -36,7 +36,7 @@ AppendTo[$AllTests,
   VerificationTest[
     (* a vector with a print name *)
     ParseVar[{varTestVec[i], PrintAs -> "vtv"}],
-    <|"Head" -> varTestVec, "Name" -> "varTestVec", "Slots" -> {i}, "Symmetry" -> None, "Pairs" -> {}, "PrintAs" -> "vtv"|>,
+    <|"Head" -> varTestVec, "Name" -> "varTestVec", "Slots" -> {i}, "Symmetry" -> None, "Pairs" -> {}, "PrintAs" -> "vtv", "DerivativeOf" -> None, "TimeDerivativeOf" -> None|>,
     TestID -> "ParseVar-Vector-Record"
   ]
 ];
@@ -45,7 +45,7 @@ AppendTo[$AllTests,
   VerificationTest[
     (* a scalar has no slots, and a field the spec does not state is None *)
     ParseVar[{varTestScalar[]}],
-    <|"Head" -> varTestScalar, "Name" -> "varTestScalar", "Slots" -> {}, "Symmetry" -> None, "Pairs" -> {}, "PrintAs" -> None|>,
+    <|"Head" -> varTestScalar, "Name" -> "varTestScalar", "Slots" -> {}, "Symmetry" -> None, "Pairs" -> {}, "PrintAs" -> None, "DerivativeOf" -> None, "TimeDerivativeOf" -> None|>,
     TestID -> "ParseVar-Scalar-Record"
   ]
 ];
@@ -54,7 +54,7 @@ AppendTo[$AllTests,
   VerificationTest[
     (* the symmetry is kept as stated, and normalised to a pair of slots *)
     ParseVar[{varTestSym[-i, -j], Symmetric[{-i, -j}], PrintAs -> "vts"}],
-    <|"Head" -> varTestSym, "Name" -> "varTestSym", "Slots" -> {-i, -j}, "Symmetry" -> Symmetric[{-i, -j}], "Pairs" -> {{1, 2, 1}}, "PrintAs" -> "vts"|>,
+    <|"Head" -> varTestSym, "Name" -> "varTestSym", "Slots" -> {-i, -j}, "Symmetry" -> Symmetric[{-i, -j}], "Pairs" -> {{1, 2, 1}}, "PrintAs" -> "vts", "DerivativeOf" -> None, "TimeDerivativeOf" -> None|>,
     TestID -> "ParseVar-Symmetric-Record"
   ]
 ];
@@ -63,7 +63,7 @@ AppendTo[$AllTests,
   VerificationTest[
     (* the features of a var spec come in any order *)
     ParseVar[{PrintAs -> "order", Symmetric[{-i, -j}], varTestOrder[-i, -j]}],
-    <|"Head" -> varTestOrder, "Name" -> "varTestOrder", "Slots" -> {-i, -j}, "Symmetry" -> Symmetric[{-i, -j}], "Pairs" -> {{1, 2, 1}}, "PrintAs" -> "order"|>,
+    <|"Head" -> varTestOrder, "Name" -> "varTestOrder", "Slots" -> {-i, -j}, "Symmetry" -> Symmetric[{-i, -j}], "Pairs" -> {{1, 2, 1}}, "PrintAs" -> "order", "DerivativeOf" -> None, "TimeDerivativeOf" -> None|>,
     TestID -> "ParseVar-OrderIndependence"
   ]
 ];
@@ -75,6 +75,72 @@ AppendTo[$AllTests,
     ParseVar[{varTestPi$Upt[-i, -j], Symmetric[{-i, -j}]}]["Name"],
     "varTestPi",
     TestID -> "ParseVar-Name-WithoutUnprotectedSuffix"
+  ]
+];
+
+(* ========================================= *)
+(* Test: ParseVar - a declared relation *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a rule is told apart by its key: DerivativeOf names the variable a derivative is taken of *)
+    ParseVar[{varTestD[-k, -i, -j], Symmetric[{-i, -j}], DerivativeOf -> varTestBase, PrintAs -> "d"}],
+    <|"Head" -> varTestD, "Name" -> "varTestD", "Slots" -> {-k, -i, -j}, "Symmetry" -> Symmetric[{-i, -j}], "Pairs" -> {{2, 3, 1}}, "PrintAs" -> "d",
+      "DerivativeOf" -> varTestBase, "TimeDerivativeOf" -> None|>,
+    TestID -> "ParseVar-DerivativeOf-Record"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* TimeDerivativeOf names the variable a time derivative is taken of; the relation is a rule like the print name, in any place *)
+    ParseVar[{TimeDerivativeOf -> varTestBase, varTestDt[-i, -j], Symmetric[{-i, -j}]}],
+    <|"Head" -> varTestDt, "Name" -> "varTestDt", "Slots" -> {-i, -j}, "Symmetry" -> Symmetric[{-i, -j}], "Pairs" -> {{1, 2, 1}}, "PrintAs" -> None,
+      "DerivativeOf" -> None, "TimeDerivativeOf" -> varTestBase|>,
+    TestID -> "ParseVar-TimeDerivativeOf-Record"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a relation names a variable by its head *)
+    Catch[
+      ParseVar[{varTestD[-k], DerivativeOf -> "varTestBase"}];
+      "NoThrow",
+      GeneratoFailure
+    ],
+    $Failed,
+    {ParseVar::EKey},
+    TestID -> "ParseVar-RelationNotAHead-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a var states at most one relation *)
+    Catch[
+      ParseVar[{varTestD[-k], DerivativeOf -> varTestBase, TimeDerivativeOf -> varTestBase}];
+      "NoThrow",
+      GeneratoFailure
+    ],
+    $Failed,
+    {ParseVar::EShape},
+    TestID -> "ParseVar-TwoRelations-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* and at most one print name *)
+    Catch[
+      ParseVar[{varTestD[-k], PrintAs -> "d", PrintAs -> "e"}];
+      "NoThrow",
+      GeneratoFailure
+    ],
+    $Failed,
+    {ParseVar::EShape},
+    TestID -> "ParseVar-TwoPrintNames-Stops"
   ]
 ];
 
@@ -298,6 +364,132 @@ AppendTo[$AllTests,
 ];
 
 (* ========================================= *)
+(* Test: DefineTensor - a relation is checked where it is declared *)
+(* ========================================= *)
+
+DefTensors[{varRelScalar[]}, {varRelVec[i]}, {varRelSym[-i, -j], Symmetric[{-i, -j}]}];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a derivative has more slots than the variable it differentiates, at any order; a time derivative has as many *)
+    DefTensors[
+      {varRelDScalar[-k], DerivativeOf -> varRelScalar},
+      {varRelDDScalar[-i, -j], Symmetric[{-i, -j}], DerivativeOf -> varRelScalar},
+      {varRelDSym[-k, -i, -j], Symmetric[{-i, -j}], DerivativeOf -> varRelSym},
+      {varRelDtSym[-i, -j], Symmetric[{-i, -j}], TimeDerivativeOf -> varRelSym}
+    ];
+    {
+      DeclaredVariable[varRelDScalar]["DerivativeOf"],
+      DeclaredVariable[varRelDDScalar]["DerivativeOf"],
+      DeclaredVariable[varRelDSym]["DerivativeOf"],
+      DeclaredVariable[varRelDSym]["TimeDerivativeOf"],
+      DeclaredVariable[varRelDtSym]["DerivativeOf"],
+      DeclaredVariable[varRelDtSym]["TimeDerivativeOf"]
+    },
+    {varRelScalar, varRelScalar, varRelSym, None, None, varRelSym},
+    TestID -> "DefineTensor-Relation-Declared"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* the variable a relation names must be declared already; the var that fails is not declared *)
+    {
+      Catch[
+        DefTensors[{varRelDNever[-k], DerivativeOf -> varRelNever}];
+        "NoThrow",
+        GeneratoFailure
+      ],
+      xTensorQ[varRelDNever],
+      DeclaredVariable[varRelDNever]
+    },
+    {$Failed, False, Missing["NotDeclared", varRelDNever]},
+    {DefineTensor::EBase},
+    TestID -> "DefineTensor-DerivativeOf-UndeclaredBase-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* the same holds for a time derivative *)
+    Catch[
+      DefTensors[{varRelDtNever[i], TimeDerivativeOf -> varRelNever}];
+      "NoThrow",
+      GeneratoFailure
+    ],
+    $Failed,
+    {DefineTensor::EBase},
+    TestID -> "DefineTensor-TimeDerivativeOf-UndeclaredBase-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a variable is not its own derivative: it is not declared while its var is read *)
+    Catch[
+      DefTensors[{varRelSelf[-k], DerivativeOf -> varRelSelf}];
+      "NoThrow",
+      GeneratoFailure
+    ],
+    $Failed,
+    {DefineTensor::EBase},
+    TestID -> "DefineTensor-DerivativeOf-Itself-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a derivative of a variable of equal rank has no derivative slot *)
+    {
+      Catch[
+        DefTensors[{varRelDEqual[-k], DerivativeOf -> varRelVec}];
+        "NoThrow",
+        GeneratoFailure
+      ],
+      xTensorQ[varRelDEqual]
+    },
+    {$Failed, False},
+    {DefineTensor::EDerivativeOf},
+    TestID -> "DefineTensor-DerivativeOf-EqualRank-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* nor has a derivative of a variable of higher rank *)
+    Catch[
+      DefTensors[{varRelDHigher[-k], DerivativeOf -> varRelSym}];
+      "NoThrow",
+      GeneratoFailure
+    ],
+    $Failed,
+    {DefineTensor::EDerivativeOf},
+    TestID -> "DefineTensor-DerivativeOf-HigherRank-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a time derivative has the slots of its variable: a lower and a higher rank do not fit *)
+    {
+      Catch[
+        DefTensors[{varRelDtLower[i], TimeDerivativeOf -> varRelSym}];
+        "NoThrow",
+        GeneratoFailure
+      ],
+      Catch[
+        DefTensors[{varRelDtHigher[-k, i], TimeDerivativeOf -> varRelVec}];
+        "NoThrow",
+        GeneratoFailure
+      ]
+    },
+    {$Failed, $Failed},
+    {DefineTensor::ETimeDerivativeOf, DefineTensor::ETimeDerivativeOf},
+    TestID -> "DefineTensor-TimeDerivativeOf-OtherRank-Stops"
+  ]
+];
+
+(* ========================================= *)
 (* Test: DefTensors *)
 (* ========================================= *)
 
@@ -326,7 +518,7 @@ AppendTo[$AllTests,
       DeclaredVariable[varDefsTest2] === ParseVar[{varDefsTest2[-i, -j], Symmetric[{-i, -j}]}]
     },
     {
-      <|"Head" -> varDefsTest1, "Name" -> "varDefsTest1", "Slots" -> {i}, "Symmetry" -> None, "Pairs" -> {}, "PrintAs" -> "a"|>,
+      <|"Head" -> varDefsTest1, "Name" -> "varDefsTest1", "Slots" -> {i}, "Symmetry" -> None, "Pairs" -> {}, "PrintAs" -> "a", "DerivativeOf" -> None, "TimeDerivativeOf" -> None|>,
       True
     },
     TestID -> "DefTensors-DeclaredHasARecordWithoutStorage"
@@ -366,7 +558,7 @@ AppendTo[$AllTests,
     DefTensors[{varStoreTest1[i], PrintAs -> "s1"}];
     RecordBinding[varStoreTest1, "Temp", {<|"Slot" -> 0|>}];
     DeclaredVariable[varStoreTest1],
-    <|"Head" -> varStoreTest1, "Name" -> "varStoreTest1", "Slots" -> {i}, "Symmetry" -> None, "Pairs" -> {}, "PrintAs" -> "s1",
+    <|"Head" -> varStoreTest1, "Name" -> "varStoreTest1", "Slots" -> {i}, "Symmetry" -> None, "Pairs" -> {}, "PrintAs" -> "s1", "DerivativeOf" -> None, "TimeDerivativeOf" -> None,
       "Storage" -> "Temp", "Components" -> {<|"Slot" -> 0|>}|>,
     TestID -> "RecordBinding-ExtendsTheDeclaredRecord"
   ]

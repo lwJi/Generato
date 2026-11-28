@@ -26,6 +26,10 @@ TempTensors::usage = "TempTensors[var1, var2, ...] declares tensors, binds them 
 
 VariableRecord::usage = "VariableRecord[head] returns the record of a bound variable.\nVariableRecord[var] returns the record of the bound variable a var spec names. It stops the run if the variable is not bound.";
 
+ComponentRecord::usage = "ComponentRecord[comp] returns the record of a component written in xAct's notation, say gam[{1, -cart}, {2, -cart}]. It stops the run if comp is not an independent component of a bound variable.";
+
+BaseRecord::usage = "BaseRecord[variable] returns the record of the bound variable that a variable record declares a relation to, by DerivativeOf or by TimeDerivativeOf, or None if it declares none.";
+
 PrintComponent::usage = "PrintComponent[coordinate, variable, component, extrareplacerules] prints one component record of a bound variable through the backend, as an initialization or as an equation.";
 
 Is3DAbstractIndex::usage = "Is3DAbstractIndex[index] returns True if the abstract index represents a 3D spatial index (first letter >= 'i').";
@@ -59,6 +63,7 @@ Protect[IndependentIndices];
 
     <|"Head" -> gam, "Name" -> "gam", "Slots" -> {-i, -j},                    declared
       "Symmetry" -> Symmetric[{-i, -j}], "Pairs" -> {{1, 2, 1}}, "PrintAs" -> "gam",
+      "DerivativeOf" -> None, "TimeDerivativeOf" -> None,
       "Storage" -> "Grid",                                                     bound
       "Components" -> {<|"Comp" -> gam[{1, -cart}, {1, -cart}], "Indices" -> {1, 1}, "Slot" -> 0,
                          "Name" -> "gam11", "Expr" -> gam11[[ijk]]|>, ...}|>
@@ -69,6 +74,9 @@ Protect[IndependentIndices];
 
   VariableRecord is what a print call reads. A variable that is declared and
   not bound has a record without "Storage", and nothing to print.
+  ComponentRecord finds one component record from the component in xAct's
+  notation, through its head. BaseRecord follows a declared relation to the
+  record of the variable it names.
 *)
 BoundQ[variable_] :=
   AssociationQ[variable] && KeyExistsQ[variable, "Storage"];
@@ -87,6 +95,31 @@ VariableRecord[var_] :=
 VariableRecord::EUnbound = "Variable `1` is not bound. Bind it with GridTensors, TileTensors or TempTensors before it is used.";
 
 Protect[VariableRecord];
+
+ComponentRecord[comp_] :=
+  Module[{variable = VariableRecord[Head[comp]], component},
+    component = SelectFirst[variable["Components"], #["Comp"] === comp&, None];
+    If[component === None,
+      Stop[ComponentRecord::EComponent, comp, variable["Head"]]
+    ];
+    component
+  ];
+
+ComponentRecord::EComponent = "`1` is not an independent component of the bound variable `2`.";
+
+Protect[ComponentRecord];
+
+(* A var spec states at most one relation, so a variable has at most one such record *)
+BaseRecord[variable_Association] :=
+  With[{head = FirstCase[Lookup[variable, {"DerivativeOf", "TimeDerivativeOf"}, None], Except[None], None]},
+    If[head === None,
+      None
+      ,
+      VariableRecord[head]
+    ]
+  ];
+
+Protect[BaseRecord];
 
 (* The range a component index runs over: 1 to 3 in three dimensions, 0 to dim - 1 otherwise *)
 ComponentIndexRange[] :=
@@ -117,7 +150,7 @@ PointIndex[storage_String] :=
     name: the C identifier, say Pi12, ignoring the information about covariant/contravariant
     expr: what is printed to C code, or lhs, say Pi12[[ijk]]
 *)
-ComponentRecord[variable_Association, storage_String, coordinate_, indices_List, slot_Integer] :=
+NewComponentRecord[variable_Association, storage_String, coordinate_, indices_List, slot_Integer] :=
   Module[{name, colist = {"t", "x", "y", "z"}},
     name =
       variable["Name"] <>
@@ -174,7 +207,7 @@ BindVariable[binding_Symbol, storage_String, var_] :=
     indices = IndependentIndices[Length[slots], variable["Pairs"], ComponentIndexRange[]];
     components =
       MapIndexed[
-        ComponentRecord[variable, storage, coordinate, #1, First[#2] - 1]&
+        NewComponentRecord[variable, storage, coordinate, #1, First[#2] - 1]&
         ,
         Select[indices, ZeroSpatialSlots[slots, #] === {}&]
       ];
@@ -233,6 +266,10 @@ Protect[GridTensors, TileTensors, TempTensors];
   The records of a variable are its components in the chart it was bound
   in. A print call that names another chart has no record to print, except
   for a scalar, whose component carries no chart.
+  An initialization gets the records: the variable, the component, and the
+  variable a declared relation names, or None. An equation gets the
+  component in xAct's notation, the form a script that prints single
+  components writes; a backend reads the record of it with ComponentRecord.
 *)
 PrintComponent[coordinate_, variable_Association, component_Association, extrareplacerules_] :=
   Module[{compname = component["Comp"]},
@@ -242,7 +279,7 @@ PrintComponent[coordinate_, variable_Association, component_Association, extrare
     Which[
       InInitializationsMode[],
         PrintVerbose["    PrintComponentInitialization ", compname, "..."];
-        Global`PrintComponentInitialization[{variable["Head"] @@ variable["Slots"], variable["Symmetry"]}, compname]
+        Global`PrintComponentInitialization[variable, component, BaseRecord[variable]]
       ,
       InEquationsMode[],
         PrintVerbose["    PrintComponentEquation ", compname, "..."];

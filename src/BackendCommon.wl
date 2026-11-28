@@ -21,8 +21,9 @@ GetGFIndexNameMix2nd::usage = "GetGFIndexNameMix2nd[index1, index2] creates mixe
 GetInterfaceName::usage = "GetInterfaceName[compname] returns the interface name for a component.";
 ComputeRHSValue::usage = "ComputeRHSValue[coordinate, compname, extrareplacerules] computes the RHS value for an equation.";
 PrintEquationByMode::usage = "PrintEquationByMode[compToValue, rhssToValue, mainFormatter, tempFormatter] prints equation based on current EquationsMode. tempFormatter is optional (defaults to Automatic for standard Temp output).";
-GetTensorIndexSubbuf::usage = "GetTensorIndexSubbuf[len, varlistindex] computes subbuf string for tensor component indexing.";
-ExtractComponentInfo::usage = "ExtractComponentInfo[varinfo, compname] returns {varlistindex, compToValue, varname, symmetry, len} for component initialization, read from the record of the bound variable.";
+IndexSuffix::usage = "IndexSuffix[variable, component, base] returns the index a component has in the storage of its variable, as C text: \"\" for a scalar, \"[v]\" for its slot v, and \"[v mod N][v div N]\" for a derivative of a variable with N components. base is the record DerivativeOf names.";
+BaseComponent::usage = "BaseComponent[component, base] returns the component record of base that a component of one of its derivatives differentiates: the one at the trailing indices.";
+RequireRelation::usage = "RequireRelation[variable, relation, mode] stops the run, with a pointer to the rule to add, if the variable record declares no relation of that name. mode is the mode it is loaded with.";
 
 Begin["`Private`"];
 
@@ -143,84 +144,75 @@ PrintEquationByMode::EMode = "PrintEquationByMode: EquationsMode unrecognized!";
 Protect[PrintEquationByMode];
 
 (*
-  GetTensorIndexSubbuf - Computes subbuf string for tensor component indexing
-  This handles the common Scal/Vect/Smat pattern using varlistindex with
-  bracket notation. Used by AMReX.
-  Note: CarpetXGPU and Nmesh have different indexing schemes
-  and do not use this function.
+  IndexSuffix - the layout rule: where a component is in the storage of its variable.
 
-  For "Scal" TensorType, any tensor length is handled with simple [varlistindex]
-  because TensorType=Scal means each component is treated as independent scalar.
+    v = the component's slot, N = the number of independent components of
+    the variable it is a derivative of
+
+    no DerivativeOf:   ""  for a scalar, [v] otherwise
+    DerivativeOf:      [v] when N is 1, [v mod N][v div N] otherwise
+
+  The derivative slots lead, so v = N d + c for the derivative index d and
+  the component c of the differentiated variable, and the index is [c][d].
+  A time derivative has the components of its variable and is laid out like
+  it, so TimeDerivativeOf plays no part here.
 *)
-GetTensorIndexSubbuf[len_Integer, varlistindex_Integer] :=
-  Module[{tensorType = GetTensorType[]},
-    Which[
-      tensorType === "Scal",
-        (* Scal treats all components as independent scalars *)
-        If[len == 0, "", "[" <> ToString[varlistindex] <> "]"],
-      tensorType === "Vect",
-        Which[
-          len == 1, "[" <> ToString[varlistindex] <> "]",
-          len == 2,
-            "[" <> ToString[Quotient[varlistindex, 3]] <> "]["
-                <> ToString[Mod[varlistindex, 3]] <> "]",
-          len == 3,
-            "[" <> ToString[Quotient[varlistindex, 3]] <> "]["
-                <> ToString[Mod[varlistindex, 3]] <> "]",
-          True, Stop[GetTensorIndexSubbuf::ELength]
-        ],
-      tensorType === "Smat",
-        Which[
-          len == 2, "[" <> ToString[varlistindex] <> "]",
-          len == 3,
-            "[" <> ToString[Quotient[varlistindex, 6]] <> "]["
-                <> ToString[Mod[varlistindex, 6]] <> "]",
-          len == 4,
-            "[" <> ToString[Quotient[varlistindex, 6]] <> "]["
-                <> ToString[Mod[varlistindex, 6]] <> "]",
-          True, Stop[GetTensorIndexSubbuf::ELength]
-        ],
-      True,
-        Stop[GetTensorIndexSubbuf::ETensorType]
+IndexSuffix[variable_Association, component_Association, base_] :=
+  With[{slot = component["Slot"]},
+    If[variable["DerivativeOf"] === None,
+      If[variable["Slots"] === {},
+        ""
+        ,
+        "[" <> ToString[slot] <> "]"
+      ]
+      ,
+      With[{count = Length[base["Components"]]},
+        If[count == 1,
+          "[" <> ToString[slot] <> "]"
+          ,
+          "[" <> ToString[Mod[slot, count]] <> "][" <> ToString[Quotient[slot, count]] <> "]"
+        ]
+      ]
     ]
   ];
 
-GetTensorIndexSubbuf::ELength = "GetTensorIndexSubbuf: Unsupported tensor rank for tensor type.";
-GetTensorIndexSubbuf::ETensorType = "GetTensorIndexSubbuf: Unknown tensor type.";
-
-Protect[GetTensorIndexSubbuf];
+Protect[IndexSuffix];
 
 (*
-  ExtractComponentInfo - what a backend reads about a component it initializes
-  Returns: {varlistindex, compToValue, varname, symmetry, len}
-
-  Every entry is read from the record of the bound variable the component
-  belongs to, which is found through the head of compname:
-    varlistindex   the component's "Slot"
-    compToValue    the component's "Expr"
-    varname        the variable's head with its "Slots", say MDD[-i, -j]
-    symmetry       the variable's "Symmetry"
-    len            the number of slots
-  varinfo is what PrintComponent hands the backend; nothing is read from it.
+  BaseComponent - the component a derivative component differentiates.
+  The slots of the differentiated variable are the trailing ones, so its
+  component is the one at the trailing indices: dgamt123 differentiates
+  gamt23. A derivative declared with less symmetry than its variable has
+  components for which there is none, say dgamt132.
 *)
-ExtractComponentInfo[varinfo_, compname_] :=
-  Module[{variable = VariableRecord[Head[compname]], component},
-    component = SelectFirst[variable["Components"], #["Comp"] === compname&, None];
-    If[component === None,
-      Stop[ExtractComponentInfo::EComponent, compname, variable["Head"]]
+BaseComponent[component_Association, base_Association] :=
+  Module[{indices = Take[component["Indices"], -Length[base["Slots"]]], basecomponent},
+    basecomponent = SelectFirst[base["Components"], #["Indices"] === indices&, None];
+    If[basecomponent === None,
+      Stop[BaseComponent::EComponent, component["Name"], base["Head"], indices]
     ];
-    {
-      component["Slot"],
-      component["Expr"],
-      variable["Head"] @@ variable["Slots"],
-      variable["Symmetry"],
-      Length[variable["Slots"]]
-    }
+    basecomponent
   ];
 
-ExtractComponentInfo::EComponent = "`1` is not an independent component of the bound variable `2`.";
+BaseComponent::EComponent = "`1` is a derivative of the component of `2` at the indices `3`, and `2` has no independent component there. Declare the derivative with the symmetry of `2`.";
 
-Protect[ExtractComponentInfo];
+Protect[BaseComponent];
+
+(*
+  RequireRelation - a load that reads a relation needs it declared.
+  A relation is never read out of a name, so a variable that is loaded as a
+  derivative and declares none stops the run.
+*)
+$RelationPhrase = <|"DerivativeOf" -> "derivative", "TimeDerivativeOf" -> "time derivative"|>;
+
+RequireRelation[variable_Association, relation_String, mode_String] :=
+  If[Lookup[variable, relation, None] === None,
+    Stop[RequireRelation::EMissing, variable["Head"], mode, relation, $RelationPhrase[relation]]
+  ];
+
+RequireRelation::EMissing = "`1` is loaded with \"`2`\" but declares no `3`. Add `3` -> v to its declaration, where v is the variable `1` is the `4` of.";
+
+Protect[RequireRelation];
 
 End[];
 

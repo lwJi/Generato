@@ -43,16 +43,16 @@ EvolVarlist =
 (* Derivatives computed inline. The tile point index is empty, so the names carry no index *)
 dEvolVarlist =
   TileTensors[
-    {dW[-k], PrintAs -> "dW"},
-    {dgamt[-k, -i, -j], Symmetric[{-i, -j}], PrintAs -> "dgamt"},
-    {dbeta[-k, i], PrintAs -> "dbeta"}
+    {dW[-k], DerivativeOf -> W, PrintAs -> "dW"},
+    {dgamt[-k, -i, -j], Symmetric[{-i, -j}], DerivativeOf -> gamt, PrintAs -> "dgamt"},
+    {dbeta[-k, i], DerivativeOf -> beta, PrintAs -> "dbeta"}
   ];
 
 ddEvolVarlist =
   TileTensors[
-    {ddW[-i, -j], Symmetric[{-i, -j}], PrintAs -> "ddW"},
-    {ddgamt[-l, -m, -i, -j], GenSet[Cycles[{1, 2}], Cycles[{3, 4}]], PrintAs -> "ddgamt"},
-    {ddbeta[-i, -j, k], Symmetric[{-i, -j}], PrintAs -> "ddbeta"}
+    {ddW[-i, -j], Symmetric[{-i, -j}], DerivativeOf -> W, PrintAs -> "ddW"},
+    {ddgamt[-l, -m, -i, -j], GenSet[Cycles[{1, 2}], Cycles[{3, 4}]], DerivativeOf -> gamt, PrintAs -> "ddgamt"},
+    {ddbeta[-i, -j, k], Symmetric[{-i, -j}], DerivativeOf -> beta, PrintAs -> "ddbeta"}
   ];
 
 TempVarlist =

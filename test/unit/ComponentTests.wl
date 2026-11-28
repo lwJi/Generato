@@ -1,7 +1,8 @@
 (* ::Package:: *)
 
 (* ComponentTests.wl *)
-(* Unit tests for Generato`Component module: the enumeration of components, binding and the records *)
+(* Unit tests for Generato`Component module: the enumeration of components, binding and the records, *)
+(* and for what a backend reads from the records: the index layout and the variable a relation names *)
 (* The store of the records lasts as long as the kernel, like the xAct tensors, so each test uses heads of its own *)
 
 If[Environment["QUIET"] =!= "1", Print["Loading ComponentTests.wl..."]];
@@ -276,7 +277,7 @@ AppendTo[$AllTests,
   VerificationTest[
     (* the record holds what the declaration states, and the storage of the binding *)
     KeyDrop[VariableRecord[compTestM], "Components"],
-    <|"Head" -> compTestM, "Name" -> "compTestM", "Slots" -> {-i, -j}, "Symmetry" -> Symmetric[{-i, -j}], "Pairs" -> {{1, 2, 1}}, "PrintAs" -> "m", "Storage" -> "Grid"|>,
+    <|"Head" -> compTestM, "Name" -> "compTestM", "Slots" -> {-i, -j}, "Symmetry" -> Symmetric[{-i, -j}], "Pairs" -> {{1, 2, 1}}, "PrintAs" -> "m", "DerivativeOf" -> None, "TimeDerivativeOf" -> None, "Storage" -> "Grid"|>,
     TestID -> "Bind-Record-DeclaredFactsAndStorage"
   ]
 ];
@@ -289,7 +290,7 @@ AppendTo[$AllTests,
       KeyDrop[DeclaredVariable[compTestM], {"Storage", "Components"}] === ParseVar[compTestGridVarlist[[2]]],
       Keys[DeclaredVariable[compTestM]]
     },
-    {True, True, {"Head", "Name", "Slots", "Symmetry", "Pairs", "PrintAs", "Storage", "Components"}},
+    {True, True, {"Head", "Name", "Slots", "Symmetry", "Pairs", "PrintAs", "DerivativeOf", "TimeDerivativeOf", "Storage", "Components"}},
     TestID -> "Bind-ExtendsTheDeclaredRecord"
   ]
 ];
@@ -428,7 +429,7 @@ AppendTo[$AllTests,
     },
     {
       $Failed,
-      <|"Head" -> compTestD, "Name" -> "compTestD", "Slots" -> {i}, "Symmetry" -> None, "Pairs" -> {}, "PrintAs" -> None|>
+      <|"Head" -> compTestD, "Name" -> "compTestD", "Slots" -> {i}, "Symmetry" -> None, "Pairs" -> {}, "PrintAs" -> None, "DerivativeOf" -> None, "TimeDerivativeOf" -> None|>
     },
     {DefineTensor::EExists},
     TestID -> "Bind-ExistingTensor-Stops"
@@ -564,10 +565,10 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    (* ExtractComponentInfo reads its tuple from the record: slot, C expression, tensor, symmetry, rank *)
-    MapAt[ToString, ExtractComponentInfo[Null, compTestM[{2, -testCart}, {3, -testCart}]], 2],
-    {4, "compTestM23[[ijk]]", compTestM[-i, -j], Symmetric[{-i, -j}], 2},
-    TestID -> "ExtractComponentInfo-ReadsTheRecord"
+    (* a component in xAct's notation resolves through its head to its record *)
+    MapAt[ToString, ComponentRecord[compTestM[{2, -testCart}, {3, -testCart}]], "Expr"],
+    <|"Comp" -> compTestM[{2, -testCart}, {3, -testCart}], "Indices" -> {2, 3}, "Slot" -> 4, "Name" -> "compTestM23", "Expr" -> "compTestM23[[ijk]]"|>,
+    TestID -> "ComponentRecord-ReadsTheRecord"
   ]
 ];
 
@@ -575,39 +576,37 @@ AppendTo[$AllTests,
   VerificationTest[
     (* the mirror of a symmetric pair has no record *)
     Catch[
-      ExtractComponentInfo[Null, compTestM[{3, -testCart}, {2, -testCart}]];
+      ComponentRecord[compTestM[{3, -testCart}, {2, -testCart}]];
       "NoThrow",
       GeneratoFailure
     ],
     $Failed,
-    {ExtractComponentInfo::EComponent},
-    TestID -> "ExtractComponentInfo-DependentComponent-Stops"
+    {ComponentRecord::EComponent},
+    TestID -> "ComponentRecord-DependentComponent-Stops"
   ]
 ];
 
 AppendTo[$AllTests,
   VerificationTest[
-    (* a print call walks the records of its varlist, in order, and hands each to the backend *)
+    (* a print call walks the records of its varlist, in order: an initialization gets the records, *)
+    (* an equation the component in xAct's notation *)
     ResetContext[];
     Block[{PrintComponentInitialization, PrintComponentEquation, compTestPrinted = {}},
-      PrintComponentInitialization[varinfo_, compname_] := AppendTo[compTestPrinted, {"Init", GetInitializationsMode[], varinfo, compname}];
+      PrintComponentInitialization[variable_, component_, base_] := AppendTo[compTestPrinted, {"Init", GetInitializationsMode[], variable === VariableRecord[variable["Head"]], component, base}];
       PrintComponentEquation[coordinate_, compname_, rules_] := AppendTo[compTestPrinted, {"Eqn", GetEquationsMode[], coordinate, compname, rules}];
       PrintInitializations[{Mode -> "MainIn"}, Take[compTestGridVarlist, 2]];
       PrintEquations[{Mode -> "Temp", ExtraReplaceRules -> {compTestX -> 1}}, compTestTempVarlist];
       compTestPrinted
     ],
-    {
-      {"Init", "MainIn", {compTestS[], None}, compTestS[]},
-      {"Init", "MainIn", {compTestM[-i, -j], Symmetric[{-i, -j}]}, compTestM[{1, -testCart}, {1, -testCart}]},
-      {"Init", "MainIn", {compTestM[-i, -j], Symmetric[{-i, -j}]}, compTestM[{1, -testCart}, {2, -testCart}]},
-      {"Init", "MainIn", {compTestM[-i, -j], Symmetric[{-i, -j}]}, compTestM[{1, -testCart}, {3, -testCart}]},
-      {"Init", "MainIn", {compTestM[-i, -j], Symmetric[{-i, -j}]}, compTestM[{2, -testCart}, {2, -testCart}]},
-      {"Init", "MainIn", {compTestM[-i, -j], Symmetric[{-i, -j}]}, compTestM[{2, -testCart}, {3, -testCart}]},
-      {"Init", "MainIn", {compTestM[-i, -j], Symmetric[{-i, -j}]}, compTestM[{3, -testCart}, {3, -testCart}]},
-      {"Eqn", "Temp", testCart, compTestV[{1, testCart}], {compTestX -> 1}},
-      {"Eqn", "Temp", testCart, compTestV[{2, testCart}], {compTestX -> 1}},
-      {"Eqn", "Temp", testCart, compTestV[{3, testCart}], {compTestX -> 1}}
-    },
+    Join[
+      {"Init", "MainIn", True, #, None}& /@ VariableRecord[compTestS]["Components"],
+      {"Init", "MainIn", True, #, None}& /@ VariableRecord[compTestM]["Components"],
+      {
+        {"Eqn", "Temp", testCart, compTestV[{1, testCart}], {compTestX -> 1}},
+        {"Eqn", "Temp", testCart, compTestV[{2, testCart}], {compTestX -> 1}},
+        {"Eqn", "Temp", testCart, compTestV[{3, testCart}], {compTestX -> 1}}
+      }
+    ],
     TestID -> "PrintCalls-WalkRecordsInOrder"
   ]
 ];
@@ -668,6 +667,255 @@ AppendTo[$AllTests,
     ],
     {{compTestOtherChart, compTestS[]}},
     TestID -> "PrintCalls-OtherChart-Scalar"
+  ]
+];
+
+(* ========================================= *)
+(* Test: a declared relation reaches a backend *)
+(* ========================================= *)
+
+ResetContext[];
+SetPVerbose[False];
+SetPrintDate[False];
+SetGridPointIndex["[[ijk]]"];
+
+(* A scalar, a symmetric matrix and a vector, with their first and second derivatives: *)
+(* the shapes of test/regression/CarpetXGPU/testTileDerivs.wl *)
+compTestBaseVarlist =
+  GridTensors[
+    {compTestW[]},
+    {compTestG[-i, -j], Symmetric[{-i, -j}]},
+    {compTestB[i]}
+  ];
+
+compTestDVarlist =
+  TileTensors[
+    {compTestDW[-k], DerivativeOf -> compTestW},
+    {compTestDG[-k, -i, -j], Symmetric[{-i, -j}], DerivativeOf -> compTestG},
+    {compTestDB[-k, i], DerivativeOf -> compTestB}
+  ];
+
+compTestDDVarlist =
+  TileTensors[
+    {compTestDDW[-i, -j], Symmetric[{-i, -j}], DerivativeOf -> compTestW},
+    {compTestDDG[-l, -m, -i, -j], GenSet[Cycles[{1, 2}], Cycles[{3, 4}]], DerivativeOf -> compTestG},
+    {compTestDDB[-i, -j, k], Symmetric[{-i, -j}], DerivativeOf -> compTestB}
+  ];
+
+compTestDtVarlist = GridTensors[{compTestDtB[i], TimeDerivativeOf -> compTestB}];
+
+(* A derivative declared without the symmetry of its variable, and one of a variable that is not bound *)
+compTestOddVarlist = TempTensors[{compTestDGn[-k, -i, -j], DerivativeOf -> compTestG}];
+
+DefTensors[{compTestUB[i]}];
+
+compTestDUBVarlist = TempTensors[{compTestDUB[-k, i], DerivativeOf -> compTestUB}];
+
+ResetContext[];
+
+(* The index of each component of a bound variable, as a print call would have it *)
+compTestSuffixes[head_] :=
+  With[{variable = VariableRecord[head]},
+    IndexSuffix[variable, #, BaseRecord[variable]]& /@ variable["Components"]
+  ];
+
+(* The slots 0 to count - 1 as one index, and as the two indices [v mod n][v div n] *)
+compTestOneIndex[count_] := Table["[" <> ToString[v] <> "]", {v, 0, count - 1}];
+
+compTestTwoIndices[count_, n_] := Table["[" <> ToString[Mod[v, n]] <> "][" <> ToString[Quotient[v, n]] <> "]", {v, 0, count - 1}];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* without a relation a scalar has no index, and any other variable the slot *)
+    {compTestSuffixes[compTestW], compTestSuffixes[compTestB], compTestSuffixes[compTestG]},
+    {{""}, compTestOneIndex[3], compTestOneIndex[6]},
+    TestID -> "IndexSuffix-NoRelation"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* first derivatives of a scalar, a symmetric matrix and a vector: N is 1, 6 and 3 *)
+    {compTestSuffixes[compTestDW], compTestSuffixes[compTestDG], compTestSuffixes[compTestDB]},
+    {compTestOneIndex[3], compTestTwoIndices[18, 6], compTestTwoIndices[9, 3]},
+    TestID -> "IndexSuffix-FirstDerivatives"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* second derivatives of the same three *)
+    {compTestSuffixes[compTestDDW], compTestSuffixes[compTestDDG], compTestSuffixes[compTestDDB]},
+    {compTestOneIndex[6], compTestTwoIndices[36, 6], compTestTwoIndices[18, 3]},
+    TestID -> "IndexSuffix-SecondDerivatives"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* the index is [component of the differentiated variable][derivative]: *)
+    (* d_2 G_13 is component 2 of G in direction 1, and d_2 d_3 B^1 is component 0 of B in the pair 4 *)
+    {
+      IndexSuffix[VariableRecord[compTestDG], ComponentRecord[compTestDG[{2, -testCart}, {1, -testCart}, {3, -testCart}]], VariableRecord[compTestG]],
+      IndexSuffix[VariableRecord[compTestDDB], ComponentRecord[compTestDDB[{2, -testCart}, {3, -testCart}, {1, testCart}]], VariableRecord[compTestB]]
+    },
+    {"[2][1]", "[0][4]"},
+    TestID -> "IndexSuffix-ComponentThenDerivative"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a time derivative has the components of its variable and is laid out like it *)
+    compTestSuffixes[compTestDtB],
+    compTestOneIndex[3],
+    TestID -> "IndexSuffix-TimeDerivative"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a relation is followed to the record of the bound variable it names *)
+    {
+      BaseRecord[VariableRecord[compTestG]],
+      BaseRecord[VariableRecord[compTestDG]] === VariableRecord[compTestG],
+      BaseRecord[VariableRecord[compTestDDW]] === VariableRecord[compTestW],
+      BaseRecord[VariableRecord[compTestDtB]] === VariableRecord[compTestB]
+    },
+    {None, True, True, True},
+    TestID -> "BaseRecord-FollowsTheRelation"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* the variable a relation names must be bound when the relation is read *)
+    Catch[
+      BaseRecord[VariableRecord[compTestDUB]];
+      "NoThrow",
+      GeneratoFailure
+    ],
+    $Failed,
+    {VariableRecord::EUnbound},
+    TestID -> "BaseRecord-UnboundBase-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a derivative component differentiates the component at its trailing indices *)
+    {
+      BaseComponent[ComponentRecord[compTestDG[{2, -testCart}, {1, -testCart}, {3, -testCart}]], VariableRecord[compTestG]]["Name"],
+      BaseComponent[ComponentRecord[compTestDDB[{2, -testCart}, {3, -testCart}, {1, testCart}]], VariableRecord[compTestB]]["Name"],
+      BaseComponent[ComponentRecord[compTestDDW[{1, -testCart}, {2, -testCart}]], VariableRecord[compTestW]]["Name"]
+    },
+    {"compTestG13", "compTestB1", "compTestW"},
+    TestID -> "BaseComponent-TrailingIndices"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a derivative without the symmetry of its variable has components the variable has none for *)
+    {
+      BaseComponent[ComponentRecord[compTestDGn[{1, -testCart}, {1, -testCart}, {2, -testCart}]], VariableRecord[compTestG]]["Name"],
+      Catch[
+        BaseComponent[ComponentRecord[compTestDGn[{1, -testCart}, {2, -testCart}, {1, -testCart}]], VariableRecord[compTestG]];
+        "NoThrow",
+        GeneratoFailure
+      ]
+    },
+    {"compTestG12", $Failed},
+    {BaseComponent::EComponent},
+    TestID -> "BaseComponent-NoSuchComponent-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a load that reads a relation stops at a variable that does not declare it *)
+    {
+      RequireRelation[VariableRecord[compTestDG], "DerivativeOf", "Derivs"],
+      Catch[
+        RequireRelation[VariableRecord[compTestG], "DerivativeOf", "Derivs"];
+        "NoThrow",
+        GeneratoFailure
+      ],
+      Catch[
+        RequireRelation[VariableRecord[compTestDG], "TimeDerivativeOf", "MainOut"];
+        "NoThrow",
+        GeneratoFailure
+      ]
+    },
+    {Null, $Failed, $Failed},
+    {RequireRelation::EMissing, RequireRelation::EMissing},
+    TestID -> "RequireRelation-MissingRelation-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a print call hands the backend the record a relation names; the options that stated the layout are accepted *)
+    ResetContext[];
+    Block[{PrintComponentInitialization, compTestPrinted = {}},
+      PrintComponentInitialization[variable_, component_, base_] := AppendTo[compTestPrinted, {component["Name"], base["Head"]}];
+      PrintInitializations[{Mode -> "Derivs", TensorType -> "Vect", DerivsOrder -> 1, DerivsAccuracy -> 4}, Take[compTestDVarlist, 1]];
+      PrintInitializations[{Mode -> "MainOut"}, compTestDtVarlist];
+      compTestPrinted
+    ],
+    {
+      {"compTestDW1", compTestW}, {"compTestDW2", compTestW}, {"compTestDW3", compTestW},
+      {"compTestDtB1", compTestB}, {"compTestDtB2", compTestB}, {"compTestDtB3", compTestB}
+    },
+    TestID -> "PrintCalls-HandTheBaseRecord"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* TensorType "Vect" or "Smat" on a variable that declares no DerivativeOf stops the call before it prints: *)
+    (* the first var of the list declares one and is not printed either *)
+    ResetContext[];
+    Block[{PrintComponentInitialization, compTestPrinted = {}},
+      PrintComponentInitialization[variable_, component_, base_] := AppendTo[compTestPrinted, component["Name"]];
+      {
+        Catch[
+          PrintInitializations[{Mode -> "Derivs", StorageType -> "Tile", TensorType -> "Vect"}, Join[Take[compTestDVarlist, 1], compTestTileVarlist]];
+          "NoThrow",
+          GeneratoFailure
+        ],
+        Catch[
+          PrintInitializations[{Mode -> "MainIn", TensorType -> "Smat"}, Take[compTestGridVarlist, {2}]];
+          "NoThrow",
+          GeneratoFailure
+        ],
+        compTestPrinted
+      }
+    ],
+    {$Failed, $Failed, {}},
+    {PrintInitializations::ETensorType, PrintInitializations::ETensorType},
+    TestID -> "PrintInitializations-TensorTypeWithoutDerivativeOf-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a variable that declares no DerivativeOf is printed when TensorType is "Scal" or is not stated, *)
+    (* and one that declares it is printed whatever TensorType says *)
+    ResetContext[];
+    Block[{PrintComponentInitialization, compTestPrinted = {}},
+      PrintComponentInitialization[variable_, component_, base_] := AppendTo[compTestPrinted, component["Name"]];
+      PrintInitializations[{Mode -> "Derivs", StorageType -> "Tile"}, compTestTileVarlist];
+      PrintInitializations[{Mode -> "Derivs", StorageType -> "Tile", TensorType -> "Scal"}, compTestTileVarlist];
+      PrintInitializations[{Mode -> "Derivs", StorageType -> "Tile", TensorType -> "Smat"}, Take[compTestDDVarlist, 1]];
+      compTestPrinted
+    ],
+    {
+      "compTestT1", "compTestT2", "compTestT3",
+      "compTestT1", "compTestT2", "compTestT3",
+      "compTestDDW11", "compTestDDW12", "compTestDDW13", "compTestDDW22", "compTestDDW23", "compTestDDW33"
+    },
+    TestID -> "PrintInitializations-TensorType-AcceptedOtherwise"
   ]
 ];
 

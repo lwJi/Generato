@@ -18,15 +18,16 @@ DefManifold[M4, 4, Union[Complement[IndexRange[a, z], {g}], Table[ToExpression["
 
 DefChart[cart, M4, {0, 1, 2, 3}, {T[], X[], Y[], Z[]}, ChartColor -> Blue];
 
+EvolVarlist = GridTensors[{g[-a, -b], Symmetric[{-a, -b}]}, {Pi$Upt[-a, -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalPi]"}, {Phi[-k, -a, -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalPhi]"}, {H[-a]}];
+
+(* Each right-hand side names the variable it is the time derivative of, which is declared above it *)
 dtEvolVarlist =
   GridTensors[
-    {dtg[-a, -b], Symmetric[{-a, -b}]}
+    {dtg[-a, -b], Symmetric[{-a, -b}], TimeDerivativeOf -> g}
     ,
-    {dtPi[-a, -b], Symmetric[{-a, -b}], PrintAs -> "dt\[CapitalPi]"},
-    {dtPhi[-k, -a, -b], Symmetric[{-a, -b}], PrintAs -> "dt\[CapitalPhi]"}
+    {dtPi[-a, -b], Symmetric[{-a, -b}], TimeDerivativeOf -> Pi$Upt, PrintAs -> "dt\[CapitalPi]"},
+    {dtPhi[-k, -a, -b], Symmetric[{-a, -b}], TimeDerivativeOf -> Phi, PrintAs -> "dt\[CapitalPhi]"}
   ];
-
-EvolVarlist = GridTensors[{g[-a, -b], Symmetric[{-a, -b}]}, {Pi$Upt[-a, -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalPi]"}, {Phi[-k, -a, -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalPhi]"}, {H[-a]}];
 
 MoreInVarlist = GridTensors[{Adg[-a, -b], Symmetric[{-a, -b}]}, {AdPi[-a, -b], Symmetric[{-a, -b}], PrintAs -> "Ad\[CapitalPi]"}, {AdPhi[-k, -a, -b], Symmetric[{-a, -b}], PrintAs -> "Ad\[CapitalPhi]"}, {alpha[], PrintAs -> "\[Alpha]"}, {beta[i], PrintAs -> "\[Beta]"}, {srcSdH[-a, -b], Symmetric[{-a, -b}], PrintAs -> "\!\(\*SubscriptBox[\(\[PartialD]\), \((a\)]\)\!\(\*SubscriptBox[\(H\), \(\(b\)\()\)\)]\)"}];
 

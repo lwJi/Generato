@@ -60,17 +60,21 @@ AppendTo[$AllTests,
         ParseVar::ETensorType,
         ParseVar::ESymmetryType,
         DefineTensor::EExists,
+        DefineTensor::EBase,
+        DefineTensor::EDerivativeOf,
+        DefineTensor::ETimeDerivativeOf,
         RecordBinding::EState,
         GridTensors::EBound,
         TileTensors::EBound,
         TempTensors::EBound,
         VariableRecord::EUnbound,
+        ComponentRecord::EComponent,
         PrintComponent::EMode,
         PrintComponent::EChart,
-        ExtractComponentInfo::EComponent,
         PrintEquationByMode::EMode,
-        GetTensorIndexSubbuf::ELength,
-        GetTensorIndexSubbuf::ETensorType,
+        BaseComponent::EComponent,
+        RequireRelation::EMissing,
+        PrintInitializations::ETensorType,
         TestEQN::EFailed,
         WriteToFile::EThrow
       ],
@@ -98,36 +102,6 @@ AppendTo[$AllTests,
 (* ========================================= *)
 (* Test: sites that used to return a value or abort *)
 (* ========================================= *)
-
-AppendTo[$AllTests,
-  VerificationTest[
-    (* an unsupported rank used to give a message and an empty index *)
-    ResetContext[];
-    Catch[
-      WithMode[{"TensorType" -> "Vect"}, GetTensorIndexSubbuf[4, 0]];
-      "NoThrow",
-      GeneratoFailure
-    ],
-    $Failed,
-    {GetTensorIndexSubbuf::ELength},
-    TestID -> "GetTensorIndexSubbuf-UnsupportedRank-Stops"
-  ]
-];
-
-AppendTo[$AllTests,
-  VerificationTest[
-    (* an unknown tensor type used to give a message and an empty index *)
-    ResetContext[];
-    Catch[
-      GetTensorIndexSubbuf[1, 0];
-      "NoThrow",
-      GeneratoFailure
-    ],
-    $Failed,
-    {GetTensorIndexSubbuf::ETensorType},
-    TestID -> "GetTensorIndexSubbuf-NoTensorType-Stops"
-  ]
-];
 
 AppendTo[$AllTests,
   VerificationTest[

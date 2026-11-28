@@ -28,7 +28,7 @@ MetricInBasis[euclid, cart, DiagonalMatrix[{1, 1, 1}]];
 (* Variables for derivative test *)
 EvolVarlist = GridTensors[{phi[], PrintAs -> "phi"}];
 
-DerivVarlist = GridTensors[{dphi[-i], PrintAs -> "dphi"}];
+DerivVarlist = GridTensors[{dphi[-i], DerivativeOf -> phi, PrintAs -> "dphi"}];
 
 TempVarlist = TempTensors[{psi[], PrintAs -> "psi"}];
 
