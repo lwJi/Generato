@@ -14,13 +14,11 @@
 
 <<Context.wl
 
-<<Basic.wl
-
-<<ParseMode.wl
-
 <<Variable.wl
 
 <<Component.wl
+
+<<Equation.wl
 
 <<Backend.wl
 
@@ -28,13 +26,9 @@
 
 <<Program.wl
 
-<<Interface.wl
+<<Stencil.wl
 
-<<Derivation.wl
-
-<<stencils/FiniteDifferenceStencils.wl
-
-If[Environment["QUIET"] =!= "1",
+If[!GetQuietMode[],
   System`Print[]
 ];
 

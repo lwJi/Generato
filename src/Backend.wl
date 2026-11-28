@@ -4,9 +4,9 @@
 
 (* (c) Liwei Ji, 11/2026 *)
 
-BeginPackage["Generato`Backend`", {"Generato`Failure`"}];
+BeginPackage["Generato`Backend`", {"Generato`Failure`", "Generato`Context`"}];
 
-If[Environment["QUIET"] =!= "1",
+If[!GetQuietMode[],
   System`Print["------------------------------------------------------------"];
   System`Print["Package Generato`Backend`, {2026, 11, 27}"];
   System`Print["------------------------------------------------------------"];
@@ -14,7 +14,7 @@ If[Environment["QUIET"] =!= "1",
 
 CText::usage = "CText[expr] returns expr as C text, wrapped at 78 columns with no trailing newline.";
 
-DefineBackend::usage = "DefineBackend[name, table] registers a backend under name. table states what differs from what the backend builds on: the backend table[\"Extends\"] names, or $BackendDefaults. A formatter is at table[kind][mode][storage], where kind is \"Load\" or \"Store\" and storage is \"Grid\", \"Tile\", \"Temp\" or All for any; the keys of a table are what the backend accepts. Registering has no effect on output, and a name registered again replaces the earlier table.";
+DefineBackend::usage = "DefineBackend[name, table] registers a backend under name. table states what differs from what the backend builds on: the backend table[\"Extends\"] names, or $BackendDefaults. A formatter is at table[kind][mode][storage], where kind is \"Load\" or \"Store\" and storage is \"Grid\", \"Tile\", \"Temp\" or All for any; the keys of a table are what the backend accepts. Registering has no effect on output, and a name registered again replaces the earlier table. A file in the codes directory of Generato is one such call, read when the name is resolved: a script that reads the file itself, as the last line of a script once did, stops the run.";
 
 ResolveBackend::usage = "ResolveBackend[name] returns the table of a backend, merged key by key, down to the storage, with the backend it extends or with $BackendDefaults. The table carries \"Name\" -> name. A name that is not registered is looked for in the codes directory of Generato: the file name.wl there is loaded, and it must register the name. It stops the run if the name is not registered and there is no such file.";
 
@@ -166,14 +166,45 @@ $BackendDefaults = <|
 Protect[$BackendDefaults];
 
 (*
+  The backends of Generato are the files of codes/, beside src/: the file
+  <name>.wl there is one DefineBackend call that registers <name>. This is
+  the one place that says where they are.
+*)
+$CodesDirectory = FileNameJoin[{ParentDirectory[DirectoryName[$InputFileName]], "codes"}];
+
+BackendFile[name_String] :=
+  FileNameJoin[{$CodesDirectory, name <> ".wl"}];
+
+(*
   The registry: name -> table as DefineBackend was given it. It is private
   to this file; DefineBackend is its one writer and ResolveBackend its one
   reader, through RegisteredTable.
+
+  A file of codes/ is read by RegisteredTable and by nothing else, and
+  $ReadingBackendFile is True for as long as it reads one. A script used to
+  end with the Import of such a file, which started the write. The file
+  starts nothing now, so a script that still reads one and hands no program
+  to Generate would run to its end, write nothing and report success: the
+  DefineBackend call of a file of codes/ that a script is reading stops the
+  run instead. Import lets the throw of Stop pass.
 *)
 $Backends = <||>;
 
+$ReadingBackendFile = False;
+
+(* Whether a file being read is the one RegisteredTable would read for its name *)
+BackendFileQ[file_String] :=
+  file =!= "" && ExpandFileName[file] === ExpandFileName[BackendFile[FileBaseName[file]]];
+
 DefineBackend[name_String, table_Association] :=
-  ($Backends[name] = table;);
+  Module[{},
+    If[!$ReadingBackendFile && BackendFileQ[$InputFileName],
+      Stop[DefineBackend::EImport, FileNameTake[$InputFileName], name]
+    ];
+    $Backends[name] = table;
+  ];
+
+DefineBackend::EImport = "The script read the backend file codes/`1` of Generato. The Import of a backend file was removed. Name the backend in Generate[\"`2`\", file, program], which reads the file. See README, \"Porting a script\".";
 
 Protect[DefineBackend];
 
@@ -187,16 +218,6 @@ MergeTables[base_Association, table_Association] :=
   Merge[{base, table}, If[MatchQ[#, {_Association, _Association}], MergeTables @@ #, Last[#]]&];
 
 (*
-  The backends of Generato are the files of codes/, beside src/: the file
-  <name>.wl there is one DefineBackend call that registers <name>. This is
-  the one place that says where they are.
-*)
-$CodesDirectory = FileNameJoin[{ParentDirectory[DirectoryName[$InputFileName]], "codes"}];
-
-BackendFile[name_String] :=
-  FileNameJoin[{$CodesDirectory, name <> ".wl"}];
-
-(*
   RegisteredTable - the table DefineBackend was given under a name, or None.
   A name that is not registered may be a backend of Generato whose file has
   not been read yet, so the file is read and the name is looked up again. A
@@ -206,7 +227,7 @@ BackendFile[name_String] :=
 RegisteredTable[name_String] :=
   Module[{file = BackendFile[name]},
     If[!KeyExistsQ[$Backends, name] && FileExistsQ[file],
-      Get[file];
+      Block[{$ReadingBackendFile = True}, Get[file]];
       If[!KeyExistsQ[$Backends, name],
         Stop[ResolveBackend::EFile, name, file]
       ]

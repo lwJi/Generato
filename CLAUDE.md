@@ -16,25 +16,29 @@ Before adding code, read `agent_docs/design-rules.md`, the rules the code is bei
 
 ## Architecture
 
+A script builds a value: setters, declarations, bindings, equations and one `Generate[backend, file, program]` call. Four stages turn it into a file: declare, bind, lower, render.
+
 ### Core (src/)
-- **Generato.wl** - Package loader, imports modules in dependency order
-- **Context.wl** - Global state via `$CurrentContext`, accessor generation
-- **Basic.wl** - Config, tensor utilities, SetEQN/SetEQNDelayed
-- **ParseMode.wl** - Phase management, `WithMode[{...}, body]` for scoped settings
-- **Component.wl** - Tensor component to varlist mapping
-- **Varlist.wl** - Tensor definitions via ParseVarlist
-- **Interface.wl** - Public API: DefTensors, GridTensors, TileTensors, TempTensors, SetComponents, PrintEquations, PrintInitializations
-- **BackendCommon.wl** - Shared backend utilities
-- **Writefile.wl** - Output buffering (SetMainPrint/GetMainPrint)
-- **stencils/FiniteDifferenceStencils.wl** - Finite difference stencil generation
+- **Generato.wl** - Package loader: loads the files from Failure.wl to Stencil.wl, in the order listed
+- **Failure.wl** - `Stop`, the one error path: a message, then a throw tagged `GeneratoFailure`
+- **Context.wl** - User configuration in `$CurrentContext`; one `defineConfig` call per key
+- **Variable.wl** - declare: var specs, `DefTensors`, the variable records
+- **Component.wl** - bind: `GridTensors`, `TileTensors`, `TempTensors`, the component records
+- **Equation.wl** - `SetEQN`/`SetEQNDelayed`, right-hand-side evaluation
+- **Backend.wl** - `DefineBackend`, the shared formatters, `Render`
+- **Emit.wl** - `Emit`, the one write
+- **Program.wl** - `Load`, `Store`, `Generate` (check, lower, render, emit); stubs for the removed names
+- **Stencil.wl** - Finite difference stencil coefficients
+- **Driver.wl** - What the `Generato` wrapper runs: clears a stale output, sets the exit status
 
 ### Backends (codes/)
-Each implements `PrintComponentInitialization` and `PrintComponentEquation`:
+Each file is one `DefineBackend` call, a table of formatters keyed by kind (`"Load"`, `"Store"`), mode and storage:
 - CarpetXGPU.wl, AMReX.wl, Nmesh.wl
 
 ### Key Patterns
-- **State**: All in `$CurrentContext`; use `WithMode[{...}, body]` for scoped settings
-- **Two phases**: SetComp (map components) → PrintComp (generate code)
+- **State**: `$CurrentContext` holds user configuration only, and a key is written by its setter. A variable's facts are its record in Variable.wl; the mode of a step is an argument of its node
+- **Stages**: declare → bind → lower → render; a formatter reads the statement it is handed and nothing else
+- **Errors**: Raise with `Stop[symbol::tag, args...]`. Only Driver.wl catches a failed run and exits
 - **Equations**: Use `SetEQN` normally; use `SetEQNDelayed` when RHS contains `If` statements
 
 ## Tests

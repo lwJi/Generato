@@ -1,14 +1,14 @@
 (* ::Package:: *)
 
-(* FiniteDifferenceStencils.wl *)
+(* Generato`Stencil`, finite-difference stencils: their sample points, their coefficients, and the names of grid functions at stencil points *)
 
 (* (c) Liwei Ji, 01/2025 *)
 
-BeginPackage["Generato`FiniteDifferenceStencils`"];
+BeginPackage["Generato`Stencil`", {"Generato`Context`"}];
 
-If[Environment["QUIET"] =!= "1",
+If[!GetQuietMode[],
   System`Print["------------------------------------------------------------"];
-  System`Print["Package Generato`FiniteDifferenceStencils`, {2025, 1, 21}"];
+  System`Print["Package Generato`Stencil`, {2025, 1, 21}"];
   System`Print["------------------------------------------------------------"];
 ];
 
@@ -23,6 +23,10 @@ StencilCoefficient::usage = "Subscript[StencilCoefficient, point] is the coeffic
 UpwindSymmetricCoefficient::usage = "Subscript[UpwindSymmetricCoefficient, i] is the i-th coefficient of the symmetric part in the rules GetUpwindCoefficients returns, i from 1.";
 
 UpwindAntisymmetricCoefficient::usage = "Subscript[UpwindAntisymmetricCoefficient, i] is the i-th coefficient of the antisymmetric part in the rules GetUpwindCoefficients returns, i from 0.";
+
+GetGFIndexName::usage = "GetGFIndexName[index] converts integer index to GF index name (p1, m1, c0, etc.).";
+
+GetGFIndexNameMix2nd::usage = "GetGFIndexNameMix2nd[index1, index2] creates mixed 2nd derivative GF index name.";
 
 Begin["`Private`"];
 
@@ -115,6 +119,36 @@ GetUpwindCoefficients[sample_?ListQ] := Module[{numPoints, numCoeff, upwind, dnw
 Protect[GetUpwindCoefficients];
 
 Protect[StencilCoefficient, UpwindSymmetricCoefficient, UpwindAntisymmetricCoefficient];
+
+(*
+  The two functions below name a grid function at a stencil point. They were
+  shared by backends that are gone: nothing in src/ or codes/ calls them,
+  and no test exercises them.
+*)
+
+(* GetGFIndexName - Converts integer index to GF index name *)
+GetGFIndexName[index_?IntegerQ] :=
+  Module[{gfindex},
+    gfindex =
+      Which[
+        index > 0, "p" <> ToString[index],
+        index < 0, "m" <> ToString[Abs[index]],
+        True, "c0"
+      ];
+    ToExpression[gfindex]
+  ];
+
+Protect[GetGFIndexName];
+
+(* GetGFIndexNameMix2nd - Creates mixed 2nd derivative GF index name *)
+GetGFIndexNameMix2nd[index1_?IntegerQ, index2_?IntegerQ] :=
+  Module[{gfindex},
+    gfindex = ToString[GetGFIndexName[index1]]
+           <> ToString[GetGFIndexName[index2]];
+    ToExpression[gfindex]
+  ];
+
+Protect[GetGFIndexNameMix2nd];
 
 End[];
 

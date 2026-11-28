@@ -24,6 +24,10 @@ CarpetXGPU:failInEquation:.hxx:fails
 CarpetXGPU:failNoRelation:.hxx:fails
 # Probe 2: a failure at the check of the program, a mode the backend does not have
 CarpetXGPU:failUnknownMode:.hxx:fails
+# A script on the surface that was removed: it stops at its first old call, SetMainPrint, with the porting pointer
+CarpetXGPU:failOldSurface:.hxx:fails
+# A script that hands no program to Generate and still ends with the Import of a backend file
+CarpetXGPU:failBackendImport:.hxx:fails
 AMReX:test:.hxx
 #Nmesh:test:.c
 #Nmesh:GHG_rhs:.c

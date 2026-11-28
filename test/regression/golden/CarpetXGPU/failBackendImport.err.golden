@@ -1,0 +1,1 @@
+DefineBackend::EImport: The script read the backend file codes/CarpetXGPU.wl of Generato. The Import of a backend file was removed. Name the backend in Generate["CarpetXGPU", file, program], which reads the file. See README, "Porting a script".

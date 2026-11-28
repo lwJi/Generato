@@ -1,12 +1,14 @@
 (* ::Package:: *)
 
-(* FiniteDifferenceStencilsTests.wl *)
-(* Unit tests for Generato`FiniteDifferenceStencils module *)
+(* StencilTests.wl *)
+(* Unit tests for Generato`Stencil module *)
 
-If[Environment["QUIET"] =!= "1", Print["Loading FiniteDifferenceStencilsTests.wl..."]];
+If[Environment["QUIET"] =!= "1", Print["Loading StencilTests.wl..."]];
 
-(* Load the stencils package *)
-Needs["Generato`FiniteDifferenceStencils`", FileNameJoin[{Environment["GENERATO"], "src/stencils/FiniteDifferenceStencils.wl"}]];
+(* Load Generato which includes Stencil *)
+If[!MemberQ[$Packages, "Generato`Stencil`"],
+  Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"}]]
+];
 
 (* ========================================= *)
 (* Test: GetCenteringStencils *)
@@ -152,4 +154,4 @@ AppendTo[$AllTests,
   ]
 ];
 
-If[Environment["QUIET"] =!= "1", Print["FiniteDifferenceStencilsTests.wl completed."]];
+If[Environment["QUIET"] =!= "1", Print["StencilTests.wl completed."]];

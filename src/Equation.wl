@@ -1,30 +1,16 @@
 (* ::Package:: *)
 
-(* Generato`Basic`, set up basics for Generato *)
+(* Generato`Equation`, an equation is set on a tensor with SetEQN, and its right-hand side is evaluated for one component *)
 
 (* (c) Liwei Ji, 01/2024 *)
 
-(* Suppress xAct loading banners in quiet mode *)
+BeginPackage["Generato`Equation`", {"xAct`xPerm`", "xAct`xTensor`", "xAct`xCoba`", "Generato`Failure`", "Generato`Context`"}];
 
-If[Environment["QUIET"] === "1",
-  Block[{Print},
-    BeginPackage["Generato`Basic`", {"xAct`xTensor`", "xAct`xCoba`", "Generato`Failure`", "Generato`Context`"}]
-  ]
-  ,
-  BeginPackage["Generato`Basic`", {"xAct`xTensor`", "xAct`xCoba`", "Generato`Failure`", "Generato`Context`"}]
-];
-
-If[Environment["QUIET"] =!= "1",
+If[!GetQuietMode[],
   System`Print["------------------------------------------------------------"];
-  System`Print["Package Generato`Basic`, {2024, 1, 11}"];
+  System`Print["Package Generato`Equation`, {2026, 11, 28}"];
   System`Print["------------------------------------------------------------"];
 ];
-
-GetDefaultManifold::usage = "GetDefaultManifold[] returns the first defined manifold. Stops the run if no manifolds have been defined.";
-
-GetDefaultChart::usage = "GetDefaultChart[] returns the default coordinate chart of the first defined manifold.";
-
-GetDim::usage = "GetDim[] returns the dimension of the first defined manifold.";
 
 IsDefined::usage = "IsDefined[term] returns True if term is a defined tensor or constant, False otherwise.";
 
@@ -38,42 +24,15 @@ SetEQN::usage = "SetEQN[var, varrhs] assigns varrhs to var$RHS using IndexSet.\n
 
 CheckRHS::usage = "CheckRHS is an option for SetEQN that specifies whether to verify all terms in the right-hand side are defined.";
 
+SuffixName::usage = "SuffixName -> suffix, an option of SetEQN and SetEQNDelayed, names the equation that is set, so a variable may have several. As an option of Store it selects which of them is written: the one set under the same SuffixName. The default is the equation set without one.";
+
 SetEQNDelayed::usage = "SetEQNDelayed[var, varrhs] assigns varrhs to var$RHS using IndexSetDelayed.\nSetEQNDelayed[{SuffixName->suffix}, var, varrhs] assigns with a suffix.";
 
 ComputeRHSValue::usage = "ComputeRHSValue[coordinate, compname, suffix, extrareplacerules] computes the RHS value of the equation set for a component under the suffix name suffix, \"\" for an equation set without one.";
 
-GetGFIndexName::usage = "GetGFIndexName[index] converts integer index to GF index name (p1, m1, c0, etc.).";
-
-GetGFIndexNameMix2nd::usage = "GetGFIndexNameMix2nd[index1, index2] creates mixed 2nd derivative GF index name.";
-
-GetInterfaceName::usage = "GetInterfaceName[compname] returns the interface name for a component.";
-
-PrintVerbose::usage = "PrintVerbose[expr] prints expr if verbose mode is enabled.";
+TestEQN::usage = "TestEQN[bool, label] prints 'SUCCEED' if bool is True, otherwise stops the run with the message TestEQN::EFailed.";
 
 Begin["`Private`"];
-
-GetDefaultManifold[] :=
-  Module[{},
-    If[Length[$Manifolds] === 0,
-      Stop[GetDefaultManifold::NoManifolds]
-      ,
-      Return[$Manifolds[[1]]]
-    ]
-  ];
-
-GetDefaultManifold::NoManifolds = "No manifolds have been defined. Use DefManifold to define a manifold.";
-
-Protect[GetDefaultManifold];
-
-GetDefaultChart[] :=
-  ChartsOfManifold[GetDefaultManifold[]][[1]];
-
-Protect[GetDefaultChart];
-
-GetDim[] :=
-  DimOfManifold[GetDefaultManifold[]];
-
-Protect[GetDim];
 
 IsDefined[term_] :=
   Module[{head = Head[term]},
@@ -278,59 +237,19 @@ ComputeRHSValue[coordinate_, compname_, suffix_String, extrareplacerules_] :=
 
 Protect[ComputeRHSValue];
 
-(*
-  The three functions below name a grid function at a stencil point and a
-  component at an interface. They were shared by backends that are gone:
-  nothing in src/ or codes/ calls them, and no test exercises them.
-*)
-
-(* GetGFIndexName - Converts integer index to GF index name *)
-GetGFIndexName[index_?IntegerQ] :=
-  Module[{gfindex},
-    gfindex =
-      Which[
-        index > 0, "p" <> ToString[index],
-        index < 0, "m" <> ToString[Abs[index]],
-        True, "c0"
-      ];
-    ToExpression[gfindex]
-  ];
-
-Protect[GetGFIndexName];
-
-(* GetGFIndexNameMix2nd - Creates mixed 2nd derivative GF index name *)
-GetGFIndexNameMix2nd[index1_?IntegerQ, index2_?IntegerQ] :=
-  Module[{gfindex},
-    gfindex = ToString[GetGFIndexName[index1]]
-           <> ToString[GetGFIndexName[index2]];
-    ToExpression[gfindex]
-  ];
-
-Protect[GetGFIndexNameMix2nd];
-
-(* GetInterfaceName - Returns the interface name for a component *)
-GetInterfaceName[compname_] :=
-  Module[{intfname = ToString[compname[[0]]], colist = {"t", "x", "y", "z"}, coindex},
-    Do[
-      coindex = compname[[icomp]][[1]];
-      intfname = intfname <> colist[[coindex + 1]]
-      ,
-      {icomp, 1, Length[compname]}
-    ];
-    intfname = ToString[CForm[ToExpression[intfname <> GetGridPointIndex[]]]];
-    Return[intfname];
-  ];
-
-Protect[GetInterfaceName];
-
-PrintVerbose[var__:""] :=
+(* TestEQN - a check a script makes of its own equations: a failed one ends the run *)
+TestEQN[equal_?BooleanQ, terms_:""] :=
   Module[{},
-    If[GetPVerbose[],
-      System`Print[var]
+    If[equal,
+      System`Print["  Testing " <> terms <> " SUCCEED!"]
+      ,
+      Stop[TestEQN::EFailed, terms]
     ]
   ];
 
-Protect[PrintVerbose];
+TestEQN::EFailed = "Testing `1` FAILED!";
+
+Protect[TestEQN];
 
 End[];
 

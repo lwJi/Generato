@@ -13,9 +13,6 @@ If[!MemberQ[$Packages, "Generato`Failure`"],
 SetPVerbose[False];
 SetPrintDate[False];
 
-(* Helper to reset context to defaults *)
-ResetContext[] := ($CurrentContext = $ContextDefaults);
-
 failureTest::EWithText = "Stopped with `1` and `2`.";
 
 (* ========================================= *)
@@ -47,17 +44,16 @@ AppendTo[$AllTests,
     Select[
       Hold[
         SetPVerbose::EInvalidValue,
-        WithMode::EInvalidValue,
         GetDefaultManifold::NoManifolds,
         IsDefined::EType,
         RHSOf::Eargs,
-        Generato`Basic`Private`SetEQNDetail::Evar,
-        Generato`Basic`Private`SetEQNDetail::Evarrhs,
-        Generato`Basic`Private`SetEQNDelayedDetail::Evar,
+        Generato`Equation`Private`SetEQNDetail::Evar,
+        Generato`Equation`Private`SetEQNDetail::Evarrhs,
+        Generato`Equation`Private`SetEQNDelayedDetail::Evar,
         ParseVar::EVar,
         ParseVar::EKey,
         ParseVar::EShape,
-        ParseVar::ETensorType,
+        ParseVar::ERank,
         ParseVar::ESymmetryType,
         DefineTensor::EExists,
         DefineTensor::EBase,
@@ -70,26 +66,18 @@ AppendTo[$AllTests,
         VariableRecord::EUnbound,
         ComponentRecord::EComponent,
         RequireChart::EChart,
+        DefineBackend::EImport,
         ResolveBackend::EUnknown,
         ResolveBackend::EFile,
         ResolveBackend::ECycle,
         Render::EKey,
         Render::ELines,
         Render::EStatement,
-        CurrentBackend::ENoWrite,
-        pr::ENoWrite,
-        WriteToFile::EThrow,
-        WriteToFile::EBackend,
         BaseComponent::EComponent,
         RequireRelation::EMissing,
         GridTensors::EDeclared,
         TileTensors::EDeclared,
         TempTensors::EDeclared,
-        PrintEquations::EMode,
-        PrintEquations::ESuffixName,
-        PrintComponentEquation::EMode,
-        PrintInitializations::EMode,
-        PrintInitializations::ETensorType,
         Generate::EArguments,
         Generate::ENode,
         Generate::EVar,
@@ -102,6 +90,11 @@ AppendTo[$AllTests,
         Generate::EEquation,
         Generate::EProblems,
         Generate::ENoRule,
+        SetMainPrint::ERemoved,
+        SetOutputFile::ERemoved,
+        PrintInitializations::ERemoved,
+        PrintEquations::ERemoved,
+        pr::ERemoved,
         TestEQN::EFailed
       ],
       Function[name, !StringQ[name], HoldFirst]
@@ -140,23 +133,6 @@ AppendTo[$AllTests,
     $Failed,
     {TestEQN::EFailed},
     TestID -> "TestEQN-False-Stops"
-  ]
-];
-
-AppendTo[$AllTests,
-  VerificationTest[
-    (* WithMode restores its keys when the body stops *)
-    ResetContext[];
-    {
-      Catch[
-        WithMode[{"SuffixName" -> "inside"}, Stop[failureTest::EWithText, 1, 2]],
-        GeneratoFailure
-      ],
-      GetSuffixName[]
-    },
-    {$Failed, ""},
-    {failureTest::EWithText},
-    TestID -> "WithMode-RestoresWhenBodyStops"
   ]
 ];
 

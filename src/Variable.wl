@@ -4,15 +4,31 @@
 
 (* (c) Liwei Ji, 11/2026 *)
 
-BeginPackage["Generato`Variable`", {"Generato`Failure`", "Generato`Context`"}];
+(*
+  xAct is loaded here, by the first file that reads it, and its banners are
+  not printed in quiet mode. The contexts are named in BeginPackage, so the
+  script that loads Generato finds the symbols of xAct too.
+*)
 
-Needs["Generato`Basic`"];
+If[GetQuietMode[],
+  Block[{Print},
+    BeginPackage["Generato`Variable`", {"xAct`xPerm`", "xAct`xTensor`", "xAct`xCoba`", "Generato`Failure`", "Generato`Context`"}]
+  ]
+  ,
+  BeginPackage["Generato`Variable`", {"xAct`xPerm`", "xAct`xTensor`", "xAct`xCoba`", "Generato`Failure`", "Generato`Context`"}]
+];
 
-If[Environment["QUIET"] =!= "1",
+If[!GetQuietMode[],
   System`Print["------------------------------------------------------------"];
-  System`Print["Package Generato`Variable`, {2026, 11, 27}"];
+  System`Print["Package Generato`Variable`, {2026, 11, 28}"];
   System`Print["------------------------------------------------------------"];
 ];
+
+GetDefaultManifold::usage = "GetDefaultManifold[] returns the first defined manifold, the one variables are declared on. It stops the run if no manifold has been defined.";
+
+GetDefaultChart::usage = "GetDefaultChart[] returns the first chart of the default manifold, the one variables are bound in.";
+
+GetDim::usage = "GetDim[] returns the dimension of the default manifold.";
 
 ParseVar::usage = "ParseVar[var] returns the variable record of a var spec, with the fields \"Head\", \"Name\", \"Slots\", \"Symmetry\", \"Pairs\", \"PrintAs\", \"DerivativeOf\" and \"TimeDerivativeOf\".";
 
@@ -29,6 +45,27 @@ DeclaredVariable::usage = "DeclaredVariable[head] returns the record of a declar
 RecordBinding::usage = "RecordBinding[head, storage, components] adds \"Storage\" and \"Components\" to the record of a declared variable. It stops the run if the head is not declared or is bound already.";
 
 Begin["`Private`"];
+
+(*
+  The manifold a script defined first is the one its variables are declared
+  on, and the first chart of that manifold is the one they are bound in.
+*)
+GetDefaultManifold[] :=
+  If[Length[$Manifolds] === 0,
+    Stop[GetDefaultManifold::NoManifolds]
+    ,
+    $Manifolds[[1]]
+  ];
+
+GetDefaultManifold::NoManifolds = "No manifolds have been defined. Use DefManifold to define a manifold.";
+
+GetDefaultChart[] :=
+  ChartsOfManifold[GetDefaultManifold[]][[1]];
+
+GetDim[] :=
+  DimOfManifold[GetDefaultManifold[]];
+
+Protect[GetDefaultManifold, GetDefaultChart, GetDim];
 
 (*
   Declaring a variable is ParseVar followed by DefineTensor.
@@ -161,7 +198,7 @@ ParseVar[var_List] :=
     tensor = First[Pick[var, kinds, "Tensor"]];
     symmetry = First[Pick[var, kinds, "Symmetry"], None];
     If[Length[tensor] > 4,
-      Stop[ParseVar::ETensorType, tensor, Length[tensor]]
+      Stop[ParseVar::ERank, tensor, Length[tensor]]
     ];
     pairs = SymmetryPairs[symmetry, List @@ tensor];
     If[pairs === $Failed,
@@ -188,7 +225,7 @@ ParseVar::EKey = "Rule `1` in var `2` is not understood. The rules a var takes a
 
 ParseVar::EShape = "Var `1` must be a list of one tensor, at most one symmetry, at most one PrintAs and at most one of DerivativeOf and TimeDerivativeOf.";
 
-ParseVar::ETensorType = "Tensor `1` has `2` indices. A tensor with more than 4 is unsupported yet!";
+ParseVar::ERank = "Tensor `1` has `2` indices. A tensor with more than 4 is unsupported yet!";
 
 ParseVar::ESymmetryType = "Symmetry `1` of `2` is unsupported yet! A symmetry must be a set of disjoint pairs of the tensor's indices.";
 

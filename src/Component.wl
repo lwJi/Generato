@@ -4,13 +4,9 @@
 
 (* (c) Liwei Ji, 01/2024 *)
 
-BeginPackage["Generato`Component`", {"Generato`Failure`", "Generato`Context`"}];
+BeginPackage["Generato`Component`", {"xAct`xPerm`", "xAct`xTensor`", "xAct`xCoba`", "Generato`Failure`", "Generato`Context`", "Generato`Variable`"}];
 
-Needs["Generato`Basic`"];
-
-Needs["Generato`Variable`"];
-
-If[Environment["QUIET"] =!= "1",
+If[!GetQuietMode[],
   System`Print["------------------------------------------------------------"];
   System`Print["Package Generato`Component`, {2024, 1, 11}"];
   System`Print["------------------------------------------------------------"];
@@ -37,6 +33,8 @@ BaseRecord::usage = "BaseRecord[variable] returns the record of the bound variab
 RequireChart::usage = "RequireChart[variable, component, coordinate] stops the run if a component record of the variable is not a component in the chart coordinate. The records of a variable are its components in the chart it was bound in; the component of a scalar carries no chart.";
 
 Is3DAbstractIndex::usage = "Is3DAbstractIndex[index] returns True if the abstract index represents a 3D spatial index (first letter >= 'i').";
+
+GetInterfaceName::usage = "GetInterfaceName[compname] returns the interface name for a component.";
 
 Begin["`Private`"];
 
@@ -76,9 +74,9 @@ Protect[IndependentIndices];
   list, counted from 0 as C does. "Name" is the bare C identifier and "Expr"
   is what an equation refers to, which carries the point index of the storage.
 
-  VariableRecord is what a print call reads. A variable that is declared and
-  not bound has a record without "Storage", and nothing to print; BoundQ
-  tells the two apart without stopping.
+  VariableRecord is what the lowering of a program reads. A variable that is
+  declared and not bound has a record without "Storage", and nothing to
+  write; BoundQ tells the two apart without stopping.
   FindComponent is the one statement of how a component in xAct's notation
   is found among the records of a variable: it is the "Comp" of one of them.
   The mirror of a symmetric pair is the "Comp" of none. ComponentRecord
@@ -314,10 +312,10 @@ Scan[
 Protect[GridTensors, TileTensors, TempTensors];
 
 (*
-  RequireChart - a print call prints the records of a variable in one chart.
-  The records are the components in the chart the variable was bound in. A
-  print call that names another chart has no record to print, except for a
-  scalar, whose component carries no chart.
+  RequireChart - a node of a program is about the records of a variable in
+  one chart. The records are the components in the chart the variable was
+  bound in. A node that names another chart has no record to write, except
+  for a scalar, whose component carries no chart.
 *)
 RequireChart[variable_Association, component_Association, coordinate_] :=
   If[ComponentName[variable, component["Indices"], coordinate] =!= component["Comp"],
@@ -332,6 +330,25 @@ Is3DAbstractIndex[idx_] :=
   Module[{},
     LetterNumber[StringPart[ToString[idx /. {Times[-1, x_] :> x}], 1]] >= LetterNumber["i"]
   ];
+
+(*
+  GetInterfaceName names a component at an interface. It was shared by
+  backends that are gone: nothing in src/ or codes/ calls it, and no test
+  exercises it.
+*)
+GetInterfaceName[compname_] :=
+  Module[{intfname = ToString[compname[[0]]], colist = {"t", "x", "y", "z"}, coindex},
+    Do[
+      coindex = compname[[icomp]][[1]];
+      intfname = intfname <> colist[[coindex + 1]]
+      ,
+      {icomp, 1, Length[compname]}
+    ];
+    intfname = ToString[CForm[ToExpression[intfname <> GetGridPointIndex[]]]];
+    Return[intfname];
+  ];
+
+Protect[GetInterfaceName];
 
 End[];
 
