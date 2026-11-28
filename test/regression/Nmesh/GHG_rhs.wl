@@ -92,68 +92,62 @@ SetEQN[dtPhi[i_, a_, b_], -AdPhi[i, a, b] interior + 1/2 alpha[] nvec[c] nvec[d]
 
 (* Write to files *)
 
-SetOutputFile[FileNameJoin[{Directory[], "GHG_rhs.c"}]];
-
 SetProject["GHG"];
 
-SetMainPrint[
-  Module[{project = GetProject[]},
-    pr["#include \"nmesh.h\""];
-    pr["#include \"" <> project <> ".h\""];
-    pr[];
-    pr["#define Power(x,y) (pow((double) (x),(double) (y)))"];
-    pr["#define Log(x) log((double) (x))"];
-    pr["#define pow2(x) ((x)*(x))"];
-    pr["#define pow2inv(x) (1.0/((x)*(x)))"];
-    pr["#define Cal(x,y,z) ((x)?(y):(z))"];
-    pr["#define Sqrt(x) sqrt(x)"];
-    pr["#define Abs(x) fabs(x)"];
-    pr[];
-    pr["/* use globals from " <> project <> " */"];
-    pr["extern t" <> project <> " " <> project <> "[1];"];
-    pr[];
-    pr[];
-    pr["int GHG_rhs(tNode *node, tVarList *vlr, tVarList *vlu)"];
-    pr["{"];
-    pr["tMesh *mesh = node->pat->mesh;"];
-    pr["int ialpha = Ind(\"ADM_alpha\");"];
-    pr["int ibetax = Ind(\"ADM_betax\");"];
-    pr["int iAdgtt = Ind(\"GHG_Adgtt\");"];
-    pr["int iAdPitt = Ind(\"GHG_AdPitt\");"];
-    pr["int iAdPhixtt = Ind(\"GHG_AdPhixtt\");"];
-    pr["int isrcSdHtt = Ind(\"GHG_srcSdHtt\");"];
-    pr["int fc[6];"];
-    pr["int ijk;"];
-    pr[];
-    PrintInitializations[{Mode -> "MainOut"}, dtEvolVarlist];
-    PrintInitializations[{Mode -> "MainIn"}, EvolVarlist];
-    PrintInitializations[{Mode -> "MoreInOut"}, MoreInVarlist];
-    pr[];
-    pr["TIMER_START;"];
-    pr[];
-    pr["/* compute */"];
-    pr["forpoints(node, ijk)"];
-    pr["{"];
+With[{project = GetProject[]},
+  Generate["Nmesh", "GHG_rhs.c", {
+    "#include \"nmesh.h\"",
+    "#include \"" <> project <> ".h\"",
+    "",
+    "#define Power(x,y) (pow((double) (x),(double) (y)))",
+    "#define Log(x) log((double) (x))",
+    "#define pow2(x) ((x)*(x))",
+    "#define pow2inv(x) (1.0/((x)*(x)))",
+    "#define Cal(x,y,z) ((x)?(y):(z))",
+    "#define Sqrt(x) sqrt(x)",
+    "#define Abs(x) fabs(x)",
+    "",
+    "/* use globals from " <> project <> " */",
+    "extern t" <> project <> " " <> project <> "[1];",
+    "",
+    "",
+    "int GHG_rhs(tNode *node, tVarList *vlr, tVarList *vlu)",
+    "{",
+    "tMesh *mesh = node->pat->mesh;",
+    "int ialpha = Ind(\"ADM_alpha\");",
+    "int ibetax = Ind(\"ADM_betax\");",
+    "int iAdgtt = Ind(\"GHG_Adgtt\");",
+    "int iAdPitt = Ind(\"GHG_AdPitt\");",
+    "int iAdPhixtt = Ind(\"GHG_AdPhixtt\");",
+    "int isrcSdHtt = Ind(\"GHG_srcSdHtt\");",
+    "int fc[6];",
+    "int ijk;",
+    "",
+    Load[dtEvolVarlist, "Out"],
+    Load[EvolVarlist, "In"],
+    Load[MoreInVarlist, "MoreInOut"],
+    "",
+    "TIMER_START;",
+    "",
+    "/* compute */",
+    "forpoints(node, ijk)",
+    "{",
     (* parameters *)
-    pr["double interior = !(ind_on_nodeface(node, ijk, fc));"];
-    pr["double gammas[3], gamma0, gamma1, gamma2;"];
-    pr["GHG_gammas(node, ijk, gammas);"];
-    pr["gamma0 = gammas[0];"];
-    pr["gamma1 = gammas[1];"];
-    pr["gamma2 = gammas[2];"];
-    pr[];
-    PrintEquations[{Mode -> "Temp"}, TempVarlist];
-    pr[];
-    PrintEquations[{Mode -> "MainOut"}, dtEvolVarlist];
-    pr["} /* end of points */"];
-    pr[];
-    pr["TIMER_STOP;"];
-    pr[];
-    pr["return 0;"];
-    pr["} /* end of function */"];
-  ]
+    "double interior = !(ind_on_nodeface(node, ijk, fc));",
+    "double gammas[3], gamma0, gamma1, gamma2;",
+    "GHG_gammas(node, ijk, gammas);",
+    "gamma0 = gammas[0];",
+    "gamma1 = gammas[1];",
+    "gamma2 = gammas[2];",
+    "",
+    Store[TempVarlist, "Temp"],
+    "",
+    Store[dtEvolVarlist, "Out"],
+    "} /* end of points */",
+    "",
+    "TIMER_STOP;",
+    "",
+    "return 0;",
+    "} /* end of function */"
+  }]
 ];
-
-Import[FileNameJoin[{Environment["GENERATO"], "codes/Nmesh.wl"}]];
-
-(*<< ../xActToC/Codes/Nmesh.wl*)

@@ -6,25 +6,29 @@
 CarpetXGPU:test:.hxx
 CarpetXGPU:testTile:.hxx
 CarpetXGPU:testDerivs:.hxx
-# Derivs at order 1 and 2, of a scalar, a vector and a symmetric matrix
+# The "Derivs" load at order 1 and 2, of a scalar, a vector and a symmetric matrix
 CarpetXGPU:testDerivs2nd:.hxx
-# Tile-stored derivatives with TensorType "Vect" and "Smat"
+# Tile-stored derivatives at order 1 and 2, loaded with "In"
 CarpetXGPU:testTileDerivs:.hxx
-# The "Temp" initialization and the "AddToMainOut" equation
+# The "Temp" load and the "AddTo" store
 CarpetXGPU:testModes:.hxx
+# Probe 1: the script registers a backend that extends CarpetXGPU in one key
+CarpetXGPU:testVariant:.hxx
+# A module: module/ADM/ADM_var.wl declares the variables, and the script binds the ones it uses
+CarpetXGPU:testModule:.hxx
 # A failure before generation: a var spec that cannot be parsed
 CarpetXGPU:failBadVarSpec:.hxx:fails
-# A failure while a right-hand side is evaluated, after part of the output is built
+# A failure while a right-hand side is evaluated, after the program has passed its check
 CarpetXGPU:failInEquation:.hxx:fails
-# "Derivs" on a variable that declares no DerivativeOf
+# A failure at the check of the program: "Derivs" on a variable that declares no DerivativeOf
 CarpetXGPU:failNoRelation:.hxx:fails
-# A tile load with TensorType "Vect" on a variable that declares no DerivativeOf
-CarpetXGPU:failTensorTypeNoRelation:.hxx:fails
+# Probe 2: a failure at the check of the program, a mode the backend does not have
+CarpetXGPU:failUnknownMode:.hxx:fails
 AMReX:test:.hxx
 #Nmesh:test:.c
 #Nmesh:GHG_rhs:.c
 Nmesh:GHG_set_profile_ADM:.c
-# The "MainOut" initialization (vlr, "dt" prefix trimmed)
+# The "Out" load: a right-hand side is read from vlr, at the index of the variable it is the time derivative of
 Nmesh:testOut:.c
 
 # Note: test/Nmesh/GHG_rhs.ipynb is documentation-only and not part of the test suite

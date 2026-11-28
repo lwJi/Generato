@@ -33,14 +33,10 @@ dtEvolVarlist = GridTensors[{rU[i][j], PrintAs -> "r"}];
 
 SetEQN[rU[i_], uU[i]];
 
-SetOutputFile[FileNameJoin[{Directory[], "failBadVarSpec.hxx"}]];
-
-SetMainPrint[
-  pr[];
-  PrintInitializations[{Mode -> "MainOut"}, dtEvolVarlist];
-  PrintInitializations[{Mode -> "MainIn"}, EvolVarlist];
-  pr[];
-  PrintEquations[{Mode -> "MainOut"}, dtEvolVarlist];
-];
-
-Import[FileNameJoin[{Environment["GENERATO"], "codes/CarpetXGPU.wl"}]];
+Generate["CarpetXGPU", "failBadVarSpec.hxx", {
+  "",
+  Load[dtEvolVarlist, "Out"],
+  Load[EvolVarlist, "In"],
+  "",
+  Store[dtEvolVarlist, "Out"]
+}];

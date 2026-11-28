@@ -76,7 +76,3 @@ With[
     |>]
   ]
 ];
-
-(* Write to files *)
-
-WriteToFile["Nmesh", GetOutputFile[]];

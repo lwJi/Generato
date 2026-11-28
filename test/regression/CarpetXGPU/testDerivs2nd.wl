@@ -1,8 +1,8 @@
 (* ::Package:: *)
 
 (* testDerivs2nd.wl *)
-(* Integration test for Mode->Derivs at order 1 and 2, of a scalar, a vector and a symmetric matrix *)
-(* Declarations follow SpacetimeX Z4cowGPU/wolfram/wl/Z4c_vars.wl, the print calls Z4cowGPU_set_rhs.wl *)
+(* Integration test for the "Derivs" load at order 1 and 2, of a scalar, a vector and a symmetric matrix *)
+(* Declarations follow SpacetimeX Z4cowGPU/wolfram/wl/Z4c_vars.wl, the program Z4cowGPU_set_rhs.wl *)
 
 (* (c) Liwei Ji, 11/2026 *)
 
@@ -40,16 +40,16 @@ EvolVarlist =
     {beta[i], PrintAs -> "beta"}
   ];
 
-(* Derivatives computed inline. The tile point index is empty, so the names carry no index *)
+(* Derivatives computed inline are locals, so they are bound as temporaries: the names carry no index *)
 dEvolVarlist =
-  TileTensors[
+  TempTensors[
     {dW[-k], DerivativeOf -> W, PrintAs -> "dW"},
     {dgamt[-k, -i, -j], Symmetric[{-i, -j}], DerivativeOf -> gamt, PrintAs -> "dgamt"},
     {dbeta[-k, i], DerivativeOf -> beta, PrintAs -> "dbeta"}
   ];
 
 ddEvolVarlist =
-  TileTensors[
+  TempTensors[
     {ddW[-i, -j], Symmetric[{-i, -j}], DerivativeOf -> W, PrintAs -> "ddW"},
     {ddgamt[-l, -m, -i, -j], GenSet[Cycles[{1, 2}], Cycles[{3, 4}]], DerivativeOf -> gamt, PrintAs -> "ddgamt"},
     {ddbeta[-i, -j, k], Symmetric[{-i, -j}], DerivativeOf -> beta, PrintAs -> "ddbeta"}
@@ -82,25 +82,21 @@ SetEQN[dtW[], beta[k] dW[-k] - W[] divbeta[] + lapW[]];
 
 SetEQN[dtbeta[i_], beta[k] dbeta[-k, i] + lapbeta[i]];
 
-SetOutputFile[FileNameJoin[{Directory[], "testDerivs2nd.hxx"}]];
-
-SetMainPrint[
-  pr[];
-  PrintInitializations[{Mode -> "MainOut"}, dtEvolVarlist];
-  PrintInitializations[{Mode -> "MainIn"}, EvolVarlist];
-  pr[];
-  pr["grid.loop_int_device<0, 0, 0>("];
-  pr["  grid.nghostzones, [=] ARITH_DEVICE(const PointDesc &p) ARITH_INLINE {"];
-  pr["const int ijk = layout2.linear(p.i, p.j, p.k);"];
-  pr[];
-  PrintInitializations[{Mode -> "Derivs", DerivsOrder -> 1}, dEvolVarlist];
-  PrintInitializations[{Mode -> "Derivs", DerivsOrder -> 2}, ddEvolVarlist];
-  pr[];
-  PrintEquations[{Mode -> "Temp"}, TempVarlist];
-  pr[];
-  PrintEquations[{Mode -> "MainOut"}, dtEvolVarlist];
-  pr[];
-  pr["});"];
-];
-
-Import[FileNameJoin[{Environment["GENERATO"], "codes/CarpetXGPU.wl"}]];
+Generate["CarpetXGPU", "testDerivs2nd.hxx", {
+  "",
+  Load[dtEvolVarlist, "Out"],
+  Load[EvolVarlist, "In"],
+  "",
+  "grid.loop_int_device<0, 0, 0>(",
+  "  grid.nghostzones, [=] ARITH_DEVICE(const PointDesc &p) ARITH_INLINE {",
+  "const int ijk = layout2.linear(p.i, p.j, p.k);",
+  "",
+  Load[dEvolVarlist, "Derivs"],
+  Load[ddEvolVarlist, "Derivs"],
+  "",
+  Store[TempVarlist, "Temp"],
+  "",
+  Store[dtEvolVarlist, "Out"],
+  "",
+  "});"
+}];

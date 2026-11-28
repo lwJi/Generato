@@ -1,8 +1,8 @@
 (* ::Package:: *)
 
 (* testTileDerivs.wl *)
-(* Integration test for derivatives read from tile storage, with TensorType "Vect" and "Smat" *)
-(* Declarations follow SpacetimeX Z4cowGPU/wolfram/wl/Z4c_vars.wl, the print calls Z4cowGPU_set_rhs_GF3D5.wl *)
+(* Integration test for derivatives read from tile storage, at order 1 and 2, of a scalar, a vector and a symmetric matrix *)
+(* Declarations follow SpacetimeX Z4cowGPU/wolfram/wl/Z4c_vars.wl, the program Z4cowGPU_set_rhs_GF3D5.wl *)
 
 (* (c) Liwei Ji, 11/2026 *)
 
@@ -84,30 +84,23 @@ SetEQN[dtW[], beta[k] dW[-k] - W[] divbeta[] + lapW[]];
 
 SetEQN[dtbeta[i_], beta[k] dbeta[-k, i] + lapbeta[i]];
 
-SetOutputFile[FileNameJoin[{Directory[], "testTileDerivs.hxx"}]];
-
-SetMainPrint[
-  pr[];
-  PrintInitializations[{Mode -> "MainOut"}, dtEvolVarlist];
-  PrintInitializations[{Mode -> "MainIn"}, EvolVarlist];
-  pr[];
-  PrintInitializations[{Mode -> "Derivs", DerivsOrder -> 1,
-                        StorageType -> "Tile", TensorType -> "Vect"},
-                       dEvolVarlist];
-  PrintInitializations[{Mode -> "Derivs", DerivsOrder -> 2,
-                        StorageType -> "Tile", TensorType -> "Smat"},
-                       ddEvolVarlist];
-  pr[];
-  pr["grid.loop_int_device<0, 0, 0>("];
-  pr["  grid.nghostzones, [=] ARITH_DEVICE(const PointDesc &p) ARITH_INLINE {"];
-  pr["const int ijk = layout2.linear(p.i, p.j, p.k);"];
-  pr["const int ijk5 = layout5.linear(p.i, p.j, p.k);"];
-  pr[];
-  PrintEquations[{Mode -> "Temp"}, TempVarlist];
-  pr[];
-  PrintEquations[{Mode -> "MainOut"}, dtEvolVarlist];
-  pr[];
-  pr["});"];
-];
-
-Import[FileNameJoin[{Environment["GENERATO"], "codes/CarpetXGPU.wl"}]];
+(* A derivative stored on a tile is read like any tile, with "In"; its two indices follow from its declaration *)
+Generate["CarpetXGPU", "testTileDerivs.hxx", {
+  "",
+  Load[dtEvolVarlist, "Out"],
+  Load[EvolVarlist, "In"],
+  "",
+  Load[dEvolVarlist, "In"],
+  Load[ddEvolVarlist, "In"],
+  "",
+  "grid.loop_int_device<0, 0, 0>(",
+  "  grid.nghostzones, [=] ARITH_DEVICE(const PointDesc &p) ARITH_INLINE {",
+  "const int ijk = layout2.linear(p.i, p.j, p.k);",
+  "const int ijk5 = layout5.linear(p.i, p.j, p.k);",
+  "",
+  Store[TempVarlist, "Temp"],
+  "",
+  Store[dtEvolVarlist, "Out"],
+  "",
+  "});"
+}];

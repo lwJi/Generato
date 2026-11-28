@@ -1,0 +1,59 @@
+/* testModule.hxx */
+/* Produced with Generato */
+
+#ifndef TESTMODULE_HXX
+#define TESTMODULE_HXX
+
+
+const auto ADMdtalpha = gf_ADMdtalpha;
+const auto ADMdtbeta1 = gf_ADMdtbeta[0];
+const auto ADMdtbeta2 = gf_ADMdtbeta[1];
+const auto ADMdtbeta3 = gf_ADMdtbeta[2];
+const auto ADMgam11 = gf_ADMgam[0];
+const auto ADMgam12 = gf_ADMgam[1];
+const auto ADMgam13 = gf_ADMgam[2];
+const auto ADMgam22 = gf_ADMgam[3];
+const auto ADMgam23 = gf_ADMgam[4];
+const auto ADMgam33 = gf_ADMgam[5];
+const auto ADMexK11 = gf_ADMexK[0];
+const auto ADMexK12 = gf_ADMexK[1];
+const auto ADMexK13 = gf_ADMexK[2];
+const auto ADMexK22 = gf_ADMexK[3];
+const auto ADMexK23 = gf_ADMexK[4];
+const auto ADMexK33 = gf_ADMexK[5];
+const auto ADMalpha = gf_ADMalpha;
+const auto ADMbeta1 = gf_ADMbeta[0];
+const auto ADMbeta2 = gf_ADMbeta[1];
+const auto ADMbeta3 = gf_ADMbeta[2];
+
+const vreal
+trK
+=
+ADMexK11 + ADMexK22 + ADMexK33
+;
+
+
+ADMdtalpha
+=
+-2*ADMalpha*trK
+;
+
+ADMdtbeta1
+=
+-(ADMbeta1*trK)
+;
+
+ADMdtbeta2
+=
+-(ADMbeta2*trK)
+;
+
+ADMdtbeta3
+=
+-(ADMbeta3*trK)
+;
+
+
+#endif // #ifndef TESTMODULE_HXX
+
+/* testModule.hxx */

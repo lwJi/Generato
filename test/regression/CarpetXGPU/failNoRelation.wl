@@ -1,7 +1,7 @@
 (* ::Package:: *)
 
 (* failNoRelation.wl *)
-(* A run that must fail during generation: a variable is loaded with Mode->Derivs and declares no DerivativeOf *)
+(* A run that must fail at the check of the program: a variable is loaded with "Derivs" and declares no DerivativeOf *)
 
 (* (c) Liwei Ji, 11/2026 *)
 
@@ -29,27 +29,23 @@ EvolVarlist = GridTensors[{phi[], PrintAs -> "phi"}];
 
 (*
     dphi is named like a derivative of phi and does not declare that it is
-    one. Nothing is read out of a name, so the run stops when dphi is loaded
-    with Mode->Derivs, after the header and the first initialization have
-    been built.
+    one. Nothing is read out of a name, so the check of the program finds
+    that the "Derivs" load reads a relation dphi does not declare, and
+    nothing is computed.
 *)
 
-DerivVarlist = GridTensors[{dphi[-i], PrintAs -> "dphi"}];
+DerivVarlist = TempTensors[{dphi[-i], PrintAs -> "dphi"}];
 
 TempVarlist = TempTensors[{psi[], PrintAs -> "psi"}];
 
 (* Simple equation using the derivative *)
 SetEQN[psi[], euclid[i, j] dphi[-i] dphi[-j]];
 
-SetOutputFile[FileNameJoin[{Directory[], "failNoRelation.hxx"}]];
-
-SetMainPrint[
-  pr[];
-  PrintInitializations[{Mode -> "MainIn"}, EvolVarlist];
-  pr[];
-  PrintInitializations[{Mode -> "Derivs"}, DerivVarlist];
-  pr[];
-  PrintEquations[{Mode -> "Temp"}, TempVarlist];
-];
-
-Import[FileNameJoin[{Environment["GENERATO"], "codes/CarpetXGPU.wl"}]];
+Generate["CarpetXGPU", "failNoRelation.hxx", {
+  "",
+  Load[EvolVarlist, "In"],
+  "",
+  Load[DerivVarlist, "Derivs"],
+  "",
+  Store[TempVarlist, "Temp"]
+}];

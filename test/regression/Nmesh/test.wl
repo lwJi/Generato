@@ -26,9 +26,10 @@ MetricInBasis[euclid, -cart, DiagonalMatrix[{1, 1, 1}]];
 
 MetricInBasis[euclid, cart, DiagonalMatrix[{1, 1, 1}]];
 
-dtEvolVarlist = GridTensors[{rU[i], PrintAs -> "r"}];
-
 EvolVarlist = GridTensors[{uU[i], PrintAs -> "u"}];
+
+(* The right-hand side names the variable it is the time derivative of, which is declared above it *)
+dtEvolVarlist = GridTensors[{rU[i], TimeDerivativeOf -> uU, PrintAs -> "r"}];
 
 MoreInVarlist = GridTensors[{MDD[-i, -j], Symmetric[{-i, -j}], PrintAs -> "M"}];
 
@@ -45,53 +46,49 @@ SetEQN[{SuffixName -> "Msqr"}, rU[i_], euclid[i, k] MDD[-k, -j] vU[j]];
 
 SetEQN[{SuffixName -> "otherwise"}, rU[i_], vU[i]];
 
-SetOutputFile[FileNameJoin[{Directory[], "test.c"}]];
-
 SetProject["C3GH"];
 
-SetMainPrint[
-  Module[{project = GetProject[]},
-    pr["#include \"nmesh.h\""];
-    pr["#include \"" <> project <> ".h\""];
-    pr[];
-    pr["/* use globals from " <> project <> " */"];
-    pr["extern t" <> project <> " " <> project <> "[1];"];
-    pr[];
-    pr[];
-    pr["void test(tVarList *vlu, tVarList *vlr)"];
-    pr["{"];
-    pr["tMesh *mesh = u->mesh;"];
-    pr[];
-    pr["int Msqr = GetvLax(Par(\"ADM_ConstraintNorm\"), \"Msqr \");"];
-    pr[];
-    pr["formylnodes(mesh)"];
-    pr["{"];
-    pr["tNode *node = MyLnode;"];
-    pr["int ijk;"];
-    pr[];
-    pr["forpoints(node, ijk)"];
-    pr["{"];
-    pr["int iMDD = Ind(\"ADM_gxx\");"];
-    pr[];
-    PrintInitializations[{Mode -> "MainOut"}, dtEvolVarlist];
-    PrintInitializations[{Mode -> "MainIn"}, EvolVarlist];
-    PrintInitializations[{Mode -> "MoreInOut"}, MoreInVarlist];
-    pr[];
-    PrintEquations[{Mode -> "Temp"}, TempVarlist];
-    pr[];
-    pr["if(Msqr)"];
-    pr["{"];
-    PrintEquations[{Mode -> "MainOut", SuffixName -> "Msqr", ChartName -> cart}, dtEvolVarlist];
-    pr["}"];
-    pr["else"];
-    pr["{"];
-    PrintEquations[{Mode -> "MainOut", SuffixName -> "otherwise"}, dtEvolVarlist];
-    pr["}"];
-    pr[];
-    pr["} /* end of points */"];
-    pr["} /* end of nodes */"];
-    pr["}"];
-  ]
+With[{project = GetProject[]},
+  Generate["Nmesh", "test.c", {
+    "#include \"nmesh.h\"",
+    "#include \"" <> project <> ".h\"",
+    "",
+    "/* use globals from " <> project <> " */",
+    "extern t" <> project <> " " <> project <> "[1];",
+    "",
+    "",
+    "void test(tVarList *vlu, tVarList *vlr)",
+    "{",
+    "tMesh *mesh = u->mesh;",
+    "",
+    "int Msqr = GetvLax(Par(\"ADM_ConstraintNorm\"), \"Msqr \");",
+    "",
+    "formylnodes(mesh)",
+    "{",
+    "tNode *node = MyLnode;",
+    "int ijk;",
+    "",
+    "forpoints(node, ijk)",
+    "{",
+    "int iMDD = Ind(\"ADM_gxx\");",
+    "",
+    Load[dtEvolVarlist, "Out"],
+    Load[EvolVarlist, "In"],
+    Load[MoreInVarlist, "MoreInOut"],
+    "",
+    Store[TempVarlist, "Temp"],
+    "",
+    "if(Msqr)",
+    "{",
+    Store[dtEvolVarlist, "Out", SuffixName -> "Msqr", ChartName -> cart],
+    "}",
+    "else",
+    "{",
+    Store[dtEvolVarlist, "Out", SuffixName -> "otherwise"],
+    "}",
+    "",
+    "} /* end of points */",
+    "} /* end of nodes */",
+    "}"
+  }]
 ];
-
-Import[FileNameJoin[{Environment["GENERATO"], "codes/Nmesh.wl"}]];

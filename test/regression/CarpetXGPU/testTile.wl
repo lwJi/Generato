@@ -1,7 +1,7 @@
 (* ::Package:: *)
 
 (* testTile.wl *)
-(* Integration test for TileTensors with Tile storage type *)
+(* Integration test for TileTensors: a tile-bound variable is loaded from its tile *)
 
 (* (c) Liwei Ji, 01/2026 *)
 
@@ -39,16 +39,13 @@ SetEQN[tempU[i_], gridU[i]];
 
 SetEQN[tileU[i_], tempU[i]];
 
-SetOutputFile[FileNameJoin[{Directory[], "testTile.hxx"}]];
-
-SetMainPrint[
-  pr[];
-  PrintInitializations[{Mode -> "Derivs", StorageType -> "Tile"}, TileVarlist];
-  PrintInitializations[{Mode -> "MainIn"}, GridVarlist];
-  pr[];
-  PrintEquations[{Mode -> "Temp"}, TempVarlist];
-  pr[];
-  PrintEquations[{Mode -> "MainOut"}, TileVarlist];
-];
-
-Import[FileNameJoin[{Environment["GENERATO"], "codes/CarpetXGPU.wl"}]];
+(* Each list is loaded as what it is bound to: the tile from tl_, the grid function from gf_ *)
+Generate["CarpetXGPU", "testTile.hxx", {
+  "",
+  Load[TileVarlist, "In"],
+  Load[GridVarlist, "In"],
+  "",
+  Store[TempVarlist, "Temp"],
+  "",
+  Store[TileVarlist, "Out"]
+}];

@@ -395,6 +395,74 @@ AppendTo[$AllTests,
 ];
 
 (* ========================================= *)
+(* Test: binding - a variable that is declared already *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a variable that is declared already is bound without being declared again: binding adds the storage *)
+    (* and the component records to the record the declaration wrote, and xAct gets its copy of them *)
+    ResetContext[];
+    compTestDeclaredVars = DefTensors[{compTestD[i], PrintAs -> "d"}];
+    compTestDeclaredRecord = DeclaredVariable[compTestD];
+    {
+      GridTensors[{compTestD[i], PrintAs -> "d"}],
+      KeyDrop[VariableRecord[compTestD], {"Storage", "Components"}] === compTestDeclaredRecord,
+      VariableRecord[compTestD]["Storage"],
+      compTestFields[compTestD, "Name"],
+      ToString[compTestD[{2, testCart}] // ToValues]
+    },
+    {{{compTestD[i], PrintAs -> "d"}}, True, "Grid", {"compTestD1", "compTestD2", "compTestD3"}, "compTestD2"},
+    TestID -> "Bind-DeclaredHead-BindsWithoutDeclaring"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a binding takes its var specs as one list, which is how the list a declaration returned is bound. *)
+    (* It returns the list, and parts of one list may be bound to different storage *)
+    compTestModuleVars = DefTensors[{compTestMA[], PrintAs -> "a"}, {compTestMB[i]}, {compTestMC[-i, -j], Symmetric[{-i, -j}]}];
+    {
+      TileTensors[Take[compTestModuleVars, 2]] === Take[compTestModuleVars, 2],
+      TempTensors[Drop[compTestModuleVars, 2]] === Drop[compTestModuleVars, 2],
+      VariableRecord[#]["Storage"]& /@ {compTestMA, compTestMB, compTestMC},
+      Length[VariableRecord[#]["Components"]]& /@ {compTestMA, compTestMB, compTestMC}
+    },
+    {True, True, {"Tile", "Tile", "Temp"}, {1, 3, 6}},
+    TestID -> "Bind-ListOfVarSpecs-BindsADeclaration"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* one list of var specs that are not declared yet is declared and bound, like the var specs one by one *)
+    {
+      GridTensors[{{compTestLA[]}, {compTestLB[i]}}],
+      VariableRecord[#]["Storage"]& /@ {compTestLA, compTestLB}
+    },
+    {{{compTestLA[]}, {compTestLB[i]}}, {"Grid", "Grid"}},
+    TestID -> "Bind-ListOfVarSpecs-DeclaresAndBinds"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a declared variable is bound once like any other: a second binding stops, and the first stays *)
+    {
+      Catch[
+        TempTensors[compTestDeclaredVars];
+        "NoThrow",
+        GeneratoFailure
+      ],
+      VariableRecord[compTestD]["Storage"]
+    },
+    {$Failed, "Grid"},
+    {TempTensors::EBound},
+    TestID -> "Bind-DeclaredHead-BoundTwice-Stops"
+  ]
+];
+
+(* ========================================= *)
 (* Test: binding - what is an error *)
 (* ========================================= *)
 
@@ -418,22 +486,46 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    (* a declared variable cannot be bound yet: its record stays as declared, without storage *)
-    DefTensors[{compTestD[i]}];
+    (* a tensor defined outside Generato has no record, and cannot be bound *)
+    DefTensor[compTestOutside[i], TestM3];
     {
       Catch[
-        GridTensors[{compTestD[i]}];
+        GridTensors[{compTestOutside[i]}];
         "NoThrow",
         GeneratoFailure
       ],
-      DeclaredVariable[compTestD]
+      DeclaredVariable[compTestOutside]
+    },
+    {$Failed, Missing["NotDeclared", compTestOutside]},
+    {DefineTensor::EExists},
+    TestID -> "Bind-TensorDefinedOutside-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a var that states a declared variable differently is not bound: the declaration stands, without storage *)
+    DefTensors[{compTestDF[-i, -j], Symmetric[{-i, -j}]}];
+    {
+      Catch[
+        GridTensors[{compTestDF[-i, -j]}];
+        "NoThrow",
+        GeneratoFailure
+      ],
+      Catch[
+        GridTensors[{compTestDF[-i, -j], Symmetric[{-i, -j}], PrintAs -> "other"}];
+        "NoThrow",
+        GeneratoFailure
+      ],
+      DeclaredVariable[compTestDF]
     },
     {
       $Failed,
-      <|"Head" -> compTestD, "Name" -> "compTestD", "Slots" -> {i}, "Symmetry" -> None, "Pairs" -> {}, "PrintAs" -> None, "DerivativeOf" -> None, "TimeDerivativeOf" -> None|>
+      $Failed,
+      <|"Head" -> compTestDF, "Name" -> "compTestDF", "Slots" -> {-i, -j}, "Symmetry" -> Symmetric[{-i, -j}], "Pairs" -> {{1, 2, 1}}, "PrintAs" -> None, "DerivativeOf" -> None, "TimeDerivativeOf" -> None|>
     },
-    {DefineTensor::EExists},
-    TestID -> "Bind-ExistingTensor-Stops"
+    {GridTensors::EDeclared, GridTensors::EDeclared},
+    TestID -> "Bind-DeclaredHead-StatedDifferently-Stops"
   ]
 ];
 
@@ -467,6 +559,20 @@ AppendTo[$AllTests,
     {{{compTestC[i]}}, True, False, $Failed},
     {VariableRecord::EUnbound},
     TestID -> "Bind-CheckInputEquations-DeclaresOnly"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* and a variable that is declared already is left as it is, declared and not bound *)
+    ResetContext[];
+    compTestCheckVars = DefTensors[{compTestCD[i]}];
+    SetCheckInputEquations[True];
+    compTestCheckResult = TileTensors[compTestCheckVars];
+    SetCheckInputEquations[False];
+    {compTestCheckResult === compTestCheckVars, BoundQ[DeclaredVariable[compTestCD]]},
+    {True, False},
+    TestID -> "Bind-CheckInputEquations-DeclaredHeadStaysUnbound"
   ]
 ];
 
@@ -570,6 +676,34 @@ AppendTo[$AllTests,
     MapAt[ToString, ComponentRecord[compTestM[{2, -testCart}, {3, -testCart}]], "Expr"],
     <|"Comp" -> compTestM[{2, -testCart}, {3, -testCart}], "Indices" -> {2, 3}, "Slot" -> 4, "Name" -> "compTestM23", "Expr" -> "compTestM23[[ijk]]"|>,
     TestID -> "ComponentRecord-ReadsTheRecord"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a record is that of a bound variable once a binding has given it storage: the record of a declaration *)
+    (* has none yet, and a head that is not declared has no record *)
+    {
+      BoundQ[DeclaredVariable[compTestM]],
+      BoundQ[ParseVar[{compTestNotDeclared[i]}]],
+      BoundQ[DeclaredVariable[compTestNotDeclared]]
+    },
+    {True, False, False},
+    TestID -> "BoundQ-StorageMakesARecordBound"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a component is found among the records of its variable by its "Comp". The mirror of a symmetric pair *)
+    (* and the tensor with its abstract indices are the "Comp" of no record, and looking for them stops nothing *)
+    {
+      FindComponent[VariableRecord[compTestM], compTestM[{2, -testCart}, {3, -testCart}]] === ComponentRecord[compTestM[{2, -testCart}, {3, -testCart}]],
+      FindComponent[VariableRecord[compTestM], compTestM[{3, -testCart}, {2, -testCart}]],
+      FindComponent[VariableRecord[compTestM], compTestM[-i, -j]]
+    },
+    {True, Missing["NotIndependent", compTestM[{3, -testCart}, {2, -testCart}]], Missing["NotIndependent", compTestM[-i, -j]]},
+    TestID -> "FindComponent-RecordOrMissing"
   ]
 ];
 

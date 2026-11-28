@@ -1,7 +1,7 @@
 (* ::Package:: *)
 
 (* testDerivs.wl *)
-(* Integration test for Mode->Derivs with finite difference stencils *)
+(* Integration test for the "Derivs" load: a derivative computed from the variable it declares *)
 
 (* (c) Liwei Ji, 01/2026 *)
 
@@ -28,23 +28,20 @@ MetricInBasis[euclid, cart, DiagonalMatrix[{1, 1, 1}]];
 (* Variables for derivative test *)
 EvolVarlist = GridTensors[{phi[], PrintAs -> "phi"}];
 
-DerivVarlist = GridTensors[{dphi[-i], DerivativeOf -> phi, PrintAs -> "dphi"}];
+(* A derivative computed inline is a local, so it is bound as a temporary *)
+DerivVarlist = TempTensors[{dphi[-i], DerivativeOf -> phi, PrintAs -> "dphi"}];
 
 TempVarlist = TempTensors[{psi[], PrintAs -> "psi"}];
 
 (* Simple equation using the derivative *)
 SetEQN[psi[], euclid[i, j] dphi[-i] dphi[-j]];
 
-SetOutputFile[FileNameJoin[{Directory[], "testDerivs.hxx"}]];
-
-SetMainPrint[
-  pr[];
-  PrintInitializations[{Mode -> "MainIn"}, EvolVarlist];
-  pr[];
-  (* Test Mode->Derivs with DerivsOrder and DerivsAccuracy *)
-  PrintInitializations[{Mode -> "Derivs", TensorType -> "Vect", DerivsOrder -> 1, DerivsAccuracy -> 4}, DerivVarlist];
-  pr[];
-  PrintEquations[{Mode -> "Temp"}, TempVarlist];
-];
-
-Import[FileNameJoin[{Environment["GENERATO"], "codes/CarpetXGPU.wl"}]];
+Generate["CarpetXGPU", "testDerivs.hxx", {
+  "",
+  Load[EvolVarlist, "In"],
+  "",
+  (* dphi is computed from phi, which its declaration names *)
+  Load[DerivVarlist, "Derivs"],
+  "",
+  Store[TempVarlist, "Temp"]
+}];

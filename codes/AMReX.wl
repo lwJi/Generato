@@ -37,7 +37,3 @@ With[
     "Store" -> <|"Temp" -> <|All -> DeclareAssign|>|>
   |>]
 ];
-
-(* Write to files *)
-
-WriteToFile["AMReX", GetOutputFile[]];
