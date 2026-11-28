@@ -69,7 +69,7 @@ AppendTo[$AllTests,
 AppendTo[$AllTests,
   VerificationTest[
     coeffs = GetFiniteDifferenceCoefficients[{-1, 0, 1}, 1];
-    {Subscript[c, -1], Subscript[c, 0], Subscript[c, 1]} /. coeffs,
+    {Subscript[StencilCoefficient, -1], Subscript[StencilCoefficient, 0], Subscript[StencilCoefficient, 1]} /. coeffs,
     {-1/2, 0, 1/2},
     TestID -> "GetFiniteDifferenceCoefficients-Order2-Deriv1"
   ]
@@ -79,7 +79,7 @@ AppendTo[$AllTests,
 AppendTo[$AllTests,
   VerificationTest[
     coeffs = GetFiniteDifferenceCoefficients[{-2, -1, 0, 1, 2}, 1];
-    {Subscript[c, -2], Subscript[c, -1], Subscript[c, 0], Subscript[c, 1], Subscript[c, 2]} /. coeffs,
+    {Subscript[StencilCoefficient, -2], Subscript[StencilCoefficient, -1], Subscript[StencilCoefficient, 0], Subscript[StencilCoefficient, 1], Subscript[StencilCoefficient, 2]} /. coeffs,
     {1/12, -2/3, 0, 2/3, -1/12},
     TestID -> "GetFiniteDifferenceCoefficients-Order4-Deriv1"
   ]
@@ -89,7 +89,7 @@ AppendTo[$AllTests,
 AppendTo[$AllTests,
   VerificationTest[
     coeffs = GetFiniteDifferenceCoefficients[{-1, 0, 1}, 2];
-    {Subscript[c, -1], Subscript[c, 0], Subscript[c, 1]} /. coeffs,
+    {Subscript[StencilCoefficient, -1], Subscript[StencilCoefficient, 0], Subscript[StencilCoefficient, 1]} /. coeffs,
     {1, -2, 1},
     TestID -> "GetFiniteDifferenceCoefficients-Order2-Deriv2"
   ]
@@ -99,7 +99,7 @@ AppendTo[$AllTests,
 AppendTo[$AllTests,
   VerificationTest[
     coeffs = GetFiniteDifferenceCoefficients[{-2, -1, 0, 1, 2}, 2];
-    {Subscript[c, -2], Subscript[c, -1], Subscript[c, 0], Subscript[c, 1], Subscript[c, 2]} /. coeffs,
+    {Subscript[StencilCoefficient, -2], Subscript[StencilCoefficient, -1], Subscript[StencilCoefficient, 0], Subscript[StencilCoefficient, 1], Subscript[StencilCoefficient, 2]} /. coeffs,
     {-1/12, 4/3, -5/2, 4/3, -1/12},
     TestID -> "GetFiniteDifferenceCoefficients-Order4-Deriv2"
   ]
@@ -145,8 +145,8 @@ AppendTo[$AllTests,
   VerificationTest[
     sample = {-1, 0, 1};
     coeffs = GetUpwindCoefficients[sample];
-    (* Check that we got symmetric (cs) and antisymmetric (ca) coefficients *)
-    MemberQ[coeffs[[All, 1]], Subscript[cs, 1]] && MemberQ[coeffs[[All, 1]], Subscript[ca, 0]],
+    (* Check that we got symmetric and antisymmetric coefficients *)
+    MemberQ[coeffs[[All, 1]], Subscript[UpwindSymmetricCoefficient, 1]] && MemberQ[coeffs[[All, 1]], Subscript[UpwindAntisymmetricCoefficient, 0]],
     True,
     TestID -> "GetUpwindCoefficients-HasSymmetricAndAntisymmetric"
   ]

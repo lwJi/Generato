@@ -16,18 +16,11 @@ SetPrintDate[False];
 (* Helper to reset context to defaults *)
 ResetContext[] := ($CurrentContext = $ContextDefaults);
 
-(* The text PutAppend writes for expr, which CText reproduces less the final newline *)
-PutAppendText[expr_] :=
-  Module[{file = FileNameJoin[{$TemporaryDirectory, "generato_emit_putappend.txt"}], text},
-    If[FileExistsQ[file], DeleteFile[file]];
-    PutAppend[CForm[expr], file];
-    text = ReadString[file];
-    DeleteFile[file];
-    text
-  ];
-
 (* A sum long enough to be wrapped several times *)
 emitLongSum = Sum[k Symbol["emitC" <> ToString[k]]^2, {k, 1, 40}];
+
+(* A backend to write through: the tests of the writer state nothing of their own *)
+DefineBackend["emitTest", <||>];
 
 (* ========================================= *)
 (* Test: SetMainPrint / GetMainPrint *)
@@ -58,63 +51,6 @@ AppendTo[$AllTests,
 ];
 
 (* ========================================= *)
-(* Test: CText *)
-(* ========================================= *)
-
-AppendTo[$AllTests,
-  VerificationTest[
-    (* a short expression is one line, with no newline at its end *)
-    CText[emitA emitB + emitD],
-    "emitA*emitB + emitD",
-    TestID -> "CText-ShortExpression"
-  ]
-];
-
-AppendTo[$AllTests,
-  VerificationTest[
-    (* a Part expression prints as a C subscript, as a point index does *)
-    CText[emitA[[emitIjk]]],
-    "emitA[emitIjk]",
-    TestID -> "CText-PartExpression"
-  ]
-];
-
-AppendTo[$AllTests,
-  VerificationTest[
-    (* a long expression is broken over lines shorter than 78 characters,
-       and a continuation line is indented by two spaces *)
-    Module[{textLines = StringSplit[CText[emitLongSum], "\n"]},
-      {
-        Length[textLines] > 3,
-        Max[StringLength /@ textLines] < 78,
-        AllTrue[Rest[textLines], StringStartsQ[#, "  "] &],
-        StringEndsQ[CText[emitLongSum], "\n"]
-      }
-    ],
-    {True, True, True, False},
-    TestID -> "CText-WrapsLongExpression"
-  ]
-];
-
-AppendTo[$AllTests,
-  VerificationTest[
-    (* CText is the text PutAppend[CForm[expr]] writes, less its final newline *)
-    Map[
-      CText[#] <> "\n" === PutAppendText[#] &,
-      {
-        emitA emitB + emitD,
-        emitLongSum,
-        Expand[(emitA + emitB + emitD)^6],
-        emitA[[emitIjk]]^2 / (3 emitB[[emitIjk]]) - 0.5 Sqrt[emitD],
-        emitF @@ Table[Symbol["emitArg" <> ToString[k]], {k, 1, 30}]
-      }
-    ],
-    {True, True, True, True, True},
-    TestID -> "CText-MatchesPutAppend"
-  ]
-];
-
-(* ========================================= *)
 (* Test: WriteToFile *)
 (* ========================================= *)
 
@@ -125,8 +61,8 @@ AppendTo[$AllTests,
     tempFile = FileNameJoin[{$TemporaryDirectory, "test_write.hxx"}];
     SetPrintHeaderMacro[True];
     SetPrintDate[False];
-    SetMainPrint[Global`pr["// test content"]];
-    WriteToFile[tempFile];
+    SetMainPrint[pr["// test content"]];
+    WriteToFile["emitTest", tempFile];
     result = Import[tempFile, "Text"];
     DeleteFile[tempFile];
     (* Check for header comment and macro guards *)
@@ -145,8 +81,8 @@ AppendTo[$AllTests,
     tempFile = FileNameJoin[{$TemporaryDirectory, "test_write_nomacro.hxx"}];
     SetPrintHeaderMacro[False];
     SetPrintDate[False];
-    SetMainPrint[Global`pr["// content only"]];
-    WriteToFile[tempFile];
+    SetMainPrint[pr["// content only"]];
+    WriteToFile["emitTest", tempFile];
     result = Import[tempFile, "Text"];
     DeleteFile[tempFile];
     (* Should have comment but no macro guards *)
@@ -166,15 +102,15 @@ AppendTo[$AllTests,
     SetPrintHeaderMacro[False];
     SetPrintDate[False];
     SetMainPrint[
-      Global`pr["const double "];
-      Global`pr["x \t"];
-      Global`pr["="];
-      Global`pr["a +  \n  b"];
-      Global`pr[";\n"];
-      Global`pr["  indented"];
-      Global`pr["   "]
+      pr["const double "];
+      pr["x \t"];
+      pr["="];
+      pr["a +  \n  b"];
+      pr[";\n"];
+      pr["  indented"];
+      pr["   "]
     ];
-    WriteToFile[tempFile];
+    WriteToFile["emitTest", tempFile];
     result = ReadString[tempFile];
     DeleteFile[tempFile];
     result,
@@ -204,8 +140,8 @@ AppendTo[$AllTests,
     tempFile = FileNameJoin[{$TemporaryDirectory, "test_write_wrapped.hxx"}];
     SetPrintHeaderMacro[False];
     SetPrintDate[False];
-    SetMainPrint[Global`pr[CText[emitLongSum]]];
-    WriteToFile[tempFile];
+    SetMainPrint[pr[CText[emitLongSum]]];
+    WriteToFile["emitTest", tempFile];
     result = ReadString[tempFile];
     DeleteFile[tempFile];
     {
@@ -224,10 +160,10 @@ AppendTo[$AllTests,
     tempFile = FileNameJoin[{$TemporaryDirectory, "test_write_twice.hxx"}];
     SetPrintHeaderMacro[False];
     SetPrintDate[False];
-    SetMainPrint[Global`pr["// first"]];
-    WriteToFile[tempFile];
-    SetMainPrint[Global`pr["// second"]];
-    WriteToFile[tempFile];
+    SetMainPrint[pr["// first"]];
+    WriteToFile["emitTest", tempFile];
+    SetMainPrint[pr["// second"]];
+    WriteToFile["emitTest", tempFile];
     result = ReadString[tempFile];
     DeleteFile[tempFile];
     {StringContainsQ[result, "// first"], StringCount[result, "/* test_write_twice.hxx */"]},
@@ -245,11 +181,11 @@ AppendTo[$AllTests,
     SetPrintHeaderMacro[True];
     SetPrintDate[False];
     SetMainPrint[
-      Global`pr["// before"];
+      pr["// before"];
       Throw["stopped", emitTestTag];
-      Global`pr["// after"]
+      pr["// after"]
     ];
-    caught = Catch[WriteToFile[tempFile], emitTestTag];
+    caught = Catch[WriteToFile["emitTest", tempFile], emitTestTag];
     {caught, FileExistsQ[tempFile]},
     {"stopped", False},
     TestID -> "WriteToFile-NothingWrittenWhenBodyThrows"
@@ -266,15 +202,167 @@ AppendTo[$AllTests,
     SetPrintHeaderMacro[True];
     SetPrintDate[False];
     SetMainPrint[
-      Global`pr["// before"];
+      pr["// before"];
       Throw["stopped"];
-      Global`pr["// after"]
+      pr["// after"]
     ];
-    caught = Catch[WriteToFile[tempFile]; "NoThrow", GeneratoFailure];
+    caught = Catch[WriteToFile["emitTest", tempFile]; "NoThrow", GeneratoFailure];
     {caught, FileExistsQ[tempFile]},
     {$Failed, False},
     {WriteToFile::EThrow},
     TestID -> "WriteToFile-UntaggedThrowInBodyStops"
+  ]
+];
+
+(* ========================================= *)
+(* Test: pr *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* pr is a symbol of the package, so the pr a script writes is the one the write reads *)
+    {Context[pr], Names["Global`pr"]},
+    {"Generato`Emit`", {}},
+    TestID -> "pr-IsAPackageSymbol"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* pr[] is an empty line, and the lines are in the order of the calls *)
+    ResetContext[];
+    tempFile = FileNameJoin[{$TemporaryDirectory, "test_write_pr.hxx"}];
+    SetPrintHeaderMacro[False];
+    SetPrintDate[False];
+    SetMainPrint[
+      pr["// first"];
+      pr[];
+      pr["// second"]
+    ];
+    WriteToFile["emitTest", tempFile];
+    result = ReadString[tempFile];
+    DeleteFile[tempFile];
+    result,
+    "/* test_write_pr.hxx */\n" <>
+    "/* Produced with Generato */\n" <>
+    "\n" <>
+    "// first\n" <>
+    "\n" <>
+    "// second\n" <>
+    "\n" <>
+    "/* test_write_pr.hxx */\n",
+    TestID -> "pr-AddsALineToTheWrite"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* outside a write there is nothing to add a line to: the call stops, it is not inert *)
+    {
+      Catch[pr["// lost"]; "NoThrow", GeneratoFailure],
+      Catch[pr[]; "NoThrow", GeneratoFailure]
+    },
+    {$Failed, $Failed},
+    {pr::ENoWrite, pr::ENoWrite},
+    TestID -> "pr-OutsideAWrite-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* the lines of a write are let go when it ends, and when its main content stops *)
+    ResetContext[];
+    tempFile = FileNameJoin[{$TemporaryDirectory, "test_write_pr_stop.hxx"}];
+    If[FileExistsQ[tempFile], DeleteFile[tempFile]];
+    SetPrintDate[False];
+    SetMainPrint[pr["// before"]; Throw["stopped", emitTestTag]];
+    {
+      Catch[WriteToFile["emitTest", tempFile], emitTestTag],
+      Catch[pr["// after"]; "NoThrow", GeneratoFailure],
+      FileExistsQ[tempFile]
+    },
+    {"stopped", $Failed, False},
+    {pr::ENoWrite},
+    TestID -> "pr-LetGoWhenTheWriteStops"
+  ]
+];
+
+(* ========================================= *)
+(* Test: the backend of a write *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* the table of the named backend is held while the main content is evaluated, and let go after *)
+    ResetContext[];
+    tempFile = FileNameJoin[{$TemporaryDirectory, "test_write_backend.hxx"}];
+    SetPrintHeaderMacro[False];
+    SetPrintDate[False];
+    SetMainPrint[emitTable = CurrentBackend[]];
+    WriteToFile["emitTest", tempFile];
+    DeleteFile[tempFile];
+    {
+      emitTable === ResolveBackend["emitTest"],
+      Catch[CurrentBackend[]; "NoThrow", GeneratoFailure]
+    },
+    {True, $Failed},
+    {CurrentBackend::ENoWrite},
+    TestID -> "WriteToFile-HoldsTheBackendForTheWrite"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* the table is let go when the main content stops, too *)
+    ResetContext[];
+    tempFile = FileNameJoin[{$TemporaryDirectory, "test_write_backend_stop.hxx"}];
+    If[FileExistsQ[tempFile], DeleteFile[tempFile]];
+    SetPrintDate[False];
+    SetMainPrint[Throw["stopped", emitTestTag]];
+    {
+      Catch[WriteToFile["emitTest", tempFile], emitTestTag],
+      Catch[CurrentBackend[]; "NoThrow", GeneratoFailure]
+    },
+    {"stopped", $Failed},
+    {CurrentBackend::ENoWrite},
+    TestID -> "WriteToFile-LetsTheBackendGoWhenBodyStops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a backend that is not registered stops the write before the main content is evaluated *)
+    ResetContext[];
+    tempFile = FileNameJoin[{$TemporaryDirectory, "test_write_nobackend.hxx"}];
+    If[FileExistsQ[tempFile], DeleteFile[tempFile]];
+    SetPrintDate[False];
+    emitReached = False;
+    SetMainPrint[emitReached = True];
+    {
+      Catch[WriteToFile["emitTestNotRegistered", tempFile]; "NoThrow", GeneratoFailure],
+      emitReached,
+      FileExistsQ[tempFile]
+    },
+    {$Failed, False, False},
+    {ResolveBackend::EUnknown},
+    TestID -> "WriteToFile-UnregisteredBackend-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* the call a backend file used to end with, without a backend, stops and writes nothing *)
+    ResetContext[];
+    tempFile = FileNameJoin[{$TemporaryDirectory, "test_write_oldform.hxx"}];
+    If[FileExistsQ[tempFile], DeleteFile[tempFile]];
+    SetMainPrint[pr["// content"]];
+    {
+      Catch[WriteToFile[tempFile]; "NoThrow", GeneratoFailure],
+      FileExistsQ[tempFile]
+    },
+    {$Failed, False},
+    {WriteToFile::EBackend},
+    TestID -> "WriteToFile-WithoutABackend-Stops"
   ]
 ];
 

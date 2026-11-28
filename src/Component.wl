@@ -30,7 +30,7 @@ ComponentRecord::usage = "ComponentRecord[comp] returns the record of a componen
 
 BaseRecord::usage = "BaseRecord[variable] returns the record of the bound variable that a variable record declares a relation to, by DerivativeOf or by TimeDerivativeOf, or None if it declares none.";
 
-PrintComponent::usage = "PrintComponent[coordinate, variable, component, extrareplacerules] prints one component record of a bound variable through the backend, as an initialization or as an equation.";
+RequireChart::usage = "RequireChart[variable, component, coordinate] stops the run if a component record of the variable is not a component in the chart coordinate. The records of a variable are its components in the chart it was bound in; the component of a scalar carries no chart.";
 
 Is3DAbstractIndex::usage = "Is3DAbstractIndex[index] returns True if the abstract index represents a 3D spatial index (first letter >= 'i').";
 
@@ -262,39 +262,19 @@ Scan[
 Protect[GridTensors, TileTensors, TempTensors];
 
 (*
-  PrintComponent - hands one component record to the backend.
-  The records of a variable are its components in the chart it was bound
-  in. A print call that names another chart has no record to print, except
-  for a scalar, whose component carries no chart.
-  An initialization gets the records: the variable, the component, and the
-  variable a declared relation names, or None. An equation gets the
-  component in xAct's notation, the form a script that prints single
-  components writes; a backend reads the record of it with ComponentRecord.
+  RequireChart - a print call prints the records of a variable in one chart.
+  The records are the components in the chart the variable was bound in. A
+  print call that names another chart has no record to print, except for a
+  scalar, whose component carries no chart.
 *)
-PrintComponent[coordinate_, variable_Association, component_Association, extrareplacerules_] :=
-  Module[{compname = component["Comp"]},
-    If[ComponentName[variable, component["Indices"], coordinate] =!= compname,
-      Stop[PrintComponent::EChart, variable["Head"], coordinate]
-    ];
-    Which[
-      InInitializationsMode[],
-        PrintVerbose["    PrintComponentInitialization ", compname, "..."];
-        Global`PrintComponentInitialization[variable, component, BaseRecord[variable]]
-      ,
-      InEquationsMode[],
-        PrintVerbose["    PrintComponentEquation ", compname, "..."];
-        Global`PrintComponentEquation[coordinate, compname, extrareplacerules]
-      ,
-      True,
-        Stop[PrintComponent::EMode]
-    ]
+RequireChart[variable_Association, component_Association, coordinate_] :=
+  If[ComponentName[variable, component["Indices"], coordinate] =!= component["Comp"],
+    Stop[RequireChart::EChart, variable["Head"], coordinate]
   ];
 
-PrintComponent::EMode = "PrintMode unrecognized!";
+RequireChart::EChart = "Variable `1` has no components in chart `2`: it is bound in the default chart.";
 
-PrintComponent::EChart = "Variable `1` has no components in chart `2`: it is bound in the default chart.";
-
-Protect[PrintComponent];
+Protect[RequireChart];
 
 Is3DAbstractIndex[idx_] :=
   Module[{},

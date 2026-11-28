@@ -40,6 +40,14 @@ CheckRHS::usage = "CheckRHS is an option for SetEQN that specifies whether to ve
 
 SetEQNDelayed::usage = "SetEQNDelayed[var, varrhs] assigns varrhs to var$RHS using IndexSetDelayed.\nSetEQNDelayed[{SuffixName->suffix}, var, varrhs] assigns with a suffix.";
 
+ComputeRHSValue::usage = "ComputeRHSValue[coordinate, compname, suffix, extrareplacerules] computes the RHS value of the equation set for a component under the suffix name suffix, \"\" for an equation set without one.";
+
+GetGFIndexName::usage = "GetGFIndexName[index] converts integer index to GF index name (p1, m1, c0, etc.).";
+
+GetGFIndexNameMix2nd::usage = "GetGFIndexNameMix2nd[index1, index2] creates mixed 2nd derivative GF index name.";
+
+GetInterfaceName::usage = "GetInterfaceName[compname] returns the interface name for a component.";
+
 PrintVerbose::usage = "PrintVerbose[expr] prints expr if verbose mode is enabled.";
 
 Begin["`Private`"];
@@ -248,6 +256,72 @@ SetEQNDelayed[OptionsPattern[], var_, varrhs_] :=
   ];
 
 Protect[SetEQNDelayed];
+
+(*
+  ComputeRHSValue - Computes the RHS value for an equation
+  The suffix name selects which of the equations set for the variable is
+  evaluated; it is an argument, so nothing here reads a mode.
+*)
+ComputeRHSValue[coordinate_, compname_, suffix_String, extrareplacerules_] :=
+  Module[{rhssToValue},
+    rhssToValue =
+      (compname /. {compname[[0]] -> RHSOf[compname[[0]], suffix]}) //
+      DummyToBasis[coordinate] // TraceBasisDummy // ToValues;
+    If[GetSimplifyEquation[],
+      rhssToValue = rhssToValue // Simplify
+    ];
+    If[Length[extrareplacerules] > 0,
+      rhssToValue = (rhssToValue // ToValues) /. extrareplacerules
+    ];
+    rhssToValue
+  ];
+
+Protect[ComputeRHSValue];
+
+(*
+  The three functions below name a grid function at a stencil point and a
+  component at an interface. They were shared by backends that are gone:
+  nothing in src/ or codes/ calls them, and no test exercises them.
+*)
+
+(* GetGFIndexName - Converts integer index to GF index name *)
+GetGFIndexName[index_?IntegerQ] :=
+  Module[{gfindex},
+    gfindex =
+      Which[
+        index > 0, "p" <> ToString[index],
+        index < 0, "m" <> ToString[Abs[index]],
+        True, "c0"
+      ];
+    ToExpression[gfindex]
+  ];
+
+Protect[GetGFIndexName];
+
+(* GetGFIndexNameMix2nd - Creates mixed 2nd derivative GF index name *)
+GetGFIndexNameMix2nd[index1_?IntegerQ, index2_?IntegerQ] :=
+  Module[{gfindex},
+    gfindex = ToString[GetGFIndexName[index1]]
+           <> ToString[GetGFIndexName[index2]];
+    ToExpression[gfindex]
+  ];
+
+Protect[GetGFIndexNameMix2nd];
+
+(* GetInterfaceName - Returns the interface name for a component *)
+GetInterfaceName[compname_] :=
+  Module[{intfname = ToString[compname[[0]]], colist = {"t", "x", "y", "z"}, coindex},
+    Do[
+      coindex = compname[[icomp]][[1]];
+      intfname = intfname <> colist[[coindex + 1]]
+      ,
+      {icomp, 1, Length[compname]}
+    ];
+    intfname = ToString[CForm[ToExpression[intfname <> GetGridPointIndex[]]]];
+    Return[intfname];
+  ];
+
+Protect[GetInterfaceName];
 
 PrintVerbose[var__:""] :=
   Module[{},

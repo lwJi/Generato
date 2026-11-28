@@ -1,87 +1,82 @@
 (* ::Package:: *)
 
-(* Nmesh.wl, set up functions adapted to Nmesh code *)
+(* Nmesh.wl, the backend table of Nmesh code *)
 
 (* (c) Liwei Ji, 01/2024 *)
 
-(* One letter per slot of a variable: "x" for a spatial index, "t" for a spacetime one *)
-GetInitialComp[slots_List] :=
-  StringJoin[If[Is3DAbstractIndex[#], "x", "t"]& /@ slots];
-
 (*
-    Print initialization of each component of a tensor
+    The file is one DefineBackend call. Its formatters are bound by the Withs
+    around the call, so the file assigns no symbol. A formatter takes one
+    statement and returns its lines, and reads nothing else.
 
-    variable, component: the records of the variable and of the component.
-    base: the record of the variable a declared relation names, or None.
+    A variable is found by an index: the name of the variable, one letter per
+    slot, "x" for a spatial index and "t" for a spacetime one, which is the
+    index of its first component, and the slot of the component after that.
 
-    A variable is read at the index of its first component plus the slot of
-    the component. A right-hand side is stored at the index of the variable
-    it is the time derivative of, so "MainOut" needs TimeDerivativeOf.
+    A load brings one component into scope as a pointer of its bare name:
+
+      inLoad          an evolved variable is read from vlu, at its index in
+                      the project
+      outLoad         a right-hand side is read from vlr, at the index of the
+                      variable it is the time derivative of. It reads the
+                      relation, so it is registered with Requires
+      moreInOutLoad   any other variable of the node is read at its own index
+      declare         a temporary is declared, to be assigned later
+
+    A store is rendered by the defaults in src/Backend.wl: the table states no
+    "Store" key.
 *)
 
-PrintComponentInitialization[variable_, component_, base_] :=
-  Module[{mode = GetInitializationsMode[], name = component["Name"], initialcomp, offset},
-    initialcomp = GetInitialComp[variable["Slots"]];
-    offset =
-      If[component["Slot"] == 0,
-        ""
-        ,
-        "+" <> ToString[component["Slot"]]
-      ];
-    pr[
-      Which[
-        mode === "MainOut",
-          RequireRelation[variable, "TimeDerivativeOf", mode];
-          "double *" <> name <> " = Vard(node, Vind(vlr," <> ToString[GetProject[]] <> "->i_" <> base["Name"] <> initialcomp <> offset <> "));"
-        ,
-        mode === "MainIn",
-          "double *" <> name <> " = Vard(node, Vind(vlu," <> ToString[GetProject[]] <> "->i_" <> variable["Name"] <> initialcomp <> offset <> "));"
-        ,
-        mode === "MoreInOut",
-          "double *" <> name <> " = Vard(node, i" <> variable["Name"] <> initialcomp <> offset <> ");"
-        ,
-        mode === "Temp",
-          "double " <> name <> ";"
-        ,
-        True,
-          Stop[PrintComponentInitialization::EMode]
+With[
+  {
+    index =
+      Function[{name, statement},
+        name
+        <> StringJoin[If[Is3DAbstractIndex[#], "x", "t"]& /@ statement["Variable", "Slots"]]
+        <> If[statement["Component", "Slot"] == 0, "", "+" <> ToString[statement["Component", "Slot"]]]
       ]
-    ];
-  ];
+  },
+  With[
+    {
+      inLoad =
+        Function[statement,
+          {
+            "double *" <> statement["Component", "Name"]
+            <> " = Vard(node, Vind(vlu," <> statement["Config", "Project"]
+            <> "->i_" <> index[statement["Variable", "Name"], statement] <> "));"
+          }
+        ],
+      outLoad =
+        Function[statement,
+          {
+            "double *" <> statement["Component", "Name"]
+            <> " = Vard(node, Vind(vlr," <> statement["Config", "Project"]
+            <> "->i_" <> index[statement["Base", "Name"], statement] <> "));"
+          }
+        ],
+      moreInOutLoad =
+        Function[statement,
+          {
+            "double *" <> statement["Component", "Name"]
+            <> " = Vard(node, i" <> index[statement["Variable", "Name"], statement] <> ");"
+          }
+        ],
+      declare =
+        Function[statement,
+          {"double " <> statement["Component", "Name"] <> ";"}
+        ]
+    },
+    DefineBackend["Nmesh", <|
+      "Load" -> <|
+        "In" -> <|"Grid" -> inLoad|>,
+        "Out" -> <|"Grid" -> Requires["TimeDerivativeOf", outLoad]|>,
+        "MoreInOut" -> <|"Grid" -> moreInOutLoad|>,
+        "Temp" -> <|"Temp" -> declare|>
+      |>
+    |>]
+  ]
+];
 
-PrintComponentInitialization::EMode = "PrintComponentInitialization mode unrecognized!";
+(* Write to files *)
 
-Protect[PrintComponentInitialization];
-
-
-(******************************************************************************)
-(*               Print equation of each component of a tensor                 *)
-(******************************************************************************)
-(**
- * \param extrareplacerules: not needed in most of the cases, they are
- *        introduced to replace say coordinates representation of metric.
- *)
-
-PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
-  Module[{compToValue, rhssToValue},
-    compToValue = compname // ToValues;
-    rhssToValue = ComputeRHSValue[coordinate, compname, extrareplacerules];
-    PrintEquationByMode[compToValue, rhssToValue,
-      (* MainOut formatter - standard assignment *)
-      Function[{comp, rhs},
-        Global`pr[CText[comp]];
-        Global`pr["="];
-        Global`pr[CText[rhs]];
-        Global`pr[";\n"]
-      ]
-      (* Temp uses default: no const prefix, CForm[compToValue] *)
-    ]
-  ];
-
-Protect[PrintComponentEquation];
-
-(*
-    Write to files
-*)
-
-WriteToFile[GetOutputFile[]];
+WriteToFile["Nmesh", GetOutputFile[]];
