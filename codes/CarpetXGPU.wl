@@ -69,7 +69,3 @@ With[
     "Store" -> <|"Temp" -> <|All -> DeclareAssign|>|>
   |>]
 ];
-
-(* Write to files *)
-
-WriteToFile["CarpetXGPU", GetOutputFile[]];

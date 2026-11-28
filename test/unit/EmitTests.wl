@@ -23,6 +23,110 @@ emitLongSum = Sum[k Symbol["emitC" <> ToString[k]]^2, {k, 1, 40}];
 DefineBackend["emitTest", <||>];
 
 (* ========================================= *)
+(* Test: Emit *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a file is its header, the lines it was given and its footer; the name of the file is returned *)
+    ResetContext[];
+    tempFile = FileNameJoin[{$TemporaryDirectory, "test_emit.hxx"}];
+    SetPrintHeaderMacro[True];
+    SetPrintDate[False];
+    {
+      Emit[tempFile, {"// first", "", "// second"}] === tempFile,
+      result = ReadString[tempFile];
+      DeleteFile[tempFile];
+      result
+    },
+    {
+      True,
+      "/* test_emit.hxx */\n" <>
+      "/* Produced with Generato */\n" <>
+      "\n" <>
+      "#ifndef TEST_EMIT_HXX\n" <>
+      "#define TEST_EMIT_HXX\n" <>
+      "\n" <>
+      "// first\n" <>
+      "\n" <>
+      "// second\n" <>
+      "\n" <>
+      "#endif // #ifndef TEST_EMIT_HXX\n" <>
+      "\n" <>
+      "/* test_emit.hxx */\n"
+    },
+    TestID -> "Emit-HeaderLinesFooter"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* without the header macro, and with no lines, the file is its header and its footer; *)
+    (* the second line is the one Driver.wl knows a generated file by *)
+    ResetContext[];
+    tempFile = FileNameJoin[{$TemporaryDirectory, "test_emit_empty.c"}];
+    SetPrintHeaderMacro[False];
+    SetPrintDate[False];
+    Emit[tempFile, {}];
+    result = ReadString[tempFile];
+    DeleteFile[tempFile];
+    result,
+    "/* test_emit_empty.c */\n" <>
+    "/* Produced with Generato */\n" <>
+    "\n" <>
+    "\n" <>
+    "/* test_emit_empty.c */\n",
+    TestID -> "Emit-NoLinesNoHeaderMacro"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* the whitespace that ends a line is stripped, inside an entry of several lines too; *)
+    (* an earlier file at the path is replaced, not appended to *)
+    ResetContext[];
+    tempFile = FileNameJoin[{$TemporaryDirectory, "test_emit_strip.hxx"}];
+    SetPrintHeaderMacro[False];
+    SetPrintDate[False];
+    Emit[tempFile, {"// earlier"}];
+    Emit[tempFile, {"const double ", "x \t", "=", "a +  \n  b", ";", "", "  indented"}];
+    result = ReadString[tempFile];
+    DeleteFile[tempFile];
+    result,
+    "/* test_emit_strip.hxx */\n" <>
+    "/* Produced with Generato */\n" <>
+    "\n" <>
+    "const double\n" <>
+    "x\n" <>
+    "=\n" <>
+    "a +\n" <>
+    "  b\n" <>
+    ";\n" <>
+    "\n" <>
+    "  indented\n" <>
+    "\n" <>
+    "/* test_emit_strip.hxx */\n",
+    TestID -> "Emit-StripsTrailingWhitespaceAndReplaces"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* the date is in the second line when it is asked for, after the text Driver.wl looks for *)
+    ResetContext[];
+    tempFile = FileNameJoin[{$TemporaryDirectory, "test_emit_date.hxx"}];
+    SetPrintDate[True];
+    Emit[tempFile, {}];
+    result = StringSplit[ReadString[tempFile], "\n"][[2]];
+    DeleteFile[tempFile];
+    SetPrintDate[False];
+    StringMatchQ[result, "/* Produced with Generato on " ~~ DigitCharacter.. ~~ "/" ~~ DigitCharacter.. ~~ "/" ~~ DigitCharacter.. ~~ " */"],
+    True,
+    TestID -> "Emit-DateInTheSecondLine"
+  ]
+];
+
+(* ========================================= *)
 (* Test: SetMainPrint / GetMainPrint *)
 (* ========================================= *)
 
@@ -363,6 +467,51 @@ AppendTo[$AllTests,
     {$Failed, False},
     {WriteToFile::EBackend},
     TestID -> "WriteToFile-WithoutABackend-Stops"
+  ]
+];
+
+(* ========================================= *)
+(* Test: RequireMainPrintWritten *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a script that set no main content has nothing to be written *)
+    ResetContext[];
+    Catch[RequireMainPrintWritten[]; "NoThrow", GeneratoFailure],
+    "NoThrow",
+    TestID -> "RequireMainPrintWritten-NoMainPrint-Passes"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a main content that no WriteToFile wrote stops the run: the script that ends by importing a backend file *)
+    ResetContext[];
+    SetMainPrint[pr["// never written"]];
+    Catch[RequireMainPrintWritten[]; "NoThrow", GeneratoFailure],
+    $Failed,
+    {RequireMainPrintWritten::EUnwritten},
+    TestID -> "RequireMainPrintWritten-UnwrittenMainPrint-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a main content WriteToFile wrote passes, and one set after that write does not *)
+    ResetContext[];
+    tempFile = FileNameJoin[{$TemporaryDirectory, "test_require_written.hxx"}];
+    SetMainPrint[pr["// written"]];
+    WriteToFile["emitTest", tempFile];
+    DeleteFile[tempFile];
+    {
+      Catch[RequireMainPrintWritten[]; "NoThrow", GeneratoFailure],
+      SetMainPrint[pr["// set after the write"]];
+      Catch[RequireMainPrintWritten[]; "NoThrow", GeneratoFailure]
+    },
+    {"NoThrow", $Failed},
+    {RequireMainPrintWritten::EUnwritten},
+    TestID -> "RequireMainPrintWritten-WrittenMainPrint-Passes"
   ]
 ];
 

@@ -575,6 +575,20 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
+    (* a record is that of a bound variable once a binding has given it storage: the record of a declaration *)
+    (* has none yet, and a head that is not declared has no record *)
+    {
+      BoundQ[DeclaredVariable[compTestM]],
+      BoundQ[ParseVar[{compTestNotDeclared[i]}]],
+      BoundQ[DeclaredVariable[compTestNotDeclared]]
+    },
+    {True, False, False},
+    TestID -> "BoundQ-StorageMakesARecordBound"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
     (* the mirror of a symmetric pair has no record *)
     Catch[
       ComponentRecord[compTestM[{3, -testCart}, {2, -testCart}]];

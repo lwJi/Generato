@@ -7,8 +7,8 @@
 (*
   The driver does the two things a script cannot do for itself.
   - It owns the output path before the run. A file an earlier run generated
-    is removed before the script starts, and WriteToFile in Emit.wl writes
-    the new one only after its last line is built. So a run that fails leaves
+    is removed before the script starts, and Emit in Emit.wl writes the new
+    one only after its last line is built. So a run that fails leaves
     no file, and no failure path has to delete one.
   - It sets the exit status. wolframscript exits 0 when a script ends in an
     uncaught throw or is aborted, so the driver catches every such ending
@@ -24,7 +24,7 @@ Begin["Generato`Driver`"];
 (* A generated file is named after its script and has one of these extensions. *)
 $OutputExtensions = {".hxx", ".cxx", ".c", ".h"};
 
-(* The second line of a generated file starts with this text: the header WriteToFile prints in Emit.wl. *)
+(* The second line of a generated file starts with this text: the header Emit writes in Emit.wl. *)
 $GeneratedMark = "/* Produced with Generato";
 
 GeneratedFileQ[file_String] :=
@@ -78,6 +78,10 @@ ReportEnding[script_, value_] :=
   - an abort, by CheckAbort;
   - a syntax error, after which Get returns as if the file had ended there,
     by Check.
+  A script that ran to its end may still have written nothing: one that set
+  a main content no backend file wrote. RequireMainPrintWritten in Emit.wl
+  stops that run, through Stop like any other failure. It is named by its
+  full context and is inert when the script did not load Generato.
 *)
 RunScript[script_String] :=
   Module[{ending},
@@ -89,6 +93,7 @@ RunScript[script_String] :=
             CheckAbort[
               Check[
                 Get[ExpandFileName[script]];
+                Generato`Emit`RequireMainPrintWritten[];
                 ranToEnd
                 ,
                 unreadable

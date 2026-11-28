@@ -16,6 +16,8 @@ Needs["Generato`Backend`"];
 
 Needs["Generato`Emit`"];
 
+Needs["Generato`Program`"];
+
 If[Environment["QUIET"] =!= "1",
   System`Print["------------------------------------------------------------"];
   System`Print["Package Generato`Interface`, {2024, 1, 11}"];
@@ -48,10 +50,10 @@ PrintVarlist[varlist_List, print_] :=
   ];
 
 (*
-  The print calls are an adapter: each builds one statement per component
-  and prints the lines the backend of the write under way renders it to.
-  They hold no formatting, and they are deleted when a script hands Generate
-  its program.
+  The print calls are an adapter: each has Program.wl build one statement
+  per component and prints the lines the backend of the write under way
+  renders it to. They hold no formatting, and they are deleted when no
+  script holds its main content any more.
 
   A mode of the old print calls is a mode of a Store statement. caller is
   the print call whose mode it is, and its message says what it accepts.
@@ -65,30 +67,10 @@ StoreMode[caller_Symbol, mode_] :=
     Stop[MessageName[caller, "EMode"], mode]
   ];
 
-(*
-  StoreStatement - one component and its right-hand side as a statement.
-  The statement is self-contained: it carries the records, the evaluated
-  right-hand side and a copy of the user configuration, so the formatter
-  that gets it reads nothing else. The replace rules are applied to the
-  right-hand side and to what the equation assigns to, the "Expr" of the
-  statement's copy of the component record; the "Name" a declaration prints
-  is not rewritten.
-*)
-StoreStatement[mode_String, suffixname_String, coordinate_, variable_Association, component_Association, extrareplacerules_] :=
-  <|
-    "Kind" -> "Store",
-    "Mode" -> mode,
-    "Variable" -> variable,
-    "Component" -> MapAt[ReplaceAll[extrareplacerules], component, "Expr"],
-    "Base" -> BaseRecord[variable],
-    "RHS" -> ComputeRHSValue[coordinate, component["Comp"], suffixname, extrareplacerules],
-    "Config" -> GetConfiguration[]
-  |>;
-
 PrintStore[table_Association, mode_String, suffixname_String, coordinate_, variable_Association, component_Association, extrareplacerules_] :=
   Module[{},
     PrintVerbose["    PrintComponentEquation ", component["Comp"], "..."];
-    Scan[pr, Render[table, {StoreStatement[mode, suffixname, coordinate, variable, component, extrareplacerules]}]]
+    Scan[pr, Render[table, {StoreStatement[GetConfiguration[], mode, suffixname, coordinate, variable, component, extrareplacerules]}]]
   ];
 
 (**
@@ -180,25 +162,13 @@ LoadKey[mode_, storagetype_] :=
   Replace[{mode, storagetype}, Append[$LoadKeys, _ :> Stop[PrintInitializations::EMode, mode, storagetype]]];
 
 (*
-  LoadStatement - one component to bring into scope, as a statement.
-  It is self-contained, like a Store statement, and has no right-hand side.
-  The storage is written over the statement's copy of the variable record;
-  the record binding wrote is left as it is.
+  The storage of a load is written over the copy of the variable record the
+  statement is given; the record binding wrote is left as it is.
 *)
-LoadStatement[mode_String, storage_String, variable_Association, component_Association] :=
-  <|
-    "Kind" -> "Load",
-    "Mode" -> mode,
-    "Variable" -> ReplacePart[variable, "Storage" -> storage],
-    "Component" -> component,
-    "Base" -> BaseRecord[variable],
-    "Config" -> GetConfiguration[]
-  |>;
-
 PrintLoad[table_Association, mode_String, storage_String, variable_Association, component_Association] :=
   Module[{},
     PrintVerbose["    PrintInitialization ", component["Comp"], "..."];
-    Scan[pr, Render[table, {LoadStatement[mode, storage, variable, component]}]]
+    Scan[pr, Render[table, {LoadStatement[GetConfiguration[], mode, ReplacePart[variable, "Storage" -> storage], component]}]]
   ];
 
 (**

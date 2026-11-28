@@ -24,6 +24,8 @@ TileTensors::usage = "TileTensors[var1, var2, ...] declares tensors, binds them 
 
 TempTensors::usage = "TempTensors[var1, var2, ...] declares tensors, binds them as temporaries (C names carry no point index), and returns the varlist.";
 
+BoundQ::usage = "BoundQ[variable] returns True if variable is the record of a bound variable: what DeclaredVariable returns for a head once a binding has given it \"Storage\". It is False for the record of a variable that is declared and not bound, and for what DeclaredVariable returns for a head that is not declared.";
+
 VariableRecord::usage = "VariableRecord[head] returns the record of a bound variable.\nVariableRecord[var] returns the record of the bound variable a var spec names. It stops the run if the variable is not bound.";
 
 ComponentRecord::usage = "ComponentRecord[comp] returns the record of a component written in xAct's notation, say gam[{1, -cart}, {2, -cart}]. It stops the run if comp is not an independent component of a bound variable.";
@@ -73,13 +75,16 @@ Protect[IndependentIndices];
   is what an equation refers to, which carries the point index of the storage.
 
   VariableRecord is what a print call reads. A variable that is declared and
-  not bound has a record without "Storage", and nothing to print.
+  not bound has a record without "Storage", and nothing to print; BoundQ
+  tells the two apart without stopping.
   ComponentRecord finds one component record from the component in xAct's
   notation, through its head. BaseRecord follows a declared relation to the
   record of the variable it names.
 *)
 BoundQ[variable_] :=
   AssociationQ[variable] && KeyExistsQ[variable, "Storage"];
+
+Protect[BoundQ];
 
 VariableRecord[head_Symbol] :=
   With[{variable = DeclaredVariable[head]},

@@ -1,8 +1,8 @@
 (* ::Package:: *)
 
 (* BackendTests.wl *)
-(* Unit tests for Generato`Backend module: CText, the store formatters, the registry and its merge, Render and Requires, *)
-(* and for the load formatters of the backends in codes/ *)
+(* Unit tests for Generato`Backend module: CText, the store formatters, the registry, its merge and the files it reads, *)
+(* the lookup of a formatter, Render and Requires, and for the load formatters of the backends in codes/ *)
 (* A formatter is a function of one statement, so it is tested on a literal record: no tensor is declared here *)
 (* The registry lasts as long as the kernel, so each backend registered here has a name of its own *)
 
@@ -225,7 +225,7 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    (* a name that is not registered stops *)
+    (* a name that is not registered, and that codes/ has no file for, stops *)
     Catch[
       ResolveBackend["backendTestNotRegistered"];
       "NoThrow",
@@ -234,6 +234,90 @@ AppendTo[$AllTests,
     $Failed,
     {ResolveBackend::EUnknown},
     TestID -> "ResolveBackend-NotRegistered-Stops"
+  ]
+];
+
+(* ========================================= *)
+(* Test: a name that is not registered is read from its file *)
+(* ========================================= *)
+
+(*
+  backendTestWithCodes - evaluates body with a directory of its own in the
+  place of codes/, holding the files given as name -> text. Where the
+  backends of Generato are is private to Backend.wl, so that is where the
+  directory is put.
+*)
+SetAttributes[backendTestWithCodes, HoldRest];
+
+backendTestWithCodes[files_Association, body_] :=
+  Module[{directory = CreateDirectory[]},
+    KeyValueMap[Export[FileNameJoin[{directory, #1 <> ".wl"}], #2, "Text"]&, files];
+    WithCleanup[
+      Block[{Generato`Backend`Private`$CodesDirectory = directory}, body]
+      ,
+      DeleteDirectory[directory, DeleteContents -> True]
+    ]
+  ];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* the backends of Generato are the files of codes/, beside src/ *)
+    Generato`Backend`Private`$CodesDirectory,
+    FileNameJoin[{Environment["GENERATO"], "codes"}],
+    SameTest -> (ExpandFileName[#1] === ExpandFileName[#2]&),
+    TestID -> "ResolveBackend-CodesDirectory"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* the file of the name is read, and the table it registers is resolved like any other; *)
+    (* a backend that extends one not registered has its file read the same way *)
+    backendTestWithCodes[
+      <|
+        "backendTestFromFile" -> "DefineBackend[\"backendTestFromFile\", <|\"Store\" -> <|\"Temp\" -> <|All -> DeclareAssign|>|>|>];",
+        "backendTestFromFileBase" -> "DefineBackend[\"backendTestFromFileBase\", <|\"Store\" -> <|\"Out\" -> <|All -> AddAssign|>|>|>];"
+      |>,
+      DefineBackend["backendTestExtendsFile", <|"Extends" -> "backendTestFromFileBase"|>];
+      {
+        ResolveBackend["backendTestFromFile"],
+        ResolveBackend["backendTestExtendsFile"]["Store", "Out"]
+      }
+    ],
+    {
+      <|
+        "Store" -> <|"Out" -> <|All -> Assign|>, "AddTo" -> <|All -> AddAssign|>, "Temp" -> <|All -> DeclareAssign|>|>,
+        "Name" -> "backendTestFromFile"
+      |>,
+      <|All -> AddAssign|>
+    },
+    TestID -> "ResolveBackend-NotRegistered-ReadsItsFile"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a name that is registered is not read from a file: what a script registers is found first *)
+    backendTestWithCodes[
+      <|"backendTestPlain" -> "backendTestFileWasRead = True;"|>,
+      backendTestFileWasRead = False;
+      {ResolveBackend["backendTestPlain"]["Name"], backendTestFileWasRead}
+    ],
+    {"backendTestPlain", False},
+    TestID -> "ResolveBackend-Registered-ReadsNoFile"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a file that does not register the name it has stops *)
+    backendTestWithCodes[
+      <|"backendTestMisnamed" -> "DefineBackend[\"backendTestAnotherName\", <||>];"|>,
+      Catch[ResolveBackend["backendTestMisnamed"]; "NoThrow", GeneratoFailure]
+    ],
+    $Failed,
+    {ResolveBackend::EFile},
+    TestID -> "ResolveBackend-FileRegistersAnotherName-Stops"
   ]
 ];
 
@@ -376,6 +460,31 @@ AppendTo[$AllTests,
     Render[backendTestTable, {}],
     {},
     TestID -> "Render-NoStatements"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* the modes a table accepts for a kind are its keys there; a kind it lacks has none *)
+    {AcceptedModes[backendTestTable, "Store"], AcceptedModes[backendTestTable, "Load"]},
+    {{"Out", "Temp"}, {}},
+    TestID -> "AcceptedModes-AreTheKeysOfTheKind"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* the formatter for a storage is the one at its key, or the one for any storage; *)
+    (* where there is none, what is returned says which storages the mode has, and stops nothing *)
+    {
+      FindFormatter[backendTestTable, "Store", "Out", "Tile"] === backendTestTable["Store", "Out", "Tile"],
+      FindFormatter[backendTestTable, "Store", "Out", "Grid"] === backendTestTable["Store", "Out", All],
+      FindFormatter[backendTestTable, "Store", "Temp", "Grid"],
+      FindFormatter[backendTestTable, "Store", "AddTo", "Grid"],
+      FindFormatter[backendTestTable, "Load", "In", "Grid"]
+    },
+    {True, True, Missing["NoFormatter", {"Temp"}], Missing["NoFormatter", {}], Missing["NoFormatter", {}]},
+    TestID -> "FindFormatter-StorageThenAnyThenMissing"
   ]
 ];
 
@@ -618,17 +727,13 @@ AppendTo[$AllTests,
 (* ========================================= *)
 
 (*
-  A backend file registers its table and then starts the write of the
-  script that imported it. Here the file is read for its table only, so the
-  write is held back.
+  A backend file is one DefineBackend call, and ResolveBackend reads it when
+  its name is first asked for: nothing here loads CarpetXGPU or AMReX.
+  The file of Nmesh still ends by starting the write of the script that
+  imported it. Here it is read for its table only, so the write is held back.
 *)
-Scan[
-  Function[name,
-    Block[{WriteToFile},
-      Get[FileNameJoin[{Environment["GENERATO"], "codes", name <> ".wl"}]]
-    ]
-  ],
-  {"CarpetXGPU", "AMReX", "Nmesh"}
+Block[{WriteToFile},
+  Get[FileNameJoin[{Environment["GENERATO"], "codes", "Nmesh.wl"}]]
 ];
 
 AppendTo[$AllTests,

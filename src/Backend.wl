@@ -16,7 +16,11 @@ CText::usage = "CText[expr] returns expr as C text, wrapped at 78 columns with n
 
 DefineBackend::usage = "DefineBackend[name, table] registers a backend under name. table states what differs from what the backend builds on: the backend table[\"Extends\"] names, or $BackendDefaults. A formatter is at table[kind][mode][storage], where kind is \"Load\" or \"Store\" and storage is \"Grid\", \"Tile\", \"Temp\" or All for any; the keys of a table are what the backend accepts. Registering has no effect on output, and a name registered again replaces the earlier table.";
 
-ResolveBackend::usage = "ResolveBackend[name] returns the table of a registered backend, merged key by key, down to the storage, with the backend it extends or with $BackendDefaults. The table carries \"Name\" -> name. It stops the run if no backend of that name is registered.";
+ResolveBackend::usage = "ResolveBackend[name] returns the table of a backend, merged key by key, down to the storage, with the backend it extends or with $BackendDefaults. The table carries \"Name\" -> name. A name that is not registered is looked for in the codes directory of Generato: the file name.wl there is loaded, and it must register the name. It stops the run if the name is not registered and there is no such file.";
+
+AcceptedModes::usage = "AcceptedModes[table, kind] returns the modes a resolved backend table accepts for a kind of statement, \"Load\" or \"Store\": the keys of table[kind].";
+
+FindFormatter::usage = "FindFormatter[table, kind, mode, storage] returns the formatter a resolved backend table has for a kind of statement, a mode and the storage of a variable: the one at table[kind][mode][storage], or at All if the storage has no key. If there is none it returns Missing[\"NoFormatter\", storages], with the storages the table has a formatter for under the kind and the mode.";
 
 Render::usage = "Render[table, statements] returns the lines of a list of statements. A string is a line and passes through; a statement record is handed to the formatter at table[kind][mode][storage of its variable], or at All if the storage has no key. It stops the run if the table has no such formatter, or if the formatter is marked with Requires and the variable of the statement does not declare the relation.";
 
@@ -164,7 +168,7 @@ Protect[$BackendDefaults];
 (*
   The registry: name -> table as DefineBackend was given it. It is private
   to this file; DefineBackend is its one writer and ResolveBackend its one
-  reader.
+  reader, through RegisteredTable.
 *)
 $Backends = <||>;
 
@@ -182,14 +186,42 @@ Protect[DefineBackend];
 MergeTables[base_Association, table_Association] :=
   Merge[{base, table}, If[MatchQ[#, {_Association, _Association}], MergeTables @@ #, Last[#]]&];
 
+(*
+  The backends of Generato are the files of codes/, beside src/: the file
+  <name>.wl there is one DefineBackend call that registers <name>. This is
+  the one place that says where they are.
+*)
+$CodesDirectory = FileNameJoin[{ParentDirectory[DirectoryName[$InputFileName]], "codes"}];
+
+BackendFile[name_String] :=
+  FileNameJoin[{$CodesDirectory, name <> ".wl"}];
+
+(*
+  RegisteredTable - the table DefineBackend was given under a name, or None.
+  A name that is not registered may be a backend of Generato whose file has
+  not been read yet, so the file is read and the name is looked up again. A
+  script selects a backend by its name and imports no file; one it registers
+  itself is found first.
+*)
+RegisteredTable[name_String] :=
+  Module[{file = BackendFile[name]},
+    If[!KeyExistsQ[$Backends, name] && FileExistsQ[file],
+      Get[file];
+      If[!KeyExistsQ[$Backends, name],
+        Stop[ResolveBackend::EFile, name, file]
+      ]
+    ];
+    Lookup[$Backends, name, None]
+  ];
+
 ResolveBackend[name_String] :=
   ResolveBackend[name, {}];
 
 (* extending: the names on the way here, so a backend that extends itself stops *)
 ResolveBackend[name_String, extending_List] :=
-  Module[{table = Lookup[$Backends, name, None], base},
+  Module[{table = RegisteredTable[name], base},
     If[table === None,
-      Stop[ResolveBackend::EUnknown, name, Keys[$Backends]]
+      Stop[ResolveBackend::EUnknown, name, Keys[$Backends], BackendFile[name]]
     ];
     If[MemberQ[extending, name],
       Stop[ResolveBackend::ECycle, name, Append[extending, name]]
@@ -203,18 +235,36 @@ ResolveBackend[name_String, extending_List] :=
     Append[MergeTables[base, KeyDrop[table, "Extends"]], "Name" -> name]
   ];
 
-ResolveBackend::EUnknown = "No backend is registered as \"`1`\". DefineBackend[name, table] registers one; registered are `2`.";
+ResolveBackend::EUnknown = "No backend is registered as \"`1`\", and Generato has no file `3` for it. DefineBackend[name, table] registers one; registered are `2`.";
+
+ResolveBackend::EFile = "The file `2` does not register a backend named \"`1`\". The file of a backend is one DefineBackend[\"`1`\", table] call.";
 
 ResolveBackend::ECycle = "Backend \"`1`\" extends itself: `2`.";
 
 Protect[ResolveBackend];
 
-(* The formatter of a statement: the one for the storage of its variable, or the one for any storage *)
+(*
+  What a table accepts is what it has keys for. AcceptedModes and
+  FindFormatter are the one statement of how a key is looked up: Render
+  reads a formatter through them, and so does whoever checks a program
+  before anything is rendered.
+*)
+AcceptedModes[table_Association, kind_String] :=
+  Keys[Lookup[table, kind, <||>]];
+
+(* The formatter for a storage: the one at its key, or the one for any storage *)
+FindFormatter[table_Association, kind_String, mode_String, storage_] :=
+  With[{bystorage = Lookup[Lookup[table, kind, <||>], mode, <||>]},
+    Lookup[bystorage, storage, Lookup[bystorage, All, Missing["NoFormatter", Keys[bystorage]]]]
+  ];
+
+Protect[AcceptedModes, FindFormatter];
+
+(* The formatter of a statement *)
 Formatter[table_Association, statement_Association] :=
-  Module[{kind = statement["Kind"], mode = statement["Mode"], storage = statement["Variable", "Storage"], bystorage, formatter},
-    bystorage = Lookup[Lookup[table, kind, <||>], mode, <||>];
-    formatter = Lookup[bystorage, storage, Lookup[bystorage, All, None]];
-    If[formatter === None,
+  Module[{kind = statement["Kind"], mode = statement["Mode"], storage = statement["Variable", "Storage"], formatter},
+    formatter = FindFormatter[table, kind, mode, storage];
+    If[MissingQ[formatter],
       Stop[Render::EKey, table["Name"], kind, mode, storage]
     ];
     formatter

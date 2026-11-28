@@ -1,7 +1,7 @@
 (* ::Package:: *)
 
 (* testModes.wl *)
-(* Integration test for the "Temp" initialization and the "AddToMainOut" equation *)
+(* Integration test for the "Temp" load and the "AddTo" store *)
 
 (* (c) Liwei Ji, 11/2026 *)
 
@@ -45,27 +45,23 @@ SetEQN[{SuffixName -> "otherwise"}, vU[i_], uU[i]];
 
 SetEQN[rU[i_], vU[i]];
 
-SetOutputFile[FileNameJoin[{Directory[], "testModes.hxx"}]];
-
-SetMainPrint[
-  pr[];
-  PrintInitializations[{Mode -> "MainOut"}, dtEvolVarlist];
-  PrintInitializations[{Mode -> "MainIn"}, EvolVarlist];
-  PrintInitializations[{Mode -> "MainIn"}, MoreInVarlist];
-  pr[];
+Generate["CarpetXGPU", "testModes.hxx", {
+  "",
+  Load[dtEvolVarlist, "Out"],
+  Load[EvolVarlist, "In"],
+  Load[MoreInVarlist, "In"],
+  "",
   (* Declare the temporaries, then assign them in a branch *)
-  PrintInitializations[{Mode -> "Temp"}, TempVarlist];
-  pr[];
-  pr["if(Msqr)"];
-  pr["{"];
-  PrintEquations[{Mode -> "MainOut", SuffixName -> "Msqr"}, TempVarlist];
-  pr["}"];
-  pr["else"];
-  pr["{"];
-  PrintEquations[{Mode -> "MainOut", SuffixName -> "otherwise"}, TempVarlist];
-  pr["}"];
-  pr[];
-  PrintEquations[{Mode -> "AddToMainOut"}, dtEvolVarlist];
-];
-
-Import[FileNameJoin[{Environment["GENERATO"], "codes/CarpetXGPU.wl"}]];
+  Load[TempVarlist, "Temp"],
+  "",
+  "if(Msqr)",
+  "{",
+  Store[TempVarlist, "Out", SuffixName -> "Msqr"],
+  "}",
+  "else",
+  "{",
+  Store[TempVarlist, "Out", SuffixName -> "otherwise"],
+  "}",
+  "",
+  Store[dtEvolVarlist, "AddTo"]
+}];

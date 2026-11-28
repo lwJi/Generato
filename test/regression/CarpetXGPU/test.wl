@@ -45,26 +45,22 @@ SetEQN[{SuffixName -> "Msqr"}, rU[i_], euclid[i, k] MDD[-k, -j] vU[j]];
 
 SetEQN[{SuffixName -> "otherwise"}, rU[i_], vU[i]];
 
-SetOutputFile[FileNameJoin[{Directory[], "test.hxx"}]];
-
 (* SetProject["CarpetX"]; *)
 
-SetMainPrint[
-  pr[];
-  PrintInitializations[{Mode -> "MainOut"}, dtEvolVarlist];
-  PrintInitializations[{Mode -> "MainIn"}, EvolVarlist];
-  PrintInitializations[{Mode -> "MainIn"}, MoreInVarlist];
-  pr[];
-  PrintEquations[{Mode -> "Temp"}, TempVarlist];
-  pr[];
-  pr["if(Msqr)"];
-  pr["{"];
-  PrintEquations[{Mode -> "MainOut", SuffixName -> "Msqr", ChartName -> cart}, dtEvolVarlist];
-  pr["}"];
-  pr["else"];
-  pr["{"];
-  PrintEquations[{Mode -> "MainOut", SuffixName -> "otherwise"}, dtEvolVarlist];
-  pr["}"];
-];
-
-Import[FileNameJoin[{Environment["GENERATO"], "codes/CarpetXGPU.wl"}]];
+Generate["CarpetXGPU", "test.hxx", {
+  "",
+  Load[dtEvolVarlist, "Out"],
+  Load[EvolVarlist, "In"],
+  Load[MoreInVarlist, "In"],
+  "",
+  Store[TempVarlist, "Temp"],
+  "",
+  "if(Msqr)",
+  "{",
+  Store[dtEvolVarlist, "Out", SuffixName -> "Msqr", ChartName -> cart],
+  "}",
+  "else",
+  "{",
+  Store[dtEvolVarlist, "Out", SuffixName -> "otherwise"],
+  "}"
+}];

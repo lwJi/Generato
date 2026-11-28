@@ -36,9 +36,9 @@ TempVarlist = TempTensors[{vU[i], PrintAs -> "v"}];
 (*
     v^i = M^i_j u^j     for i = 1, 2
     The right-hand side of v^3 ends the way an xAct error does: a message,
-    then a throw that Generato did not raise. It is evaluated when the
-    equation is printed, after the header, the initializations and the first
-    two components have been built.
+    then a throw that Generato did not raise. The program passes its check,
+    since vU has an equation; the throw comes when the right-hand sides are
+    evaluated, after those of the first two components.
 *)
 
 vU::nocomp = "No right-hand side for component `1` of vU.";
@@ -53,17 +53,13 @@ SetEQNDelayed[vU[i_],
 
 SetEQN[rU[i_], vU[i]];
 
-SetOutputFile[FileNameJoin[{Directory[], "failInEquation.hxx"}]];
-
-SetMainPrint[
-  pr[];
-  PrintInitializations[{Mode -> "MainOut"}, dtEvolVarlist];
-  PrintInitializations[{Mode -> "MainIn"}, EvolVarlist];
-  PrintInitializations[{Mode -> "MainIn"}, MoreInVarlist];
-  pr[];
-  PrintEquations[{Mode -> "Temp"}, TempVarlist];
-  pr[];
-  PrintEquations[{Mode -> "MainOut"}, dtEvolVarlist];
-];
-
-Import[FileNameJoin[{Environment["GENERATO"], "codes/CarpetXGPU.wl"}]];
+Generate["CarpetXGPU", "failInEquation.hxx", {
+  "",
+  Load[dtEvolVarlist, "Out"],
+  Load[EvolVarlist, "In"],
+  Load[MoreInVarlist, "In"],
+  "",
+  Store[TempVarlist, "Temp"],
+  "",
+  Store[dtEvolVarlist, "Out"]
+}];
