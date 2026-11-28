@@ -49,7 +49,9 @@ GetFiniteDifferenceCoefficients[sample_?ListQ, order_?IntegerQ] := Module[{numPo
   (* Number of points in the sample *)
   numPoints = Length[sample];
 
-  (* Ensure the sample has enough points for the desired order *)
+  (* Ensure the sample has enough points for the desired order.
+     $Failed is the answer for a sample that is too short, not a failure of
+     generation, so this site does not go through Stop. *)
   If[numPoints < order + 1,
     Message[GetFiniteDifferenceCoefficients::shortSample];
     Return[$Failed];

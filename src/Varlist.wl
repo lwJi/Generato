@@ -4,6 +4,8 @@
 
 BeginPackage["Generato`Varlist`"];
 
+Needs["Generato`Failure`"];
+
 Needs["Generato`Basic`"];
 
 Needs["Generato`ParseMode`"];
@@ -57,11 +59,11 @@ ParseVarlist[OptionsPattern[], varlist_?ListQ, chartname_] :=
         If[InSetCompPhase[],
           DefineTensor[varname, symmetry, printname]
           ,
-          Throw @ Message[ParseVarlist::ETensorNonExist, ivar, varname]
+          Stop[ParseVarlist::ETensorNonExist, ivar, varname]
         ]
         ,
         If[!MemberQ[Keys[GetMapComponentToVarlist[]][[All, 0]], varname[[0]]],
-          Throw @ Message[ParseVarlist::ETensorExistOutside, ivar, varname]
+          Stop[ParseVarlist::ETensorExistOutside, ivar, varname]
         ]
       ];
       parseComponentValue[compindexlist_] := ParseComponent[varinfo, compindexlist, chartname, extrareplacerules];
@@ -82,7 +84,7 @@ ParseVarlist[OptionsPattern[], varlist_?ListQ, chartname_] :=
                 Do[parseComponentValue[{ia, ib}], {ia, iMin, iMax}, {ib, ia + 1, iMax}]
               ,
               _,
-                Throw @ Message[ParseVarlist::ESymmetryType, ivar, varname]
+                Stop[ParseVarlist::ESymmetryType, ivar, varname]
             ];
             varname //
             ToBasis[chartname] //
@@ -104,7 +106,7 @@ ParseVarlist[OptionsPattern[], varlist_?ListQ, chartname_] :=
                     Do[parseComponentValue[{ic, ia, ib}], {ic, iMin, iMax}, {ia, iMin, iMax}, {ib, ia + 1, iMax}]
                   ,
                   _,
-                    Throw @ Message[ParseVarlist::ESymmetryType, ivar, varname]
+                    Stop[ParseVarlist::ESymmetryType, ivar, varname]
                 ]
               ,
               (symindex[[1]] === varname[[1]]) && (symindex[[2]] === varname[[2]])(*(ab)c or [ab]c*),
@@ -116,11 +118,11 @@ ParseVarlist[OptionsPattern[], varlist_?ListQ, chartname_] :=
                     Do[parseComponentValue[{ia, ib, ic}], {ia, iMin, iMax}, {ib, ia + 1, iMax}, {ic, iMin, iMax}]
                   ,
                   _,
-                    Throw @ Message[ParseVarlist::ESymmetryType, ivar, varname]
+                    Stop[ParseVarlist::ESymmetryType, ivar, varname]
                 ]
               ,
               True,
-                Throw @ Message[ParseVarlist::ESymmetryType, ivar, varname]
+                Stop[ParseVarlist::ESymmetryType, ivar, varname]
             ];
             varname //
             ToBasis[chartname] //
@@ -142,7 +144,7 @@ ParseVarlist[OptionsPattern[], varlist_?ListQ, chartname_] :=
                     Do[parseComponentValue[{ic, id, ia, ib}], {ic, iMin, iMax}, {id, ic + 1, iMax}, {ia, iMin, iMax}, {ib, ia + 1, iMax}]
                   ,
                   True,
-                    Throw @ Message[ParseVarlist::ESymmetryType, ivar, varname]
+                    Stop[ParseVarlist::ESymmetryType, ivar, varname]
                 ]
               ,
               (symindex[[1]] === varname[[3]]) && (symindex[[2]] === varname[[4]])(*cd(ab) or cd[ab]*),
@@ -154,7 +156,7 @@ ParseVarlist[OptionsPattern[], varlist_?ListQ, chartname_] :=
                     Do[parseComponentValue[{ic, id, ia, ib}], {ic, iMin, iMax}, {id, iMin, iMax}, {ia, iMin, iMax}, {ib, ia + 1, iMax}]
                   ,
                   _,
-                    Throw @ Message[ParseVarlist::ESymmetryType, ivar, varname]
+                    Stop[ParseVarlist::ESymmetryType, ivar, varname]
                 ]
               ,
               (symindex[[1]] === varname[[1]]) && (symindex[[2]] === varname[[2]])(*(ab)cd or [ab]cd*),
@@ -166,7 +168,7 @@ ParseVarlist[OptionsPattern[], varlist_?ListQ, chartname_] :=
                     Do[parseComponentValue[{ia, ib, ic, id}], {ia, iMin, iMax}, {ib, ia + 1, iMax}, {ic, iMin, iMax}, {id, iMin, iMax}]
                   ,
                   _,
-                    Throw @ Message[ParseVarlist::ESymmetryType, ivar, varname]
+                    Stop[ParseVarlist::ESymmetryType, ivar, varname]
                 ]
               ,
               (symindex[[1]] === varname[[2]]) && (symindex[[2]] === varname[[3]])(*c(ab)d or c[ab]d*),
@@ -178,11 +180,11 @@ ParseVarlist[OptionsPattern[], varlist_?ListQ, chartname_] :=
                     Do[parseComponentValue[{ic, ia, ib, id}], {ic, iMin, iMax}, {ia, iMin, iMax}, {ib, ia + 1, iMax}, {id, iMin, iMax}]
                   ,
                   _,
-                    Throw @ Message[ParseVarlist::ESymmetryType, ivar, varname]
+                    Stop[ParseVarlist::ESymmetryType, ivar, varname]
                 ]
               ,
               True,
-                Throw @ Message[ParseVarlist::ESymmetryType, ivar, varname]
+                Stop[ParseVarlist::ESymmetryType, ivar, varname]
             ];
             varname //
             ToBasis[chartname] //
@@ -193,7 +195,7 @@ ParseVarlist[OptionsPattern[], varlist_?ListQ, chartname_] :=
           ]
         ,
         _(* OTHER NUM OF INDEXES *),
-          Throw @ Message[ParseVarlist::ETensorType, ivar, varname]
+          Stop[ParseVarlist::ETensorType, ivar, varname]
       ]
       ,
       {ivar, 1, Length[varlist]}
@@ -244,7 +246,7 @@ ParseVar[var_] :=
             varname = vfeature
           ]
           ,
-          Throw @ Message[ParseVar::EVar, vfeature, var]
+          Stop[ParseVar::EVar, vfeature, var]
         ]
       ]
       ,

@@ -165,11 +165,12 @@ RunUnitTests[] := Module[{unitTestFiles, report},
 (* PHASE 2: Golden File Regression Tests *)
 (* ========================================= *)
 
-(* Load test cases from shared config *)
+(* Load test cases from shared config: the cases that must succeed, and the cases that must fail *)
 $TestCases = TestConfig`LoadTestCases[];
+$FailingTestCases = TestConfig`LoadFailingTestCases[];
 
 (* Abort if test configuration failed to load *)
-If[$TestCases === $Failed,
+If[$TestCases === $Failed || $FailingTestCases === $Failed,
   Print["FATAL: Failed to load test configuration"];
   Exit[1]
 ];
@@ -328,6 +329,85 @@ RunRegressionTests[] := Module[{backend, testName, ext, testFile, result, output
   ];
 ];
 
+(* ========================================= *)
+(* PHASE 2b: Cases that must fail *)
+(* ========================================= *)
+
+(* The lines of text, without the whitespace that ends them *)
+TrimmedLines[text_String] := StringDelete[StringSplit[text, "\n"], RegularExpression["[[:space:]]+$"]];
+
+(*
+  Run one failing case and return what is wrong with it; {} means it passed.
+  A file that looks like the output of an earlier run is planted first, so
+  the case also holds that a failed run clears it. The case passes when the
+  wrapper exits non-zero, no file is left at the output path, and every line
+  of the hand-written .err.golden is a line of what the run printed.
+  --generate does not touch a .err.golden.
+*)
+RunFailingCase[{backend_String, testName_String, ext_String}] := Module[
+  {testDir, outputFile, errGoldenFile, logFile, status, printed, expected, problems},
+  testDir = FileNameJoin[{$TestDir, "regression", backend}];
+  outputFile = FileNameJoin[{testDir, testName <> ext}];
+  errGoldenFile = FileNameJoin[{$TestDir, "regression", "golden", backend, testName <> ".err.golden"}];
+  logFile = FileNameJoin[{$TemporaryDirectory, "generato_" <> backend <> "_" <> testName <> ".log"}];
+
+  If[!ValidShellInput[backend] || !ValidShellInput[testName],
+    Return[{"invalid characters in backend or test name"}]
+  ];
+  If[!FileExistsQ[FileNameJoin[{testDir, testName <> ".wl"}]],
+    Return[{testName <> ".wl not found"}]
+  ];
+  If[!FileExistsQ[errGoldenFile],
+    Return[{FileNameTake[errGoldenFile] <> " not found; it is written by hand"}]
+  ];
+
+  (* Plant the stale output, with the header every generated file starts with *)
+  Export[
+    outputFile,
+    "/* " <> testName <> ext <> " */\n/* Produced with Generato */\n\nleft by an earlier run\n",
+    "Text"
+  ];
+
+  status = Run["cd " <> testDir <> " && QUIET=1 \"$GENERATO/Generato\" " <> testName <> ".wl > \"" <> logFile <> "\" 2>&1"];
+  printed = If[FileExistsQ[logFile], TrimmedLines[ReadString[logFile] /. EndOfFile -> ""], {}];
+  Quiet[DeleteFile[logFile], DeleteFile::fdnfnd];
+
+  problems = {};
+  If[status == 0,
+    AppendTo[problems, "the wrapper exited 0"]
+  ];
+  If[FileExistsQ[outputFile],
+    AppendTo[problems, "a file was left at " <> testName <> ext];
+    DeleteFile[outputFile]
+  ];
+  expected = DeleteCases[TrimmedLines[ReadString[errGoldenFile] /. EndOfFile -> ""], ""];
+  Do[
+    If[!MemberQ[printed, line],
+      AppendTo[problems, "not printed: " <> line]
+    ],
+    {line, expected}
+  ];
+  problems
+];
+
+RunFailingCases[] := Module[{backend, testName, ext, problems},
+  PrintSection["Regression Tests (Failing Runs)"];
+  QuietPrint[""];
+  Do[
+    {backend, testName, ext} = testCase;
+    QuietPrint["  ", $TagRun, " ", backend, "/", testName, ".wl"];
+    problems = RunFailingCase[testCase];
+    If[Length[problems] == 0,
+      QuietPrint["  ", $TagPass, " ", backend, "/", testName, ".wl failed as expected"],
+      $PhaseSuccess = False;
+      (* Always print what is wrong, even in quiet mode *)
+      Print["  ", $TagFail, " ", backend, "/", testName, ".wl"];
+      Do[Print["         ", problem], {problem, problems}]
+    ],
+    {testCase, $FailingTestCases}
+  ];
+];
+
 (* Run the test phases or generate golden files *)
 If[$GenerateMode,
   (* Generate mode: update golden files *)
@@ -337,7 +417,7 @@ If[$GenerateMode,
   $UnitTestsSuccess = RunPhase["unit", RunUnitTests[]];
   $RegressionTestsSuccess = If[$UnitOnlyMode,
     True,
-    RunPhase["regression", RunRegressionTests[]]
+    RunPhase["regression", RunRegressionTests[]; RunFailingCases[]]
   ];
 
   (* Print final result box *)

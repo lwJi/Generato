@@ -12,7 +12,9 @@ show_help() {
   echo
   echo "DESCRIPTION:"
   echo "  Processes the specified Wolfram Language (*.wl) files using wolframscript."
-  echo "  Each script writes its own output file (.hxx, .cxx, .c, .h)."
+  echo "  Each script writes its own output file. Every script is run; the exit"
+  echo "  status is non-zero if any of them failed, and a failed script leaves no"
+  echo "  output file."
   echo
   echo "EXAMPLES:"
   echo "  Generato C3GH_set_profile_ADM.wl"
@@ -31,41 +33,50 @@ if ! command -v wolframscript &> /dev/null; then
   exit 1
 fi
 
-# Supported output file extensions
-OUTPUT_EXTENSIONS=(".hxx" ".cxx" ".c" ".h")
+# The driver, and the scripts themselves, are found through GENERATO
+if [[ ! -f "$GENERATO/src/Driver.wl" ]]; then
+  echo "Error: GENERATO is not set to the Generato repository ('$GENERATO/src/Driver.wl' not found)."
+  exit 1
+fi
 
-# Process each file given as an argument
+# Process each file given as an argument. Each script runs in its own kernel,
+# so one that fails does not stop the others.
+total=0
+failed=()
 for input_file in "$@"; do
+  total=$((total + 1))
+
   # Ensure the file exists
   if [[ ! -f "$input_file" ]]; then
-    echo "Warning: File '$input_file' does not exist. Skipping."
+    echo "Error: File '$input_file' does not exist."
+    failed+=("$input_file")
     continue
   fi
 
-  # Remove .wl extension to form the base name
-  base_name="${input_file%.wl}"
-
-  # Run wolframscript on the input file
+  # Run the script through the driver, which catches every abnormal ending
+  # and is the only place that sets a non-zero exit status
   [[ "$QUIET" != "1" ]] && echo "Processing '$input_file'..."
-  if ! wolframscript -f "$input_file"; then
+  if ! wolframscript -script "$GENERATO/src/Driver.wl" "$input_file"; then
     echo "Error: Failed to process '$input_file'."
-    continue
-  fi
-
-  # Check for an output file with any supported extension
-  found_output=false
-  for ext in "${OUTPUT_EXTENSIONS[@]}"; do
-    if [[ -f "${base_name}${ext}" ]]; then
-      found_output=true
-    fi
-  done
-
-  if [[ "$found_output" == false ]]; then
-    echo "Warning: No output file found for '$input_file' (checked: ${OUTPUT_EXTENSIONS[*]})"
+    failed+=("$input_file")
   fi
 
   [[ "$QUIET" != "1" ]] && echo
 done
 
-[[ "$QUIET" != "1" ]] && echo "DONE."
-exit 0
+if [[ ${#failed[@]} -eq 0 ]]; then
+  [[ "$QUIET" != "1" ]] && echo "DONE."
+  exit 0
+fi
+
+# Say which scripts failed. A script that did not fail wrote its file.
+written=$((total - ${#failed[@]}))
+scripts_word="scripts"
+[[ $total -eq 1 ]] && scripts_word="script"
+files_word="files"
+[[ $written -eq 1 ]] && files_word="file"
+echo "Generato: ${#failed[@]} of $total $scripts_word failed, $written $files_word written."
+for input_file in "${failed[@]}"; do
+  echo "  failed: $input_file"
+done
+exit 1

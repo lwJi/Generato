@@ -4,6 +4,7 @@
 
 BeginPackage["Generato`BackendCommon`"];
 
+Needs["Generato`Failure`"];
 Needs["Generato`Basic`"];
 Needs["Generato`ParseMode`"];
 Needs["Generato`Component`"];
@@ -134,7 +135,7 @@ PrintEquationByMode[compToValue_, rhssToValue_, mainFormatter_, tempFormatter_] 
       Global`pr[";\n"]
     ,
     True,
-      Throw @ Message[PrintEquationByMode::EMode]
+      Stop[PrintEquationByMode::EMode]
   ];
 
 PrintEquationByMode::EMode = "PrintEquationByMode: EquationsMode unrecognized!";
@@ -166,7 +167,7 @@ GetTensorIndexSubbuf[len_Integer, varlistindex_Integer] :=
           len == 3,
             "[" <> ToString[Quotient[varlistindex, 3]] <> "]["
                 <> ToString[Mod[varlistindex, 3]] <> "]",
-          True, Message[GetTensorIndexSubbuf::ELength]; ""
+          True, Stop[GetTensorIndexSubbuf::ELength]
         ],
       tensorType === "Smat",
         Which[
@@ -177,10 +178,10 @@ GetTensorIndexSubbuf[len_Integer, varlistindex_Integer] :=
           len == 4,
             "[" <> ToString[Quotient[varlistindex, 6]] <> "]["
                 <> ToString[Mod[varlistindex, 6]] <> "]",
-          True, Message[GetTensorIndexSubbuf::ELength]; ""
+          True, Stop[GetTensorIndexSubbuf::ELength]
         ],
       True,
-        Message[GetTensorIndexSubbuf::ETensorType]; ""
+        Stop[GetTensorIndexSubbuf::ETensorType]
     ]
   ];
 
@@ -209,15 +210,6 @@ ExtractComponentInfo[varinfo_, compname_] :=
   ];
 
 Protect[ExtractComponentInfo];
-
-(*
-  Standard backend error messages - shared by all backends
-  Previously duplicated in: CarpetX.wl, CarpetXGPU.wl, CarpetXPointDesc.wl,
-  Carpet.wl, AMReX.wl, Nmesh.wl
-*)
-PrintComponentInitialization::EMode = "PrintComponentInitialization mode unrecognized!";
-PrintComponentInitialization::EVarLength = "PrintComponentInitialization variable's tensor type unsupported!";
-PrintComponentInitialization::EDerivativeName = "PrintComponentInitialization: derivative tensor name '`1`' does not contain 'd'!";
 
 End[];
 

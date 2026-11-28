@@ -2,7 +2,7 @@
 
 (* (c) Liwei Ji, 07/2024 *)
 
-BeginPackage["Generato`ParseMode`", {"Generato`Context`"}];
+BeginPackage["Generato`ParseMode`", {"Generato`Failure`", "Generato`Context`"}];
 
 If[Environment["QUIET"] =!= "1",
   System`Print["------------------------------------------------------------"];
@@ -31,7 +31,7 @@ WithMode[settings_List, body_] :=
     Scan[
       Function[setting,
         If[!ValidateContextModeValue[First[setting], Last[setting]],
-          Throw @ Message[WithMode::EInvalidValue, First[setting], Last[setting]]
+          Stop[WithMode::EInvalidValue, First[setting], Last[setting]]
         ]
       ],
       settings

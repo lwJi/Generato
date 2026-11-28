@@ -1,6 +1,8 @@
 # Test case definitions for Generato
-# Format: backend:test_name:extension
 # Lines starting with # are comments
+# backend:test_name:extension          must succeed and match its .golden
+# backend:test_name:extension:fails    must exit non-zero, leave no output file,
+#                                      and print every line of its .err.golden
 CarpetXGPU:test:.hxx
 CarpetXGPU:testTile:.hxx
 CarpetXGPU:testDerivs:.hxx
@@ -10,6 +12,10 @@ CarpetXGPU:testDerivs2nd:.hxx
 CarpetXGPU:testTileDerivs:.hxx
 # The "Temp" initialization and the "AddToMainOut" equation
 CarpetXGPU:testModes:.hxx
+# A failure before generation: a var spec that cannot be parsed
+CarpetXGPU:failBadVarSpec:.hxx:fails
+# A failure while a right-hand side is evaluated, after part of the output is built
+CarpetXGPU:failInEquation:.hxx:fails
 AMReX:test:.hxx
 #Nmesh:test:.c
 #Nmesh:GHG_rhs:.c

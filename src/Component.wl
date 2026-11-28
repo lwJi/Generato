@@ -2,7 +2,7 @@
 
 (* (c) Liwei Ji, 01/2024 *)
 
-BeginPackage["Generato`Component`", {"Generato`Context`"}];
+BeginPackage["Generato`Component`", {"Generato`Failure`", "Generato`Context`"}];
 
 Needs["Generato`Basic`"];
 
@@ -39,7 +39,7 @@ ParseComponent[varinfo_, compindexlist_?ListQ, coordinate_, extrareplacerules_?L
         PrintComponent[coordinate, varinfo, compname, extrareplacerules]
       ,
       True,
-        Throw @ Message[ParseComponent::EMode]
+        Stop[ParseComponent::EMode]
     ]
   ];
 
@@ -59,7 +59,7 @@ PrintComponent[coordinate_, varinfo_, compname_, extrareplacerules_] :=
         Global`PrintComponentEquation[coordinate, compname, extrareplacerules]
       ,
       True,
-        Throw @ Message[PrintComponent::EMode]
+        Stop[PrintComponent::EMode]
     ]
   ];
 

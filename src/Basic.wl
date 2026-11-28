@@ -8,10 +8,10 @@
 
 If[Environment["QUIET"] === "1",
   Block[{Print},
-    BeginPackage["Generato`Basic`", {"xAct`xTensor`", "xAct`xCoba`", "Generato`Context`"}]
+    BeginPackage["Generato`Basic`", {"xAct`xTensor`", "xAct`xCoba`", "Generato`Failure`", "Generato`Context`"}]
   ]
   ,
-  BeginPackage["Generato`Basic`", {"xAct`xTensor`", "xAct`xCoba`", "Generato`Context`"}]
+  BeginPackage["Generato`Basic`", {"xAct`xTensor`", "xAct`xCoba`", "Generato`Failure`", "Generato`Context`"}]
 ];
 
 If[Environment["QUIET"] =!= "1",
@@ -20,7 +20,7 @@ If[Environment["QUIET"] =!= "1",
   System`Print["------------------------------------------------------------"];
 ];
 
-GetDefaultManifold::usage = "GetDefaultManifold[] returns the first defined manifold. Returns $Failed if no manifolds have been defined.";
+GetDefaultManifold::usage = "GetDefaultManifold[] returns the first defined manifold. Stops the run if no manifolds have been defined.";
 
 GetDefaultChart::usage = "GetDefaultChart[] returns the default coordinate chart of the first defined manifold.";
 
@@ -47,8 +47,7 @@ Begin["`Private`"];
 GetDefaultManifold[] :=
   Module[{},
     If[Length[$Manifolds] === 0,
-      Message[GetDefaultManifold::NoManifolds];
-      Return[$Failed]
+      Stop[GetDefaultManifold::NoManifolds]
       ,
       Return[$Manifolds[[1]]]
     ]
@@ -59,24 +58,12 @@ GetDefaultManifold::NoManifolds = "No manifolds have been defined. Use DefManifo
 Protect[GetDefaultManifold];
 
 GetDefaultChart[] :=
-  Module[{manifold = GetDefaultManifold[]},
-    If[manifold === $Failed,
-      Return[$Failed]
-      ,
-      Return[ChartsOfManifold[manifold][[1]]]
-    ]
-  ];
+  ChartsOfManifold[GetDefaultManifold[]][[1]];
 
 Protect[GetDefaultChart];
 
 GetDim[] :=
-  Module[{manifold = GetDefaultManifold[]},
-    If[manifold === $Failed,
-      Return[$Failed]
-      ,
-      Return[DimOfManifold[manifold]]
-    ]
-  ];
+  DimOfManifold[GetDefaultManifold[]];
 
 Protect[GetDim];
 
@@ -98,6 +85,7 @@ IsDefined[term_] :=
             {isub, 1, Length[subterms]}
           ];
           If[undefinedsubterm > 0,
+            (* False is the answer, not a failure of generation: SetEQN reads it and stops with its own message *)
             Message[IsDefined::ETerm, undefinedsubterm, term];
             Return[False]
             ,
@@ -115,7 +103,7 @@ IsDefined[term_] :=
         Return[True]
       ,
       True,
-        Throw @ Message[IsDefined::EType, term]
+        Stop[IsDefined::EType, term]
     ]
   ];
 
@@ -148,7 +136,7 @@ RHSOf[var__] :=
         ToExpression[ToString[arglist[[1]]] <> ToString[arglist[[2]]] <> "$RHS"]
       ,
       _,
-        Throw @ Message[RHSOf::Eargs, Length[arglist]]
+        Stop[RHSOf::Eargs, Length[arglist]]
     ]
   ];
 
@@ -190,10 +178,10 @@ SetEQNDetail[checkrhs_, suffix_, var_, varrhs_] :=
         ToString[suffix]
       ];
     If[IsExprComb[Head[var]],
-      Throw @ Message[SetEQNDetail::Evar, var]
+      Stop[SetEQNDetail::Evar, var]
     ];
     If[checkrhs && !IsDefined[varrhs],
-      Throw @ Message[SetEQNDetail::Evarrhs, varrhs]
+      Stop[SetEQNDetail::Evarrhs, varrhs]
     ];
     ReleaseHold[Hold[IndexSet[var, varrhs]] /. {var[[0]] :> RHSOf[ToString[var[[0]]] <> suffix0] /; replacetimes++ == 0}]
   ];
@@ -215,7 +203,7 @@ SetEQNDelayedDetail[suffix_, var_, varrhs_] :=
         ToString[suffix]
       ];
     If[IsExprComb[Head[var]],
-      Throw @ Message[SetEQNDelayedDetail::Evar, var]
+      Stop[SetEQNDelayedDetail::Evar, var]
     ];
     ReleaseHold[Hold[IndexSetDelayed[var, varrhs]] /. {var[[0]] :> RHSOf[ToString[var[[0]]] <> suffix0] /; replacetimes++ == 0}]
   ];

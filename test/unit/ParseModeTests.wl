@@ -246,9 +246,10 @@ AppendTo[$AllTests,
     (* WithMode should throw on invalid Phase value *)
     Catch[
       WithMode[{"Phase" -> "InvalidPhase"}, GetPhase[]];
-      "NoThrow"
+      "NoThrow",
+      GeneratoFailure
     ],
-    Null,  (* Message returns Null, Throw propagates it *)
+    $Failed,  (* Stop issues the message, then throws $Failed to the tag *)
     {WithMode::EInvalidValue},
     TestID -> "Mode-WithMode-Validation-InvalidPhase"
   ]
@@ -260,9 +261,10 @@ AppendTo[$AllTests,
     (* WithMode should throw on invalid DerivsOrder value *)
     Catch[
       WithMode[{"DerivsOrder" -> "NotAnInteger"}, GetDerivsOrder[]];
-      "NoThrow"
+      "NoThrow",
+      GeneratoFailure
     ],
-    Null,
+    $Failed,
     {WithMode::EInvalidValue},
     TestID -> "Mode-WithMode-Validation-InvalidDerivsOrder"
   ]

@@ -59,12 +59,12 @@ PrintComponentInitialization[varinfo_, compname_] :=
         buf = "double " <> ToString[compToValue] <> ";"
       ,
       True,
-        Throw @ Message[PrintComponentInitialization::EMode]
+        Stop[PrintComponentInitialization::EMode]
     ];
     pr[buf];
   ];
 
-(* Error message PrintComponentInitialization::EMode is in BackendCommon.wl *)
+PrintComponentInitialization::EMode = "PrintComponentInitialization mode unrecognized!";
 
 Protect[PrintComponentInitialization];
 

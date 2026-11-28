@@ -10,6 +10,8 @@
 
 (*****************)
 
+<<Failure.wl
+
 <<Context.wl
 
 <<Basic.wl

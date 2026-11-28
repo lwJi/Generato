@@ -1,0 +1,162 @@
+(* ::Package:: *)
+
+(* FailureTests.wl *)
+(* Unit tests for Generato`Failure`, and for the error sites that used to return a value or abort *)
+
+If[Environment["QUIET"] =!= "1", Print["Loading FailureTests.wl..."]];
+
+(* Load Generato which includes Failure *)
+If[!MemberQ[$Packages, "Generato`Failure`"],
+  Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"}]]
+];
+
+SetPVerbose[False];
+SetPrintDate[False];
+
+(* Helper to reset context to defaults *)
+ResetContext[] := ($CurrentContext = $ContextDefaults);
+
+failureTest::EWithText = "Stopped with `1` and `2`.";
+
+(* ========================================= *)
+(* Test: Stop *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* Stop issues the message and throws $Failed to the tag; what follows does not run *)
+    failureReached = False;
+    {
+      Catch[
+        Stop[failureTest::EWithText, 1, "two"];
+        failureReached = True;
+        "NoThrow",
+        GeneratoFailure
+      ],
+      failureReached
+    },
+    {$Failed, False},
+    {failureTest::EWithText},
+    TestID -> "Stop-MessageThenTaggedThrow"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a message name that has text evaluates to it, so a name left unevaluated here has none *)
+    Select[
+      Hold[
+        SetPVerbose::EInvalidValue,
+        WithMode::EInvalidValue,
+        GetDefaultManifold::NoManifolds,
+        IsDefined::EType,
+        RHSOf::Eargs,
+        Generato`Basic`Private`SetEQNDetail::Evar,
+        Generato`Basic`Private`SetEQNDetail::Evarrhs,
+        Generato`Basic`Private`SetEQNDelayedDetail::Evar,
+        ParseComponent::EMode,
+        Generato`Component`Private`PrintComponent::EMode,
+        ParseVarlist::ETensorNonExist,
+        ParseVarlist::ETensorExistOutside,
+        ParseVarlist::ETensorType,
+        ParseVarlist::ESymmetryType,
+        ParseVar::EVar,
+        PrintEquationByMode::EMode,
+        GetTensorIndexSubbuf::ELength,
+        GetTensorIndexSubbuf::ETensorType,
+        TestEQN::EFailed,
+        WriteToFile::EThrow
+      ],
+      Function[name, !StringQ[name], HoldFirst]
+    ],
+    Hold[],
+    TestID -> "Stop-EveryMessageRaisedInSrcHasText"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a Catch without the tag does not catch it, so a script's own Catch cannot hide a failure *)
+    Catch[
+      Catch[Stop[failureTest::EWithText, 1, 2]; "NoThrow"];
+      "InnerCatchReturned",
+      GeneratoFailure
+    ],
+    $Failed,
+    {failureTest::EWithText},
+    TestID -> "Stop-PassesAnUntaggedCatch"
+  ]
+];
+
+(* ========================================= *)
+(* Test: sites that used to return a value or abort *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* an unsupported rank used to give a message and an empty index *)
+    ResetContext[];
+    Catch[
+      WithMode[{"TensorType" -> "Vect"}, GetTensorIndexSubbuf[4, 0]];
+      "NoThrow",
+      GeneratoFailure
+    ],
+    $Failed,
+    {GetTensorIndexSubbuf::ELength},
+    TestID -> "GetTensorIndexSubbuf-UnsupportedRank-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* an unknown tensor type used to give a message and an empty index *)
+    ResetContext[];
+    Catch[
+      GetTensorIndexSubbuf[1, 0];
+      "NoThrow",
+      GeneratoFailure
+    ],
+    $Failed,
+    {GetTensorIndexSubbuf::ETensorType},
+    TestID -> "GetTensorIndexSubbuf-NoTensorType-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a failed check used to print and abort *)
+    Catch[
+      TestEQN[False, "the identity"];
+      "NoThrow",
+      GeneratoFailure
+    ],
+    $Failed,
+    {TestEQN::EFailed},
+    TestID -> "TestEQN-False-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* WithMode restores its keys when the body stops *)
+    ResetContext[];
+    {
+      Catch[
+        WithMode[{"SuffixName" -> "inside"}, Stop[failureTest::EWithText, 1, 2]],
+        GeneratoFailure
+      ],
+      GetSuffixName[]
+    },
+    {$Failed, ""},
+    {failureTest::EWithText},
+    TestID -> "WithMode-RestoresWhenBodyStops"
+  ]
+];
+
+(* ========================================= *)
+(* Cleanup *)
+(* ========================================= *)
+
+ResetContext[];
+
+If[Environment["QUIET"] =!= "1", Print["FailureTests.wl completed."]];

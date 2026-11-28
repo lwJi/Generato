@@ -4,7 +4,7 @@
 
 (* (c) Liwei Ji, 11/2026 *)
 
-BeginPackage["Generato`Emit`", {"Generato`Context`"}];
+BeginPackage["Generato`Emit`", {"Generato`Failure`", "Generato`Context`"}];
 
 If[Environment["QUIET"] =!= "1",
   System`Print["------------------------------------------------------------"];
@@ -43,6 +43,12 @@ StripTrailingWhitespace[text_String] :=
     "\n"
   ];
 
+(* ThrownText - a thrown value as text; it may be a whole expression, so only its start is kept. *)
+ThrownText[value_] :=
+  Module[{text = ToString[value, InputForm]},
+    If[StringLength[text] > 200, StringTake[text, 200] <> " ...", text]
+  ];
+
 (*
   WriteToFile - the one writer.
   Global`pr appends to a buffer that lives for this call only. The file is
@@ -50,7 +56,7 @@ StripTrailingWhitespace[text_String] :=
   writes nothing.
 *)
 WriteToFile[outputfile_String] :=
-  Module[{lines = {}, headerGuard, stream},
+  Module[{lines = {}, headerGuard, stream, ending},
     If[Environment["QUIET"] =!= "1",
       System`Print["Writing to \"", outputfile, "\"...\n"]
     ];
@@ -61,7 +67,7 @@ WriteToFile[outputfile_String] :=
       ];
     Block[{Global`pr},
       Global`pr[x_:""] := (AppendTo[lines, x];);
-      (* print first few lines *)
+      (* print first few lines; Driver.wl knows a generated file by the second *)
       Global`pr["/* " <> FileNameTake[outputfile] <> " */"];
       Global`pr[
         "/* Produced with Generato" <>
@@ -77,8 +83,15 @@ WriteToFile[outputfile_String] :=
         Global`pr["#define " <> headerGuard];
         Global`pr[]
       ];
-      (* GetMainPrint[] evaluates the held main print content *)
-      GetMainPrint[];
+      (* GetMainPrint[] evaluates the held main print content.
+         A throw without a tag raised in it, which is how an xAct error ends,
+         would not reach Driver.wl: the Import that loads the backend file
+         returns the thrown value and the script carries on. So it is caught
+         here and raised again through Stop, whose tag Import lets pass. *)
+      ending = Catch[GetMainPrint[]; finished];
+      If[ending =!= finished,
+        Stop[WriteToFile::EThrow, ThrownText[ending]]
+      ];
       Global`pr[];
       If[GetPrintHeaderMacro[],
         Global`pr["#endif // #ifndef " <> headerGuard];
@@ -97,6 +110,8 @@ WriteToFile[outputfile_String] :=
     ];
     outputfile
   ];
+
+WriteToFile::EThrow = "The main content stopped at an uncaught Throw[`1`].";
 
 Protect[WriteToFile];
 

@@ -4,7 +4,7 @@
 
 (* (c) Liwei Ji, 01/2026 *)
 
-BeginPackage["Generato`Context`"];
+BeginPackage["Generato`Context`", {"Generato`Failure`"}];
 
 $CurrentContext::usage = "$CurrentContext is the global context state.";
 
@@ -209,7 +209,7 @@ expectedValueText[contextKey_String] :=
 (* Common setter implementation - validates and updates context *)
 setContextValue[contextKey_String, setterSymbol_Symbol, contextValue_] :=
   If[!ValidateContextModeValue[contextKey, contextValue],
-    Throw @ Message[MessageName[setterSymbol, "EInvalidValue"], contextValue, expectedValueText[contextKey]],
+    Stop[MessageName[setterSymbol, "EInvalidValue"], contextValue, expectedValueText[contextKey]],
     $CurrentContext = Append[$CurrentContext, contextKey -> contextValue]
   ];
 

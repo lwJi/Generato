@@ -256,4 +256,26 @@ AppendTo[$AllTests,
   ]
 ];
 
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a throw without a tag in the main content, which the Import of a backend
+       file would swallow, is raised again through Stop; nothing is written *)
+    ResetContext[];
+    tempFile = FileNameJoin[{$TemporaryDirectory, "test_write_untagged.hxx"}];
+    If[FileExistsQ[tempFile], DeleteFile[tempFile]];
+    SetPrintHeaderMacro[True];
+    SetPrintDate[False];
+    SetMainPrint[
+      Global`pr["// before"];
+      Throw["stopped"];
+      Global`pr["// after"]
+    ];
+    caught = Catch[WriteToFile[tempFile]; "NoThrow", GeneratoFailure];
+    {caught, FileExistsQ[tempFile]},
+    {$Failed, False},
+    {WriteToFile::EThrow},
+    TestID -> "WriteToFile-UntaggedThrowInBodyStops"
+  ]
+];
+
 If[Environment["QUIET"] =!= "1", Print["EmitTests.wl completed."]];

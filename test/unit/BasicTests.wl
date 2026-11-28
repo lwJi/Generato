@@ -201,15 +201,17 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    (* GetDefaultManifold should return $Failed when no manifolds exist *)
-    Module[{savedManifolds = $Manifolds, result},
-      Block[{$Manifolds = {}},
-        result = Quiet[GetDefaultManifold[]];
-        result === $Failed
+    (* GetDefaultManifold should stop the run when no manifolds exist *)
+    Block[{$Manifolds = {}},
+      Catch[
+        GetDefaultManifold[];
+        "NoThrow",
+        GeneratoFailure
       ]
     ],
-    True,
-    TestID -> "GetDefaultManifold-EmptyManifolds-ReturnsFailed"
+    $Failed,
+    {GetDefaultManifold::NoManifolds},
+    TestID -> "GetDefaultManifold-EmptyManifolds-Stops"
   ]
 ];
 
@@ -228,15 +230,17 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    (* GetDefaultChart should return $Failed when no manifolds exist *)
-    Module[{savedManifolds = $Manifolds, result},
-      Block[{$Manifolds = {}},
-        result = Quiet[GetDefaultChart[]];
-        result === $Failed
+    (* GetDefaultChart should stop the run when no manifolds exist *)
+    Block[{$Manifolds = {}},
+      Catch[
+        GetDefaultChart[];
+        "NoThrow",
+        GeneratoFailure
       ]
     ],
-    True,
-    TestID -> "GetDefaultChart-EmptyManifolds-ReturnsFailed"
+    $Failed,
+    {GetDefaultManifold::NoManifolds},
+    TestID -> "GetDefaultChart-EmptyManifolds-Stops"
   ]
 ];
 
@@ -257,15 +261,17 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    (* GetDim should return $Failed when no manifolds exist *)
-    Module[{savedManifolds = $Manifolds, result},
-      Block[{$Manifolds = {}},
-        result = Quiet[GetDim[]];
-        result === $Failed
+    (* GetDim should stop the run when no manifolds exist *)
+    Block[{$Manifolds = {}},
+      Catch[
+        GetDim[];
+        "NoThrow",
+        GeneratoFailure
       ]
     ],
-    True,
-    TestID -> "GetDim-EmptyManifolds-ReturnsFailed"
+    $Failed,
+    {GetDefaultManifold::NoManifolds},
+    TestID -> "GetDim-EmptyManifolds-Stops"
   ]
 ];
 
