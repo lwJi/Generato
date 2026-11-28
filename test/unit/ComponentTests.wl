@@ -3,7 +3,7 @@
 (* ComponentTests.wl *)
 (* Unit tests for Generato`Component module: the enumeration of components, binding and the records, *)
 (* for what a backend reads from the records: the index layout and the variable a relation names, *)
-(* and for the equation print calls, which hand the backend of a write one statement per component *)
+(* and for the print calls, which hand the backend of a write one statement per component *)
 (* The store of the records lasts as long as the kernel, like the xAct tensors, so each test uses heads of its own *)
 
 If[Environment["QUIET"] =!= "1", Print["Loading ComponentTests.wl..."]];
@@ -589,53 +589,6 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    (* an initialization walks the records of its varlist, in order, and the backend gets the records *)
-    ResetContext[];
-    Block[{PrintComponentInitialization, compTestPrinted = {}},
-      PrintComponentInitialization[variable_, component_, base_] := AppendTo[compTestPrinted, {GetInitializationsMode[], variable === VariableRecord[variable["Head"]], component, base}];
-      PrintInitializations[{Mode -> "MainIn"}, Take[compTestGridVarlist, 2]];
-      compTestPrinted
-    ],
-    Join[
-      {"MainIn", True, #, None}& /@ VariableRecord[compTestS]["Components"],
-      {"MainIn", True, #, None}& /@ VariableRecord[compTestM]["Components"]
-    ],
-    TestID -> "PrintInitializations-WalksRecordsInOrder"
-  ]
-];
-
-AppendTo[$AllTests,
-  VerificationTest[
-    (* a print call on a var that is not bound stops before anything is printed *)
-    ResetContext[];
-    Catch[
-      PrintInitializations[{Mode -> "MainIn"}, {{compTestUnbound[i], PrintAs -> "u"}}];
-      "NoThrow",
-      GeneratoFailure
-    ],
-    $Failed,
-    {VariableRecord::EUnbound},
-    TestID -> "PrintCalls-UnboundVar-Stops"
-  ]
-];
-
-AppendTo[$AllTests,
-  VerificationTest[
-    (* outside a print call there is no mode to initialize a component in *)
-    ResetContext[];
-    Catch[
-      PrintComponent[testCart, VariableRecord[compTestM], First[VariableRecord[compTestM]["Components"]]];
-      "NoThrow",
-      GeneratoFailure
-    ],
-    $Failed,
-    {PrintComponent::EMode},
-    TestID -> "PrintComponent-NoMode-Stops"
-  ]
-];
-
-AppendTo[$AllTests,
-  VerificationTest[
     (* a variable has records in the chart it was bound in and in no other; *)
     (* the component of a scalar carries no chart, so any chart has it *)
     {
@@ -653,49 +606,23 @@ AppendTo[$AllTests,
   ]
 ];
 
-AppendTo[$AllTests,
-  VerificationTest[
-    (* an initialization in another chart stops, too *)
-    ResetContext[];
-    Block[{PrintComponentInitialization, compTestPrinted = {}},
-      PrintComponentInitialization[variable_, component_, base_] := AppendTo[compTestPrinted, component["Name"]];
-      {
-        Catch[
-          PrintInitializations[{Mode -> "MainIn", ChartName -> compTestOtherChart}, Take[compTestGridVarlist, 2]];
-          "NoThrow",
-          GeneratoFailure
-        ],
-        compTestPrinted
-      }
-    ],
-    {$Failed, {"compTestS"}},
-    {RequireChart::EChart},
-    TestID -> "PrintInitializations-OtherChart-Stops"
-  ]
-];
-
-(* ========================================= *)
-(* Test: an equation print call hands the backend of the write one Store statement per component *)
-(* ========================================= *)
-
-SetEQN[compTestS[], 2 compTestS[]];
-
-SetEQN[compTestV[i_], compTestS[] compTestT[i]];
-
-SetEQN[{SuffixName -> "alt"}, compTestV[i_], 2 compTestT[i]];
-
-SetEQN[compTestT[i_], compTestS[] compTestV[i]];
-
-SetEQN[compTestM[i_, j_], compTestS[] compTestM[i, j]];
-
 (* A backend whose one formatter keeps each statement it is handed, and prints its mode and component *)
 compTestStatements = {};
 
 compTestKeep = Function[statement, AppendTo[compTestStatements, statement]; {statement["Mode"] <> " " <> statement["Component", "Name"]}];
 
-DefineBackend["compTestKeep", <|"Store" -> <|"Out" -> <|All -> compTestKeep|>, "AddTo" -> <|All -> compTestKeep|>, "Temp" -> <|All -> compTestKeep|>|>|>];
+DefineBackend["compTestKeep", <|
+  "Load" -> <|
+    "In" -> <|All -> compTestKeep|>,
+    "Out" -> <|All -> compTestKeep|>,
+    "Derivs" -> <|All -> compTestKeep|>,
+    "Temp" -> <|All -> compTestKeep|>,
+    "MoreInOut" -> <|All -> compTestKeep|>
+  |>,
+  "Store" -> <|"Out" -> <|All -> compTestKeep|>, "AddTo" -> <|All -> compTestKeep|>, "Temp" -> <|All -> compTestKeep|>|>
+|>];
 
-(* A backend with the table codes/CarpetXGPU.wl states *)
+(* A backend with the stores codes/CarpetXGPU.wl states, and no load *)
 DefineBackend["compTestConst", <|"Store" -> <|"Temp" -> <|All -> DeclareAssign|>|>|>];
 
 (*
@@ -715,6 +642,211 @@ compTestWrite[backend_String, body_] :=
     DeleteFile[file];
     lines[[4 ;; -4]]
   ];
+
+(* ========================================= *)
+(* Test: a load print call hands the backend of the write one Load statement per component *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* one statement per component record, in the order of the varlist; each is rendered and its lines are printed *)
+    ResetContext[];
+    {
+      compTestWrite["compTestKeep", PrintInitializations[{Mode -> "MainIn"}, Take[compTestGridVarlist, 2]]],
+      #["Component"]& /@ compTestStatements,
+      #["Variable"]& /@ compTestStatements,
+      Union[KeyTake[#, {"Kind", "Mode", "Base"}]& /@ compTestStatements]
+    },
+    {
+      {"In compTestS", "In compTestM11", "In compTestM12", "In compTestM13", "In compTestM22", "In compTestM23", "In compTestM33"},
+      Join[VariableRecord[compTestS]["Components"], VariableRecord[compTestM]["Components"]],
+      Join[{VariableRecord[compTestS]}, ConstantArray[VariableRecord[compTestM], 6]],
+      {<|"Kind" -> "Load", "Mode" -> "In", "Base" -> None|>}
+    },
+    TestID -> "PrintInitializations-OneLoadStatementPerComponent"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a Load statement has these keys and no other: it has no right-hand side, *)
+    (* and its "Config" is a copy of the user configuration *)
+    ResetContext[];
+    SetProject["compTestProject"];
+    compTestWrite["compTestKeep", PrintInitializations[{Mode -> "MainIn"}, Take[compTestGridVarlist, 1]]];
+    {
+      Keys[First[compTestStatements]],
+      First[compTestStatements]["Config"] === GetConfiguration[],
+      First[compTestStatements]["Config", "Project"]
+    },
+    {{"Kind", "Mode", "Variable", "Component", "Base", "Config"}, True, "compTestProject"},
+    TestID -> "PrintInitializations-StatementIsSelfContained"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* the Mode and the StorageType of the call give the mode of the statement and the storage of its variable, *)
+    (* whatever the binding: "GF" is the StorageType unstated, and "Temp" the Mode unstated *)
+    ResetContext[];
+    compTestWrite["compTestKeep",
+      PrintInitializations[{Mode -> "MainIn"}, compTestTileVarlist[[{1}]]];
+      PrintInitializations[{Mode -> "MainIn", StorageType -> "GF"}, Take[compTestGridVarlist, 1]];
+      PrintInitializations[{Mode -> "MainOut"}, Take[compTestGridVarlist, 1]];
+      PrintInitializations[{Mode -> "MainIn", StorageType -> "Tile"}, Take[compTestGridVarlist, 1]];
+      PrintInitializations[{Mode -> "MainOut", StorageType -> "Tile"}, Take[compTestGridVarlist, 1]];
+      PrintInitializations[{Mode -> "Derivs"}, Take[compTestGridVarlist, 1]];
+      PrintInitializations[{Mode -> "Derivs", StorageType -> "Tile"}, Take[compTestGridVarlist, 1]];
+      PrintInitializations[{Mode -> "Temp"}, Take[compTestGridVarlist, 1]];
+      PrintInitializations[{Mode -> "Temp", StorageType -> "Tile"}, Take[compTestGridVarlist, 1]];
+      PrintInitializations[{Mode -> "MoreInOut"}, Take[compTestGridVarlist, 1]];
+      PrintInitializations[{Mode -> "MoreInOut", StorageType -> "Tile"}, Take[compTestGridVarlist, 1]];
+      PrintInitializations[Take[compTestGridVarlist, 1]]
+    ];
+    {#["Mode"], #["Variable", "Storage"]}& /@ compTestStatements,
+    {
+      {"In", "Grid"}, {"In", "Grid"}, {"In", "Grid"},
+      {"In", "Grid"},
+      {"Out", "Grid"},
+      {"In", "Tile"},
+      {"Out", "Tile"},
+      {"Derivs", "Temp"},
+      {"In", "Tile"},
+      {"Temp", "Temp"},
+      {"Temp", "Temp"},
+      {"MoreInOut", "Grid"},
+      {"MoreInOut", "Grid"},
+      {"Temp", "Temp"}
+    },
+    TestID -> "PrintInitializations-ModeAndStorageOfALoadStatement"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* the storage is written over the statement's copy of the variable record: *)
+    (* nothing else of the copy differs, and the record binding wrote is left as it is *)
+    ResetContext[];
+    compTestWrite["compTestKeep", PrintInitializations[{Mode -> "MainIn", StorageType -> "Tile"}, Take[compTestGridVarlist, {2}]]];
+    {
+      Union[#["Variable", "Storage"]& /@ compTestStatements],
+      VariableRecord[compTestM]["Storage"],
+      Union[#["Variable"]& /@ compTestStatements] === {ReplacePart[VariableRecord[compTestM], "Storage" -> "Tile"]},
+      Keys[First[compTestStatements]["Variable"]] === Keys[VariableRecord[compTestM]]
+    },
+    {{"Tile"}, "Grid", True, True},
+    TestID -> "PrintInitializations-StorageOfTheCallNotOfTheBinding"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a Mode or a StorageType the call does not take stops, whatever the varlist and before a backend is asked for *)
+    ResetContext[];
+    {
+      Catch[PrintInitializations[{Mode -> "Main"}, {}]; "NoThrow", GeneratoFailure],
+      Catch[
+        compTestWrite["compTestKeep", PrintInitializations[{Mode -> "MainIn", StorageType -> "Grid"}, compTestTempVarlist]];
+        "NoThrow",
+        GeneratoFailure
+      ],
+      compTestStatements
+    },
+    {$Failed, $Failed, {}},
+    {PrintInitializations::EMode, PrintInitializations::EMode},
+    TestID -> "PrintInitializations-UnknownModeOrStorageType-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* None is the value of no mode and of no storage type: it is not taken either *)
+    ResetContext[];
+    {
+      Catch[PrintInitializations[{Mode -> None}, {}]; "NoThrow", GeneratoFailure],
+      Catch[PrintInitializations[{Mode -> "MainIn", StorageType -> None}, {}]; "NoThrow", GeneratoFailure]
+    },
+    {$Failed, $Failed},
+    {PrintInitializations::EMode, PrintInitializations::EMode},
+    TestID -> "PrintInitializations-ModeOrStorageTypeNone-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a print call belongs in the main content of a write: outside one there is no backend to print through *)
+    ResetContext[];
+    Catch[PrintInitializations[{Mode -> "MainIn"}, Take[compTestGridVarlist, 1]]; "NoThrow", GeneratoFailure],
+    $Failed,
+    {CurrentBackend::ENoWrite},
+    TestID -> "PrintInitializations-OutsideAWrite-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a load the backend of the write has no key for stops: the keys of a table are what the backend accepts *)
+    ResetContext[];
+    Catch[
+      compTestWrite["compTestConst", PrintInitializations[{Mode -> "MainIn"}, Take[compTestGridVarlist, 1]]];
+      "NoThrow",
+      GeneratoFailure
+    ],
+    $Failed,
+    {Render::EKey},
+    TestID -> "PrintInitializations-NoLoadInTheBackend-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a print call on a var that is not bound stops before anything is printed *)
+    ResetContext[];
+    {
+      Catch[
+        compTestWrite["compTestKeep", PrintInitializations[{Mode -> "MainIn"}, {{compTestUnbound[i], PrintAs -> "u"}}]];
+        "NoThrow",
+        GeneratoFailure
+      ],
+      compTestStatements
+    },
+    {$Failed, {}},
+    {VariableRecord::EUnbound},
+    TestID -> "PrintCalls-UnboundVar-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* an initialization in another chart stops at the first variable that has no record there *)
+    ResetContext[];
+    {
+      Catch[
+        compTestWrite["compTestKeep", PrintInitializations[{Mode -> "MainIn", ChartName -> compTestOtherChart}, Take[compTestGridVarlist, 2]]];
+        "NoThrow",
+        GeneratoFailure
+      ],
+      #["Component", "Name"]& /@ compTestStatements
+    },
+    {$Failed, {"compTestS"}},
+    {RequireChart::EChart},
+    TestID -> "PrintInitializations-OtherChart-Stops"
+  ]
+];
+
+(* ========================================= *)
+(* Test: an equation print call hands the backend of the write one Store statement per component *)
+(* ========================================= *)
+
+SetEQN[compTestS[], 2 compTestS[]];
+
+SetEQN[compTestV[i_], compTestS[] compTestT[i]];
+
+SetEQN[{SuffixName -> "alt"}, compTestV[i_], 2 compTestT[i]];
+
+SetEQN[compTestT[i_], compTestS[] compTestV[i]];
+
+SetEQN[compTestM[i_, j_], compTestS[] compTestM[i, j]];
 
 AppendTo[$AllTests,
   VerificationTest[
@@ -898,11 +1030,11 @@ AppendTo[$AllTests,
     ResetContext[];
     SetTempVariableType["vreal"];
     compTestWrite["compTestConst",
-      Global`pr["{"];
+      pr["{"];
       PrintEquations[{Mode -> "Temp"}, Take[compTestTempVarlist, 1]];
       PrintEquations[{Mode -> "MainOut"}, Take[compTestGridVarlist, 1]];
       PrintEquations[{Mode -> "AddToMainOut"}, Take[compTestGridVarlist, 1]];
-      Global`pr["}"]
+      pr["}"]
     ],
     {
       "{",
@@ -1183,19 +1315,65 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    (* a print call hands the backend the record a relation names; the options that stated the layout are accepted *)
+    (* a Load statement carries the record a relation names; the options that stated the layout are accepted *)
     ResetContext[];
-    Block[{PrintComponentInitialization, compTestPrinted = {}},
-      PrintComponentInitialization[variable_, component_, base_] := AppendTo[compTestPrinted, {component["Name"], base["Head"]}];
+    compTestWrite["compTestKeep",
       PrintInitializations[{Mode -> "Derivs", TensorType -> "Vect", DerivsOrder -> 1, DerivsAccuracy -> 4}, Take[compTestDVarlist, 1]];
-      PrintInitializations[{Mode -> "MainOut"}, compTestDtVarlist];
-      compTestPrinted
-    ],
+      PrintInitializations[{Mode -> "MainOut"}, compTestDtVarlist]
+    ];
     {
-      {"compTestDW1", compTestW}, {"compTestDW2", compTestW}, {"compTestDW3", compTestW},
-      {"compTestDtB1", compTestB}, {"compTestDtB2", compTestB}, {"compTestDtB3", compTestB}
+      {#["Mode"], #["Component", "Name"], #["Base", "Head"]}& /@ compTestStatements,
+      Union[#["Base"]& /@ compTestStatements] === Sort[{VariableRecord[compTestW], VariableRecord[compTestB]}]
+    },
+    {
+      {
+        {"Derivs", "compTestDW1", compTestW}, {"Derivs", "compTestDW2", compTestW}, {"Derivs", "compTestDW3", compTestW},
+        {"Out", "compTestDtB1", compTestB}, {"Out", "compTestDtB2", compTestB}, {"Out", "compTestDtB3", compTestB}
+      },
+      True
     },
     TestID -> "PrintCalls-HandTheBaseRecord"
+  ]
+];
+
+(* A backend whose loads read a relation and say so, as codes/CarpetXGPU.wl and codes/Nmesh.wl do *)
+DefineBackend["compTestRelation", <|
+  "Load" -> <|
+    "Derivs" -> <|"Temp" -> Requires["DerivativeOf", compTestKeep]|>,
+    "Out" -> <|"Grid" -> Requires["TimeDerivativeOf", compTestKeep]|>
+  |>
+|>];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a load whose formatter reads a relation prints a variable that declares it, *)
+    (* and stops at one that does not before its formatter is handed anything *)
+    ResetContext[];
+    {
+      compTestWrite["compTestRelation",
+        PrintInitializations[{Mode -> "Derivs"}, Take[compTestDVarlist, 1]];
+        PrintInitializations[{Mode -> "MainOut"}, compTestDtVarlist]
+      ],
+      Catch[
+        compTestWrite["compTestRelation", PrintInitializations[{Mode -> "Derivs"}, compTestTileVarlist]];
+        "NoThrow",
+        GeneratoFailure
+      ],
+      Catch[
+        compTestWrite["compTestRelation", PrintInitializations[{Mode -> "MainOut"}, Take[compTestDVarlist, 1]]];
+        "NoThrow",
+        GeneratoFailure
+      ],
+      compTestStatements
+    },
+    {
+      {"Derivs compTestDW1", "Derivs compTestDW2", "Derivs compTestDW3", "Out compTestDtB1", "Out compTestDtB2", "Out compTestDtB3"},
+      $Failed,
+      $Failed,
+      {}
+    },
+    {RequireRelation::EMissing, RequireRelation::EMissing},
+    TestID -> "PrintInitializations-RequiredRelationMissing-Stops"
   ]
 ];
 
@@ -1229,22 +1407,21 @@ AppendTo[$AllTests,
     (* TensorType "Vect" or "Smat" on a variable that declares no DerivativeOf stops the call before it prints: *)
     (* the first var of the list declares one and is not printed either *)
     ResetContext[];
-    Block[{PrintComponentInitialization, compTestPrinted = {}},
-      PrintComponentInitialization[variable_, component_, base_] := AppendTo[compTestPrinted, component["Name"]];
-      {
-        Catch[
-          PrintInitializations[{Mode -> "Derivs", StorageType -> "Tile", TensorType -> "Vect"}, Join[Take[compTestDVarlist, 1], compTestTileVarlist]];
-          "NoThrow",
-          GeneratoFailure
-        ],
-        Catch[
-          PrintInitializations[{Mode -> "MainIn", TensorType -> "Smat"}, Take[compTestGridVarlist, {2}]];
-          "NoThrow",
-          GeneratoFailure
-        ],
-        compTestPrinted
-      }
-    ],
+    {
+      Catch[
+        compTestWrite["compTestKeep",
+          PrintInitializations[{Mode -> "Derivs", StorageType -> "Tile", TensorType -> "Vect"}, Join[Take[compTestDVarlist, 1], compTestTileVarlist]]
+        ];
+        "NoThrow",
+        GeneratoFailure
+      ],
+      Catch[
+        compTestWrite["compTestKeep", PrintInitializations[{Mode -> "MainIn", TensorType -> "Smat"}, Take[compTestGridVarlist, {2}]]];
+        "NoThrow",
+        GeneratoFailure
+      ],
+      compTestStatements
+    },
     {$Failed, $Failed, {}},
     {PrintInitializations::ETensorType, PrintInitializations::ETensorType},
     TestID -> "PrintInitializations-TensorTypeWithoutDerivativeOf-Stops"
@@ -1253,20 +1430,38 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
+    (* nothing else checks the value of TensorType, so any value but "Scal" is a stated layout: *)
+    (* a mistyped one stops at a variable that declares no DerivativeOf, and is not read at one that does *)
+    ResetContext[];
+    {
+      Catch[
+        compTestWrite["compTestKeep", PrintInitializations[{Mode -> "MainIn", TensorType -> "Vec"}, Take[compTestGridVarlist, {2}]]];
+        "NoThrow",
+        GeneratoFailure
+      ],
+      compTestStatements,
+      compTestWrite["compTestKeep", PrintInitializations[{Mode -> "Derivs", StorageType -> "Tile", TensorType -> "Vec"}, Take[compTestDVarlist, 1]]]
+    },
+    {$Failed, {}, {"In compTestDW1", "In compTestDW2", "In compTestDW3"}},
+    {PrintInitializations::ETensorType},
+    TestID -> "PrintInitializations-TensorTypeMistyped"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
     (* a variable that declares no DerivativeOf is printed when TensorType is "Scal" or is not stated, *)
     (* and one that declares it is printed whatever TensorType says *)
     ResetContext[];
-    Block[{PrintComponentInitialization, compTestPrinted = {}},
-      PrintComponentInitialization[variable_, component_, base_] := AppendTo[compTestPrinted, component["Name"]];
+    compTestWrite["compTestKeep",
       PrintInitializations[{Mode -> "Derivs", StorageType -> "Tile"}, compTestTileVarlist];
       PrintInitializations[{Mode -> "Derivs", StorageType -> "Tile", TensorType -> "Scal"}, compTestTileVarlist];
-      PrintInitializations[{Mode -> "Derivs", StorageType -> "Tile", TensorType -> "Smat"}, Take[compTestDDVarlist, 1]];
-      compTestPrinted
+      PrintInitializations[{Mode -> "Derivs", StorageType -> "Tile", TensorType -> "Smat"}, Take[compTestDDVarlist, 1]]
     ],
     {
-      "compTestT1", "compTestT2", "compTestT3",
-      "compTestT1", "compTestT2", "compTestT3",
-      "compTestDDW11", "compTestDDW12", "compTestDDW13", "compTestDDW22", "compTestDDW23", "compTestDDW33"
+      "In compTestT1", "In compTestT2", "In compTestT3",
+      "In compTestT1", "In compTestT2", "In compTestT3",
+      "In compTestDDW11", "In compTestDDW12", "In compTestDDW13", "In compTestDDW22", "In compTestDDW23", "In compTestDDW33"
     },
     TestID -> "PrintInitializations-TensorType-AcceptedOtherwise"
   ]

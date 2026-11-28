@@ -16,6 +16,8 @@ WriteToFile::usage = "WriteToFile[backend, filename] resolves the table of the r
 
 CurrentBackend::usage = "CurrentBackend[] returns the backend table of the write under way: the one WriteToFile resolved from the name it was given. It stops the run when no write is under way.";
 
+pr::usage = "pr[line] adds a line to the output of the write under way, and pr[] an empty line. A script calls it in its main content, which WriteToFile evaluates. It stops the run when no write is under way.";
+
 Begin["`Private`"];
 
 (*
@@ -36,11 +38,15 @@ ThrownText[value_] :=
   ];
 
 (*
-  The backend table of the write under way, or None. WriteToFile is its one
-  writer: it holds the table for as long as the write lasts, and
-  CurrentBackend is how a print call in the main content reads it.
+  The state of the write under way: the table of its backend and the lines
+  built so far, both None when there is none. WriteToFile is their one
+  writer: it holds them for as long as its call lasts, so nothing of a write
+  is left when it ends, however it ends. CurrentBackend is how a print call
+  in the main content reads the table, and pr is how a line is added.
 *)
 $WriteBackend = None;
+
+$WriteLines = None;
 
 CurrentBackend[] :=
   If[$WriteBackend === None,
@@ -54,14 +60,32 @@ CurrentBackend::ENoWrite = "No write is under way, so there is no backend to pri
 Protect[CurrentBackend];
 
 (*
+  pr - one more line of the output.
+  It is a symbol of this package, so the pr a script writes after it has
+  loaded Generato is this one. Outside a write there is nothing to add the
+  line to: left inert, the line would be lost and the run would report
+  success.
+*)
+pr[line_:""] :=
+  If[$WriteLines === None,
+    Stop[pr::ENoWrite]
+    ,
+    AppendTo[$WriteLines, line];
+  ];
+
+pr::ENoWrite = "No write is under way, so there is no output to add a line to. pr belongs in the main content, which WriteToFile evaluates.";
+
+Protect[pr];
+
+(*
   WriteToFile - the one writer.
   The backend is resolved once, before anything is built, and its table is
-  held for this call only. Global`pr appends to a buffer that lives for this
-  call only. The file is opened after the main content has finished, so a
-  run that stops inside it writes nothing.
+  held for this call only, as are the lines pr adds. The file is opened
+  after the main content has finished, so a run that stops inside it writes
+  nothing.
 *)
 WriteToFile[backend_String, outputfile_String] :=
-  Module[{table = ResolveBackend[backend], lines = {}, headerGuard, stream, ending},
+  Module[{table = ResolveBackend[backend], headerGuard, text, stream, ending},
     If[Environment["QUIET"] =!= "1",
       System`Print["Writing to \"", outputfile, "\"...\n"]
     ];
@@ -70,11 +94,10 @@ WriteToFile[backend_String, outputfile_String] :=
         ToUpperCase[FileNameTake[outputfile]],
         Except[LetterCharacter | DigitCharacter] -> "_"
       ];
-    Block[{$WriteBackend = table, Global`pr},
-      Global`pr[x_:""] := (AppendTo[lines, x];);
+    Block[{$WriteBackend = table, $WriteLines = {}},
       (* print first few lines; Driver.wl knows a generated file by the second *)
-      Global`pr["/* " <> FileNameTake[outputfile] <> " */"];
-      Global`pr[
+      pr["/* " <> FileNameTake[outputfile] <> " */"];
+      pr[
         "/* Produced with Generato" <>
           If[GetPrintDate[],
             " on " <> DateString[{"Month", "/", "Day", "/", "Year"}]
@@ -82,11 +105,11 @@ WriteToFile[backend_String, outputfile_String] :=
             ""
           ] <> " */"
       ];
-      Global`pr[];
+      pr[];
       If[GetPrintHeaderMacro[],
-        Global`pr["#ifndef " <> headerGuard];
-        Global`pr["#define " <> headerGuard];
-        Global`pr[]
+        pr["#ifndef " <> headerGuard];
+        pr["#define " <> headerGuard];
+        pr[]
       ];
       (* GetMainPrint[] evaluates the held main print content.
          A throw without a tag raised in it, which is how an xAct error ends,
@@ -97,18 +120,19 @@ WriteToFile[backend_String, outputfile_String] :=
       If[ending =!= finished,
         Stop[WriteToFile::EThrow, ThrownText[ending]]
       ];
-      Global`pr[];
+      pr[];
       If[GetPrintHeaderMacro[],
-        Global`pr["#endif // #ifndef " <> headerGuard];
-        Global`pr[]
+        pr["#endif // #ifndef " <> headerGuard];
+        pr[]
       ];
-      Global`pr["/* " <> FileNameTake[outputfile] <> " */"];
+      pr["/* " <> FileNameTake[outputfile] <> " */"];
+      text = StripTrailingWhitespace[StringRiffle[$WriteLines, "\n"]]
     ];
     If[FileExistsQ[outputfile] && Environment["QUIET"] =!= "1",
       System`Print["\"", outputfile, "\" already exists, replacing it ...\n"]
     ];
     stream = OpenWrite[outputfile];
-    WriteString[stream, StripTrailingWhitespace[StringRiffle[lines, "\n"]], "\n"];
+    WriteString[stream, text, "\n"];
     Close[stream];
     If[Environment["QUIET"] =!= "1",
       System`Print["Done generating \"", outputfile, "\"\n"]

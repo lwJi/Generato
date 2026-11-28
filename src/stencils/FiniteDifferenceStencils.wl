@@ -12,13 +12,25 @@ If[Environment["QUIET"] =!= "1",
   System`Print["------------------------------------------------------------"];
 ];
 
-GetFiniteDifferenceCoefficients::usage = "GetFiniteDifferenceCoefficients[sample, order] returns the finite difference coefficients for the given sample points and derivative order.";
+GetFiniteDifferenceCoefficients::usage = "GetFiniteDifferenceCoefficients[sample, order] returns the finite difference coefficients for the given sample points and derivative order, as rules Subscript[StencilCoefficient, point] -> value.";
 
 GetCenteringStencils::usage = "GetCenteringStencils[order] returns the centering stencil points for the given accuracy order.";
 
-GetUpwindCoefficients::usage = "GetUpwindCoefficients[sample] returns the symmetric and antisymmetric upwind coefficients for the given sample points.";
+GetUpwindCoefficients::usage = "GetUpwindCoefficients[sample] returns the symmetric and antisymmetric upwind coefficients for the given sample points, as rules for Subscript[UpwindSymmetricCoefficient, i] and Subscript[UpwindAntisymmetricCoefficient, i].";
+
+StencilCoefficient::usage = "Subscript[StencilCoefficient, point] is the coefficient of a sample point in the rules GetFiniteDifferenceCoefficients returns.";
+
+UpwindSymmetricCoefficient::usage = "Subscript[UpwindSymmetricCoefficient, i] is the i-th coefficient of the symmetric part in the rules GetUpwindCoefficients returns, i from 1.";
+
+UpwindAntisymmetricCoefficient::usage = "Subscript[UpwindAntisymmetricCoefficient, i] is the i-th coefficient of the antisymmetric part in the rules GetUpwindCoefficients returns, i from 0.";
 
 Begin["`Private`"];
+
+(*
+  The coefficients are symbols with a subscript. A caller reads a result by
+  the three public heads; the value of the function at a sample point,
+  Subscript[f, point], is used here only.
+*)
 
 (* Data *)
 
@@ -34,7 +46,7 @@ GetCoefficients[sample_?ListQ, values_?ListQ] := Module[{numPoints, equations, c
   numPoints = Length[sample];
 
   (* Create coefficient symbols c1, c2, ..., cn *)
-  coeffs = Table[Subscript[Global`c, sample[[i]]], {i, 1, numPoints}];
+  coeffs = Table[Subscript[StencilCoefficient, sample[[i]]], {i, 1, numPoints}];
 
   (* Generate the system of equations based on the sample and values *)
   equations = Table[Sum[coeffs[[i]] If[j==0, 1, sample[[i]]^j], {i, 1, numPoints}] == values[[j+1]], {j, 0, numPoints-1}];
@@ -75,24 +87,24 @@ GetUpwindCoefficients[sample_?ListQ] := Module[{numPoints, numCoeff, upwind, dnw
   numPoints = Length[sample];
 
   (* Calculate upwind and downwind stencils using finite difference coefficients *)
-  upwind = Sum[Subscript[Global`c, sample[[i]]] Subscript[Global`f, sample[[i]]], {i, 1, numPoints}] /. GetFiniteDifferenceCoefficients[sample, 1];
-  dnwind = Sum[Subscript[Global`c, -sample[[i]]] Subscript[Global`f, -sample[[i]]], {i, 1, numPoints}] /. GetFiniteDifferenceCoefficients[-sample, 1];
+  upwind = Sum[Subscript[StencilCoefficient, sample[[i]]] Subscript[f, sample[[i]]], {i, 1, numPoints}] /. GetFiniteDifferenceCoefficients[sample, 1];
+  dnwind = Sum[Subscript[StencilCoefficient, -sample[[i]]] Subscript[f, -sample[[i]]], {i, 1, numPoints}] /. GetFiniteDifferenceCoefficients[-sample, 1];
 
   (* Calculate the number of coefficients (assuming symmetric samples) *)
   numCoeff = (numPoints + 1)/2;
 
   (* Define symmetric and anti-symmetric coefficient variables *)
-  symmCoeffs = Table[Subscript[Global`cs, i], {i, 1, numCoeff}];
-  antiCoeffs = Table[Subscript[Global`ca, i], {i, 0, numCoeff}];
+  symmCoeffs = Table[Subscript[UpwindSymmetricCoefficient, i], {i, 1, numCoeff}];
+  antiCoeffs = Table[Subscript[UpwindAntisymmetricCoefficient, i], {i, 0, numCoeff}];
 
   (* Build symmetric and anti-symmetric expressions *)
-  symm = Sum[symmCoeffs[[i]] (Subscript[Global`f, i] - Subscript[Global`f, -i]), {i, 1, numCoeff}];
-  anti = antiCoeffs[[1]] Subscript[Global`f, 0] + Sum[antiCoeffs[[i + 1]] (Subscript[Global`f, i] + Subscript[Global`f, -i]), {i, 1, numCoeff}];
+  symm = Sum[symmCoeffs[[i]] (Subscript[f, i] - Subscript[f, -i]), {i, 1, numCoeff}];
+  anti = antiCoeffs[[1]] Subscript[f, 0] + Sum[antiCoeffs[[i + 1]] (Subscript[f, i] + Subscript[f, -i]), {i, 1, numCoeff}];
 
   (* Set up the system of equations by comparing coefficients *)
   eqns = Join[
-    Table[Coefficient[symm - anti - upwind, Subscript[Global`f, sample[[i]]]] == 0, {i, 1, numPoints}],
-    Table[Coefficient[symm + anti - dnwind, Subscript[Global`f, sample[[i]]]] == 0, {i, 1, numPoints}]
+    Table[Coefficient[symm - anti - upwind, Subscript[f, sample[[i]]]] == 0, {i, 1, numPoints}],
+    Table[Coefficient[symm + anti - dnwind, Subscript[f, sample[[i]]]] == 0, {i, 1, numPoints}]
   ];
 
   (* Solve for the symmetric and anti-symmetric coefficients, suppress underdetermined system warning *)
@@ -101,6 +113,8 @@ GetUpwindCoefficients[sample_?ListQ] := Module[{numPoints, numCoeff, upwind, dnw
 ];
 
 Protect[GetUpwindCoefficients];
+
+Protect[StencilCoefficient, UpwindSymmetricCoefficient, UpwindAntisymmetricCoefficient];
 
 End[];
 

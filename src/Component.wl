@@ -32,8 +32,6 @@ BaseRecord::usage = "BaseRecord[variable] returns the record of the bound variab
 
 RequireChart::usage = "RequireChart[variable, component, coordinate] stops the run if a component record of the variable is not a component in the chart coordinate. The records of a variable are its components in the chart it was bound in; the component of a scalar carries no chart.";
 
-PrintComponent::usage = "PrintComponent[coordinate, variable, component] prints the initialization of one component record of a bound variable through the backend.";
-
 Is3DAbstractIndex::usage = "Is3DAbstractIndex[index] returns True if the abstract index represents a 3D spatial index (first letter >= 'i').";
 
 Begin["`Private`"];
@@ -277,27 +275,6 @@ RequireChart[variable_Association, component_Association, coordinate_] :=
 RequireChart::EChart = "Variable `1` has no components in chart `2`: it is bound in the default chart.";
 
 Protect[RequireChart];
-
-(*
-  PrintComponent - hands one component record to the backend to initialize.
-  The backend gets the records: the variable, the component, and the
-  variable a declared relation names, or None. An equation does not come
-  this way: the print calls in Interface.wl render it through the table of
-  the backend.
-*)
-PrintComponent[coordinate_, variable_Association, component_Association] :=
-  Module[{},
-    RequireChart[variable, component, coordinate];
-    If[!InInitializationsMode[],
-      Stop[PrintComponent::EMode]
-    ];
-    PrintVerbose["    PrintComponentInitialization ", component["Comp"], "..."];
-    Global`PrintComponentInitialization[variable, component, BaseRecord[variable]]
-  ];
-
-PrintComponent::EMode = "PrintMode unrecognized!";
-
-Protect[PrintComponent];
 
 Is3DAbstractIndex[idx_] :=
   Module[{},

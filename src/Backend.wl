@@ -14,13 +14,17 @@ If[Environment["QUIET"] =!= "1",
 
 CText::usage = "CText[expr] returns expr as C text, wrapped at 78 columns with no trailing newline.";
 
-DefineBackend::usage = "DefineBackend[name, table] registers a backend under name. table states what differs from what the backend builds on: the backend table[\"Extends\"] names, or $BackendDefaults. A formatter is at table[kind][mode][storage], where storage is \"Grid\", \"Tile\", \"Temp\" or All for any. Registering has no effect on output, and a name registered again replaces the earlier table.";
+DefineBackend::usage = "DefineBackend[name, table] registers a backend under name. table states what differs from what the backend builds on: the backend table[\"Extends\"] names, or $BackendDefaults. A formatter is at table[kind][mode][storage], where kind is \"Load\" or \"Store\" and storage is \"Grid\", \"Tile\", \"Temp\" or All for any; the keys of a table are what the backend accepts. Registering has no effect on output, and a name registered again replaces the earlier table.";
 
 ResolveBackend::usage = "ResolveBackend[name] returns the table of a registered backend, merged key by key, down to the storage, with the backend it extends or with $BackendDefaults. The table carries \"Name\" -> name. It stops the run if no backend of that name is registered.";
 
-Render::usage = "Render[table, statements] returns the lines of a list of statements. A string is a line and passes through; a statement record is handed to the formatter at table[kind][mode][storage of its variable], or at All if the storage has no key. It stops the run if the table has no such formatter.";
+Render::usage = "Render[table, statements] returns the lines of a list of statements. A string is a line and passes through; a statement record is handed to the formatter at table[kind][mode][storage of its variable], or at All if the storage has no key. It stops the run if the table has no such formatter, or if the formatter is marked with Requires and the variable of the statement does not declare the relation.";
 
-$BackendDefaults::usage = "$BackendDefaults is the table every backend builds on: the \"Store\" formatters for the modes \"Out\", \"AddTo\" and \"Temp\", for any storage.";
+Requires::usage = "Requires[relation, formatter] is a formatter in a backend table that reads a relation the variable declares: relation is \"DerivativeOf\" or \"TimeDerivativeOf\". Render hands formatter a statement only if its variable declares the relation, and stops the run at one that does not.";
+
+RequireRelation::usage = "RequireRelation[variable, relation, mode] stops the run, with a pointer to the rule to add, if the variable record declares no relation of that name. mode is the mode it is loaded with.";
+
+$BackendDefaults::usage = "$BackendDefaults is the table every backend builds on: the \"Store\" formatters for the modes \"Out\", \"AddTo\" and \"Temp\", for any storage. It holds no \"Load\" formatter: no two backends load a component with the same text.";
 
 Assign::usage = "Assign[statement] is a \"Store\" formatter: the component, \"=\", the right-hand side, \";\".";
 
@@ -29,6 +33,10 @@ AddAssign::usage = "AddAssign[statement] is a \"Store\" formatter: the component
 DeclareAssignPlain::usage = "DeclareAssignPlain[statement] is a \"Store\" formatter: the temporary type and the component as an equation refers to it, \"=\", the right-hand side, \";\".";
 
 DeclareAssign::usage = "DeclareAssign[statement] is a \"Store\" formatter: \"const\", the temporary type and the bare name of the component, \"=\", the right-hand side, \";\".";
+
+IndexSuffix::usage = "IndexSuffix[variable, component, base] returns the index a component has in the storage of its variable, as C text: \"\" for a scalar, \"[v]\" for its slot v, and \"[v mod N][v div N]\" for a derivative of a variable with N components. base is the record DerivativeOf names. A formatter calls it on the \"Variable\", \"Component\" and \"Base\" of its statement.";
+
+BaseComponent::usage = "BaseComponent[component, base] returns the component record of base that a component of one of its derivatives differentiates: the one at the trailing indices.";
 
 Begin["`Private`"];
 
@@ -56,11 +64,13 @@ Protect[CText];
       "RHS" -> MDD11 uU1 + MDD12 uU2 + MDD13 uU3,
       "Config" -> <|"TempVariableType" -> "vreal", ...|>|>
 
-  "Variable" and "Component" are the records binding wrote, "Base" is the
-  record of the variable a declared relation names, or None, and "Config"
-  is the user configuration. A formatter is a function from one statement
-  to its lines. It reads its argument and nothing else: it calls no getter
-  and writes nothing, so it is tested by calling it on a literal record.
+  "Kind" is "Load", which brings a component into scope, or "Store", which
+  writes its equation; only a "Store" has "RHS". "Variable" and "Component"
+  are the records binding wrote, "Base" is the record of the variable a
+  declared relation names, or None, and "Config" is the user configuration.
+  A formatter is a function from one statement to its lines. It reads its
+  argument and nothing else: it calls no getter and writes nothing, so it is
+  tested by calling it on a literal record.
 
   The lines of an equation are one token each, which is the layout of the
   goldens: the left-hand side, the operator, the right-hand side, ";", and
@@ -80,6 +90,61 @@ DeclareAssign[statement_Association] :=
   {"const " <> statement["Config", "TempVariableType"], statement["Component", "Name"], "=", CText[statement["RHS"]], ";", ""};
 
 Protect[Assign, AddAssign, DeclareAssignPlain, DeclareAssign];
+
+(*
+  IndexSuffix - the layout rule: where a component is in the storage of its variable.
+
+    v = the component's slot, N = the number of independent components of
+    the variable it is a derivative of
+
+    no DerivativeOf:   ""  for a scalar, [v] otherwise
+    DerivativeOf:      [v] when N is 1, [v mod N][v div N] otherwise
+
+  The derivative slots lead, so v = N d + c for the derivative index d and
+  the component c of the differentiated variable, and the index is [c][d].
+  A time derivative has the components of its variable and is laid out like
+  it, so TimeDerivativeOf plays no part here.
+*)
+IndexSuffix[variable_Association, component_Association, base_] :=
+  With[{slot = component["Slot"]},
+    If[variable["DerivativeOf"] === None,
+      If[variable["Slots"] === {},
+        ""
+        ,
+        "[" <> ToString[slot] <> "]"
+      ]
+      ,
+      With[{count = Length[base["Components"]]},
+        If[count == 1,
+          "[" <> ToString[slot] <> "]"
+          ,
+          "[" <> ToString[Mod[slot, count]] <> "][" <> ToString[Quotient[slot, count]] <> "]"
+        ]
+      ]
+    ]
+  ];
+
+Protect[IndexSuffix];
+
+(*
+  BaseComponent - the component a derivative component differentiates.
+  The slots of the differentiated variable are the trailing ones, so its
+  component is the one at the trailing indices: dgamt123 differentiates
+  gamt23. A derivative declared with less symmetry than its variable has
+  components for which there is none, say dgamt132.
+*)
+BaseComponent[component_Association, base_Association] :=
+  Module[{indices = Take[component["Indices"], -Length[base["Slots"]]], basecomponent},
+    basecomponent = SelectFirst[base["Components"], #["Indices"] === indices&, None];
+    If[basecomponent === None,
+      Stop[BaseComponent::EComponent, component["Name"], base["Head"], indices]
+    ];
+    basecomponent
+  ];
+
+BaseComponent::EComponent = "`1` is a derivative of the component of `2` at the indices `3`, and `2` has no independent component there. Declare the derivative with the symmetry of `2`.";
+
+Protect[BaseComponent];
 
 (*
   $BackendDefaults - what a backend builds on when it extends no other.
@@ -155,11 +220,43 @@ Formatter[table_Association, statement_Association] :=
     formatter
   ];
 
+(*
+  Requires - a formatter that reads a relation says so where it is registered:
+
+    "Derivs" -> <|"Temp" -> Requires["DerivativeOf", derivLoad]|>
+
+  The mark is the value at the key, so a table states which of its modes
+  need a relation and nothing in core names a mode. A statement whose
+  variable does not declare the relation never reaches the formatter:
+  RequireRelation stops the run with the rule to add. A relation is never
+  read out of a name.
+*)
+$RelationPhrase = <|"DerivativeOf" -> "derivative", "TimeDerivativeOf" -> "time derivative"|>;
+
+RequireRelation[variable_Association, relation_String, mode_String] :=
+  If[Lookup[variable, relation, None] === None,
+    Stop[RequireRelation::EMissing, variable["Head"], mode, relation, $RelationPhrase[relation]]
+  ];
+
+RequireRelation::EMissing = "`1` is loaded with \"`2`\" but declares no `3`. Add `3` -> v to its declaration, where v is the variable `1` is the `4` of.";
+
+Protect[Requires, RequireRelation];
+
+(* The lines a formatter gives a statement; one that is marked is given the statement after its relation is checked *)
+FormatterLines[Requires[relation_String, formatter_], statement_Association] :=
+  Module[{},
+    RequireRelation[statement["Variable"], relation, statement["Mode"]];
+    formatter[statement]
+  ];
+
+FormatterLines[formatter_, statement_Association] :=
+  formatter[statement];
+
 RenderStatement[table_Association, line_String] :=
   {line};
 
 RenderStatement[table_Association, statement_Association] :=
-  Module[{lines = Formatter[table, statement][statement]},
+  Module[{lines = FormatterLines[Formatter[table, statement], statement]},
     If[!MatchQ[lines, {___String}],
       Stop[Render::ELines, table["Name"], statement["Kind"], statement["Mode"], StringTake[ToString[lines, InputForm], UpTo[200]]]
     ];

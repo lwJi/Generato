@@ -1,70 +1,75 @@
 (* ::Package:: *)
 
-(* CarpetXGPU.wl, set up functions adapted to CarpetXGPU code *)
+(* CarpetXGPU.wl, the backend table of CarpetXGPU code *)
 
 (* (c) Liwei Ji, 01/2025 *)
 
+(*
+    The file is one DefineBackend call. Its formatters are bound by the With
+    around the call, so the file assigns no symbol. A formatter takes one
+    statement and returns its lines, and reads nothing else.
 
-(******************************************************************************)
-(*            Print initialization of each component of a tensor              *)
-(******************************************************************************)
-(**
- * \param variable, component: the records of the variable and of the component.
- * \param base: the record of the variable a declared relation names, or None.
- *
- * A grid function is read from gf_<variable> and a tile from tl_<variable>,
- * at the index the layout rule gives. A derivative that is not stored on a
- * tile is computed from the variable it differentiates, so it must declare
- * DerivativeOf: its order is the number of slots it has more, and the
- * derivative directions are its leading indices.
- *)
+    A load brings one component into scope as a local of its bare name:
 
-PrintComponentInitialization[variable_, component_, base_] :=
-  Module[{mode = GetInitializationsMode[], name = component["Name"], order},
-    pr[
-      Which[
-        (mode === "MainIn" || mode === "MainOut" || mode === "Derivs") && GetStorageType[] === "Tile",
-          "const auto " <> name <> " = tl_" <> variable["Name"] <> IndexSuffix[variable, component, base] <> ".ptr;"
-        ,
-        mode === "MainIn" || mode === "MainOut",
-          "const auto " <> name <> " = gf_" <> variable["Name"] <> IndexSuffix[variable, component, base] <> ";"
-        ,
-        mode === "Derivs",
-          RequireRelation[variable, "DerivativeOf", mode];
-          order = Length[variable["Slots"]] - Length[base["Slots"]];
-          "const auto " <> name
-          <> " = calcderivs" <> ToString[order] <> "_"
-          <> StringJoin[ToString /@ Take[component["Indices"], order]]
-          <> "(" <> BaseComponent[component, base]["Name"] <> ", p.i, p.j, p.k);"
-        ,
-        mode === "Temp",
-          "auto " <> name <> ";"
-        ,
-        True,
-          Stop[PrintComponentInitialization::EMode]
+      gridLoad    a grid function is read from gf_<variable>, at the index the
+                  layout rule gives
+      tileLoad    a tile is read from tl_<variable>, at the same index
+      derivLoad   a derivative that is not stored is computed from the
+                  component it differentiates. Its order is the number of
+                  slots it has more than that variable, and the derivative
+                  directions are its leading indices. It reads the relation,
+                  so it is registered with Requires
+      declare     a temporary is declared, to be assigned later
+
+    A store is rendered by the defaults in src/Backend.wl, except that a
+    temporary is declared const, by the bare name of the component.
+*)
+
+With[
+  {
+    gridLoad =
+      Function[statement,
+        {
+          "const auto " <> statement["Component", "Name"]
+          <> " = gf_" <> statement["Variable", "Name"]
+          <> IndexSuffix[statement["Variable"], statement["Component"], statement["Base"]] <> ";"
+        }
+      ],
+    tileLoad =
+      Function[statement,
+        {
+          "const auto " <> statement["Component", "Name"]
+          <> " = tl_" <> statement["Variable", "Name"]
+          <> IndexSuffix[statement["Variable"], statement["Component"], statement["Base"]] <> ".ptr;"
+        }
+      ],
+    derivLoad =
+      Function[statement,
+        With[{order = Length[statement["Variable", "Slots"]] - Length[statement["Base", "Slots"]]},
+          {
+            "const auto " <> statement["Component", "Name"]
+            <> " = calcderivs" <> ToString[order] <> "_"
+            <> StringJoin[ToString /@ Take[statement["Component", "Indices"], order]]
+            <> "(" <> BaseComponent[statement["Component"], statement["Base"]]["Name"] <> ", p.i, p.j, p.k);"
+          }
+        ]
+      ],
+    declare =
+      Function[statement,
+        {"auto " <> statement["Component", "Name"] <> ";"}
       ]
-    ];
-  ];
+  },
+  DefineBackend["CarpetXGPU", <|
+    "Load" -> <|
+      "In" -> <|"Grid" -> gridLoad, "Tile" -> tileLoad|>,
+      "Out" -> <|"Grid" -> gridLoad, "Tile" -> tileLoad|>,
+      "Derivs" -> <|"Temp" -> Requires["DerivativeOf", derivLoad]|>,
+      "Temp" -> <|"Temp" -> declare|>
+    |>,
+    "Store" -> <|"Temp" -> <|All -> DeclareAssign|>|>
+  |>]
+];
 
-PrintComponentInitialization::EMode = "PrintComponentInitialization mode unrecognized!";
-
-Protect[PrintComponentInitialization];
-
-
-(******************************************************************************)
-(*                             The backend table                              *)
-(******************************************************************************)
-(**
- * An equation is rendered through this table. The backend states what
- * differs from the defaults in src/Backend.wl: a temporary is declared
- * const, by the bare name of the component.
- *)
-
-DefineBackend["CarpetXGPU", <|"Store" -> <|"Temp" -> <|All -> DeclareAssign|>|>|>];
-
-
-(******************************************************************************)
-(*                                Write to files                              *)
-(******************************************************************************)
+(* Write to files *)
 
 WriteToFile["CarpetXGPU", GetOutputFile[]];
