@@ -4,9 +4,17 @@
 CarpetXGPU:test:.hxx
 CarpetXGPU:testTile:.hxx
 CarpetXGPU:testDerivs:.hxx
+# Derivs at order 1 and 2, of a scalar, a vector and a symmetric matrix
+CarpetXGPU:testDerivs2nd:.hxx
+# Tile-stored derivatives with TensorType "Vect" and "Smat"
+CarpetXGPU:testTileDerivs:.hxx
+# The "Temp" initialization and the "AddToMainOut" equation
+CarpetXGPU:testModes:.hxx
 AMReX:test:.hxx
 #Nmesh:test:.c
 #Nmesh:GHG_rhs:.c
 Nmesh:GHG_set_profile_ADM:.c
+# The "MainOut" initialization (vlr, "dt" prefix trimmed)
+Nmesh:testOut:.c
 
 # Note: test/Nmesh/GHG_rhs.ipynb is documentation-only and not part of the test suite
