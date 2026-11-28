@@ -1,0 +1,341 @@
+/* testTileDerivs.hxx */
+/* Produced with Generato */
+
+#ifndef TESTTILEDERIVS_HXX
+#define TESTTILEDERIVS_HXX
+
+
+const auto dtW = gf_dtW;
+const auto dtbeta1 = gf_dtbeta[0];
+const auto dtbeta2 = gf_dtbeta[1];
+const auto dtbeta3 = gf_dtbeta[2];
+const auto W = gf_W;
+const auto gamt11 = gf_gamt[0];
+const auto gamt12 = gf_gamt[1];
+const auto gamt13 = gf_gamt[2];
+const auto gamt22 = gf_gamt[3];
+const auto gamt23 = gf_gamt[4];
+const auto gamt33 = gf_gamt[5];
+const auto beta1 = gf_beta[0];
+const auto beta2 = gf_beta[1];
+const auto beta3 = gf_beta[2];
+
+const auto dW1 = tl_dW[0].ptr;
+const auto dW2 = tl_dW[1].ptr;
+const auto dW3 = tl_dW[2].ptr;
+const auto dgamt111 = tl_dgamt[0][0].ptr;
+const auto dgamt112 = tl_dgamt[1][0].ptr;
+const auto dgamt113 = tl_dgamt[2][0].ptr;
+const auto dgamt122 = tl_dgamt[3][0].ptr;
+const auto dgamt123 = tl_dgamt[4][0].ptr;
+const auto dgamt133 = tl_dgamt[5][0].ptr;
+const auto dgamt211 = tl_dgamt[0][1].ptr;
+const auto dgamt212 = tl_dgamt[1][1].ptr;
+const auto dgamt213 = tl_dgamt[2][1].ptr;
+const auto dgamt222 = tl_dgamt[3][1].ptr;
+const auto dgamt223 = tl_dgamt[4][1].ptr;
+const auto dgamt233 = tl_dgamt[5][1].ptr;
+const auto dgamt311 = tl_dgamt[0][2].ptr;
+const auto dgamt312 = tl_dgamt[1][2].ptr;
+const auto dgamt313 = tl_dgamt[2][2].ptr;
+const auto dgamt322 = tl_dgamt[3][2].ptr;
+const auto dgamt323 = tl_dgamt[4][2].ptr;
+const auto dgamt333 = tl_dgamt[5][2].ptr;
+const auto dbeta11 = tl_dbeta[0][0].ptr;
+const auto dbeta12 = tl_dbeta[1][0].ptr;
+const auto dbeta13 = tl_dbeta[2][0].ptr;
+const auto dbeta21 = tl_dbeta[0][1].ptr;
+const auto dbeta22 = tl_dbeta[1][1].ptr;
+const auto dbeta23 = tl_dbeta[2][1].ptr;
+const auto dbeta31 = tl_dbeta[0][2].ptr;
+const auto dbeta32 = tl_dbeta[1][2].ptr;
+const auto dbeta33 = tl_dbeta[2][2].ptr;
+const auto ddW11 = tl_ddW[0].ptr;
+const auto ddW12 = tl_ddW[1].ptr;
+const auto ddW13 = tl_ddW[2].ptr;
+const auto ddW22 = tl_ddW[3].ptr;
+const auto ddW23 = tl_ddW[4].ptr;
+const auto ddW33 = tl_ddW[5].ptr;
+const auto ddgamt1111 = tl_ddgamt[0][0].ptr;
+const auto ddgamt1112 = tl_ddgamt[1][0].ptr;
+const auto ddgamt1113 = tl_ddgamt[2][0].ptr;
+const auto ddgamt1122 = tl_ddgamt[3][0].ptr;
+const auto ddgamt1123 = tl_ddgamt[4][0].ptr;
+const auto ddgamt1133 = tl_ddgamt[5][0].ptr;
+const auto ddgamt1211 = tl_ddgamt[0][1].ptr;
+const auto ddgamt1212 = tl_ddgamt[1][1].ptr;
+const auto ddgamt1213 = tl_ddgamt[2][1].ptr;
+const auto ddgamt1222 = tl_ddgamt[3][1].ptr;
+const auto ddgamt1223 = tl_ddgamt[4][1].ptr;
+const auto ddgamt1233 = tl_ddgamt[5][1].ptr;
+const auto ddgamt1311 = tl_ddgamt[0][2].ptr;
+const auto ddgamt1312 = tl_ddgamt[1][2].ptr;
+const auto ddgamt1313 = tl_ddgamt[2][2].ptr;
+const auto ddgamt1322 = tl_ddgamt[3][2].ptr;
+const auto ddgamt1323 = tl_ddgamt[4][2].ptr;
+const auto ddgamt1333 = tl_ddgamt[5][2].ptr;
+const auto ddgamt2211 = tl_ddgamt[0][3].ptr;
+const auto ddgamt2212 = tl_ddgamt[1][3].ptr;
+const auto ddgamt2213 = tl_ddgamt[2][3].ptr;
+const auto ddgamt2222 = tl_ddgamt[3][3].ptr;
+const auto ddgamt2223 = tl_ddgamt[4][3].ptr;
+const auto ddgamt2233 = tl_ddgamt[5][3].ptr;
+const auto ddgamt2311 = tl_ddgamt[0][4].ptr;
+const auto ddgamt2312 = tl_ddgamt[1][4].ptr;
+const auto ddgamt2313 = tl_ddgamt[2][4].ptr;
+const auto ddgamt2322 = tl_ddgamt[3][4].ptr;
+const auto ddgamt2323 = tl_ddgamt[4][4].ptr;
+const auto ddgamt2333 = tl_ddgamt[5][4].ptr;
+const auto ddgamt3311 = tl_ddgamt[0][5].ptr;
+const auto ddgamt3312 = tl_ddgamt[1][5].ptr;
+const auto ddgamt3313 = tl_ddgamt[2][5].ptr;
+const auto ddgamt3322 = tl_ddgamt[3][5].ptr;
+const auto ddgamt3323 = tl_ddgamt[4][5].ptr;
+const auto ddgamt3333 = tl_ddgamt[5][5].ptr;
+const auto ddbeta111 = tl_ddbeta[0][0].ptr;
+const auto ddbeta112 = tl_ddbeta[1][0].ptr;
+const auto ddbeta113 = tl_ddbeta[2][0].ptr;
+const auto ddbeta121 = tl_ddbeta[0][1].ptr;
+const auto ddbeta122 = tl_ddbeta[1][1].ptr;
+const auto ddbeta123 = tl_ddbeta[2][1].ptr;
+const auto ddbeta131 = tl_ddbeta[0][2].ptr;
+const auto ddbeta132 = tl_ddbeta[1][2].ptr;
+const auto ddbeta133 = tl_ddbeta[2][2].ptr;
+const auto ddbeta221 = tl_ddbeta[0][3].ptr;
+const auto ddbeta222 = tl_ddbeta[1][3].ptr;
+const auto ddbeta223 = tl_ddbeta[2][3].ptr;
+const auto ddbeta231 = tl_ddbeta[0][4].ptr;
+const auto ddbeta232 = tl_ddbeta[1][4].ptr;
+const auto ddbeta233 = tl_ddbeta[2][4].ptr;
+const auto ddbeta331 = tl_ddbeta[0][5].ptr;
+const auto ddbeta332 = tl_ddbeta[1][5].ptr;
+const auto ddbeta333 = tl_ddbeta[2][5].ptr;
+
+grid.loop_int_device<0, 0, 0>(
+  grid.nghostzones, [=] ARITH_DEVICE(const PointDesc &p) ARITH_INLINE {
+const int ijk = layout2.linear(p.i, p.j, p.k);
+const int ijk5 = layout5.linear(p.i, p.j, p.k);
+
+const vreal
+dlnW1
+=
+dW1[ijk5]/W[ijk]
+;
+
+const vreal
+dlnW2
+=
+dW2[ijk5]/W[ijk]
+;
+
+const vreal
+dlnW3
+=
+dW3[ijk5]/W[ijk]
+;
+
+const vreal
+GtDDD111
+=
+dgamt111[ijk5]/2.
+;
+
+const vreal
+GtDDD112
+=
+dgamt211[ijk5]/2.
+;
+
+const vreal
+GtDDD113
+=
+dgamt311[ijk5]/2.
+;
+
+const vreal
+GtDDD122
+=
+-0.5*dgamt122[ijk5] + dgamt212[ijk5]
+;
+
+const vreal
+GtDDD123
+=
+(-dgamt123[ijk5] + dgamt213[ijk5] + dgamt312[ijk5])/2.
+;
+
+const vreal
+GtDDD133
+=
+-0.5*dgamt133[ijk5] + dgamt313[ijk5]
+;
+
+const vreal
+GtDDD211
+=
+dgamt112[ijk5] - dgamt211[ijk5]/2.
+;
+
+const vreal
+GtDDD212
+=
+dgamt122[ijk5]/2.
+;
+
+const vreal
+GtDDD213
+=
+(dgamt123[ijk5] - dgamt213[ijk5] + dgamt312[ijk5])/2.
+;
+
+const vreal
+GtDDD222
+=
+dgamt222[ijk5]/2.
+;
+
+const vreal
+GtDDD223
+=
+dgamt322[ijk5]/2.
+;
+
+const vreal
+GtDDD233
+=
+-0.5*dgamt233[ijk5] + dgamt323[ijk5]
+;
+
+const vreal
+GtDDD311
+=
+dgamt113[ijk5] - dgamt311[ijk5]/2.
+;
+
+const vreal
+GtDDD312
+=
+(dgamt123[ijk5] + dgamt213[ijk5] - dgamt312[ijk5])/2.
+;
+
+const vreal
+GtDDD313
+=
+dgamt133[ijk5]/2.
+;
+
+const vreal
+GtDDD322
+=
+dgamt223[ijk5] - dgamt322[ijk5]/2.
+;
+
+const vreal
+GtDDD323
+=
+dgamt233[ijk5]/2.
+;
+
+const vreal
+GtDDD333
+=
+dgamt333[ijk5]/2.
+;
+
+const vreal
+divbeta
+=
+dbeta11[ijk5] + dbeta22[ijk5] + dbeta33[ijk5]
+;
+
+const vreal
+lapW
+=
+ddW11[ijk5] + ddW22[ijk5] + ddW33[ijk5]
+;
+
+const vreal
+lapgamt11
+=
+ddgamt1111[ijk5] + ddgamt2211[ijk5] + ddgamt3311[ijk5]
+;
+
+const vreal
+lapgamt12
+=
+ddgamt1112[ijk5] + ddgamt2212[ijk5] + ddgamt3312[ijk5]
+;
+
+const vreal
+lapgamt13
+=
+ddgamt1113[ijk5] + ddgamt2213[ijk5] + ddgamt3313[ijk5]
+;
+
+const vreal
+lapgamt22
+=
+ddgamt1122[ijk5] + ddgamt2222[ijk5] + ddgamt3322[ijk5]
+;
+
+const vreal
+lapgamt23
+=
+ddgamt1123[ijk5] + ddgamt2223[ijk5] + ddgamt3323[ijk5]
+;
+
+const vreal
+lapgamt33
+=
+ddgamt1133[ijk5] + ddgamt2233[ijk5] + ddgamt3333[ijk5]
+;
+
+const vreal
+lapbeta1
+=
+ddbeta111[ijk5] + ddbeta221[ijk5] + ddbeta331[ijk5]
+;
+
+const vreal
+lapbeta2
+=
+ddbeta112[ijk5] + ddbeta222[ijk5] + ddbeta332[ijk5]
+;
+
+const vreal
+lapbeta3
+=
+ddbeta113[ijk5] + ddbeta223[ijk5] + ddbeta333[ijk5]
+;
+
+
+dtW[ijk]
+=
+lapW + beta1[ijk]*dW1[ijk5] + beta2[ijk]*dW2[ijk5] + beta3[ijk]*dW3[ijk5] -
+  divbeta*W[ijk]
+;
+
+dtbeta1[ijk]
+=
+lapbeta1 + beta1[ijk]*dbeta11[ijk5] + beta2[ijk]*dbeta21[ijk5] +
+  beta3[ijk]*dbeta31[ijk5]
+;
+
+dtbeta2[ijk]
+=
+lapbeta2 + beta1[ijk]*dbeta12[ijk5] + beta2[ijk]*dbeta22[ijk5] +
+  beta3[ijk]*dbeta32[ijk5]
+;
+
+dtbeta3[ijk]
+=
+lapbeta3 + beta1[ijk]*dbeta13[ijk5] + beta2[ijk]*dbeta23[ijk5] +
+  beta3[ijk]*dbeta33[ijk5]
+;
+
+
+});
+
+#endif // #ifndef TESTTILEDERIVS_HXX
+
+/* testTileDerivs.hxx */

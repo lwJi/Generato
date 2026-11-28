@@ -1,0 +1,336 @@
+/* testDerivs2nd.hxx */
+/* Produced with Generato */
+
+#ifndef TESTDERIVS2ND_HXX
+#define TESTDERIVS2ND_HXX
+
+
+const auto dtW = gf_dtW;
+const auto dtbeta1 = gf_dtbeta[0];
+const auto dtbeta2 = gf_dtbeta[1];
+const auto dtbeta3 = gf_dtbeta[2];
+const auto W = gf_W;
+const auto gamt11 = gf_gamt[0];
+const auto gamt12 = gf_gamt[1];
+const auto gamt13 = gf_gamt[2];
+const auto gamt22 = gf_gamt[3];
+const auto gamt23 = gf_gamt[4];
+const auto gamt33 = gf_gamt[5];
+const auto beta1 = gf_beta[0];
+const auto beta2 = gf_beta[1];
+const auto beta3 = gf_beta[2];
+
+grid.loop_int_device<0, 0, 0>(
+  grid.nghostzones, [=] ARITH_DEVICE(const PointDesc &p) ARITH_INLINE {
+const int ijk = layout2.linear(p.i, p.j, p.k);
+
+const auto dW1 = calcderivs1_1(W, p.i, p.j, p.k);
+const auto dW2 = calcderivs1_2(W, p.i, p.j, p.k);
+const auto dW3 = calcderivs1_3(W, p.i, p.j, p.k);
+const auto dgamt111 = calcderivs1_1(gamt11, p.i, p.j, p.k);
+const auto dgamt112 = calcderivs1_1(gamt12, p.i, p.j, p.k);
+const auto dgamt113 = calcderivs1_1(gamt13, p.i, p.j, p.k);
+const auto dgamt122 = calcderivs1_1(gamt22, p.i, p.j, p.k);
+const auto dgamt123 = calcderivs1_1(gamt23, p.i, p.j, p.k);
+const auto dgamt133 = calcderivs1_1(gamt33, p.i, p.j, p.k);
+const auto dgamt211 = calcderivs1_2(gamt11, p.i, p.j, p.k);
+const auto dgamt212 = calcderivs1_2(gamt12, p.i, p.j, p.k);
+const auto dgamt213 = calcderivs1_2(gamt13, p.i, p.j, p.k);
+const auto dgamt222 = calcderivs1_2(gamt22, p.i, p.j, p.k);
+const auto dgamt223 = calcderivs1_2(gamt23, p.i, p.j, p.k);
+const auto dgamt233 = calcderivs1_2(gamt33, p.i, p.j, p.k);
+const auto dgamt311 = calcderivs1_3(gamt11, p.i, p.j, p.k);
+const auto dgamt312 = calcderivs1_3(gamt12, p.i, p.j, p.k);
+const auto dgamt313 = calcderivs1_3(gamt13, p.i, p.j, p.k);
+const auto dgamt322 = calcderivs1_3(gamt22, p.i, p.j, p.k);
+const auto dgamt323 = calcderivs1_3(gamt23, p.i, p.j, p.k);
+const auto dgamt333 = calcderivs1_3(gamt33, p.i, p.j, p.k);
+const auto dbeta11 = calcderivs1_1(beta1, p.i, p.j, p.k);
+const auto dbeta12 = calcderivs1_1(beta2, p.i, p.j, p.k);
+const auto dbeta13 = calcderivs1_1(beta3, p.i, p.j, p.k);
+const auto dbeta21 = calcderivs1_2(beta1, p.i, p.j, p.k);
+const auto dbeta22 = calcderivs1_2(beta2, p.i, p.j, p.k);
+const auto dbeta23 = calcderivs1_2(beta3, p.i, p.j, p.k);
+const auto dbeta31 = calcderivs1_3(beta1, p.i, p.j, p.k);
+const auto dbeta32 = calcderivs1_3(beta2, p.i, p.j, p.k);
+const auto dbeta33 = calcderivs1_3(beta3, p.i, p.j, p.k);
+const auto ddW11 = calcderivs2_11(W, p.i, p.j, p.k);
+const auto ddW12 = calcderivs2_12(W, p.i, p.j, p.k);
+const auto ddW13 = calcderivs2_13(W, p.i, p.j, p.k);
+const auto ddW22 = calcderivs2_22(W, p.i, p.j, p.k);
+const auto ddW23 = calcderivs2_23(W, p.i, p.j, p.k);
+const auto ddW33 = calcderivs2_33(W, p.i, p.j, p.k);
+const auto ddgamt1111 = calcderivs2_11(gamt11, p.i, p.j, p.k);
+const auto ddgamt1112 = calcderivs2_11(gamt12, p.i, p.j, p.k);
+const auto ddgamt1113 = calcderivs2_11(gamt13, p.i, p.j, p.k);
+const auto ddgamt1122 = calcderivs2_11(gamt22, p.i, p.j, p.k);
+const auto ddgamt1123 = calcderivs2_11(gamt23, p.i, p.j, p.k);
+const auto ddgamt1133 = calcderivs2_11(gamt33, p.i, p.j, p.k);
+const auto ddgamt1211 = calcderivs2_12(gamt11, p.i, p.j, p.k);
+const auto ddgamt1212 = calcderivs2_12(gamt12, p.i, p.j, p.k);
+const auto ddgamt1213 = calcderivs2_12(gamt13, p.i, p.j, p.k);
+const auto ddgamt1222 = calcderivs2_12(gamt22, p.i, p.j, p.k);
+const auto ddgamt1223 = calcderivs2_12(gamt23, p.i, p.j, p.k);
+const auto ddgamt1233 = calcderivs2_12(gamt33, p.i, p.j, p.k);
+const auto ddgamt1311 = calcderivs2_13(gamt11, p.i, p.j, p.k);
+const auto ddgamt1312 = calcderivs2_13(gamt12, p.i, p.j, p.k);
+const auto ddgamt1313 = calcderivs2_13(gamt13, p.i, p.j, p.k);
+const auto ddgamt1322 = calcderivs2_13(gamt22, p.i, p.j, p.k);
+const auto ddgamt1323 = calcderivs2_13(gamt23, p.i, p.j, p.k);
+const auto ddgamt1333 = calcderivs2_13(gamt33, p.i, p.j, p.k);
+const auto ddgamt2211 = calcderivs2_22(gamt11, p.i, p.j, p.k);
+const auto ddgamt2212 = calcderivs2_22(gamt12, p.i, p.j, p.k);
+const auto ddgamt2213 = calcderivs2_22(gamt13, p.i, p.j, p.k);
+const auto ddgamt2222 = calcderivs2_22(gamt22, p.i, p.j, p.k);
+const auto ddgamt2223 = calcderivs2_22(gamt23, p.i, p.j, p.k);
+const auto ddgamt2233 = calcderivs2_22(gamt33, p.i, p.j, p.k);
+const auto ddgamt2311 = calcderivs2_23(gamt11, p.i, p.j, p.k);
+const auto ddgamt2312 = calcderivs2_23(gamt12, p.i, p.j, p.k);
+const auto ddgamt2313 = calcderivs2_23(gamt13, p.i, p.j, p.k);
+const auto ddgamt2322 = calcderivs2_23(gamt22, p.i, p.j, p.k);
+const auto ddgamt2323 = calcderivs2_23(gamt23, p.i, p.j, p.k);
+const auto ddgamt2333 = calcderivs2_23(gamt33, p.i, p.j, p.k);
+const auto ddgamt3311 = calcderivs2_33(gamt11, p.i, p.j, p.k);
+const auto ddgamt3312 = calcderivs2_33(gamt12, p.i, p.j, p.k);
+const auto ddgamt3313 = calcderivs2_33(gamt13, p.i, p.j, p.k);
+const auto ddgamt3322 = calcderivs2_33(gamt22, p.i, p.j, p.k);
+const auto ddgamt3323 = calcderivs2_33(gamt23, p.i, p.j, p.k);
+const auto ddgamt3333 = calcderivs2_33(gamt33, p.i, p.j, p.k);
+const auto ddbeta111 = calcderivs2_11(beta1, p.i, p.j, p.k);
+const auto ddbeta112 = calcderivs2_11(beta2, p.i, p.j, p.k);
+const auto ddbeta113 = calcderivs2_11(beta3, p.i, p.j, p.k);
+const auto ddbeta121 = calcderivs2_12(beta1, p.i, p.j, p.k);
+const auto ddbeta122 = calcderivs2_12(beta2, p.i, p.j, p.k);
+const auto ddbeta123 = calcderivs2_12(beta3, p.i, p.j, p.k);
+const auto ddbeta131 = calcderivs2_13(beta1, p.i, p.j, p.k);
+const auto ddbeta132 = calcderivs2_13(beta2, p.i, p.j, p.k);
+const auto ddbeta133 = calcderivs2_13(beta3, p.i, p.j, p.k);
+const auto ddbeta221 = calcderivs2_22(beta1, p.i, p.j, p.k);
+const auto ddbeta222 = calcderivs2_22(beta2, p.i, p.j, p.k);
+const auto ddbeta223 = calcderivs2_22(beta3, p.i, p.j, p.k);
+const auto ddbeta231 = calcderivs2_23(beta1, p.i, p.j, p.k);
+const auto ddbeta232 = calcderivs2_23(beta2, p.i, p.j, p.k);
+const auto ddbeta233 = calcderivs2_23(beta3, p.i, p.j, p.k);
+const auto ddbeta331 = calcderivs2_33(beta1, p.i, p.j, p.k);
+const auto ddbeta332 = calcderivs2_33(beta2, p.i, p.j, p.k);
+const auto ddbeta333 = calcderivs2_33(beta3, p.i, p.j, p.k);
+
+const vreal
+dlnW1
+=
+dW1/W[ijk]
+;
+
+const vreal
+dlnW2
+=
+dW2/W[ijk]
+;
+
+const vreal
+dlnW3
+=
+dW3/W[ijk]
+;
+
+const vreal
+GtDDD111
+=
+dgamt111/2.
+;
+
+const vreal
+GtDDD112
+=
+dgamt211/2.
+;
+
+const vreal
+GtDDD113
+=
+dgamt311/2.
+;
+
+const vreal
+GtDDD122
+=
+-0.5*dgamt122 + dgamt212
+;
+
+const vreal
+GtDDD123
+=
+(-dgamt123 + dgamt213 + dgamt312)/2.
+;
+
+const vreal
+GtDDD133
+=
+-0.5*dgamt133 + dgamt313
+;
+
+const vreal
+GtDDD211
+=
+dgamt112 - dgamt211/2.
+;
+
+const vreal
+GtDDD212
+=
+dgamt122/2.
+;
+
+const vreal
+GtDDD213
+=
+(dgamt123 - dgamt213 + dgamt312)/2.
+;
+
+const vreal
+GtDDD222
+=
+dgamt222/2.
+;
+
+const vreal
+GtDDD223
+=
+dgamt322/2.
+;
+
+const vreal
+GtDDD233
+=
+-0.5*dgamt233 + dgamt323
+;
+
+const vreal
+GtDDD311
+=
+dgamt113 - dgamt311/2.
+;
+
+const vreal
+GtDDD312
+=
+(dgamt123 + dgamt213 - dgamt312)/2.
+;
+
+const vreal
+GtDDD313
+=
+dgamt133/2.
+;
+
+const vreal
+GtDDD322
+=
+dgamt223 - dgamt322/2.
+;
+
+const vreal
+GtDDD323
+=
+dgamt233/2.
+;
+
+const vreal
+GtDDD333
+=
+dgamt333/2.
+;
+
+const vreal
+divbeta
+=
+dbeta11 + dbeta22 + dbeta33
+;
+
+const vreal
+lapW
+=
+ddW11 + ddW22 + ddW33
+;
+
+const vreal
+lapgamt11
+=
+ddgamt1111 + ddgamt2211 + ddgamt3311
+;
+
+const vreal
+lapgamt12
+=
+ddgamt1112 + ddgamt2212 + ddgamt3312
+;
+
+const vreal
+lapgamt13
+=
+ddgamt1113 + ddgamt2213 + ddgamt3313
+;
+
+const vreal
+lapgamt22
+=
+ddgamt1122 + ddgamt2222 + ddgamt3322
+;
+
+const vreal
+lapgamt23
+=
+ddgamt1123 + ddgamt2223 + ddgamt3323
+;
+
+const vreal
+lapgamt33
+=
+ddgamt1133 + ddgamt2233 + ddgamt3333
+;
+
+const vreal
+lapbeta1
+=
+ddbeta111 + ddbeta221 + ddbeta331
+;
+
+const vreal
+lapbeta2
+=
+ddbeta112 + ddbeta222 + ddbeta332
+;
+
+const vreal
+lapbeta3
+=
+ddbeta113 + ddbeta223 + ddbeta333
+;
+
+
+dtW[ijk]
+=
+lapW + dW1*beta1[ijk] + dW2*beta2[ijk] + dW3*beta3[ijk] - divbeta*W[ijk]
+;
+
+dtbeta1[ijk]
+=
+lapbeta1 + dbeta11*beta1[ijk] + dbeta21*beta2[ijk] + dbeta31*beta3[ijk]
+;
+
+dtbeta2[ijk]
+=
+lapbeta2 + dbeta12*beta1[ijk] + dbeta22*beta2[ijk] + dbeta32*beta3[ijk]
+;
+
+dtbeta3[ijk]
+=
+lapbeta3 + dbeta13*beta1[ijk] + dbeta23*beta2[ijk] + dbeta33*beta3[ijk]
+;
+
+
+});
+
+#endif // #ifndef TESTDERIVS2ND_HXX
+
+/* testDerivs2nd.hxx */

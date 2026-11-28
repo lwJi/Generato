@@ -43,8 +43,8 @@ SetOutputFile[FileNameJoin[{Directory[], "testTile.hxx"}]];
 
 SetMainPrint[
   pr[];
-  PrintInitializations[{Mode -> "MainOut"}, TileVarlist];
-  PrintInitializations[{Mode -> "MainIn", StorageType -> "Tile"}, GridVarlist];
+  PrintInitializations[{Mode -> "Derivs", StorageType -> "Tile"}, TileVarlist];
+  PrintInitializations[{Mode -> "MainIn"}, GridVarlist];
   pr[];
   PrintEquations[{Mode -> "Temp"}, TempVarlist];
   pr[];

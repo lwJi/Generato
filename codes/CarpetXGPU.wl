@@ -176,7 +176,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
                          <> ToString[Quotient[varlistindex, 6]] <> "]"
           ,
           True,
-            Throw @ Message[PrintComponentInitialization::EVarLength]
+            Stop[PrintComponentInitialization::EVarLength]
         ]
       ,
       GetTensorType[] === "Smat",
@@ -193,11 +193,11 @@ PrintComponentInitialization[varinfo_, compname_] :=
                          <> ToString[Quotient[varlistindex, 6]] <> "]"
           ,
           True,
-            Throw @ Message[PrintComponentInitialization::EVarLength]
+            Stop[PrintComponentInitialization::EVarLength]
         ]
       ,
       True,
-        Throw @ Message[PrintComponentInitialization::EMode]
+        Stop[PrintComponentInitialization::EMode]
     ];
     fdorder = GetDerivsOrder[];
     fdaccuracy = GetDerivsAccuracy[];
@@ -229,7 +229,7 @@ PrintComponentInitialization[varinfo_, compname_] :=
                 StringContainsQ[tensorname, "d"],
                   StringPosition[tensorname, "d"][[-1]][[1]],
                 True,
-                  Throw @ Message[PrintComponentInitialization::EDerivativeName, tensorname]
+                  Stop[PrintComponentInitialization::EDerivativeName, tensorname]
               ];
             "const auto " <> ToString[compToValue]
             <> " = calcderivs" <> ToString[fdorder] <> "_"
@@ -258,12 +258,16 @@ PrintComponentInitialization[varinfo_, compname_] :=
           "auto " <> ToString[compToValue] <> ";"
         ,
         True,
-          Throw @ Message[PrintComponentInitialization::EMode]
+          Stop[PrintComponentInitialization::EMode]
       ];
     pr[buf];
   ];
 
-(* Error messages PrintComponentInitialization::EMode and ::EVarLength are in BackendCommon.wl *)
+PrintComponentInitialization::EMode = "PrintComponentInitialization mode unrecognized!";
+
+PrintComponentInitialization::EVarLength = "PrintComponentInitialization variable's tensor type unsupported!";
+
+PrintComponentInitialization::EDerivativeName = "PrintComponentInitialization: derivative tensor name '`1`' does not contain 'd'!";
 
 Protect[PrintComponentInitialization];
 
@@ -277,15 +281,15 @@ Protect[PrintComponentInitialization];
  *)
 
 PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
-  Module[{outputfile = GetOutputFile[], compToValue, rhssToValue},
+  Module[{compToValue, rhssToValue},
     compToValue = (compname // ToValues) /. extrareplacerules;
     rhssToValue = ComputeRHSValue[coordinate, compname, extrareplacerules];
     PrintEquationByMode[compToValue, rhssToValue,
       (* MainOut formatter - standard assignment *)
       Function[{comp, rhs},
-        PutAppend[CForm[comp], outputfile];
+        Global`pr[CText[comp]];
         Global`pr["="];
-        PutAppend[CForm[rhs], outputfile];
+        Global`pr[CText[rhs]];
         Global`pr[";\n"]
       ],
       (* Temp formatter - CarpetXGPU specific: const prefix, trimmed name *)
@@ -293,7 +297,7 @@ PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
         Global`pr["const " <> GetTempVariableType[] <> " "];
         Global`pr[StringTrim[ToString[comp], GetGridPointIndex[]]];
         Global`pr["="];
-        PutAppend[CForm[rhs], outputfile];
+        Global`pr[CText[rhs]];
         Global`pr[";\n"]
       ]
     ]

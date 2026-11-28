@@ -5,12 +5,12 @@
 #define TESTTILE_HXX
 
 
-const auto tileU1[[tI]] = gf_tileU[0];
-const auto tileU2[[tI]] = gf_tileU[1];
-const auto tileU3[[tI]] = gf_tileU[2];
-const auto gridU1 = tl_gridU[0].ptr;
-const auto gridU2 = tl_gridU[1].ptr;
-const auto gridU3 = tl_gridU[2].ptr;
+const auto tileU1 = tl_tileU[0].ptr;
+const auto tileU2 = tl_tileU[1].ptr;
+const auto tileU3 = tl_tileU[2].ptr;
+const auto gridU1 = gf_gridU[0];
+const auto gridU2 = gf_gridU[1];
+const auto gridU3 = gf_gridU[2];
 
 const vreal
 tempU1

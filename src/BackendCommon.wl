@@ -4,9 +4,11 @@
 
 BeginPackage["Generato`BackendCommon`"];
 
+Needs["Generato`Failure`"];
 Needs["Generato`Basic`"];
 Needs["Generato`ParseMode`"];
 Needs["Generato`Component`"];
+Needs["Generato`Emit`"];
 
 If[Environment["QUIET"] =!= "1",
   System`Print["------------------------------------------------------------"];
@@ -108,34 +110,32 @@ PrintEquationByMode[compToValue_, rhssToValue_, mainFormatter_] :=
   PrintEquationByMode[compToValue, rhssToValue, mainFormatter, Automatic];
 
 PrintEquationByMode[compToValue_, rhssToValue_, mainFormatter_, tempFormatter_] :=
-  Module[{outputfile = GetOutputFile[]},
-    Which[
-      GetEquationsMode[] === "Temp",
-        If[tempFormatter === Automatic,
-          (* Default Temp handling: no const prefix, CForm[compToValue] *)
-          Global`pr[GetTempVariableType[] <> " "];
-          PutAppend[CForm[compToValue], outputfile];
-          Global`pr["="];
-          PutAppend[CForm[rhssToValue], outputfile];
-          Global`pr[";\n"]
-          ,
-          (* Custom Temp handling via callback *)
-          tempFormatter[compToValue, rhssToValue]
-        ]
-      ,
-      GetEquationsMode[] === "MainOut",
-        mainFormatter[compToValue, rhssToValue]
-      ,
-      GetEquationsMode[] === "AddToMainOut",
-        (* Shared AddToMainOut - identical across all backends *)
-        PutAppend[CForm[compToValue], outputfile];
-        Global`pr["+="];
-        PutAppend[CForm[rhssToValue], outputfile];
+  Which[
+    GetEquationsMode[] === "Temp",
+      If[tempFormatter === Automatic,
+        (* Default Temp handling: no const prefix, CForm[compToValue] *)
+        Global`pr[GetTempVariableType[] <> " "];
+        Global`pr[CText[compToValue]];
+        Global`pr["="];
+        Global`pr[CText[rhssToValue]];
         Global`pr[";\n"]
-      ,
-      True,
-        Throw @ Message[PrintEquationByMode::EMode]
-    ]
+        ,
+        (* Custom Temp handling via callback *)
+        tempFormatter[compToValue, rhssToValue]
+      ]
+    ,
+    GetEquationsMode[] === "MainOut",
+      mainFormatter[compToValue, rhssToValue]
+    ,
+    GetEquationsMode[] === "AddToMainOut",
+      (* Shared AddToMainOut - identical across all backends *)
+      Global`pr[CText[compToValue]];
+      Global`pr["+="];
+      Global`pr[CText[rhssToValue]];
+      Global`pr[";\n"]
+    ,
+    True,
+      Stop[PrintEquationByMode::EMode]
   ];
 
 PrintEquationByMode::EMode = "PrintEquationByMode: EquationsMode unrecognized!";
@@ -167,7 +167,7 @@ GetTensorIndexSubbuf[len_Integer, varlistindex_Integer] :=
           len == 3,
             "[" <> ToString[Quotient[varlistindex, 3]] <> "]["
                 <> ToString[Mod[varlistindex, 3]] <> "]",
-          True, Message[GetTensorIndexSubbuf::ELength]; ""
+          True, Stop[GetTensorIndexSubbuf::ELength]
         ],
       tensorType === "Smat",
         Which[
@@ -178,10 +178,10 @@ GetTensorIndexSubbuf[len_Integer, varlistindex_Integer] :=
           len == 4,
             "[" <> ToString[Quotient[varlistindex, 6]] <> "]["
                 <> ToString[Mod[varlistindex, 6]] <> "]",
-          True, Message[GetTensorIndexSubbuf::ELength]; ""
+          True, Stop[GetTensorIndexSubbuf::ELength]
         ],
       True,
-        Message[GetTensorIndexSubbuf::ETensorType]; ""
+        Stop[GetTensorIndexSubbuf::ETensorType]
     ]
   ];
 
@@ -210,15 +210,6 @@ ExtractComponentInfo[varinfo_, compname_] :=
   ];
 
 Protect[ExtractComponentInfo];
-
-(*
-  Standard backend error messages - shared by all backends
-  Previously duplicated in: CarpetX.wl, CarpetXGPU.wl, CarpetXPointDesc.wl,
-  Carpet.wl, AMReX.wl, Nmesh.wl
-*)
-PrintComponentInitialization::EMode = "PrintComponentInitialization mode unrecognized!";
-PrintComponentInitialization::EVarLength = "PrintComponentInitialization variable's tensor type unsupported!";
-PrintComponentInitialization::EDerivativeName = "PrintComponentInitialization: derivative tensor name '`1`' does not contain 'd'!";
 
 End[];
 

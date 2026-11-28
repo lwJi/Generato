@@ -6,7 +6,8 @@
 BeginPackage["TestConfig`"];
 
 GetTestDir::usage = "GetTestDir[] returns the base test directory path.";
-LoadTestCases::usage = "LoadTestCases[] returns the list of test cases from test_cases.txt.";
+LoadTestCases::usage = "LoadTestCases[] returns the cases of test_cases.txt that must succeed, each as {backend, test, extension}.";
+LoadFailingTestCases::usage = "LoadFailingTestCases[] returns the cases of test_cases.txt marked \"fails\", each as {backend, test, extension}.";
 
 Begin["`Private`"];
 
@@ -14,7 +15,8 @@ $TestDir = DirectoryName[$InputFileName];
 
 GetTestDir[] := $TestDir;
 
-LoadTestCases[] := Module[{configFile, lines, parsed, valid, skipped},
+(* A case is backend:test:extension, and one that must fail carries a fourth field, "fails" *)
+ReadTestCases[] := Module[{configFile, lines, parsed, entries, valid},
   configFile = FileNameJoin[{$TestDir, "test_cases.txt"}];
 
   (* Check if config file exists *)
@@ -27,16 +29,26 @@ LoadTestCases[] := Module[{configFile, lines, parsed, valid, skipped},
   lines = Import[configFile, "Lines"];
   parsed = StringSplit[#, ":"] & /@ lines;
 
-  (* Filter valid entries (3 parts, not comments) *)
-  valid = Select[parsed, Length[#] == 3 && !StringStartsQ[#[[1]], "#"] &];
+  (* Drop empty lines and comments *)
+  entries = Select[parsed, Length[#] > 0 && !StringStartsQ[#[[1]], "#"] &];
+
+  (* Filter valid entries (3 parts, or 4 parts ending in "fails") *)
+  valid = Select[entries, MatchQ[#, {_, _, _} | {_, _, _, "fails"}] &];
 
   (* Warn about malformed lines (non-comments with wrong format) *)
-  skipped = Select[parsed, Length[#] != 3 && Length[#] > 0 && !StringStartsQ[#[[1]], "#"] &];
-  If[Length[skipped] > 0,
-    Print["WARNING: Skipped ", Length[skipped], " malformed line(s) in test_cases.txt"]
+  If[Length[valid] < Length[entries],
+    Print["WARNING: Skipped ", Length[entries] - Length[valid], " malformed line(s) in test_cases.txt"]
   ];
 
   valid
+];
+
+LoadTestCases[] := Module[{cases = ReadTestCases[]},
+  If[cases === $Failed, $Failed, Select[cases, Length[#] == 3 &]]
+];
+
+LoadFailingTestCases[] := Module[{cases = ReadTestCases[]},
+  If[cases === $Failed, $Failed, Most /@ Select[cases, Length[#] == 4 &]]
 ];
 
 End[];

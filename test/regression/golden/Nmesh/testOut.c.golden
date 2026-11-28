@@ -1,0 +1,415 @@
+/* testOut.c */
+/* Produced with Generato */
+
+#include "nmesh.h"
+#include "GHG.h"
+
+/* use globals from GHG */
+extern tGHG GHG[1];
+
+
+int testOut(tNode *node, tVarList *vlr, tVarList *vlu)
+{
+int ialpha = Ind("ADM_alpha");
+int ibetax = Ind("ADM_betax");
+int ijk;
+
+double *dtg00 = Vard(node, Vind(vlr,GHG->i_gtt));
+double *dtg01 = Vard(node, Vind(vlr,GHG->i_gtt+1));
+double *dtg02 = Vard(node, Vind(vlr,GHG->i_gtt+2));
+double *dtg03 = Vard(node, Vind(vlr,GHG->i_gtt+3));
+double *dtg11 = Vard(node, Vind(vlr,GHG->i_gtt+4));
+double *dtg12 = Vard(node, Vind(vlr,GHG->i_gtt+5));
+double *dtg13 = Vard(node, Vind(vlr,GHG->i_gtt+6));
+double *dtg22 = Vard(node, Vind(vlr,GHG->i_gtt+7));
+double *dtg23 = Vard(node, Vind(vlr,GHG->i_gtt+8));
+double *dtg33 = Vard(node, Vind(vlr,GHG->i_gtt+9));
+double *dtPi00 = Vard(node, Vind(vlr,GHG->i_Pitt));
+double *dtPi01 = Vard(node, Vind(vlr,GHG->i_Pitt+1));
+double *dtPi02 = Vard(node, Vind(vlr,GHG->i_Pitt+2));
+double *dtPi03 = Vard(node, Vind(vlr,GHG->i_Pitt+3));
+double *dtPi11 = Vard(node, Vind(vlr,GHG->i_Pitt+4));
+double *dtPi12 = Vard(node, Vind(vlr,GHG->i_Pitt+5));
+double *dtPi13 = Vard(node, Vind(vlr,GHG->i_Pitt+6));
+double *dtPi22 = Vard(node, Vind(vlr,GHG->i_Pitt+7));
+double *dtPi23 = Vard(node, Vind(vlr,GHG->i_Pitt+8));
+double *dtPi33 = Vard(node, Vind(vlr,GHG->i_Pitt+9));
+double *dtPhi100 = Vard(node, Vind(vlr,GHG->i_Phixtt));
+double *dtPhi101 = Vard(node, Vind(vlr,GHG->i_Phixtt+1));
+double *dtPhi102 = Vard(node, Vind(vlr,GHG->i_Phixtt+2));
+double *dtPhi103 = Vard(node, Vind(vlr,GHG->i_Phixtt+3));
+double *dtPhi111 = Vard(node, Vind(vlr,GHG->i_Phixtt+4));
+double *dtPhi112 = Vard(node, Vind(vlr,GHG->i_Phixtt+5));
+double *dtPhi113 = Vard(node, Vind(vlr,GHG->i_Phixtt+6));
+double *dtPhi122 = Vard(node, Vind(vlr,GHG->i_Phixtt+7));
+double *dtPhi123 = Vard(node, Vind(vlr,GHG->i_Phixtt+8));
+double *dtPhi133 = Vard(node, Vind(vlr,GHG->i_Phixtt+9));
+double *dtPhi200 = Vard(node, Vind(vlr,GHG->i_Phixtt+10));
+double *dtPhi201 = Vard(node, Vind(vlr,GHG->i_Phixtt+11));
+double *dtPhi202 = Vard(node, Vind(vlr,GHG->i_Phixtt+12));
+double *dtPhi203 = Vard(node, Vind(vlr,GHG->i_Phixtt+13));
+double *dtPhi211 = Vard(node, Vind(vlr,GHG->i_Phixtt+14));
+double *dtPhi212 = Vard(node, Vind(vlr,GHG->i_Phixtt+15));
+double *dtPhi213 = Vard(node, Vind(vlr,GHG->i_Phixtt+16));
+double *dtPhi222 = Vard(node, Vind(vlr,GHG->i_Phixtt+17));
+double *dtPhi223 = Vard(node, Vind(vlr,GHG->i_Phixtt+18));
+double *dtPhi233 = Vard(node, Vind(vlr,GHG->i_Phixtt+19));
+double *dtPhi300 = Vard(node, Vind(vlr,GHG->i_Phixtt+20));
+double *dtPhi301 = Vard(node, Vind(vlr,GHG->i_Phixtt+21));
+double *dtPhi302 = Vard(node, Vind(vlr,GHG->i_Phixtt+22));
+double *dtPhi303 = Vard(node, Vind(vlr,GHG->i_Phixtt+23));
+double *dtPhi311 = Vard(node, Vind(vlr,GHG->i_Phixtt+24));
+double *dtPhi312 = Vard(node, Vind(vlr,GHG->i_Phixtt+25));
+double *dtPhi313 = Vard(node, Vind(vlr,GHG->i_Phixtt+26));
+double *dtPhi322 = Vard(node, Vind(vlr,GHG->i_Phixtt+27));
+double *dtPhi323 = Vard(node, Vind(vlr,GHG->i_Phixtt+28));
+double *dtPhi333 = Vard(node, Vind(vlr,GHG->i_Phixtt+29));
+double *g00 = Vard(node, Vind(vlu,GHG->i_gtt));
+double *g01 = Vard(node, Vind(vlu,GHG->i_gtt+1));
+double *g02 = Vard(node, Vind(vlu,GHG->i_gtt+2));
+double *g03 = Vard(node, Vind(vlu,GHG->i_gtt+3));
+double *g11 = Vard(node, Vind(vlu,GHG->i_gtt+4));
+double *g12 = Vard(node, Vind(vlu,GHG->i_gtt+5));
+double *g13 = Vard(node, Vind(vlu,GHG->i_gtt+6));
+double *g22 = Vard(node, Vind(vlu,GHG->i_gtt+7));
+double *g23 = Vard(node, Vind(vlu,GHG->i_gtt+8));
+double *g33 = Vard(node, Vind(vlu,GHG->i_gtt+9));
+double *Pi00 = Vard(node, Vind(vlu,GHG->i_Pitt));
+double *Pi01 = Vard(node, Vind(vlu,GHG->i_Pitt+1));
+double *Pi02 = Vard(node, Vind(vlu,GHG->i_Pitt+2));
+double *Pi03 = Vard(node, Vind(vlu,GHG->i_Pitt+3));
+double *Pi11 = Vard(node, Vind(vlu,GHG->i_Pitt+4));
+double *Pi12 = Vard(node, Vind(vlu,GHG->i_Pitt+5));
+double *Pi13 = Vard(node, Vind(vlu,GHG->i_Pitt+6));
+double *Pi22 = Vard(node, Vind(vlu,GHG->i_Pitt+7));
+double *Pi23 = Vard(node, Vind(vlu,GHG->i_Pitt+8));
+double *Pi33 = Vard(node, Vind(vlu,GHG->i_Pitt+9));
+double *Phi100 = Vard(node, Vind(vlu,GHG->i_Phixtt));
+double *Phi101 = Vard(node, Vind(vlu,GHG->i_Phixtt+1));
+double *Phi102 = Vard(node, Vind(vlu,GHG->i_Phixtt+2));
+double *Phi103 = Vard(node, Vind(vlu,GHG->i_Phixtt+3));
+double *Phi111 = Vard(node, Vind(vlu,GHG->i_Phixtt+4));
+double *Phi112 = Vard(node, Vind(vlu,GHG->i_Phixtt+5));
+double *Phi113 = Vard(node, Vind(vlu,GHG->i_Phixtt+6));
+double *Phi122 = Vard(node, Vind(vlu,GHG->i_Phixtt+7));
+double *Phi123 = Vard(node, Vind(vlu,GHG->i_Phixtt+8));
+double *Phi133 = Vard(node, Vind(vlu,GHG->i_Phixtt+9));
+double *Phi200 = Vard(node, Vind(vlu,GHG->i_Phixtt+10));
+double *Phi201 = Vard(node, Vind(vlu,GHG->i_Phixtt+11));
+double *Phi202 = Vard(node, Vind(vlu,GHG->i_Phixtt+12));
+double *Phi203 = Vard(node, Vind(vlu,GHG->i_Phixtt+13));
+double *Phi211 = Vard(node, Vind(vlu,GHG->i_Phixtt+14));
+double *Phi212 = Vard(node, Vind(vlu,GHG->i_Phixtt+15));
+double *Phi213 = Vard(node, Vind(vlu,GHG->i_Phixtt+16));
+double *Phi222 = Vard(node, Vind(vlu,GHG->i_Phixtt+17));
+double *Phi223 = Vard(node, Vind(vlu,GHG->i_Phixtt+18));
+double *Phi233 = Vard(node, Vind(vlu,GHG->i_Phixtt+19));
+double *Phi300 = Vard(node, Vind(vlu,GHG->i_Phixtt+20));
+double *Phi301 = Vard(node, Vind(vlu,GHG->i_Phixtt+21));
+double *Phi302 = Vard(node, Vind(vlu,GHG->i_Phixtt+22));
+double *Phi303 = Vard(node, Vind(vlu,GHG->i_Phixtt+23));
+double *Phi311 = Vard(node, Vind(vlu,GHG->i_Phixtt+24));
+double *Phi312 = Vard(node, Vind(vlu,GHG->i_Phixtt+25));
+double *Phi313 = Vard(node, Vind(vlu,GHG->i_Phixtt+26));
+double *Phi322 = Vard(node, Vind(vlu,GHG->i_Phixtt+27));
+double *Phi323 = Vard(node, Vind(vlu,GHG->i_Phixtt+28));
+double *Phi333 = Vard(node, Vind(vlu,GHG->i_Phixtt+29));
+double *alpha = Vard(node, ialpha);
+double *beta1 = Vard(node, ibetax);
+double *beta2 = Vard(node, ibetax+1);
+double *beta3 = Vard(node, ibetax+2);
+
+forpoints(node, ijk)
+{
+double gammas[3], gamma0, gamma1, gamma2;
+GHG_gammas(node, ijk, gammas);
+gamma0 = gammas[0];
+gamma1 = gammas[1];
+gamma2 = gammas[2];
+
+dtg00[ijk]
+=
+-(gamma1*beta1[ijk]*Phi100[ijk]) - gamma1*beta2[ijk]*Phi200[ijk] -
+  gamma1*beta3[ijk]*Phi300[ijk] - alpha[ijk]*Pi00[ijk]
+;
+
+dtg01[ijk]
+=
+-(gamma1*beta1[ijk]*Phi101[ijk]) - gamma1*beta2[ijk]*Phi201[ijk] -
+  gamma1*beta3[ijk]*Phi301[ijk] - alpha[ijk]*Pi01[ijk]
+;
+
+dtg02[ijk]
+=
+-(gamma1*beta1[ijk]*Phi102[ijk]) - gamma1*beta2[ijk]*Phi202[ijk] -
+  gamma1*beta3[ijk]*Phi302[ijk] - alpha[ijk]*Pi02[ijk]
+;
+
+dtg03[ijk]
+=
+-(gamma1*beta1[ijk]*Phi103[ijk]) - gamma1*beta2[ijk]*Phi203[ijk] -
+  gamma1*beta3[ijk]*Phi303[ijk] - alpha[ijk]*Pi03[ijk]
+;
+
+dtg11[ijk]
+=
+-(gamma1*beta1[ijk]*Phi111[ijk]) - gamma1*beta2[ijk]*Phi211[ijk] -
+  gamma1*beta3[ijk]*Phi311[ijk] - alpha[ijk]*Pi11[ijk]
+;
+
+dtg12[ijk]
+=
+-(gamma1*beta1[ijk]*Phi112[ijk]) - gamma1*beta2[ijk]*Phi212[ijk] -
+  gamma1*beta3[ijk]*Phi312[ijk] - alpha[ijk]*Pi12[ijk]
+;
+
+dtg13[ijk]
+=
+-(gamma1*beta1[ijk]*Phi113[ijk]) - gamma1*beta2[ijk]*Phi213[ijk] -
+  gamma1*beta3[ijk]*Phi313[ijk] - alpha[ijk]*Pi13[ijk]
+;
+
+dtg22[ijk]
+=
+-(gamma1*beta1[ijk]*Phi122[ijk]) - gamma1*beta2[ijk]*Phi222[ijk] -
+  gamma1*beta3[ijk]*Phi322[ijk] - alpha[ijk]*Pi22[ijk]
+;
+
+dtg23[ijk]
+=
+-(gamma1*beta1[ijk]*Phi123[ijk]) - gamma1*beta2[ijk]*Phi223[ijk] -
+  gamma1*beta3[ijk]*Phi323[ijk] - alpha[ijk]*Pi23[ijk]
+;
+
+dtg33[ijk]
+=
+-(gamma1*beta1[ijk]*Phi133[ijk]) - gamma1*beta2[ijk]*Phi233[ijk] -
+  gamma1*beta3[ijk]*Phi333[ijk] - alpha[ijk]*Pi33[ijk]
+;
+
+dtPi00[ijk]
+=
+-(gamma1*gamma2*beta1[ijk]*Phi100[ijk]) -
+  gamma1*gamma2*beta2[ijk]*Phi200[ijk] -
+  gamma1*gamma2*beta3[ijk]*Phi300[ijk] - gamma0*alpha[ijk]*Pi00[ijk]
+;
+
+dtPi01[ijk]
+=
+-(gamma1*gamma2*beta1[ijk]*Phi101[ijk]) -
+  gamma1*gamma2*beta2[ijk]*Phi201[ijk] -
+  gamma1*gamma2*beta3[ijk]*Phi301[ijk] - gamma0*alpha[ijk]*Pi01[ijk]
+;
+
+dtPi02[ijk]
+=
+-(gamma1*gamma2*beta1[ijk]*Phi102[ijk]) -
+  gamma1*gamma2*beta2[ijk]*Phi202[ijk] -
+  gamma1*gamma2*beta3[ijk]*Phi302[ijk] - gamma0*alpha[ijk]*Pi02[ijk]
+;
+
+dtPi03[ijk]
+=
+-(gamma1*gamma2*beta1[ijk]*Phi103[ijk]) -
+  gamma1*gamma2*beta2[ijk]*Phi203[ijk] -
+  gamma1*gamma2*beta3[ijk]*Phi303[ijk] - gamma0*alpha[ijk]*Pi03[ijk]
+;
+
+dtPi11[ijk]
+=
+-(gamma1*gamma2*beta1[ijk]*Phi111[ijk]) -
+  gamma1*gamma2*beta2[ijk]*Phi211[ijk] -
+  gamma1*gamma2*beta3[ijk]*Phi311[ijk] - gamma0*alpha[ijk]*Pi11[ijk]
+;
+
+dtPi12[ijk]
+=
+-(gamma1*gamma2*beta1[ijk]*Phi112[ijk]) -
+  gamma1*gamma2*beta2[ijk]*Phi212[ijk] -
+  gamma1*gamma2*beta3[ijk]*Phi312[ijk] - gamma0*alpha[ijk]*Pi12[ijk]
+;
+
+dtPi13[ijk]
+=
+-(gamma1*gamma2*beta1[ijk]*Phi113[ijk]) -
+  gamma1*gamma2*beta2[ijk]*Phi213[ijk] -
+  gamma1*gamma2*beta3[ijk]*Phi313[ijk] - gamma0*alpha[ijk]*Pi13[ijk]
+;
+
+dtPi22[ijk]
+=
+-(gamma1*gamma2*beta1[ijk]*Phi122[ijk]) -
+  gamma1*gamma2*beta2[ijk]*Phi222[ijk] -
+  gamma1*gamma2*beta3[ijk]*Phi322[ijk] - gamma0*alpha[ijk]*Pi22[ijk]
+;
+
+dtPi23[ijk]
+=
+-(gamma1*gamma2*beta1[ijk]*Phi123[ijk]) -
+  gamma1*gamma2*beta2[ijk]*Phi223[ijk] -
+  gamma1*gamma2*beta3[ijk]*Phi323[ijk] - gamma0*alpha[ijk]*Pi23[ijk]
+;
+
+dtPi33[ijk]
+=
+-(gamma1*gamma2*beta1[ijk]*Phi133[ijk]) -
+  gamma1*gamma2*beta2[ijk]*Phi233[ijk] -
+  gamma1*gamma2*beta3[ijk]*Phi333[ijk] - gamma0*alpha[ijk]*Pi33[ijk]
+;
+
+dtPhi100[ijk]
+=
+-(gamma2*alpha[ijk]*Phi100[ijk])
+;
+
+dtPhi101[ijk]
+=
+-(gamma2*alpha[ijk]*Phi101[ijk])
+;
+
+dtPhi102[ijk]
+=
+-(gamma2*alpha[ijk]*Phi102[ijk])
+;
+
+dtPhi103[ijk]
+=
+-(gamma2*alpha[ijk]*Phi103[ijk])
+;
+
+dtPhi111[ijk]
+=
+-(gamma2*alpha[ijk]*Phi111[ijk])
+;
+
+dtPhi112[ijk]
+=
+-(gamma2*alpha[ijk]*Phi112[ijk])
+;
+
+dtPhi113[ijk]
+=
+-(gamma2*alpha[ijk]*Phi113[ijk])
+;
+
+dtPhi122[ijk]
+=
+-(gamma2*alpha[ijk]*Phi122[ijk])
+;
+
+dtPhi123[ijk]
+=
+-(gamma2*alpha[ijk]*Phi123[ijk])
+;
+
+dtPhi133[ijk]
+=
+-(gamma2*alpha[ijk]*Phi133[ijk])
+;
+
+dtPhi200[ijk]
+=
+-(gamma2*alpha[ijk]*Phi200[ijk])
+;
+
+dtPhi201[ijk]
+=
+-(gamma2*alpha[ijk]*Phi201[ijk])
+;
+
+dtPhi202[ijk]
+=
+-(gamma2*alpha[ijk]*Phi202[ijk])
+;
+
+dtPhi203[ijk]
+=
+-(gamma2*alpha[ijk]*Phi203[ijk])
+;
+
+dtPhi211[ijk]
+=
+-(gamma2*alpha[ijk]*Phi211[ijk])
+;
+
+dtPhi212[ijk]
+=
+-(gamma2*alpha[ijk]*Phi212[ijk])
+;
+
+dtPhi213[ijk]
+=
+-(gamma2*alpha[ijk]*Phi213[ijk])
+;
+
+dtPhi222[ijk]
+=
+-(gamma2*alpha[ijk]*Phi222[ijk])
+;
+
+dtPhi223[ijk]
+=
+-(gamma2*alpha[ijk]*Phi223[ijk])
+;
+
+dtPhi233[ijk]
+=
+-(gamma2*alpha[ijk]*Phi233[ijk])
+;
+
+dtPhi300[ijk]
+=
+-(gamma2*alpha[ijk]*Phi300[ijk])
+;
+
+dtPhi301[ijk]
+=
+-(gamma2*alpha[ijk]*Phi301[ijk])
+;
+
+dtPhi302[ijk]
+=
+-(gamma2*alpha[ijk]*Phi302[ijk])
+;
+
+dtPhi303[ijk]
+=
+-(gamma2*alpha[ijk]*Phi303[ijk])
+;
+
+dtPhi311[ijk]
+=
+-(gamma2*alpha[ijk]*Phi311[ijk])
+;
+
+dtPhi312[ijk]
+=
+-(gamma2*alpha[ijk]*Phi312[ijk])
+;
+
+dtPhi313[ijk]
+=
+-(gamma2*alpha[ijk]*Phi313[ijk])
+;
+
+dtPhi322[ijk]
+=
+-(gamma2*alpha[ijk]*Phi322[ijk])
+;
+
+dtPhi323[ijk]
+=
+-(gamma2*alpha[ijk]*Phi323[ijk])
+;
+
+dtPhi333[ijk]
+=
+-(gamma2*alpha[ijk]*Phi333[ijk])
+;
+
+} /* end of points */
+
+return 0;
+} /* end of function */
+
+/* testOut.c */

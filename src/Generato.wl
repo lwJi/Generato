@@ -10,6 +10,8 @@
 
 (*****************)
 
+<<Failure.wl
+
 <<Context.wl
 
 <<Basic.wl
@@ -18,6 +20,8 @@
 
 <<Component.wl
 
+<<Emit.wl
+
 <<BackendCommon.wl
 
 <<Varlist.wl
@@ -25,8 +29,6 @@
 <<Interface.wl
 
 <<Derivation.wl
-
-<<Writefile.wl
 
 <<stencils/FiniteDifferenceStencils.wl
 

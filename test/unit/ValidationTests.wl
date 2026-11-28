@@ -22,9 +22,10 @@ AppendTo[$AllTests,
     ResetContext[];
     Catch[
       SetCheckInputEquations["invalid"];
-      "NoThrow"
+      "NoThrow",
+      GeneratoFailure
     ],
-    Null,  (* Message returns Null, Throw propagates it *)
+    $Failed,  (* Stop issues the message, then throws $Failed to the tag *)
     {SetCheckInputEquations::EInvalidValue},
     TestID -> "SetCheckInputEquations rejects string"
   ]
@@ -45,9 +46,10 @@ AppendTo[$AllTests,
     ResetContext[];
     Catch[
       SetPVerbose[1];
-      "NoThrow"
+      "NoThrow",
+      GeneratoFailure
     ],
-    Null,
+    $Failed,
     {SetPVerbose::EInvalidValue},
     TestID -> "SetPVerbose rejects integer"
   ]
@@ -69,9 +71,10 @@ AppendTo[$AllTests,
     ResetContext[];
     Catch[
       SetGridPointIndex[123];
-      "NoThrow"
+      "NoThrow",
+      GeneratoFailure
     ],
-    Null,
+    $Failed,
     {SetGridPointIndex::EInvalidValue},
     TestID -> "SetGridPointIndex rejects integer"
   ]
@@ -92,9 +95,10 @@ AppendTo[$AllTests,
     ResetContext[];
     Catch[
       SetOutputFile[True];
-      "NoThrow"
+      "NoThrow",
+      GeneratoFailure
     ],
-    Null,
+    $Failed,
     {SetOutputFile::EInvalidValue},
     TestID -> "SetOutputFile rejects boolean"
   ]
@@ -117,9 +121,10 @@ AppendTo[$AllTests,
     ResetContext[];
     Catch[
       SetSimplifyEquation["yes"];
-      "NoThrow"
+      "NoThrow",
+      GeneratoFailure
     ],
-    Null,
+    $Failed,
     {SetSimplifyEquation::EInvalidValue},
     TestID -> "SetSimplifyEquation rejects string"
   ]
@@ -140,9 +145,10 @@ AppendTo[$AllTests,
     ResetContext[];
     Catch[
       SetTempVariableType[123];
-      "NoThrow"
+      "NoThrow",
+      GeneratoFailure
     ],
-    Null,
+    $Failed,
     {SetTempVariableType::EInvalidValue},
     TestID -> "SetTempVariableType rejects integer"
   ]
@@ -163,9 +169,10 @@ AppendTo[$AllTests,
     ResetContext[];
     Catch[
       SetMapComponentToVarlist[{1, 2, 3}];
-      "NoThrow"
+      "NoThrow",
+      GeneratoFailure
     ],
-    Null,
+    $Failed,
     {SetMapComponentToVarlist::EInvalidValue},
     TestID -> "SetMapComponentToVarlist rejects list"
   ]

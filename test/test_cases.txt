@@ -1,12 +1,26 @@
 # Test case definitions for Generato
-# Format: backend:test_name:extension
 # Lines starting with # are comments
+# backend:test_name:extension          must succeed and match its .golden
+# backend:test_name:extension:fails    must exit non-zero, leave no output file,
+#                                      and print every line of its .err.golden
 CarpetXGPU:test:.hxx
 CarpetXGPU:testTile:.hxx
 CarpetXGPU:testDerivs:.hxx
+# Derivs at order 1 and 2, of a scalar, a vector and a symmetric matrix
+CarpetXGPU:testDerivs2nd:.hxx
+# Tile-stored derivatives with TensorType "Vect" and "Smat"
+CarpetXGPU:testTileDerivs:.hxx
+# The "Temp" initialization and the "AddToMainOut" equation
+CarpetXGPU:testModes:.hxx
+# A failure before generation: a var spec that cannot be parsed
+CarpetXGPU:failBadVarSpec:.hxx:fails
+# A failure while a right-hand side is evaluated, after part of the output is built
+CarpetXGPU:failInEquation:.hxx:fails
 AMReX:test:.hxx
 #Nmesh:test:.c
 #Nmesh:GHG_rhs:.c
 Nmesh:GHG_set_profile_ADM:.c
+# The "MainOut" initialization (vlr, "dt" prefix trimmed)
+Nmesh:testOut:.c
 
 # Note: test/Nmesh/GHG_rhs.ipynb is documentation-only and not part of the test suite
