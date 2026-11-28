@@ -2,7 +2,8 @@
 
 (* VariableTests.wl *)
 (* Unit tests for Generato`Variable`: a var spec becomes a variable record and an xAct tensor *)
-(* Tests: ParseVar, DefineTensor, DefTensors, DeclaredVariable, RecordBinding, and the relations DerivativeOf and TimeDerivativeOf *)
+(* Tests: ParseVar, DefineTensor, DefTensors, DeclaredVariable, RecordBinding, the relations DerivativeOf and TimeDerivativeOf, *)
+(* and the manifold and the chart of the declarations *)
 (* The store of the records lasts as long as the kernel, like the xAct tensors, so each test uses heads of its own *)
 
 If[Environment["QUIET"] =!= "1", Print["Loading VariableTests.wl..."]];
@@ -10,15 +11,12 @@ If[Environment["QUIET"] =!= "1", Print["Loading VariableTests.wl..."]];
 (* Load Generato *)
 Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"}]];
 
-(* Helper to reset context to defaults *)
-ResetContext[] := ($CurrentContext = $ContextDefaults);
-
 ResetContext[];
 SetPVerbose[False];
 SetPrintDate[False];
 
 (* ========================================= *)
-(* Setup: Use existing test manifold from BasicTests *)
+(* Setup: Use existing test manifold of the unit tests *)
 (* ========================================= *)
 
 (* Reuse TestM3 manifold if it exists, otherwise define it *)
@@ -228,7 +226,7 @@ AppendTo[$AllTests,
       GeneratoFailure
     ],
     $Failed,
-    {ParseVar::ETensorType},
+    {ParseVar::ERank},
     TestID -> "ParseVar-Rank5-Stops"
   ]
 ];
@@ -527,7 +525,7 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    (* a declared variable is not bound: a print call has nothing to read *)
+    (* a declared variable is not bound: a node of a program has nothing to write *)
     Catch[
       VariableRecord[varDefsTest1];
       "NoThrow",
@@ -595,6 +593,106 @@ AppendTo[$AllTests,
     {$Failed, Missing["NotDeclared", varStoreTestNever]},
     {RecordBinding::EState},
     TestID -> "RecordBinding-NotDeclared-Stops"
+  ]
+];
+
+(* ========================================= *)
+(* Test: GetDefaultManifold *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* GetDefaultManifold should return a symbol when manifolds exist *)
+    Module[{result = GetDefaultManifold[]},
+      Head[result] === Symbol && MemberQ[$Manifolds, result]
+    ],
+    True,
+    TestID -> "GetDefaultManifold-ReturnsFirstManifold"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* GetDefaultManifold should return the first manifold in $Manifolds *)
+    GetDefaultManifold[] === $Manifolds[[1]],
+    True,
+    TestID -> "GetDefaultManifold-ReturnsFirstInList"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* GetDefaultManifold should stop the run when no manifolds exist *)
+    Block[{$Manifolds = {}},
+      Catch[
+        GetDefaultManifold[];
+        "NoThrow",
+        GeneratoFailure
+      ]
+    ],
+    $Failed,
+    {GetDefaultManifold::NoManifolds},
+    TestID -> "GetDefaultManifold-EmptyManifolds-Stops"
+  ]
+];
+
+(* ========================================= *)
+(* Test: GetDefaultChart *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* GetDefaultChart should return a symbol *)
+    Head[GetDefaultChart[]] === Symbol || GetDefaultChart[] === Null,
+    True,
+    TestID -> "GetDefaultChart-ReturnsSymbolOrNull"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* GetDefaultChart should stop the run when no manifolds exist *)
+    Block[{$Manifolds = {}},
+      Catch[
+        GetDefaultChart[];
+        "NoThrow",
+        GeneratoFailure
+      ]
+    ],
+    $Failed,
+    {GetDefaultManifold::NoManifolds},
+    TestID -> "GetDefaultChart-EmptyManifolds-Stops"
+  ]
+];
+
+(* ========================================= *)
+(* Test: GetDim *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* GetDim should return a valid dimension (1-10) *)
+    Module[{dim = GetDim[]},
+      IntegerQ[dim] && dim >= 1 && dim <= 10
+    ],
+    True,
+    TestID -> "GetDim-ReturnsValidDimension"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* GetDim should stop the run when no manifolds exist *)
+    Block[{$Manifolds = {}},
+      Catch[
+        GetDim[];
+        "NoThrow",
+        GeneratoFailure
+      ]
+    ],
+    $Failed,
+    {GetDefaultManifold::NoManifolds},
+    TestID -> "GetDim-EmptyManifolds-Stops"
   ]
 ];
 

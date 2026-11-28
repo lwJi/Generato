@@ -4,6 +4,7 @@
 (* Unit tests for Generato`Program module: a node is inert, Generate checks every node before anything is computed *)
 (* and reports every problem with its position, and a program that passes is lowered, rendered and written once *)
 (* A node is about a varlist or about one component, and a binding takes the variables a module declared *)
+(* A name of the surface a script had before, when its main content was held and printed, stops the run *)
 (* The store of the records lasts as long as the kernel, like the xAct tensors, so each test uses heads of its own *)
 
 If[Environment["QUIET"] =!= "1", Print["Loading ProgramTests.wl..."]];
@@ -13,11 +14,8 @@ If[!MemberQ[$Packages, "Generato`Program`"],
   Needs["xAct`xCoba`", FileNameJoin[{Environment["GENERATO"], "src/Generato.wl"}]]
 ];
 
-(* Helper to reset context to defaults *)
-ResetContext[] := ($CurrentContext = $ContextDefaults);
-
 (* ========================================= *)
-(* Setup: bound variables on the test manifold from BasicTests *)
+(* Setup: bound variables on the test manifold of the unit tests *)
 (* ========================================= *)
 
 (* Reuse TestM3 manifold if it exists, otherwise define it *)
@@ -46,6 +44,9 @@ progTestDerivVarlist = TempTensors[{progTestDS[-i], DerivativeOf -> progTestS}];
 
 progTestPlainVarlist = TempTensors[{progTestP[-i]}];
 
+(* A time derivative that declares what it is the time derivative of *)
+progTestDtVarlist = GridTensors[{progTestDtU[i], TimeDerivativeOf -> progTestU}];
+
 (* A variable that is declared and not bound, and a bound derivative of it *)
 progTestDeclaredVarlist = DefTensors[{progTestD[i]}];
 
@@ -68,6 +69,8 @@ SetEQN[progTestV[i_], progTestS[] progTestU[i]];
 SetEQN[progTestR[i_], progTestV[i]];
 
 SetEQN[{SuffixName -> "alt"}, progTestR[i_], 2 progTestV[i]];
+
+SetEQN[progTestDtU[i_], progTestV[i]];
 
 (* Only the first component of progTestT has a right-hand side *)
 SetEQN[progTestT[{1, testCart}], progTestU[{1, testCart}]];
@@ -150,14 +153,14 @@ AppendTo[$AllTests,
     ResetContext[];
     progTestCount = 0;
     If[FileExistsQ[progTestFile], DeleteFile[progTestFile]];
-    Module[{before = $CurrentContext, bound = VariableRecord[progTestU], program},
+    Module[{before = GetConfiguration[], bound = VariableRecord[progTestU], program},
       program = {
         "// a line",
         Load[progTestGridVarlist, "NoSuchMode"],
         {Load[progTestDeclaredVarlist, "In"], Store[progTestCountedVarlist, "Temp"]},
         Store[progTestThrowingVarlist, "Temp"]
       };
-      {Length[Flatten[program]], $CurrentContext === before, VariableRecord[progTestU] === bound, progTestCount, FileExistsQ[progTestFile]}
+      {Length[Flatten[program]], GetConfiguration[] === before, VariableRecord[progTestU] === bound, progTestCount, FileExistsQ[progTestFile]}
     ],
     {5, True, True, 0, False},
     TestID -> "Node-BuildingAProgramIsInert"
@@ -299,6 +302,19 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
+    (* a Store statement carries the record a declared relation names, as a Load statement does *)
+    ResetContext[];
+    {
+      progTestGenerate["progTestKeep", {Store[progTestDtVarlist, "Out"]}],
+      Union[#["Base"]& /@ progTestStatements] === {VariableRecord[progTestU]}
+    },
+    {{"store Out progTestDtU1", "store Out progTestDtU2", "store Out progTestDtU3"}, True},
+    TestID -> "Generate-StoreCarriesTheRecordOfARelation"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
     (* SuffixName selects which of the equations set for a variable is written; an option may be named by a string *)
     ResetContext[];
     progTestGenerate["progTestKeep",
@@ -316,15 +332,20 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    (* ExtraReplaceRules are applied to the right-hand side and to what the equation assigns to, not to the name *)
+    (* ExtraReplaceRules are applied to the right-hand side and to what the equation assigns to, not to the name; *)
+    (* what is rewritten is the statement's copy of the component, and the record binding wrote is left as it is *)
     ResetContext[];
     progTestGenerate["progTestKeep",
       {Store[progTestOutVarlist, "Out", ExtraReplaceRules -> {progTestV1 -> progTestRhs, progTestR1[[ijk]] -> progTestLhs}]}
     ];
-    {ToString[#["RHS"], InputForm], ToString[#["Component", "Expr"], InputForm], #["Component", "Name"]}& /@ Take[progTestStatements, 2],
+    Append[
+      {ToString[#["RHS"], InputForm], ToString[#["Component", "Expr"], InputForm], #["Component", "Name"]}& /@ Take[progTestStatements, 2],
+      ToString[First[VariableRecord[progTestR]["Components"]]["Expr"], InputForm]
+    ],
     {
       {"progTestRhs", "progTestLhs", "progTestR1"},
-      {"progTestV2", "progTestR2[[ijk]]", "progTestR2"}
+      {"progTestV2", "progTestR2[[ijk]]", "progTestR2"},
+      "progTestR1[[ijk]]"
     },
     TestID -> "Generate-ExtraReplaceRules"
   ]
@@ -757,6 +778,62 @@ AppendTo[$AllTests,
     {$Failed, $Failed, False},
     {Generate::EArguments, Generate::EArguments},
     TestID -> "Generate-OtherArguments-Stops"
+  ]
+];
+
+(* ========================================= *)
+(* Test: the names of the old surface stop the run *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* each removed name is defined only to stop the run, whatever it is called with: left undefined, *)
+    (* an old script would run to its end, write nothing and report success *)
+    {
+      Catch[SetOutputFile["progTestOld.hxx"]; "NoThrow", GeneratoFailure],
+      Catch[PrintInitializations[{progTestMode -> "MainIn"}, progTestGridVarlist]; "NoThrow", GeneratoFailure],
+      Catch[PrintEquations[{progTestMode -> "Temp"}, progTestTempVarlist]; "NoThrow", GeneratoFailure],
+      Catch[pr["// a line"]; "NoThrow", GeneratoFailure],
+      Catch[pr[]; "NoThrow", GeneratoFailure]
+    },
+    {$Failed, $Failed, $Failed, $Failed, $Failed},
+    {SetOutputFile::ERemoved, PrintInitializations::ERemoved, PrintEquations::ERemoved, pr::ERemoved, pr::ERemoved},
+    TestID -> "OldSurface-EachRemovedName-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* SetMainPrint holds the main content it is given: nothing of it is evaluated, *)
+    (* so the one message an old script gets is that of SetMainPrint *)
+    progTestHeld = False;
+    {
+      Catch[
+        SetMainPrint[
+          progTestHeld = True;
+          pr[];
+          PrintInitializations[{progTestMode -> "MainIn"}, progTestGridVarlist]
+        ];
+        "NoThrow",
+        GeneratoFailure
+      ],
+      progTestHeld
+    },
+    {$Failed, False},
+    {SetMainPrint::ERemoved},
+    TestID -> "OldSurface-SetMainPrint-StopsWithoutEvaluatingItsContent"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* the message of a removed name says what to write in its place and where the porting is described *)
+    {SetMainPrint::ERemoved, pr::ERemoved},
+    {
+      "SetMainPrint was removed. Pass the program as a list to Generate. See README, \"Porting a script\".",
+      "pr was removed. A line of output is a string in the program handed to Generate. See README, \"Porting a script\"."
+    },
+    TestID -> "OldSurface-MessageIsAPortingPointer"
   ]
 ];
 

@@ -16,9 +16,6 @@ If[!MemberQ[$Packages, "Generato`Backend`"],
 SetPVerbose[False];
 SetPrintDate[False];
 
-(* Helper to reset context to defaults *)
-ResetContext[] := ($CurrentContext = $ContextDefaults);
-
 (* The text PutAppend writes for expr, which CText reproduces less the final newline *)
 PutAppendText[expr_] :=
   Module[{file = FileNameJoin[{$TemporaryDirectory, "generato_backend_putappend.txt"}], text},
@@ -318,6 +315,36 @@ AppendTo[$AllTests,
     $Failed,
     {ResolveBackend::EFile},
     TestID -> "ResolveBackend-FileRegistersAnotherName-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a file of codes/ is read when its name is resolved, and by nothing else: a script that reads one itself, *)
+    (* as the last line of a script once did, is stopped by the DefineBackend call of the file, whether the *)
+    (* name is registered yet or not. Import lets the stop pass, and what is registered stays as it was *)
+    Module[{file = FileNameJoin[{Environment["GENERATO"], "codes", "CarpetXGPU.wl"}], imported, table},
+      imported = Catch[Import[file]; "NoThrow", GeneratoFailure];
+      table = ResolveBackend["CarpetXGPU"];
+      {
+        imported,
+        Catch[Get[file]; "NoThrow", GeneratoFailure],
+        ResolveBackend["CarpetXGPU"] === table
+      }
+    ],
+    {$Failed, $Failed, True},
+    {DefineBackend::EImport, DefineBackend::EImport},
+    TestID -> "DefineBackend-BackendFileReadByAScript-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* the message names the file and the backend, and says what to write in place of the Import *)
+    StringTemplate[DefineBackend::EImport]["CarpetXGPU.wl", "CarpetXGPU"],
+    "The script read the backend file codes/CarpetXGPU.wl of Generato. The Import of a backend file was removed. " <>
+    "Name the backend in Generate[\"CarpetXGPU\", file, program], which reads the file. See README, \"Porting a script\".",
+    TestID -> "DefineBackend-BackendFileReadByAScript-MessageIsAPortingPointer"
   ]
 ];
 

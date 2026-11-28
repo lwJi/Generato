@@ -78,10 +78,6 @@ ReportEnding[script_, value_] :=
   - an abort, by CheckAbort;
   - a syntax error, after which Get returns as if the file had ended there,
     by Check.
-  A script that ran to its end may still have written nothing: one that set
-  a main content no backend file wrote. RequireMainPrintWritten in Emit.wl
-  stops that run, through Stop like any other failure. It is named by its
-  full context and is inert when the script did not load Generato.
 *)
 RunScript[script_String] :=
   Module[{ending},
@@ -93,7 +89,6 @@ RunScript[script_String] :=
             CheckAbort[
               Check[
                 Get[ExpandFileName[script]];
-                Generato`Emit`RequireMainPrintWritten[];
                 ranToEnd
                 ,
                 unreadable

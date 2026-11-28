@@ -4,9 +4,9 @@
 
 (* (c) Liwei Ji, 11/2026 *)
 
-BeginPackage["Generato`Program`", {"Generato`Failure`", "Generato`Context`", "Generato`Basic`", "Generato`Variable`", "Generato`Component`", "Generato`Backend`", "Generato`Emit`"}];
+BeginPackage["Generato`Program`", {"Generato`Failure`", "Generato`Context`", "Generato`Variable`", "Generato`Component`", "Generato`Equation`", "Generato`Backend`", "Generato`Emit`"}];
 
-If[Environment["QUIET"] =!= "1",
+If[!GetQuietMode[],
   System`Print["------------------------------------------------------------"];
   System`Print["Package Generato`Program`, {2026, 11, 28}"];
   System`Print["------------------------------------------------------------"];
@@ -18,8 +18,6 @@ Store::usage = "Store[varlist, mode] is a node of a program: it writes the equat
 
 ChartName::usage = "ChartName -> chart, an option of Load and Store, names the chart whose components the node is about. The default is the chart the variables were bound in.";
 
-SuffixName::usage = "SuffixName -> suffix, an option of Store, selects which of the equations set for a variable is written: the one SetEQN was given the same SuffixName for. The default is the equation set without one.";
-
 ExtraReplaceRules::usage = "ExtraReplaceRules -> rules, an option of Store, is a list of rules applied to the right-hand side of each equation and to what it assigns to.";
 
 Generate::usage = "Generate[backend, file, program] writes file: the program, rendered by the backend named. program is a list whose elements are lines of text, Load and Store nodes, and lists of these, nested to any depth; it is flattened and read top to bottom. Every node is checked before anything is computed: its shape, that each variable is bound, that a component given alone is an independent one, that the backend has a formatter for the kind of the node, its mode and the storage of each variable, that each variable declares the relation the formatter reads, and that a Store has an equation. Every problem is reported with the position of its node in the flattened program, and then the run stops and nothing is written.";
@@ -27,6 +25,16 @@ Generate::usage = "Generate[backend, file, program] writes file: the program, re
 LoadStatement::usage = "LoadStatement[config, mode, variable, component] returns the Load statement of one component: the record a backend formatter is handed. variable and component are the records binding wrote, and config is the user configuration.";
 
 StoreStatement::usage = "StoreStatement[config, mode, suffix, coordinate, variable, component, extrareplacerules] returns the Store statement of one component, with the right-hand side of the equation set under the suffix name suffix, evaluated in the chart coordinate.";
+
+SetMainPrint::usage = "SetMainPrint was removed, and a call of it stops the run. Pass the program as a list to Generate.";
+
+SetOutputFile::usage = "SetOutputFile was removed, and a call of it stops the run. Name the output file in Generate[backend, file, program].";
+
+PrintInitializations::usage = "PrintInitializations was removed, and a call of it stops the run. Write a Load[varlist, mode] node in the program handed to Generate.";
+
+PrintEquations::usage = "PrintEquations was removed, and a call of it stops the run. Write a Store[varlist, mode] node in the program handed to Generate.";
+
+pr::usage = "pr was removed, and a call of it stops the run. A line of output is a string in the program handed to Generate.";
 
 Begin["`Private`"];
 
@@ -102,9 +110,8 @@ SuffixText[suffix_String] := " with SuffixName \"" <> suffix <> "\"";
 
 (*
   A statement is what crosses to a backend, one per component: Backend.wl
-  says what its fields are. These two functions are its one writer. Lowering
-  a node calls them, and so do the print calls of Interface.wl for as long
-  as a script may still hold its main content.
+  says what its fields are. These two functions are its one writer, and
+  lowering a node is what calls them.
 
   A statement is self-contained: it carries the records and a copy of the
   user configuration, and a Store its evaluated right-hand side, so the
@@ -155,7 +162,7 @@ VarHead[var_] :=
 (*
   Whether an equation is set for a head under a suffix name. SetEQN and
   SetEQNDelayed leave a rule on the symbol RHSOf names for the two
-  (SetEQNDetail in Basic.wl), so the question is asked of that symbol. It is
+  (SetEQNDetail in Equation.wl), so the question is asked of that symbol. It is
   asked per variable: a component that no rule matches is found when the
   equation is evaluated.
 *)
@@ -403,6 +410,36 @@ Generate::EProblems = "`1` `2` in the program, nothing was generated.";
 Generate::ENoRule = "Node `1`: the equation set for `3``4` gives the component `2` no right-hand side: no rule of it matches the component.";
 
 Protect[Generate];
+
+(*
+  The names of the surface a script had before its program was a value.
+  Left undefined, a call of one would be inert: an old script would run to
+  its end, write nothing and report success. So each stays defined, only to
+  stop the run and say what to write in its place. A script's Import of a
+  backend file, the last of that surface, is stopped by DefineBackend in
+  Backend.wl.
+
+  SetMainPrint holds its argument, as it did: the main content of an old
+  script is print calls, and the message the script gets is the one of
+  SetMainPrint.
+*)
+SetAttributes[SetMainPrint, HoldAll];
+
+RemovedName[name_Symbol, pointer_String] := (
+  MessageName[name, "ERemoved"] = SymbolName[name] <> " was removed. " <> pointer <> " See README, \"Porting a script\".";
+  name[___] := Stop[MessageName[name, "ERemoved"]];
+  Protect[name];
+);
+
+RemovedName[SetMainPrint, "Pass the program as a list to Generate."];
+
+RemovedName[SetOutputFile, "Name the output file in Generate[backend, file, program]."];
+
+RemovedName[PrintInitializations, "Write a Load[varlist, mode] node in the program handed to Generate."];
+
+RemovedName[PrintEquations, "Write a Store[varlist, mode] node in the program handed to Generate."];
+
+RemovedName[pr, "A line of output is a string in the program handed to Generate."];
 
 End[];
 
