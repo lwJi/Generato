@@ -171,6 +171,9 @@ SetPrefixDt::usage = "SetPrefixDt[prefix] sets the prefix used for time derivati
 SetMainPrint::usage = "SetMainPrint[content] sets the content to be written as the main body of the output file.";
 GetMainPrint::usage = "GetMainPrint[] returns and evaluates the content set by SetMainPrint.";
 
+(* The user configuration as one value *)
+GetConfiguration::usage = "GetConfiguration[] returns the user configuration as an association from key to value: the settings a script makes to say how code is generated. It holds no mode key, and neither the output file nor the main content.";
+
 (* Initialize global context with defaults *)
 $CurrentContext = $ContextDefaults;
 
@@ -278,6 +281,26 @@ SetMainPrint[content_] :=
   $CurrentContext = Append[$CurrentContext, "MainPrint" -> Hold[content]];
 
 (* ========================================= *)
+(* The User Configuration *)
+(* ========================================= *)
+
+(*
+  The keys that are user configuration. A statement handed to a backend
+  carries a copy of them, so a formatter reads a value and calls no getter.
+  The other keys of the context are scoped modes, the output file and the
+  main content; once those are deleted the context is the configuration and
+  this list goes.
+*)
+$ConfigurationKeys = {
+  "CheckInputEquations", "PVerbose", "QuietMode", "PrintDate", "PrintHeaderMacro",
+  "GridPointIndex", "TilePointIndex", "SuffixUnprotected", "Project",
+  "SimplifyEquation", "UseLetterForTensorComponent", "TempVariableType",
+  "InterfaceWithNonCoordBasis", "PrefixDt"
+};
+
+GetConfiguration[] := KeyTake[$CurrentContext, $ConfigurationKeys];
+
+(* ========================================= *)
 (* Protect All Public Symbols *)
 (* ========================================= *)
 
@@ -314,7 +337,9 @@ Protect[
   GetSuffixName, SetSuffixName,
   GetPrefixDt, SetPrefixDt,
   (* Writefile.wl accessors *)
-  GetMainPrint, SetMainPrint
+  GetMainPrint, SetMainPrint,
+  (* the user configuration *)
+  GetConfiguration
 ];
 
 End[];

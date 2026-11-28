@@ -2,7 +2,8 @@
 
 (* ComponentTests.wl *)
 (* Unit tests for Generato`Component module: the enumeration of components, binding and the records, *)
-(* and for what a backend reads from the records: the index layout and the variable a relation names *)
+(* for what a backend reads from the records: the index layout and the variable a relation names, *)
+(* and for the equation print calls, which hand the backend of a write one statement per component *)
 (* The store of the records lasts as long as the kernel, like the xAct tensors, so each test uses heads of its own *)
 
 If[Environment["QUIET"] =!= "1", Print["Loading ComponentTests.wl..."]];
@@ -588,26 +589,18 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    (* a print call walks the records of its varlist, in order: an initialization gets the records, *)
-    (* an equation the component in xAct's notation *)
+    (* an initialization walks the records of its varlist, in order, and the backend gets the records *)
     ResetContext[];
-    Block[{PrintComponentInitialization, PrintComponentEquation, compTestPrinted = {}},
-      PrintComponentInitialization[variable_, component_, base_] := AppendTo[compTestPrinted, {"Init", GetInitializationsMode[], variable === VariableRecord[variable["Head"]], component, base}];
-      PrintComponentEquation[coordinate_, compname_, rules_] := AppendTo[compTestPrinted, {"Eqn", GetEquationsMode[], coordinate, compname, rules}];
+    Block[{PrintComponentInitialization, compTestPrinted = {}},
+      PrintComponentInitialization[variable_, component_, base_] := AppendTo[compTestPrinted, {GetInitializationsMode[], variable === VariableRecord[variable["Head"]], component, base}];
       PrintInitializations[{Mode -> "MainIn"}, Take[compTestGridVarlist, 2]];
-      PrintEquations[{Mode -> "Temp", ExtraReplaceRules -> {compTestX -> 1}}, compTestTempVarlist];
       compTestPrinted
     ],
     Join[
-      {"Init", "MainIn", True, #, None}& /@ VariableRecord[compTestS]["Components"],
-      {"Init", "MainIn", True, #, None}& /@ VariableRecord[compTestM]["Components"],
-      {
-        {"Eqn", "Temp", testCart, compTestV[{1, testCart}], {compTestX -> 1}},
-        {"Eqn", "Temp", testCart, compTestV[{2, testCart}], {compTestX -> 1}},
-        {"Eqn", "Temp", testCart, compTestV[{3, testCart}], {compTestX -> 1}}
-      }
+      {"MainIn", True, #, None}& /@ VariableRecord[compTestS]["Components"],
+      {"MainIn", True, #, None}& /@ VariableRecord[compTestM]["Components"]
     ],
-    TestID -> "PrintCalls-WalkRecordsInOrder"
+    TestID -> "PrintInitializations-WalksRecordsInOrder"
   ]
 ];
 
@@ -628,10 +621,10 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    (* outside a print call there is no mode to print a component in *)
+    (* outside a print call there is no mode to initialize a component in *)
     ResetContext[];
     Catch[
-      PrintComponent[testCart, VariableRecord[compTestM], First[VariableRecord[compTestM]["Components"]], {}];
+      PrintComponent[testCart, VariableRecord[compTestM], First[VariableRecord[compTestM]["Components"]]];
       "NoThrow",
       GeneratoFailure
     ],
@@ -643,16 +636,245 @@ AppendTo[$AllTests,
 
 AppendTo[$AllTests,
   VerificationTest[
-    (* a variable has records in the chart it was bound in and in no other *)
+    (* a variable has records in the chart it was bound in and in no other; *)
+    (* the component of a scalar carries no chart, so any chart has it *)
+    {
+      RequireChart[VariableRecord[compTestM], First[VariableRecord[compTestM]["Components"]], testCart],
+      Catch[
+        RequireChart[VariableRecord[compTestM], First[VariableRecord[compTestM]["Components"]], compTestOtherChart];
+        "NoThrow",
+        GeneratoFailure
+      ],
+      RequireChart[VariableRecord[compTestS], First[VariableRecord[compTestS]["Components"]], compTestOtherChart]
+    },
+    {Null, $Failed, Null},
+    {RequireChart::EChart},
+    TestID -> "RequireChart-OtherChart-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* an initialization in another chart stops, too *)
     ResetContext[];
-    Catch[
-      PrintEquations[{Mode -> "MainOut", ChartName -> compTestOtherChart}, {compTestGridVarlist[[2]]}];
-      "NoThrow",
-      GeneratoFailure
+    Block[{PrintComponentInitialization, compTestPrinted = {}},
+      PrintComponentInitialization[variable_, component_, base_] := AppendTo[compTestPrinted, component["Name"]];
+      {
+        Catch[
+          PrintInitializations[{Mode -> "MainIn", ChartName -> compTestOtherChart}, Take[compTestGridVarlist, 2]];
+          "NoThrow",
+          GeneratoFailure
+        ],
+        compTestPrinted
+      }
     ],
+    {$Failed, {"compTestS"}},
+    {RequireChart::EChart},
+    TestID -> "PrintInitializations-OtherChart-Stops"
+  ]
+];
+
+(* ========================================= *)
+(* Test: an equation print call hands the backend of the write one Store statement per component *)
+(* ========================================= *)
+
+SetEQN[compTestS[], 2 compTestS[]];
+
+SetEQN[compTestV[i_], compTestS[] compTestT[i]];
+
+SetEQN[{SuffixName -> "alt"}, compTestV[i_], 2 compTestT[i]];
+
+SetEQN[compTestT[i_], compTestS[] compTestV[i]];
+
+SetEQN[compTestM[i_, j_], compTestS[] compTestM[i, j]];
+
+(* A backend whose one formatter keeps each statement it is handed, and prints its mode and component *)
+compTestStatements = {};
+
+compTestKeep = Function[statement, AppendTo[compTestStatements, statement]; {statement["Mode"] <> " " <> statement["Component", "Name"]}];
+
+DefineBackend["compTestKeep", <|"Store" -> <|"Out" -> <|All -> compTestKeep|>, "AddTo" -> <|All -> compTestKeep|>, "Temp" -> <|All -> compTestKeep|>|>|>];
+
+(* A backend with the table codes/CarpetXGPU.wl states *)
+DefineBackend["compTestConst", <|"Store" -> <|"Temp" -> <|All -> DeclareAssign|>|>|>];
+
+(*
+  compTestWrite - evaluates body as the main content of a write through a
+  backend, and returns the lines it printed: the file without its header
+  and its footer.
+*)
+SetAttributes[compTestWrite, HoldRest];
+
+compTestWrite[backend_String, body_] :=
+  Module[{file = FileNameJoin[{$TemporaryDirectory, "generato_component_write.hxx"}], lines},
+    compTestStatements = {};
+    SetPrintHeaderMacro[False];
+    SetMainPrint[body];
+    WriteToFile[backend, file];
+    lines = StringSplit[ReadString[file], "\n", All];
+    DeleteFile[file];
+    lines[[4 ;; -4]]
+  ];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* one statement per component record, in order; each is rendered and its lines are printed *)
+    ResetContext[];
+    {
+      compTestWrite["compTestKeep", PrintEquations[{Mode -> "Temp"}, compTestTempVarlist]],
+      #["Component"]& /@ compTestStatements,
+      Union[KeyTake[#, {"Kind", "Mode", "Variable", "Base"}]& /@ compTestStatements],
+      CText[#["RHS"]]& /@ compTestStatements
+    },
+    {
+      {"Temp compTestV1", "Temp compTestV2", "Temp compTestV3"},
+      VariableRecord[compTestV]["Components"],
+      {<|"Kind" -> "Store", "Mode" -> "Temp", "Variable" -> VariableRecord[compTestV], "Base" -> None|>},
+      {"compTestS[ijk]*compTestT1[tI]", "compTestS[ijk]*compTestT2[tI]", "compTestS[ijk]*compTestT3[tI]"}
+    },
+    TestID -> "PrintEquations-OneStoreStatementPerComponent"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a statement has these keys and no other, and its "Config" is a copy of the user configuration *)
+    ResetContext[];
+    SetTempVariableType["vreal"];
+    SetProject["compTestProject"];
+    compTestWrite["compTestKeep", PrintEquations[{Mode -> "Temp"}, compTestTempVarlist]];
+    {
+      Keys[First[compTestStatements]],
+      First[compTestStatements]["Config"] === GetConfiguration[],
+      KeyTake[First[compTestStatements]["Config"], {"TempVariableType", "Project", "GridPointIndex"}],
+      Keys[First[compTestStatements]["Config"]]
+    },
+    {
+      {"Kind", "Mode", "Variable", "Component", "Base", "RHS", "Config"},
+      True,
+      <|"TempVariableType" -> "vreal", "Project" -> "compTestProject", "GridPointIndex" -> ""|>,
+      {
+        "CheckInputEquations", "PVerbose", "QuietMode", "PrintDate", "PrintHeaderMacro", "GridPointIndex", "TilePointIndex",
+        "SuffixUnprotected", "Project", "SimplifyEquation", "UseLetterForTensorComponent", "TempVariableType",
+        "InterfaceWithNonCoordBasis", "PrefixDt"
+      }
+    },
+    TestID -> "PrintEquations-StatementIsSelfContained"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* the modes of the print call are the modes of a Store statement, and "MainOut" is the one unstated *)
+    ResetContext[];
+    compTestWrite["compTestKeep",
+      PrintEquations[{Mode -> "Temp"}, compTestTileVarlist];
+      PrintEquations[{Mode -> "MainOut"}, compTestTileVarlist];
+      PrintEquations[{Mode -> "AddToMainOut"}, compTestTileVarlist];
+      PrintEquations[Take[compTestGridVarlist, 1]]
+    ],
+    {
+      "Temp compTestT1", "Temp compTestT2", "Temp compTestT3",
+      "Out compTestT1", "Out compTestT2", "Out compTestT3",
+      "AddTo compTestT1", "AddTo compTestT2", "AddTo compTestT3",
+      "Out compTestS"
+    },
+    TestID -> "PrintEquations-ModesOfAStoreStatement"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a mode that is none of the three stops, whatever the varlist and before a backend is asked for *)
+    ResetContext[];
+    {
+      Catch[PrintEquations[{Mode -> "Main"}, {}]; "NoThrow", GeneratoFailure],
+      Catch[compTestWrite["compTestKeep", PrintEquations[{Mode -> "Main"}, compTestTempVarlist]]; "NoThrow", GeneratoFailure],
+      compTestStatements
+    },
+    {$Failed, $Failed, {}},
+    {PrintEquations::EMode, PrintEquations::EMode},
+    TestID -> "PrintEquations-UnknownMode-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a print call belongs in the main content of a write: outside one there is no backend to print through *)
+    ResetContext[];
+    Catch[PrintEquations[{Mode -> "Temp"}, compTestTempVarlist]; "NoThrow", GeneratoFailure],
     $Failed,
-    {PrintComponent::EChart},
-    TestID -> "PrintCalls-OtherChart-Stops"
+    {CurrentBackend::ENoWrite},
+    TestID -> "PrintEquations-OutsideAWrite-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* SuffixName selects the equation set under that name. It is an argument: the SuffixName of the *)
+    (* context is neither written nor read by the print call *)
+    ResetContext[];
+    SetSuffixName["compTestKept"];
+    compTestWrite["compTestKeep",
+      PrintEquations[{Mode -> "Temp", SuffixName -> "alt"}, compTestTempVarlist];
+      PrintEquations[{Mode -> "Temp"}, Take[compTestTempVarlist, 1]]
+    ];
+    {CText[#["RHS"]]& /@ compTestStatements[[{1, 4}]], GetSuffixName[]},
+    {{"2*compTestT1[tI]", "compTestS[ijk]*compTestT1[tI]"}, "compTestKept"},
+    TestID -> "PrintEquations-SuffixNameIsAnArgument"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a SuffixName that is not a string stops *)
+    ResetContext[];
+    Catch[compTestWrite["compTestKeep", PrintEquations[{Mode -> "Temp", SuffixName -> compTestNotAString}, compTestTempVarlist]]; "NoThrow", GeneratoFailure],
+    $Failed,
+    {PrintEquations::ESuffixName},
+    TestID -> "PrintEquations-SuffixNameNotAString-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* ExtraReplaceRules rewrite the right-hand side and what the equation assigns to, the "Expr" of the *)
+    (* statement's copy of the component. The "Name" is not rewritten, and neither is the bound record *)
+    ResetContext[];
+    compTestWrite["compTestKeep",
+      PrintEquations[{Mode -> "Temp", ExtraReplaceRules -> {compTestV1 -> compTestRenamed, compTestS[[ijk]] -> compTestOne}}, compTestTempVarlist]
+    ];
+    {
+      #["Component", "Expr"]& /@ compTestStatements,
+      #["Component", "Name"]& /@ compTestStatements,
+      CText[#["RHS"]]& /@ compTestStatements,
+      compTestFields[compTestV, "Expr"]
+    },
+    {
+      {compTestRenamed, compTestV2, compTestV3},
+      {"compTestV1", "compTestV2", "compTestV3"},
+      {"compTestOne*compTestT1[tI]", "compTestOne*compTestT2[tI]", "compTestOne*compTestT3[tI]"},
+      {compTestV1, compTestV2, compTestV3}
+    },
+    TestID -> "PrintEquations-ExtraReplaceRules"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* an equation in another chart has no record to print, and nothing of the varlist is printed *)
+    ResetContext[];
+    {
+      Catch[
+        compTestWrite["compTestKeep", PrintEquations[{Mode -> "MainOut", ChartName -> compTestOtherChart}, {compTestGridVarlist[[2]]}]];
+        "NoThrow",
+        GeneratoFailure
+      ],
+      compTestStatements
+    },
+    {$Failed, {}},
+    {RequireChart::EChart},
+    TestID -> "PrintEquations-OtherChart-Stops"
   ]
 ];
 
@@ -660,13 +882,119 @@ AppendTo[$AllTests,
   VerificationTest[
     (* the component of a scalar carries no chart, so any chart prints it *)
     ResetContext[];
-    Block[{PrintComponentEquation, compTestPrinted = {}},
-      PrintComponentEquation[coordinate_, compname_, rules_] := AppendTo[compTestPrinted, {coordinate, compname}];
-      PrintEquations[{Mode -> "MainOut", ChartName -> compTestOtherChart}, {compTestGridVarlist[[1]]}];
-      compTestPrinted
+    {
+      compTestWrite["compTestKeep", PrintEquations[{Mode -> "MainOut", ChartName -> compTestOtherChart}, {compTestGridVarlist[[1]]}]],
+      CText[#["RHS"]]& /@ compTestStatements
+    },
+    {{"Out compTestS"}, {"2*compTestS[ijk]"}},
+    TestID -> "PrintEquations-OtherChart-Scalar"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* through the formatters a backend builds on, the lines are the one-token-a-line layout of the goldens: *)
+    (* a temporary is declared by its bare name, and an assignment refers to the storage *)
+    ResetContext[];
+    SetTempVariableType["vreal"];
+    compTestWrite["compTestConst",
+      Global`pr["{"];
+      PrintEquations[{Mode -> "Temp"}, Take[compTestTempVarlist, 1]];
+      PrintEquations[{Mode -> "MainOut"}, Take[compTestGridVarlist, 1]];
+      PrintEquations[{Mode -> "AddToMainOut"}, Take[compTestGridVarlist, 1]];
+      Global`pr["}"]
     ],
-    {{compTestOtherChart, compTestS[]}},
-    TestID -> "PrintCalls-OtherChart-Scalar"
+    {
+      "{",
+      "const vreal", "compTestV1", "=", "compTestS[ijk]*compTestT1[tI]", ";", "",
+      "const vreal", "compTestV2", "=", "compTestS[ijk]*compTestT2[tI]", ";", "",
+      "const vreal", "compTestV3", "=", "compTestS[ijk]*compTestT3[tI]", ";", "",
+      "compTestS[ijk]", "=", "2*compTestS[ijk]", ";", "",
+      "compTestS[ijk]", "+=", "2*compTestS[ijk]", ";", "",
+      "}"
+    },
+    TestID -> "PrintEquations-LinesThroughTheSharedFormatters"
+  ]
+];
+
+(* ========================================= *)
+(* Test: one component, the way a script prints components in its own order *)
+(* ========================================= *)
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* the mode and the suffix name are the keys in force, and the component is the one named *)
+    ResetContext[];
+    compTestWrite["compTestKeep",
+      WithMode[{"Phase" -> "PrintComp", "PrintCompType" -> "Equations", "EquationsMode" -> "MainOut"},
+        PrintComponentEquation[testCart, compTestM[{2, -testCart}, {3, -testCart}], {}];
+        PrintComponentEquation[testCart, compTestM[{1, -testCart}, {1, -testCart}], {}]
+      ];
+      SetSuffixName["alt"];
+      WithMode[{"EquationsMode" -> "Temp"},
+        PrintComponentEquation[testCart, compTestV[{3, testCart}], {compTestT3[[tI]] -> compTestThree}]
+      ];
+      SetSuffixName[""]
+    ];
+    {
+      #["Mode"]& /@ compTestStatements,
+      #["Component"]& /@ compTestStatements,
+      #["Variable"]& /@ compTestStatements,
+      CText[#["RHS"]]& /@ compTestStatements
+    },
+    {
+      {"Out", "Out", "Temp"},
+      {
+        ComponentRecord[compTestM[{2, -testCart}, {3, -testCart}]],
+        ComponentRecord[compTestM[{1, -testCart}, {1, -testCart}]],
+        ComponentRecord[compTestV[{3, testCart}]]
+      },
+      {VariableRecord[compTestM], VariableRecord[compTestM], VariableRecord[compTestV]},
+      {"compTestM23[ijk]*compTestS[ijk]", "compTestM11[ijk]*compTestS[ijk]", "2*compTestThree"}
+    },
+    TestID -> "PrintComponentEquation-OneStatementForTheNamedComponent"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* with no equation mode in force there is nothing to print the component as *)
+    ResetContext[];
+    Catch[
+      compTestWrite["compTestKeep", PrintComponentEquation[testCart, compTestV[{3, testCart}], {}]];
+      "NoThrow",
+      GeneratoFailure
+    ],
+    $Failed,
+    {PrintComponentEquation::EMode},
+    TestID -> "PrintComponentEquation-NoMode-Stops"
+  ]
+];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* the mirror of a symmetric pair is not an independent component, and a head that is not bound has none *)
+    ResetContext[];
+    {
+      Catch[
+        compTestWrite["compTestKeep",
+          WithMode[{"EquationsMode" -> "MainOut"}, PrintComponentEquation[testCart, compTestM[{3, -testCart}, {2, -testCart}], {}]]
+        ];
+        "NoThrow",
+        GeneratoFailure
+      ],
+      Catch[
+        compTestWrite["compTestKeep",
+          WithMode[{"EquationsMode" -> "MainOut"}, PrintComponentEquation[testCart, compTestUnbound[{1, testCart}], {}]]
+        ];
+        "NoThrow",
+        GeneratoFailure
+      ],
+      compTestStatements
+    },
+    {$Failed, $Failed, {}},
+    {ComponentRecord::EComponent, VariableRecord::EUnbound},
+    TestID -> "PrintComponentEquation-NotAnIndependentComponent-Stops"
   ]
 ];
 
@@ -868,6 +1196,31 @@ AppendTo[$AllTests,
       {"compTestDtB1", compTestB}, {"compTestDtB2", compTestB}, {"compTestDtB3", compTestB}
     },
     TestID -> "PrintCalls-HandTheBaseRecord"
+  ]
+];
+
+SetEQN[compTestDtB[i_], compTestB[i]];
+
+SetEQN[compTestDUB[i_, j_], compTestDB[i, j]];
+
+AppendTo[$AllTests,
+  VerificationTest[
+    (* a Store statement carries the record a relation names, as a load is handed it; *)
+    (* so the variable the relation names must be bound when its derivative is stored *)
+    ResetContext[];
+    {
+      compTestWrite["compTestKeep", PrintEquations[{Mode -> "MainOut"}, compTestDtVarlist]],
+      Union[#["Base"]& /@ compTestStatements] === {VariableRecord[compTestB]},
+      Catch[
+        compTestWrite["compTestKeep", PrintEquations[{Mode -> "Temp"}, compTestDUBVarlist]];
+        "NoThrow",
+        GeneratoFailure
+      ],
+      compTestStatements
+    },
+    {{"Out compTestDtB1", "Out compTestDtB2", "Out compTestDtB3"}, True, $Failed, {}},
+    {VariableRecord::EUnbound},
+    TestID -> "PrintEquations-StatementCarriesTheBaseRecord"
   ]
 ];
 

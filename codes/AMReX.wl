@@ -52,41 +52,19 @@ Protect[PrintComponentInitialization];
 
 
 (******************************************************************************)
-(*               Print equation of each component of a tensor                 *)
+(*                             The backend table                              *)
 (******************************************************************************)
 (**
- * \param extrareplacerules: not needed in most of the cases, they are
- *        introduced to replace say coordinates representation of metric.
+ * An equation is rendered through this table. The backend states what
+ * differs from the defaults in src/Backend.wl: a temporary is declared
+ * const, by the bare name of the component.
  *)
 
-PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
-  Module[{compToValue, rhssToValue},
-    compToValue = (compname // ToValues) /. extrareplacerules;
-    rhssToValue = ComputeRHSValue[coordinate, compname, extrareplacerules];
-    PrintEquationByMode[compToValue, rhssToValue,
-      (* MainOut formatter - standard assignment *)
-      Function[{comp, rhs},
-        Global`pr[CText[comp]];
-        Global`pr["="];
-        Global`pr[CText[rhs]];
-        Global`pr[";\n"]
-      ],
-      (* Temp formatter - AMReX specific: const prefix, the bare name of the component *)
-      Function[{comp, rhs},
-        Global`pr["const " <> GetTempVariableType[] <> " "];
-        Global`pr[ComponentRecord[compname]["Name"]];
-        Global`pr["="];
-        Global`pr[CText[rhs]];
-        Global`pr[";\n"]
-      ]
-    ]
-  ];
-
-Protect[PrintComponentEquation];
+DefineBackend["AMReX", <|"Store" -> <|"Temp" -> <|All -> DeclareAssign|>|>|>];
 
 
 (******************************************************************************)
 (*                                Write to files                              *)
 (******************************************************************************)
 
-WriteToFile[GetOutputFile[]];
+WriteToFile["AMReX", GetOutputFile[]];

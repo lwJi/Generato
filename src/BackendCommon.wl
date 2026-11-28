@@ -8,7 +8,6 @@ Needs["Generato`Failure`"];
 Needs["Generato`Basic`"];
 Needs["Generato`ParseMode`"];
 Needs["Generato`Component`"];
-Needs["Generato`Emit`"];
 
 If[Environment["QUIET"] =!= "1",
   System`Print["------------------------------------------------------------"];
@@ -19,8 +18,7 @@ If[Environment["QUIET"] =!= "1",
 GetGFIndexName::usage = "GetGFIndexName[index] converts integer index to GF index name (p1, m1, c0, etc.).";
 GetGFIndexNameMix2nd::usage = "GetGFIndexNameMix2nd[index1, index2] creates mixed 2nd derivative GF index name.";
 GetInterfaceName::usage = "GetInterfaceName[compname] returns the interface name for a component.";
-ComputeRHSValue::usage = "ComputeRHSValue[coordinate, compname, extrareplacerules] computes the RHS value for an equation.";
-PrintEquationByMode::usage = "PrintEquationByMode[compToValue, rhssToValue, mainFormatter, tempFormatter] prints equation based on current EquationsMode. tempFormatter is optional (defaults to Automatic for standard Temp output).";
+ComputeRHSValue::usage = "ComputeRHSValue[coordinate, compname, suffix, extrareplacerules] computes the RHS value of the equation set for a component under the suffix name suffix, \"\" for an equation set without one.";
 IndexSuffix::usage = "IndexSuffix[variable, component, base] returns the index a component has in the storage of its variable, as C text: \"\" for a scalar, \"[v]\" for its slot v, and \"[v mod N][v div N]\" for a derivative of a variable with N components. base is the record DerivativeOf names.";
 BaseComponent::usage = "BaseComponent[component, base] returns the component record of base that a component of one of its derivatives differentiates: the one at the trailing indices.";
 RequireRelation::usage = "RequireRelation[variable, relation, mode] stops the run, with a pointer to the rule to add, if the variable record declares no relation of that name. mode is the mode it is loaded with.";
@@ -77,12 +75,13 @@ Protect[GetInterfaceName];
 
 (*
   ComputeRHSValue - Computes the RHS value for an equation
-  Previously duplicated in all 6 backends
+  The suffix name selects which of the equations set for the variable is
+  evaluated; it is an argument, so nothing here reads a mode.
 *)
-ComputeRHSValue[coordinate_, compname_, extrareplacerules_] :=
+ComputeRHSValue[coordinate_, compname_, suffix_String, extrareplacerules_] :=
   Module[{rhssToValue},
     rhssToValue =
-      (compname /. {compname[[0]] -> RHSOf[compname[[0]], GetSuffixName[]]}) //
+      (compname /. {compname[[0]] -> RHSOf[compname[[0]], suffix]}) //
       DummyToBasis[coordinate] // TraceBasisDummy // ToValues;
     If[GetSimplifyEquation[],
       rhssToValue = rhssToValue // Simplify
@@ -94,54 +93,6 @@ ComputeRHSValue[coordinate_, compname_, extrareplacerules_] :=
   ];
 
 Protect[ComputeRHSValue];
-
-(*
-  PrintEquationByMode - Prints equation based on current EquationsMode
-
-  Calling conventions:
-  1. PrintEquationByMode[compToValue, rhssToValue, mainFormatter] - callback for MainOut,
-     default Temp (no const, CForm[compToValue]), shared AddToMainOut
-  2. PrintEquationByMode[compToValue, rhssToValue, mainFormatter, tempFormatter] - callbacks
-     for both MainOut and Temp, shared AddToMainOut
-
-  The tempFormatter function takes (compToValue, rhssToValue) and prints the Temp mode output.
-  If tempFormatter is Automatic (default), uses standard: GetTempVariableType[] + CForm[compToValue]
-*)
-PrintEquationByMode[compToValue_, rhssToValue_, mainFormatter_] :=
-  PrintEquationByMode[compToValue, rhssToValue, mainFormatter, Automatic];
-
-PrintEquationByMode[compToValue_, rhssToValue_, mainFormatter_, tempFormatter_] :=
-  Which[
-    GetEquationsMode[] === "Temp",
-      If[tempFormatter === Automatic,
-        (* Default Temp handling: no const prefix, CForm[compToValue] *)
-        Global`pr[GetTempVariableType[] <> " "];
-        Global`pr[CText[compToValue]];
-        Global`pr["="];
-        Global`pr[CText[rhssToValue]];
-        Global`pr[";\n"]
-        ,
-        (* Custom Temp handling via callback *)
-        tempFormatter[compToValue, rhssToValue]
-      ]
-    ,
-    GetEquationsMode[] === "MainOut",
-      mainFormatter[compToValue, rhssToValue]
-    ,
-    GetEquationsMode[] === "AddToMainOut",
-      (* Shared AddToMainOut - identical across all backends *)
-      Global`pr[CText[compToValue]];
-      Global`pr["+="];
-      Global`pr[CText[rhssToValue]];
-      Global`pr[";\n"]
-    ,
-    True,
-      Stop[PrintEquationByMode::EMode]
-  ];
-
-PrintEquationByMode::EMode = "PrintEquationByMode: EquationsMode unrecognized!";
-
-Protect[PrintEquationByMode];
 
 (*
   IndexSuffix - the layout rule: where a component is in the storage of its variable.

@@ -54,34 +54,17 @@ PrintComponentInitialization::EMode = "PrintComponentInitialization mode unrecog
 Protect[PrintComponentInitialization];
 
 
-(******************************************************************************)
-(*               Print equation of each component of a tensor                 *)
-(******************************************************************************)
-(**
- * \param extrareplacerules: not needed in most of the cases, they are
- *        introduced to replace say coordinates representation of metric.
- *)
+(*
+    The backend table
 
-PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
-  Module[{compToValue, rhssToValue},
-    compToValue = compname // ToValues;
-    rhssToValue = ComputeRHSValue[coordinate, compname, extrareplacerules];
-    PrintEquationByMode[compToValue, rhssToValue,
-      (* MainOut formatter - standard assignment *)
-      Function[{comp, rhs},
-        Global`pr[CText[comp]];
-        Global`pr["="];
-        Global`pr[CText[rhs]];
-        Global`pr[";\n"]
-      ]
-      (* Temp uses default: no const prefix, CForm[compToValue] *)
-    ]
-  ];
+    An equation is rendered through this table. The backend states no
+    "Store" key: the defaults in src/Backend.wl are its formatters.
+*)
 
-Protect[PrintComponentEquation];
+DefineBackend["Nmesh", <||>];
 
 (*
     Write to files
 *)
 
-WriteToFile[GetOutputFile[]];
+WriteToFile["Nmesh", GetOutputFile[]];
