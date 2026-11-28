@@ -4,64 +4,49 @@
 
 (* (c) Liwei Ji, 01/2024 *)
 
-GetInitialComp[varname_] :=
-  Module[{initialcomp = ""},
-    Do[
-      If[Is3DAbstractIndex[varname[[icomp]]],
-        initialcomp = initialcomp <> "x"
-        ,
-        initialcomp = initialcomp <> "t"
-      ]
-      ,
-      {icomp, 1, Length[varname]}
-    ];
-    initialcomp
-  ];
+(* One letter per slot of a variable: "x" for a spatial index, "t" for a spacetime one *)
+GetInitialComp[slots_List] :=
+  StringJoin[If[Is3DAbstractIndex[#], "x", "t"]& /@ slots];
 
 (*
     Print initialization of each component of a tensor
+
+    variable, component: the records of the variable and of the component.
+    base: the record of the variable a declared relation names, or None.
+
+    A variable is read at the index of its first component plus the slot of
+    the component. A right-hand side is stored at the index of the variable
+    it is the time derivative of, so "MainOut" needs TimeDerivativeOf.
 *)
 
-PrintComponentInitialization[varinfo_, compname_] :=
-  Module[{varlistindex, compToValue, varname, symmetry, len, buf},
-    (* Extract common component info using shared function *)
-    {varlistindex, compToValue, varname, symmetry, len} =
-      ExtractComponentInfo[varinfo, compname];
-    Which[
-      GetInitializationsMode[] === "MainOut",
-        buf =
-          "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = Vard(node, Vind(vlr," <> ToString[GetProject[]] <> "->i_" <> StringTrim[ToString[varname[[0]]], (GetPrefixDt[] | GetSuffixUnprotected[])] <> GetInitialComp[varname] <>
-            If[varlistindex == 0,
-              ""
-              ,
-              "+" <> ToString[varlistindex]
-            ] <> "));"
-      ,
-      GetInitializationsMode[] === "MainIn",
-        buf =
-          "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = Vard(node, Vind(vlu," <> ToString[GetProject[]] <> "->i_" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]] <> GetInitialComp[varname] <>
-            If[varlistindex == 0,
-              ""
-              ,
-              "+" <> ToString[varlistindex]
-            ] <> "));"
-      ,
-      GetInitializationsMode[] === "MoreInOut",
-        buf =
-          "double *" <> StringTrim[ToString[compToValue], GetGridPointIndex[]] <> " = Vard(node, i" <> StringTrim[ToString[varname[[0]]], GetSuffixUnprotected[]] <> GetInitialComp[varname] <>
-            If[varlistindex == 0,
-              ""
-              ,
-              "+" <> ToString[varlistindex]
-            ] <> ");"
-      ,
-      GetInitializationsMode[] === "Temp",
-        buf = "double " <> ToString[compToValue] <> ";"
-      ,
-      True,
-        Stop[PrintComponentInitialization::EMode]
+PrintComponentInitialization[variable_, component_, base_] :=
+  Module[{mode = GetInitializationsMode[], name = component["Name"], initialcomp, offset},
+    initialcomp = GetInitialComp[variable["Slots"]];
+    offset =
+      If[component["Slot"] == 0,
+        ""
+        ,
+        "+" <> ToString[component["Slot"]]
+      ];
+    pr[
+      Which[
+        mode === "MainOut",
+          RequireRelation[variable, "TimeDerivativeOf", mode];
+          "double *" <> name <> " = Vard(node, Vind(vlr," <> ToString[GetProject[]] <> "->i_" <> base["Name"] <> initialcomp <> offset <> "));"
+        ,
+        mode === "MainIn",
+          "double *" <> name <> " = Vard(node, Vind(vlu," <> ToString[GetProject[]] <> "->i_" <> variable["Name"] <> initialcomp <> offset <> "));"
+        ,
+        mode === "MoreInOut",
+          "double *" <> name <> " = Vard(node, i" <> variable["Name"] <> initialcomp <> offset <> ");"
+        ,
+        mode === "Temp",
+          "double " <> name <> ";"
+        ,
+        True,
+          Stop[PrintComponentInitialization::EMode]
+      ]
     ];
-    pr[buf];
   ];
 
 PrintComponentInitialization::EMode = "PrintComponentInitialization mode unrecognized!";

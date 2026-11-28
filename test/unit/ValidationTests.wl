@@ -164,30 +164,6 @@ AppendTo[$AllTests,
   ]
 ];
 
-AppendTo[$AllTests,
-  VerificationTest[
-    ResetContext[];
-    Catch[
-      SetMapComponentToVarlist[{1, 2, 3}];
-      "NoThrow",
-      GeneratoFailure
-    ],
-    $Failed,
-    {SetMapComponentToVarlist::EInvalidValue},
-    TestID -> "SetMapComponentToVarlist rejects list"
-  ]
-];
-
-AppendTo[$AllTests,
-  VerificationTest[
-    ResetContext[];
-    SetMapComponentToVarlist[<|"a" -> 1|>];
-    GetMapComponentToVarlist[],
-    <|"a" -> 1|>,
-    TestID -> "SetMapComponentToVarlist accepts association"
-  ]
-];
-
 (* ===== Cleanup ===== *)
 
 ResetContext[];

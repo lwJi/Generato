@@ -20,18 +20,19 @@ DefManifold[M4, 4, Complement[IndexRange[a, z], {g}]];
 
 DefChart[cart, M4, {0, 1, 2, 3}, {T[], X[], Y[], Z[]}, ChartColor -> Blue];
 
-dtEvolVarlist =
-  GridTensors[
-    {dtg[-a, -b], Symmetric[{-a, -b}]},
-    {dtPi[-a, -b], Symmetric[{-a, -b}], PrintAs -> "dt\[CapitalPi]"},
-    {dtPhi[-k, -a, -b], Symmetric[{-a, -b}], PrintAs -> "dt\[CapitalPhi]"}
-  ];
-
 EvolVarlist =
   GridTensors[
     {g[-a, -b], Symmetric[{-a, -b}]},
     {Pi$Upt[-a, -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalPi]"},
     {Phi[-k, -a, -b], Symmetric[{-a, -b}], PrintAs -> "\[CapitalPhi]"}
+  ];
+
+(* Each right-hand side names the variable it is the time derivative of, which is declared above it *)
+dtEvolVarlist =
+  GridTensors[
+    {dtg[-a, -b], Symmetric[{-a, -b}], TimeDerivativeOf -> g},
+    {dtPi[-a, -b], Symmetric[{-a, -b}], TimeDerivativeOf -> Pi$Upt, PrintAs -> "dt\[CapitalPi]"},
+    {dtPhi[-k, -a, -b], Symmetric[{-a, -b}], TimeDerivativeOf -> Phi, PrintAs -> "dt\[CapitalPhi]"}
   ];
 
 MoreInVarlist = GridTensors[{alpha[], PrintAs -> "\[Alpha]"}, {beta[i], PrintAs -> "\[Beta]"}];

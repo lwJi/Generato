@@ -4,13 +4,13 @@
 
 BeginPackage["Generato`Interface`"];
 
+Needs["Generato`Failure`"];
+
 Needs["Generato`Basic`"];
 
 Needs["Generato`ParseMode`"];
 
 Needs["Generato`Component`"];
-
-Needs["Generato`Varlist`"];
 
 If[Environment["QUIET"] =!= "1",
   System`Print["------------------------------------------------------------"];
@@ -18,100 +18,28 @@ If[Environment["QUIET"] =!= "1",
   System`Print["------------------------------------------------------------"];
 ];
 
-DefTensors::usage = "DefTensors[var1, var2, ...] defines tensors without setting their components.";
-
-GridTensors::usage = "GridTensors[var1, var2, ...] defines tensors with grid point indices, sets their components, and returns the varlist.";
-
-TileTensors::usage = "TileTensors[var1, var2, ...] defines tensors with tile point indices, sets their components, and returns the varlist.";
-
-TempTensors::usage = "TempTensors[var1, var2, ...] defines temporary tensors without grid point indices, sets their components, and returns the varlist.";
-
-SetComponents::usage = "SetComponents[varlist] sets tensor components for the given varlist.\nSetComponents[{opts}, varlist] sets components with options ChartName, IndependentVarlistIndex, WithoutGridPointIndex, UseTilePointIndex.";
-
 PrintEquations::usage = "PrintEquations[varlist] prints equations for tensor components in the varlist.\nPrintEquations[{opts}, varlist] prints with options ChartName, SuffixName, Mode, ExtraReplaceRules.";
 
-PrintInitializations::usage = "PrintInitializations[varlist] prints initialization code for tensor components.\nPrintInitializations[{opts}, varlist] prints with options ChartName, Mode, TensorType, StorageType, DerivsOrder, DerivsAccuracy.";
+PrintInitializations::usage = "PrintInitializations[varlist] prints initialization code for tensor components.\nPrintInitializations[{opts}, varlist] prints with options ChartName, Mode, StorageType. TensorType, DerivsOrder and DerivsAccuracy are accepted and not read: the index layout and the order of a derivative follow from the DerivativeOf its variable declares. TensorType -> \"Vect\" or \"Smat\" on a variable that declares no DerivativeOf stops the run.";
 
 Begin["`Private`"];
 
 (*
-    Higher functions
+  PrintVarlist - walks the component records of a varlist.
+  Each var spec resolves through its head to the record of a bound
+  variable, and each component record is handed to the backend in the
+  order BindVariable gave it.
 *)
-
-(* Original API: DefTensors[var1, var2, ...] *)
-DefTensors[vars__] :=
-  Module[{arglist = List[vars], varname, symmetry, printname},
-    Do[
-      {varname, symmetry, printname} = ParseVar[arglist[[ivar]]];
-      DefineTensor[varname, symmetry, printname]
-      ,
-      {ivar, 1, Length[arglist]}
-    ];
-    Return[arglist]
-  ];
-
-Protect[DefTensors];
-
-(* Original API: GridTensors[var1, var2, ...] *)
-GridTensors[vars__] :=
-  Module[{arglist = List[vars]},
-    If[GetCheckInputEquations[],
-      DefTensors[vars]
-      ,
-      SetComponents[arglist]
-    ];
-    Return[arglist]
-  ];
-
-Protect[GridTensors];
-
-(* Original API: TileTensors[var1, var2, ...] *)
-TileTensors[vars__] :=
-  Module[{arglist = List[vars]},
-    If[GetCheckInputEquations[],
-      DefTensors[vars]
-      ,
-      SetComponents[{UseTilePointIndex -> True}, arglist]
-    ];
-    Return[arglist]
-  ];
-
-Protect[TileTensors];
-
-(* Original API: TempTensors[var1, var2, ...] *)
-TempTensors[vars__] :=
-  Module[{arglist = List[vars]},
-    If[GetCheckInputEquations[],
-      DefTensors[vars]
-      ,
-      SetComponents[{WithoutGridPointIndex -> True}, arglist]
-    ];
-    Return[arglist]
-  ];
-
-Protect[TempTensors];
-
-(*
-    Basic functions
-*)
-
-Options[SetComponents] :=
-  {ChartName -> GetDefaultChart[], IndependentVarlistIndex -> True, WithoutGridPointIndex -> False, UseTilePointIndex -> False};
-
-SetComponents[OptionsPattern[], varlist_?ListQ] :=
-  Module[{chartname, indepidx, nogpidx, tlidx},
-    {chartname, indepidx, nogpidx, tlidx} = OptionValue[{ChartName, IndependentVarlistIndex, WithoutGridPointIndex, UseTilePointIndex}];
-    WithMode[{
-      "Phase" -> "SetComp",
-      "IndependentVarlistIndex" -> indepidx,
-      "WithoutGridPointIndex" -> nogpidx,
-      "UseTilePointIndex" -> tlidx
-    },
-      ParseVarlist[varlist, chartname]
+PrintVarlist[varlist_List, chartname_, extrareplacerules_] :=
+  Scan[
+    Function[var,
+      With[{variable = VariableRecord[var]},
+        Scan[PrintComponent[chartname, variable, #, extrareplacerules]&, variable["Components"]]
+      ]
     ]
+    ,
+    varlist
   ];
-
-Protect[SetComponents];
 
 (**
  * \brief Print Equations for each tensor components from a Varlist.
@@ -132,7 +60,7 @@ PrintEquations[OptionsPattern[], varlist_?ListQ] :=
       "EquationsMode" -> mode,
       "SuffixName" -> If[suffixname === Null, "", suffixname]
     },
-      ParseVarlist[{ExtraReplaceRules -> extrareplacerules}, varlist, chartname]
+      PrintVarlist[varlist, chartname, extrareplacerules]
     ]
   ];
 
@@ -140,6 +68,19 @@ Protect[PrintEquations];
 
 (**
  * \brief Print Initialization of each tensor components from a Varlist.
+ *
+ *   \option TensorType, DerivsOrder, DerivsAccuracy: accepted and not read. What they
+ *           stated follows from the DerivativeOf a variable declares: the index
+ *           layout (IndexSuffix in BackendCommon.wl) and the order of the derivative.
+ *
+ *   The one exception is the guard below. TensorType -> "Vect" or "Smat" used to
+ *   give a two-index layout, and a variable that declares no DerivativeOf now gets
+ *   the one index [v]. A call that states either for such a variable would write
+ *   a file with other indices than it wrote before, so it stops with the rule to
+ *   add. "Scal", the default, and any TensorType on a variable that declares
+ *   DerivativeOf pass.
+ *   The guard reads an option of the old print call and nothing in a backend, so
+ *   it is deleted with this adapter in Phase 10, when TensorType is deleted.
  *)
 
 Options[PrintInitializations] :=
@@ -151,6 +92,21 @@ PrintInitializations[OptionsPattern[], varlist_?ListQ] :=
     {chartname, mode, tensortype, storagetype, derivsorder, accuracyorder} =
       OptionValue[{ChartName, Mode, TensorType, StorageType, DerivsOrder, DerivsAccuracy}];
 
+    (* the guard: checked for the whole varlist, before a component of it is printed *)
+    If[MatchQ[tensortype, "Vect" | "Smat"],
+      Scan[
+        Function[var,
+          With[{variable = VariableRecord[var]},
+            If[variable["DerivativeOf"] === None,
+              Stop[PrintInitializations::ETensorType, variable["Head"], tensortype]
+            ]
+          ]
+        ]
+        ,
+        varlist
+      ]
+    ];
+
     WithMode[{
       "Phase" -> "PrintComp",
       "PrintCompType" -> "Initializations",
@@ -160,9 +116,11 @@ PrintInitializations[OptionsPattern[], varlist_?ListQ] :=
       "DerivsOrder" -> derivsorder,
       "DerivsAccuracy" -> accuracyorder
     },
-      ParseVarlist[varlist, chartname]
+      PrintVarlist[varlist, chartname, {}]
     ]
   ];
+
+PrintInitializations::ETensorType = "`1` is loaded with TensorType -> \"`2`\" but declares no DerivativeOf. Add DerivativeOf -> v to its declaration, where v is the variable `1` is the derivative of.";
 
 Protect[PrintInitializations];
 

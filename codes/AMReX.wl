@@ -6,123 +6,47 @@
 
 
 (******************************************************************************)
-(*                    Finite difference stencil function                      *)
-(******************************************************************************)
-
-(* Function to get GF index name - GetGFIndexName is now in BackendCommon.wl *)
-
-PrintIndexes3D[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strDir_?StringQ] :=
-  Module[{stencils, solution},
-    (* Get stencils and finite difference coefficients *)
-    stencils = GetCenteringStencils[accuracyOrd];
-    solution = GetFiniteDifferenceCoefficients[stencils, fdOrd];
-    (* Construct the finite difference index expression *)
-    Do[
-      index = stencils[[i]];
-      If[(Subscript[c, index] /. solution) == 0, Continue[]];
-      buf = "  const T " <> ToString[GetGFIndexName[index]] <>
-        If[index == 0,
-          " = gf(i, j, k, comp);"
-          ,
-          " = gf("
-            <> "i + (D == 0 ? " <> ToString[index] <> " : 0), "
-            <> "j + (D == 1 ? " <> ToString[index] <> " : 0), "
-            <> "k + (D == 2 ? " <> ToString[index] <> " : 0), "
-            <> "comp);"
-        ];
-      pr[buf]
-      ,
-      {i, 1, Length[stencils]}
-    ];
-  ];
-
-PrintFDExpression[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strIdx_?StringQ] :=
-  Module[{stencils, solution, buf, rule},
-    (* Rules for string replacements *)
-    rule = {
-      "invdx" -> strIdx <> "[D]"
-    };
-    (* Get stencils and finite difference coefficients *)
-    stencils = GetCenteringStencils[accuracyOrd];
-    solution = GetFiniteDifferenceCoefficients[stencils, fdOrd];
-    (* Construct the finite difference expression *)
-    buf = "    " <> ToString[CForm[
-      (Sum[
-        index = stencils[[i]];
-        (Subscript[c, index] /. solution) GetGFIndexName[index],
-        {i, 1, Length[stencils]}] // Simplify) *
-      Product[invdx, {i, 1, fdOrd}]
-    ]] <> ";";
-    pr[StringReplace[buf, rule]];
-  ];
-
-
-(******************************************************************************)
-(*                               Misc functions                               *)
-(******************************************************************************)
-
-
-(******************************************************************************)
 (*            Print initialization of each component of a tensor              *)
 (******************************************************************************)
+(**
+ * \param variable, component: the records of the variable and of the component.
+ * \param base: the record of the variable a declared relation names, or None.
+ *
+ * A variable is read from the array of its name, at the index the layout
+ * rule gives. A derivative that is not stored on a tile is computed from
+ * the variable it differentiates, so it must declare DerivativeOf: its
+ * order is the number of slots it has more, and the derivative directions
+ * are its leading indices.
+ *)
 
-PrintComponentInitialization[varinfo_, compname_] :=
-  Module[{varlistindex, compToValue, varname, symmetry, buf, subbuf, len,
-          fdorder, fdaccuracy},
-    (* Extract common component info using shared function *)
-    {varlistindex, compToValue, varname, symmetry, len} =
-      ExtractComponentInfo[varinfo, compname];
-
-    (* set subbuf using shared function from BackendCommon *)
-    subbuf = GetTensorIndexSubbuf[len, varlistindex];
-    fdorder = GetDerivsOrder[];
-    fdaccuracy = GetDerivsAccuracy[];
-
-    (* set buf *)
-    buf =
+PrintComponentInitialization[variable_, component_, base_] :=
+  Module[{mode = GetInitializationsMode[], name = component["Name"], order},
+    pr[
       Which[
-        GetInitializationsMode[] === "MainIn" || GetInitializationsMode[] === "MainOut",
-          "auto &" <> ToString[compToValue]
-          <> " = " <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
+        mode === "MainIn" || mode === "MainOut",
+          "auto &" <> name <> " = " <> variable["Name"] <> IndexSuffix[variable, component, base] <> ";"
         ,
-        GetInitializationsMode[] === "Derivs",
-          offset = fdorder - 1;
-          If[GetStorageType[] === "Tile",
-            "const auto " <> StringTrim[ToString[compToValue], GetTilePointIndex[]]
-            <> " = tl_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ".ptr;"
-            ,
-            tensorname = StringDrop[ToString[compToValue], {-len, -len + offset}];
-            pos1stbackwards =
-              Which[
-                StringStartsQ[tensorname, "d"],
-                  fdorder,
-                StringContainsQ[tensorname, "d"],
-                  StringPosition[tensorname, "d"][[-1]][[1]],
-                True,
-                  Stop[PrintComponentInitialization::EDerivativeName, tensorname]
-              ];
-            "const auto " <> ToString[compToValue]
-            <> " = calcderivs" <> ToString[fdorder] <> "_"
-            <> StringRiffle[
-                Table[ToString[compname[[i]][[1]]], {i, 1, fdorder}], ""]
-            <> "("
-            <> StringDrop[tensorname, {pos1stbackwards - offset, pos1stbackwards}]
-            <> ", p.i, p.j, p.k);"
-          ]
+        mode === "Derivs" && GetStorageType[] === "Tile",
+          "const auto " <> name <> " = tl_" <> variable["Name"] <> IndexSuffix[variable, component, base] <> ".ptr;"
         ,
-        GetInitializationsMode[] === "Temp",
-          "const auto &" <> ToString[compToValue]
-          <> " = " <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
+        mode === "Derivs",
+          RequireRelation[variable, "DerivativeOf", mode];
+          order = Length[variable["Slots"]] - Length[base["Slots"]];
+          "const auto " <> name
+          <> " = calcderivs" <> ToString[order] <> "_"
+          <> StringJoin[ToString /@ Take[component["Indices"], order]]
+          <> "(" <> BaseComponent[component, base]["Name"] <> ", p.i, p.j, p.k);"
+        ,
+        mode === "Temp",
+          "const auto &" <> name <> " = " <> variable["Name"] <> IndexSuffix[variable, component, base] <> ";"
         ,
         True,
           Stop[PrintComponentInitialization::EMode]
-      ];
-    pr[buf];
+      ]
+    ];
   ];
 
 PrintComponentInitialization::EMode = "PrintComponentInitialization mode unrecognized!";
-
-PrintComponentInitialization::EDerivativeName = "PrintComponentInitialization: derivative tensor name '`1`' does not contain 'd'!";
 
 Protect[PrintComponentInitialization];
 
@@ -147,10 +71,10 @@ PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
         Global`pr[CText[rhs]];
         Global`pr[";\n"]
       ],
-      (* Temp formatter - AMReX specific: const prefix, trimmed name *)
+      (* Temp formatter - AMReX specific: const prefix, the bare name of the component *)
       Function[{comp, rhs},
         Global`pr["const " <> GetTempVariableType[] <> " "];
-        Global`pr[StringTrim[ToString[comp], GetGridPointIndex[]]];
+        Global`pr[ComponentRecord[compname]["Name"]];
         Global`pr["="];
         Global`pr[CText[rhs]];
         Global`pr[";\n"]

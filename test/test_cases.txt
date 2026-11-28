@@ -16,6 +16,10 @@ CarpetXGPU:testModes:.hxx
 CarpetXGPU:failBadVarSpec:.hxx:fails
 # A failure while a right-hand side is evaluated, after part of the output is built
 CarpetXGPU:failInEquation:.hxx:fails
+# "Derivs" on a variable that declares no DerivativeOf
+CarpetXGPU:failNoRelation:.hxx:fails
+# A tile load with TensorType "Vect" on a variable that declares no DerivativeOf
+CarpetXGPU:failTensorTypeNoRelation:.hxx:fails
 AMReX:test:.hxx
 #Nmesh:test:.c
 #Nmesh:GHG_rhs:.c

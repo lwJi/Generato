@@ -6,268 +6,47 @@
 
 
 (******************************************************************************)
-(*                    Finite difference stencil function                      *)
-(******************************************************************************)
-
-(* GetGFIndexName and GetGFIndexNameMix2nd are now in BackendCommon.wl *)
-
-(* Function to print 3D indexes *)
-
-PrintIndexes3D[accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strDir_?StringQ] :=
-  Module[{stencils, solution},
-    (* Get stencils and finite difference coefficients *)
-    stencils = GetCenteringStencils[accuracyOrd];
-    solution = GetFiniteDifferenceCoefficients[stencils, fdOrd];
-    (* Construct the finite difference index expression *)
-    pr["  constexpr int D = " <> strDir <> " - 1;"];
-    Do[
-      index = stencils[[i]];
-      If[(Subscript[c, index] /. solution) == 0, Continue[]];
-      buf = "  const int " <> ToString[GetGFIndexName[index]] <>
-        If[index == 0,
-          " = layout.linear(i, j, k);"
-          ,
-          " = layout.linear("
-            <> "i + (D == 0 ? " <> ToString[index] <> " : 0), "
-            <> "j + (D == 1 ? " <> ToString[index] <> " : 0), "
-            <> "k + (D == 2 ? " <> ToString[index] <> " : 0));"
-        ];
-      pr[buf]
-      ,
-      {i, 1, Length[stencils]}
-    ];
-  ];
-
-PrintIndexes3DMix2nd[accuracyOrd_?IntegerQ,
-                     strDir1_?StringQ, strDir2_?StringQ] :=
-  Module[{stencils, solution},
-    (* Get stencils and finite difference coefficients *)
-    stencils = GetCenteringStencils[accuracyOrd];
-    solution = GetFiniteDifferenceCoefficients[stencils, 1];
-    (* Construct the finite difference index expression *)
-    pr["  constexpr int D1 = " <> strDir1 <> " - 1;"];
-    pr["  constexpr int D2 = " <> strDir2 <> " - 1;"];
-    Do[
-      index1 = stencils[[i]];
-      index2 = stencils[[j]];
-      If[(Subscript[c, index1] /. solution) == 0 ||
-         (Subscript[c, index2] /. solution) == 0,
-        Continue[]
-      ];
-      buf = "  const int " <> ToString[GetGFIndexNameMix2nd[index1, index2]] <>
-        If[index1 != 0 && index2 != 0,
-          If[index1 == index2,
-            " = layout.linear("
-              <> "i + (D1 != 0 && D2 != 0 ? 0 : " <> ToString[index1] <> "), "
-              <> "j + (D1 != 1 && D2 != 1 ? 0 : " <> ToString[index1] <> "), "
-              <> "k + (D1 != 2 && D2 != 2 ? 0 : " <> ToString[index1] <> "));"
-            ,
-            " = layout.linear("
-              <> "i + (D1 != 0 && D2 != 0 ? 0 : (D1 == 0 ? "
-              <> ToString[index1] <> " : " <> ToString[index2] <> ")), "
-              <> "j + (D1 != 1 && D2 != 1 ? 0 : (D1 == 1 ? "
-              <> ToString[index1] <> " : " <> ToString[index2] <> ")), "
-              <> "k + (D1 != 2 && D2 != 2 ? 0 : (D1 == 2 ? "
-              <> ToString[index1] <> " : " <> ToString[index2] <> ")));"
-          ]
-          ,
-          If[index1 == 0 && index2 == 0,
-            " = layout.linear(i, j, k);"
-            ,
-            If[index1 == 0,
-              " = layout.linear("
-                <> "i + (D2 == 0 ? " <> ToString[index2] <> " : 0), "
-                <> "j + (D2 == 1 ? " <> ToString[index2] <> " : 0), "
-                <> "k + (D2 == 2 ? " <> ToString[index2] <> " : 0));"
-              ,
-              " = layout.linear("
-                <> "i + (D1 == 0 ? " <> ToString[index1] <> " : 0), "
-                <> "j + (D1 == 1 ? " <> ToString[index1] <> " : 0), "
-                <> "k + (D1 == 2 ? " <> ToString[index1] <> " : 0));"
-            ]
-          ]
-        ];
-      pr[buf]
-      ,
-      {i, 1, Length[stencils]}, {j, 1, Length[stencils]}
-    ];
-  ];
-
-(* Function to print FD expression *)
-
-Options[PrintFDExpression] := {ForDissipation -> False};
-
-PrintFDExpression[OptionsPattern[],
-                  accuracyOrd_?IntegerQ, fdOrd_?IntegerQ, strIdx_?StringQ] :=
-  Module[{stencils, solution, buf, rule, fordiss},
-    {fordiss} = OptionValue[{ForDissipation}];
-    (* Rules for string replacements *)
-    rule = {
-      "invdx" -> strIdx <> "[D]"
-    };
-    (* Get stencils and finite difference coefficients *)
-    stencils = GetCenteringStencils[accuracyOrd];
-    solution = GetFiniteDifferenceCoefficients[stencils, fdOrd];
-    (* Construct the finite difference expression *)
-    buf = "    " <> ToString[CForm[
-      (Sum[
-        index = stencils[[i]];
-        (Subscript[c, index] /. solution) gf[[GetGFIndexName[index]]],
-        {i, 1, Length[stencils]}] // Simplify) *
-      If[fordiss, invdx, Product[invdx, {i, 1, fdOrd}]]
-    ]] <> ";";
-    pr[StringReplace[buf, rule]];
-  ];
-
-PrintFDExpressionMix2nd[accuracyOrd_?IntegerQ, strIdx_?StringQ] :=
-  Module[{stencils, solution, buf, rule},
-    (* Rules for string replacements *)
-    rule = {
-      "invdx1" -> strIdx <> "[D1]",
-      "invdx2" -> strIdx <> "[D2]"
-    };
-    (* Get stencils and finite difference coefficients *)
-    stencils = GetCenteringStencils[accuracyOrd];
-    solution = GetFiniteDifferenceCoefficients[stencils, 1];
-    (* Construct the finite difference expression *)
-    buf = "    " <> ToString[CForm[
-      (Sum[
-        index1 = stencils[[i]];
-        index2 = stencils[[j]];
-        (Subscript[c, index1] /. solution) (Subscript[c, index2] /. solution) *
-        gf[[GetGFIndexNameMix2nd[index1, index2]]],
-      {i, 1, Length[stencils]}, {j, 1, Length[stencils]}] // Simplify) *
-      invdx1 invdx2
-    ]] <> ";";
-    pr[StringReplace[buf, rule]];
-  ];
-
-
-(* GetInterfaceName is now in BackendCommon.wl *)
-
-
-(******************************************************************************)
 (*            Print initialization of each component of a tensor              *)
 (******************************************************************************)
+(**
+ * \param variable, component: the records of the variable and of the component.
+ * \param base: the record of the variable a declared relation names, or None.
+ *
+ * A grid function is read from gf_<variable> and a tile from tl_<variable>,
+ * at the index the layout rule gives. A derivative that is not stored on a
+ * tile is computed from the variable it differentiates, so it must declare
+ * DerivativeOf: its order is the number of slots it has more, and the
+ * derivative directions are its leading indices.
+ *)
 
-PrintComponentInitialization[varinfo_, compname_] :=
-  Module[{varlistindex, compToValue, varname, symmetry, buf, subbuf, len,
-          fdorder, fdaccuracy},
-    (* Extract common component info using shared function *)
-    {varlistindex, compToValue, varname, symmetry, len} =
-      ExtractComponentInfo[varinfo, compname];
-
-    (* set subbuf - CarpetXGPU uses [Mod][Quotient] ordering *)
-    Which[
-      GetTensorType[] === "Scal",
-        subbuf = If[len == 0, "", "[" <> ToString[varlistindex] <> "]"]
-      ,
-      GetTensorType[] === "Vect",
-        Which[
-          len == 1,
-            subbuf = "[" <> ToString[varlistindex] <> "]"
-          ,
-          len == 2,
-            subbuf = "[" <> ToString[Mod[varlistindex, 3]] <> "]["
-                         <> ToString[Quotient[varlistindex, 3]] <> "]"
-          ,
-          len == 3,
-            subbuf = "[" <> ToString[Mod[varlistindex, 6]] <> "]["
-                         <> ToString[Quotient[varlistindex, 6]] <> "]"
-          ,
-          True,
-            Stop[PrintComponentInitialization::EVarLength]
-        ]
-      ,
-      GetTensorType[] === "Smat",
-        Which[
-          len == 2,
-            subbuf = "[" <> ToString[varlistindex] <> "]"
-          ,
-          len == 3,
-            subbuf = "[" <> ToString[Mod[varlistindex, 3]] <> "]["
-                         <> ToString[Quotient[varlistindex, 3]] <> "]"
-          ,
-          len == 4,
-            subbuf = "[" <> ToString[Mod[varlistindex, 6]] <> "]["
-                         <> ToString[Quotient[varlistindex, 6]] <> "]"
-          ,
-          True,
-            Stop[PrintComponentInitialization::EVarLength]
-        ]
-      ,
-      True,
-        Stop[PrintComponentInitialization::EMode]
-    ];
-    fdorder = GetDerivsOrder[];
-    fdaccuracy = GetDerivsAccuracy[];
-
-    (* set buf *)
-    buf =
+PrintComponentInitialization[variable_, component_, base_] :=
+  Module[{mode = GetInitializationsMode[], name = component["Name"], order},
+    pr[
       Which[
-        GetInitializationsMode[] === "MainIn" || GetInitializationsMode[] === "MainOut",
-          If[GetStorageType[] === "Tile",
-            "const auto " <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
-            <> " = tl_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ".ptr;"
-            ,
-            "const auto "
-            <> StringTrim[ToString[compToValue], GetGridPointIndex[]]
-            <> " = gf_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ";"
-          ]
+        (mode === "MainIn" || mode === "MainOut" || mode === "Derivs") && GetStorageType[] === "Tile",
+          "const auto " <> name <> " = tl_" <> variable["Name"] <> IndexSuffix[variable, component, base] <> ".ptr;"
         ,
-        GetInitializationsMode[] === "Derivs",
-          offset = fdorder - 1;
-          If[GetStorageType[] === "Tile",
-            "const auto " <> StringTrim[ToString[compToValue], GetTilePointIndex[]]
-            <> " = tl_" <> StringTrim[ToString[varname[[0]]]] <> subbuf <> ".ptr;"
-            ,
-            tensorname = StringDrop[ToString[compToValue], {-len, -len + offset}];
-            pos1stbackwards =
-              Which[
-                StringStartsQ[tensorname, "d"],
-                  fdorder,
-                StringContainsQ[tensorname, "d"],
-                  StringPosition[tensorname, "d"][[-1]][[1]],
-                True,
-                  Stop[PrintComponentInitialization::EDerivativeName, tensorname]
-              ];
-            "const auto " <> ToString[compToValue]
-            <> " = calcderivs" <> ToString[fdorder] <> "_"
-            <> StringRiffle[
-                Table[ToString[compname[[i]][[1]]], {i, 1, fdorder}], ""]
-            <> "("
-            <> StringDrop[tensorname, {pos1stbackwards - offset, pos1stbackwards}]
-            <> ", p.i, p.j, p.k);"
-          ]
+        mode === "MainIn" || mode === "MainOut",
+          "const auto " <> name <> " = gf_" <> variable["Name"] <> IndexSuffix[variable, component, base] <> ";"
         ,
-        (*
-        GetInitializationsMode[] === "Derivs",
-          offset = fdorder - 1;
-          "const auto " <> ToString[compToValue]
-          <> " = fd_" <> ToString[fdorder] <> "_o" <> ToString[fdaccuracy]
-          <> "<"
-          <> StringRiffle[
-              Table[ToString[compname[[i]][[1]]], {i, 1, fdorder}], ", "]
-          <> ">(layout2, "
-          <> StringDrop[
-              StringDrop[ToString[compToValue], fdorder], {-len, -len + offset}]
-          <> ", p.i, p.j, p.k, invDxyz);"
+        mode === "Derivs",
+          RequireRelation[variable, "DerivativeOf", mode];
+          order = Length[variable["Slots"]] - Length[base["Slots"]];
+          "const auto " <> name
+          <> " = calcderivs" <> ToString[order] <> "_"
+          <> StringJoin[ToString /@ Take[component["Indices"], order]]
+          <> "(" <> BaseComponent[component, base]["Name"] <> ", p.i, p.j, p.k);"
         ,
-        *)
-        GetInitializationsMode[] === "Temp",
-          "auto " <> ToString[compToValue] <> ";"
+        mode === "Temp",
+          "auto " <> name <> ";"
         ,
         True,
           Stop[PrintComponentInitialization::EMode]
-      ];
-    pr[buf];
+      ]
+    ];
   ];
 
 PrintComponentInitialization::EMode = "PrintComponentInitialization mode unrecognized!";
-
-PrintComponentInitialization::EVarLength = "PrintComponentInitialization variable's tensor type unsupported!";
-
-PrintComponentInitialization::EDerivativeName = "PrintComponentInitialization: derivative tensor name '`1`' does not contain 'd'!";
 
 Protect[PrintComponentInitialization];
 
@@ -292,10 +71,10 @@ PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
         Global`pr[CText[rhs]];
         Global`pr[";\n"]
       ],
-      (* Temp formatter - CarpetXGPU specific: const prefix, trimmed name *)
+      (* Temp formatter - CarpetXGPU specific: const prefix, the bare name of the component *)
       Function[{comp, rhs},
         Global`pr["const " <> GetTempVariableType[] <> " "];
-        Global`pr[StringTrim[ToString[comp], GetGridPointIndex[]]];
+        Global`pr[ComponentRecord[compname]["Name"]];
         Global`pr["="];
         Global`pr[CText[rhs]];
         Global`pr[";\n"]
