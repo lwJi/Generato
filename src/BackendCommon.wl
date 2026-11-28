@@ -7,6 +7,7 @@ BeginPackage["Generato`BackendCommon`"];
 Needs["Generato`Basic`"];
 Needs["Generato`ParseMode`"];
 Needs["Generato`Component`"];
+Needs["Generato`Emit`"];
 
 If[Environment["QUIET"] =!= "1",
   System`Print["------------------------------------------------------------"];
@@ -108,34 +109,32 @@ PrintEquationByMode[compToValue_, rhssToValue_, mainFormatter_] :=
   PrintEquationByMode[compToValue, rhssToValue, mainFormatter, Automatic];
 
 PrintEquationByMode[compToValue_, rhssToValue_, mainFormatter_, tempFormatter_] :=
-  Module[{outputfile = GetOutputFile[]},
-    Which[
-      GetEquationsMode[] === "Temp",
-        If[tempFormatter === Automatic,
-          (* Default Temp handling: no const prefix, CForm[compToValue] *)
-          Global`pr[GetTempVariableType[] <> " "];
-          PutAppend[CForm[compToValue], outputfile];
-          Global`pr["="];
-          PutAppend[CForm[rhssToValue], outputfile];
-          Global`pr[";\n"]
-          ,
-          (* Custom Temp handling via callback *)
-          tempFormatter[compToValue, rhssToValue]
-        ]
-      ,
-      GetEquationsMode[] === "MainOut",
-        mainFormatter[compToValue, rhssToValue]
-      ,
-      GetEquationsMode[] === "AddToMainOut",
-        (* Shared AddToMainOut - identical across all backends *)
-        PutAppend[CForm[compToValue], outputfile];
-        Global`pr["+="];
-        PutAppend[CForm[rhssToValue], outputfile];
+  Which[
+    GetEquationsMode[] === "Temp",
+      If[tempFormatter === Automatic,
+        (* Default Temp handling: no const prefix, CForm[compToValue] *)
+        Global`pr[GetTempVariableType[] <> " "];
+        Global`pr[CText[compToValue]];
+        Global`pr["="];
+        Global`pr[CText[rhssToValue]];
         Global`pr[";\n"]
-      ,
-      True,
-        Throw @ Message[PrintEquationByMode::EMode]
-    ]
+        ,
+        (* Custom Temp handling via callback *)
+        tempFormatter[compToValue, rhssToValue]
+      ]
+    ,
+    GetEquationsMode[] === "MainOut",
+      mainFormatter[compToValue, rhssToValue]
+    ,
+    GetEquationsMode[] === "AddToMainOut",
+      (* Shared AddToMainOut - identical across all backends *)
+      Global`pr[CText[compToValue]];
+      Global`pr["+="];
+      Global`pr[CText[rhssToValue]];
+      Global`pr[";\n"]
+    ,
+    True,
+      Throw @ Message[PrintEquationByMode::EMode]
   ];
 
 PrintEquationByMode::EMode = "PrintEquationByMode: EquationsMode unrecognized!";

@@ -18,6 +18,8 @@
 
 <<Component.wl
 
+<<Emit.wl
+
 <<BackendCommon.wl
 
 <<Varlist.wl
@@ -25,8 +27,6 @@
 <<Interface.wl
 
 <<Derivation.wl
-
-<<Writefile.wl
 
 <<stencils/FiniteDifferenceStencils.wl
 

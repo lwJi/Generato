@@ -134,15 +134,15 @@ Protect[PrintComponentInitialization];
  *)
 
 PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
-  Module[{outputfile = GetOutputFile[], compToValue, rhssToValue},
+  Module[{compToValue, rhssToValue},
     compToValue = (compname // ToValues) /. extrareplacerules;
     rhssToValue = ComputeRHSValue[coordinate, compname, extrareplacerules];
     PrintEquationByMode[compToValue, rhssToValue,
       (* MainOut formatter - standard assignment *)
       Function[{comp, rhs},
-        PutAppend[CForm[comp], outputfile];
+        Global`pr[CText[comp]];
         Global`pr["="];
-        PutAppend[CForm[rhs], outputfile];
+        Global`pr[CText[rhs]];
         Global`pr[";\n"]
       ],
       (* Temp formatter - AMReX specific: const prefix, trimmed name *)
@@ -150,7 +150,7 @@ PrintComponentEquation[coordinate_, compname_, extrareplacerules_] :=
         Global`pr["const " <> GetTempVariableType[] <> " "];
         Global`pr[StringTrim[ToString[comp], GetGridPointIndex[]]];
         Global`pr["="];
-        PutAppend[CForm[rhs], outputfile];
+        Global`pr[CText[rhs]];
         Global`pr[";\n"]
       ]
     ]

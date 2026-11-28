@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Generato Script (c) 2023 Liwei Ji
-# A script to process *.wl files, generate corresponding output files, and clean up trailing spaces.
+# A script to process *.wl files and generate corresponding output files.
 
 [[ "$QUIET" != "1" ]] && echo "Generato (c) 2023 Liwei Ji"
 
@@ -12,7 +12,7 @@ show_help() {
   echo
   echo "DESCRIPTION:"
   echo "  Processes the specified Wolfram Language (*.wl) files using wolframscript."
-  echo "  Removes trailing spaces from generated output files (.hxx, .cxx, .c, .h)."
+  echo "  Each script writes its own output file (.hxx, .cxx, .c, .h)."
   echo
   echo "EXAMPLES:"
   echo "  Generato C3GH_set_profile_ADM.wl"
@@ -34,7 +34,7 @@ fi
 # Supported output file extensions
 OUTPUT_EXTENSIONS=(".hxx" ".cxx" ".c" ".h")
 
-# Process each file passed as an argument
+# Process each file given as an argument
 for input_file in "$@"; do
   # Ensure the file exists
   if [[ ! -f "$input_file" ]]; then
@@ -48,19 +48,15 @@ for input_file in "$@"; do
   # Run wolframscript on the input file
   [[ "$QUIET" != "1" ]] && echo "Processing '$input_file'..."
   if ! wolframscript -f "$input_file"; then
-    echo "Error: Failed to process '$input_file'. Skipping output cleanup."
+    echo "Error: Failed to process '$input_file'."
     continue
   fi
 
-  # Check for any supported output file extensions and clean them
+  # Check for an output file with any supported extension
   found_output=false
   for ext in "${OUTPUT_EXTENSIONS[@]}"; do
-    output_file="${base_name}${ext}"
-    if [[ -f "$output_file" ]]; then
+    if [[ -f "${base_name}${ext}" ]]; then
       found_output=true
-      # Remove trailing spaces from the output file
-      [[ "$QUIET" != "1" ]] && echo "Removing trailing spaces in '$output_file'..."
-      sed -i.bak -E 's/[[:space:]]+$//' "$output_file" && rm "${output_file}.bak"
     fi
   done
 
